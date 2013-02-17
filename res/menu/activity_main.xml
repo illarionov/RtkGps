@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+	<item
+        android:id="@+id/menu_start_service"
+        android:showAsAction="never"
+        android:title="@string/menu_start_service"/>
+
+	<item
+        android:id="@+id/menu_stop_service"
+        android:showAsAction="never"
+        android:title="@string/menu_stop_service"/>
+
+    <item
+        android:id="@+id/menu_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/menu_settings"/>   
+	
+</menu>
