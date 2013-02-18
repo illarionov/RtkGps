@@ -1,7 +1,12 @@
 package ru0xdc.rtkgps;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +16,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +29,11 @@ import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements
 ActionBar.OnNavigationListener {
+
+	@SuppressWarnings("unused")
+	private static final boolean DBG = BuildConfig.DEBUG & true;
+
+	static final String TAG = MainActivity.class.getSimpleName();
 
 	/**
 	 * The serialization (saved instance state) Bundle key representing the
@@ -100,12 +112,14 @@ ActionBar.OnNavigationListener {
 	@Override
 	protected void onStop() {
 		super.onStop();
+
 		// Unbind from the service
 		if (mRtkServiceBound) {
 			unbindService(mConnection);
 			mRtkServiceBound = false;
 			mRtkService = null;
 		}
+
 	}
 
 	private void startRtkService() {
@@ -123,6 +137,10 @@ ActionBar.OnNavigationListener {
 			mRtkServiceBound = false;
 			mRtkService = null;
 		}
+	}
+
+	public RtkNaviService getRtkService() {
+		return mRtkService;
 	}
 
 	@Override
@@ -176,14 +194,25 @@ ActionBar.OnNavigationListener {
 
 	@Override
 	public boolean onNavigationItemSelected(int position, long id) {
+		Fragment fragment;
+
 		// When the given dropdown item is selected, show its contents in the
 		// container view.
-		Fragment fragment = new DummySectionFragment();
-		Bundle args = new Bundle();
-		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-		fragment.setArguments(args);
+		switch (position) {
+		case 0:
+			fragment = new StreamStatusFragment();
+			break;
+		default:
+			fragment = new DummySectionFragment();
+			Bundle args = new Bundle();
+			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+			fragment.setArguments(args);
+			break;
+		}
+
 		getSupportFragmentManager().beginTransaction()
 			.replace(R.id.container, fragment).commit();
+
 		return true;
 	}
 
@@ -211,6 +240,85 @@ ActionBar.OnNavigationListener {
 			textView.setText(Integer.toString(getArguments().getInt(
 					ARG_SECTION_NUMBER)));
 			return textView;
+		}
+	}
+
+	public static class StreamStatusFragment extends Fragment {
+
+		private TextView mTextView;
+
+		private Timer mStreamStatusUpdateTimer;
+		private RtkServerStreamStatus mStreamStatus;
+		private String mLastStreamStatusStr;
+
+		public StreamStatusFragment() {
+			mStreamStatus = new RtkServerStreamStatus();
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			// Create a new TextView and set its text to the fragment's section
+			// number argument value.
+			mTextView = new TextView(getActivity());
+			mTextView.setGravity(Gravity.CENTER);
+			return mTextView;
+		}
+
+		@Override
+		public void onStart() {
+
+			super.onStart();
+
+			mStreamStatusUpdateTimer = new Timer();
+			mStreamStatusUpdateTimer.scheduleAtFixedRate(
+					new TimerTask() {
+						Runnable updateStatusRunnable = new Runnable() {
+							@Override
+							public void run() {
+								StreamStatusFragment.this.updateStreamStatus();
+							}
+						};
+						@Override
+						public void run() {
+							Activity a = getActivity();
+							if (a == null) return;
+							a.runOnUiThread(updateStatusRunnable);
+						}
+					}, 200, 500);
+		}
+
+
+		@Override
+		public void onStop() {
+			mStreamStatusUpdateTimer.cancel();
+
+			super.onStop();
+		}
+
+		void updateStreamStatus() {
+			MainActivity ma;
+			RtkNaviService rtks;
+			String s;
+
+			ma = (MainActivity)getActivity();
+
+			if (ma == null) return;
+
+			rtks = ma.getRtkService();
+			if (rtks == null) return;
+
+
+			rtks.getStreamStatus(mStreamStatus);
+
+			s = mStreamStatus.toString();
+
+			if ( ! TextUtils.equals(mLastStreamStatusStr, s) ) {
+				mLastStreamStatusStr = s;
+				Log.v(TAG, s);
+				mTextView.setText(s);
+			}
+
 		}
 	}
 

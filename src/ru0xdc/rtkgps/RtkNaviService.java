@@ -1,7 +1,8 @@
 package ru0xdc.rtkgps;
 
+import ru0xdc.rtklib.RtkServer;
+import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -12,7 +13,8 @@ import android.widget.Toast;
 
 public class RtkNaviService extends Service {
 
-	private static final boolean DBG = BuildConfig.DEBUG & false;
+	@SuppressWarnings("unused")
+	private static final boolean DBG = BuildConfig.DEBUG & true;
 
 	static final String TAG = RtkNaviService.class.getSimpleName();
 
@@ -21,12 +23,16 @@ public class RtkNaviService extends Service {
 	// Binder given to clients
 	private final IBinder mBinder = new RtkNaviServiceBinder();
 
-	private NotificationManager mNM;
+	private final RtkServer mRtkServer = new RtkServer();
 
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
 		return mBinder;
+	}
+
+	public RtkServerStreamStatus getStreamStatus(RtkServerStreamStatus status) {
+		return mRtkServer.getStreamStatus(status);
 	}
 
 	/**
@@ -44,10 +50,7 @@ public class RtkNaviService extends Service {
 	public void onCreate() {
 		super.onCreate();
 
-		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
-		rtkSrvInit();
-		if (!rtkSrvStart()) {
+		if (!mRtkServer.start()) {
 			Log.e(TAG, "rtkSrvStart() error");
 			return;
 		}
@@ -59,7 +62,8 @@ public class RtkNaviService extends Service {
 	@Override
 	public void onDestroy() {
 		stopForeground(true);
-		rtkSrvStop();
+		mRtkServer.stop();
+
 		// Tell the user we stopped.
 		Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
 	}
@@ -81,9 +85,4 @@ public class RtkNaviService extends Service {
 
 		return notification;
 	}
-
-	private native void rtkSrvInit();
-	private native boolean rtkSrvStart();
-	private native void rtkSrvStop();
-
 }

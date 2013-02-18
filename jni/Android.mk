@@ -6,10 +6,10 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := rtkgps
 
-#LOCAL_CFLAGS += -fvisibility=hidden
+LOCAL_CFLAGS += -fvisibility=hidden
 
 LOCAL_SRC_FILES := \
-        rtknaviservice.c \
+        rtkserver.c
 
 LOCAL_STATIC_LIBRARIES := rtklib
 
