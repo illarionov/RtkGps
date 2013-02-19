@@ -11,6 +11,18 @@
 
 static jfieldID m_object_field;
 
+static struct {
+   jfieldID ns;
+   jfieldID time;
+   jfieldID sat;
+   jfieldID az;
+   jfieldID el;
+   jfieldID freq1_snr;
+   jfieldID freq2_snr;
+   jfieldID freq3_snr;
+   jfieldID vsat;
+} obs_status_fields;
+
 struct native_ctx_t {
    rtksvr_t rtksvr;                        // rtk server struct
    stream_t monistr;                       // monitor stream
@@ -180,13 +192,150 @@ static void RtkServer__get_stream_status(JNIEnv* env, jclass thiz, jobject statu
 
 }
 
+static void RtkServer__get_observation_status(JNIEnv* env, jclass thiz,
+      jint receiver, jobject status_obj)
+{
+   struct native_ctx_t *nctx;
+   jobject jgtime, jtmp;
+   jmethodID set_gtime_mid;
+   int ns;
+   int i;
+   jint *jsnr;
+   gtime_t time;
+   int sat[MAXSAT];
+   int vsat[MAXSAT];
+   double az[MAXSAT];
+   double el[MAXSAT];
+   int *snr0[MAXSAT];
+   int snr[MAXSAT][NFREQ];
+
+   nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
+   if (nctx == NULL) {
+      LOGV("nctx is null");
+      return;
+   }
+
+   for (i=0;i<MAXSAT;i++) {
+      snr0[i]=snr[i];
+   }
+
+   ns = rtksvrostat(&nctx->rtksvr, receiver,
+	 &time, sat, az, el, snr0, vsat);
+
+   if (ns > MAXSAT)
+      ns = MAXSAT;
+
+   // Set number of satellites
+   (*env)->SetIntField(env, status_obj, obs_status_fields.ns, ns);
+
+   // Set time
+   jgtime = (*env)->GetObjectField(env, status_obj, obs_status_fields.time);
+   if (jgtime == NULL) {
+      LOGV("time is null");
+   }
+   set_gtime_mid= (*env)->GetMethodID(env,
+	 (*env)->GetObjectClass(env, jgtime),
+	 "setGTime",
+	 "(JD)V");
+   if (set_gtime_mid == NULL) {
+      LOGV("setGTime() not found");
+      return;
+   }
+   (*env)->CallVoidMethod(env, jgtime, set_gtime_mid,
+	 (jlong)time.time,
+	 (jdouble)time.sec);
+
+   if (ns == 0)
+      return;
+
+   // Satellite data
+   jtmp = (*env)->GetObjectField(env, status_obj, obs_status_fields.sat);
+   (*env)->SetIntArrayRegion(env, jtmp, 0, ns, sat);
+
+   jtmp = (*env)->GetObjectField(env, status_obj, obs_status_fields.az);
+   (*env)->SetDoubleArrayRegion(env, jtmp, 0, ns, az);
+
+   jtmp = (*env)->GetObjectField(env, status_obj, obs_status_fields.el);
+   (*env)->SetDoubleArrayRegion(env, jtmp, 0, ns, el);
+
+   // freq1 snr
+   jtmp = (*env)->GetObjectField(env, status_obj, obs_status_fields.freq1_snr);
+   jsnr = (*env)->GetIntArrayElements(env, jtmp, NULL);
+   if (jsnr != NULL) {
+      for (i=0; i<ns; ++i) jsnr[i] = snr[i][0];
+      (*env)->ReleaseIntArrayElements(env, jtmp, jsnr, 0);
+   }
+
+   jtmp = (*env)->GetObjectField(env, status_obj, obs_status_fields.freq2_snr);
+   jsnr = (*env)->GetIntArrayElements(env, jtmp, NULL);
+   if (jsnr != NULL) {
+      for (i=0; i<ns; ++i) jsnr[i] = snr[i][1];
+      (*env)->ReleaseIntArrayElements(env, jtmp, jsnr, 0);
+   }
+
+   jtmp = (*env)->GetObjectField(env, status_obj, obs_status_fields.freq3_snr);
+   jsnr = (*env)->GetIntArrayElements(env, jtmp, NULL);
+   if (jsnr != NULL) {
+      for (i=0; i<ns; ++i) jsnr[i] = snr[i][2];
+      (*env)->ReleaseIntArrayElements(env, jtmp, jsnr, 0);
+   }
+
+   // vsat
+   jtmp = (*env)->GetObjectField(env, status_obj, obs_status_fields.vsat);
+   (*env)->SetIntArrayRegion(env, jtmp, 0, ns, vsat);
+
+}
+
 static JNINativeMethod nativeMethods[] = {
    {"_create", "()V", (void*)RtkServer__create},
    {"_destroy", "()V", (void*)RtkServer__destroy},
    {"start", "()Z", (void*)RtkServer_start},
    {"stop", "()V", (void*)RtkServer_stop},
-   {"_getStreamStatus", "(Lru0xdc/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status}
+   {"_getStreamStatus", "(Lru0xdc/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status},
+   {"_getObservationStatus", "(ILru0xdc/rtklib/RtkServerObservationStatus;)V", (void*)RtkServer__get_observation_status}
 };
+
+static int init_observation_status_fields(JNIEnv* env) {
+    jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServerObservationStatus");
+
+    if (clazz == NULL)
+       return JNI_FALSE;
+
+    obs_status_fields.ns = (*env)->GetFieldID(env, clazz, "ns", "I");
+    obs_status_fields.time = (*env)->GetFieldID(env, clazz, "time", "Lru0xdc/rtklib/GTime;");
+    obs_status_fields.sat = (*env)->GetFieldID(env, clazz, "sat", "[I");
+    obs_status_fields.az = (*env)->GetFieldID(env, clazz, "az", "[D");
+    obs_status_fields.el = (*env)->GetFieldID(env, clazz, "el", "[D");
+    obs_status_fields.freq1_snr = (*env)->GetFieldID(env, clazz, "freq1Snr", "[I");
+    obs_status_fields.freq2_snr = (*env)->GetFieldID(env, clazz, "freq2Snr", "[I");
+    obs_status_fields.freq3_snr = (*env)->GetFieldID(env, clazz, "freq3Snr", "[I");
+    obs_status_fields.vsat = (*env)->GetFieldID(env, clazz, "vsat", "[I");
+
+    if ((obs_status_fields.ns == NULL)
+	  || (obs_status_fields.time == NULL)
+	  || (obs_status_fields.sat == NULL)
+	  || (obs_status_fields.az == NULL)
+	  || (obs_status_fields.el == NULL)
+	  || (obs_status_fields.freq1_snr == NULL)
+	  || (obs_status_fields.freq2_snr == NULL)
+	  || (obs_status_fields.freq3_snr == NULL)
+	  || (obs_status_fields.vsat == NULL)) {
+       LOGV("ru0xdc/rtklib/RtkServerObservationStatus fields not found:%s%s%s%s%s%s%s%s%s",
+	     (obs_status_fields.ns == NULL ? " ns" : ""),
+	     (obs_status_fields.time == NULL ? " time" : ""),
+	     (obs_status_fields.sat == NULL ? " sat" : ""),
+	     (obs_status_fields.az == NULL ? " az" : ""),
+	     (obs_status_fields.el == NULL ? " el" : ""),
+	     (obs_status_fields.freq1_snr == NULL ? " freq1_snr " : ""),
+	     (obs_status_fields.freq2_snr == NULL ? " freq2_snr " : ""),
+	     (obs_status_fields.freq3_snr == NULL ? " freq3_snr " : ""),
+	     (obs_status_fields.vsat == NULL ? " vsat" : "")
+	     );
+       return JNI_FALSE;
+    }
+
+    return JNI_TRUE;
+}
 
 static int registerNatives(JNIEnv* env) {
     int result = -1;
@@ -203,6 +352,9 @@ static int registerNatives(JNIEnv* env) {
 
     m_object_field = (*env)->GetFieldID(env, clazz, "mObject", "J");
     if (m_object_field == NULL)
+       return JNI_FALSE;
+
+    if ( ! init_observation_status_fields(env))
        return JNI_FALSE;
 
     return JNI_TRUE;

@@ -1,6 +1,7 @@
 package ru0xdc.rtkgps;
 
 import ru0xdc.rtklib.RtkServer;
+import ru0xdc.rtklib.RtkServerObservationStatus;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -33,6 +34,10 @@ public class RtkNaviService extends Service {
 
 	public RtkServerStreamStatus getStreamStatus(RtkServerStreamStatus status) {
 		return mRtkServer.getStreamStatus(status);
+	}
+
+	public RtkServerObservationStatus getRoverObservationStatus(RtkServerObservationStatus status) {
+		return mRtkServer.getRoverObservationStatus(status);
 	}
 
 	/**

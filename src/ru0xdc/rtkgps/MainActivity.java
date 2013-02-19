@@ -3,6 +3,7 @@ package ru0xdc.rtkgps;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru0xdc.rtklib.RtkServerObservationStatus;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -200,7 +201,7 @@ ActionBar.OnNavigationListener {
 		// container view.
 		switch (position) {
 		case 0:
-			fragment = new StreamStatusFragment();
+			fragment = new StatusFragment();
 			break;
 		default:
 			fragment = new DummySectionFragment();
@@ -243,16 +244,21 @@ ActionBar.OnNavigationListener {
 		}
 	}
 
-	public static class StreamStatusFragment extends Fragment {
+	public static class StatusFragment extends Fragment {
 
-		private TextView mTextView;
+		private TextView mStreamStatusTextView;
+		private TextView mObservationStatusTextView;
 
 		private Timer mStreamStatusUpdateTimer;
 		private RtkServerStreamStatus mStreamStatus;
-		private String mLastStreamStatusStr;
+		private RtkServerObservationStatus mRoverObservationStatus;
 
-		public StreamStatusFragment() {
+		private String mLastStreamStatusStr;
+		private String mLastObsStatusStr;
+
+		public StatusFragment() {
 			mStreamStatus = new RtkServerStreamStatus();
+			mRoverObservationStatus = new RtkServerObservationStatus();
 		}
 
 		@Override
@@ -260,9 +266,10 @@ ActionBar.OnNavigationListener {
 				Bundle savedInstanceState) {
 			// Create a new TextView and set its text to the fragment's section
 			// number argument value.
-			mTextView = new TextView(getActivity());
-			mTextView.setGravity(Gravity.CENTER);
-			return mTextView;
+			View v = inflater.inflate(R.layout.fragment_status, container, false);
+			mStreamStatusTextView = (TextView) v.findViewById(R.id.StreamStatus);
+			mObservationStatusTextView = (TextView) v.findViewById(R.id.ObservationStatus);
+			return v;
 		}
 
 		@Override
@@ -276,7 +283,7 @@ ActionBar.OnNavigationListener {
 						Runnable updateStatusRunnable = new Runnable() {
 							@Override
 							public void run() {
-								StreamStatusFragment.this.updateStreamStatus();
+								StatusFragment.this.updateStatus();
 							}
 						};
 						@Override
@@ -296,10 +303,10 @@ ActionBar.OnNavigationListener {
 			super.onStop();
 		}
 
-		void updateStreamStatus() {
+		void updateStatus() {
 			MainActivity ma;
 			RtkNaviService rtks;
-			String s;
+			String streamStr, obsStr;
 
 			ma = (MainActivity)getActivity();
 
@@ -308,17 +315,21 @@ ActionBar.OnNavigationListener {
 			rtks = ma.getRtkService();
 			if (rtks == null) return;
 
-
 			rtks.getStreamStatus(mStreamStatus);
+			rtks.getRoverObservationStatus(mRoverObservationStatus);
 
-			s = mStreamStatus.toString();
+			streamStr = mStreamStatus.toString();
+			obsStr = mRoverObservationStatus.toString();
 
-			if ( ! TextUtils.equals(mLastStreamStatusStr, s) ) {
-				mLastStreamStatusStr = s;
-				Log.v(TAG, s);
-				mTextView.setText(s);
+			if ( ! TextUtils.equals(mLastStreamStatusStr, streamStr) ) {
+				mLastStreamStatusStr = streamStr;
+				Log.v(TAG, streamStr);
+				mStreamStatusTextView.setText(streamStr);
 			}
-
+			if ( ! TextUtils.equals(mLastObsStatusStr, obsStr) ) {
+				mLastObsStatusStr = obsStr;
+				mObservationStatusTextView.setText(obsStr);
+			}
 		}
 	}
 
