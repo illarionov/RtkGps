@@ -20,6 +20,11 @@ public class GTime {
 		setGTime(time, sec);
 	}
 
+	public void copyTo(GTime dst) {
+		if (dst == null) throw new IllegalArgumentException();
+		dst.setGTime(time, sec);
+	}
+
 	void setGTime(long time, double sec) {
 		this.time = time;
 		this.sec = sec;

@@ -17,7 +17,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:textIsSelectable="true"
-        android:minLines="8" />
+        android:minLines="5"
+        android:textIsSelectable="true" />
+    
+    <ru0xdc.rtkgps.GpsSkyView
+        android:id="@+id/Sky"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp" />
 
 </LinearLayout>

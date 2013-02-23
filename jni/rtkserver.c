@@ -9,6 +9,8 @@
 #define LOGV(...) showmsg(__VA_ARGS__)
 
 
+extern int registerRtkCommonNatives(JNIEnv* env);
+
 static jfieldID m_object_field;
 
 static struct {
@@ -338,8 +340,6 @@ static int init_observation_status_fields(JNIEnv* env) {
 }
 
 static int registerNatives(JNIEnv* env) {
-    int result = -1;
-
     /* look up the class */
     jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServer");
 
@@ -365,12 +365,17 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
     JNIEnv* env = NULL;
     jint result = -1;
 
+    (void)reserved;
+
     LOGV("Entering JNI_OnLoad");
 
     if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
         goto bail;
 
     if (!registerNatives(env))
+        goto bail;
+
+    if (!registerRtkCommonNatives(env))
         goto bail;
 
     /* success -- return valid version number */

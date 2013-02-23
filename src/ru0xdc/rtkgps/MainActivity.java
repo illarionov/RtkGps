@@ -252,6 +252,7 @@ ActionBar.OnNavigationListener {
 		private Timer mStreamStatusUpdateTimer;
 		private RtkServerStreamStatus mStreamStatus;
 		private RtkServerObservationStatus mRoverObservationStatus;
+		private GpsSkyView mSkyView;
 
 		private String mLastStreamStatusStr;
 		private String mLastObsStatusStr;
@@ -269,6 +270,7 @@ ActionBar.OnNavigationListener {
 			View v = inflater.inflate(R.layout.fragment_status, container, false);
 			mStreamStatusTextView = (TextView) v.findViewById(R.id.StreamStatus);
 			mObservationStatusTextView = (TextView) v.findViewById(R.id.ObservationStatus);
+			mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
 			return v;
 		}
 
@@ -292,7 +294,7 @@ ActionBar.OnNavigationListener {
 							if (a == null) return;
 							a.runOnUiThread(updateStatusRunnable);
 						}
-					}, 200, 500);
+					}, 200, 250);
 		}
 
 
@@ -330,6 +332,8 @@ ActionBar.OnNavigationListener {
 				mLastObsStatusStr = obsStr;
 				mObservationStatusTextView.setText(obsStr);
 			}
+
+			mSkyView.setStats(mRoverObservationStatus);
 		}
 	}
 

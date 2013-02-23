@@ -13,5 +13,17 @@
     <string name="local_service_started">Local service started</string>
     <string name="local_service_stopped">Local service stopped</string>
     <string name="local_service_label">RtkGps</string>
+    
+    <string name="sky_plot_north">N</string>
+    <string name="sky_plot_west">W</string>
+    <string name="sky_plot_south">S</string>
+    <string name="sky_plot_east">E</string>
+    <string name="sky_plot_num_of_sat"># of Sat: %d</string>
+    
+    <string-array name="rtk_server_receiver">
+        <item>Rover</item>
+        <item>Base</item>
+        <item>Emphem</item>
+    </string-array>
 
 </resources>
