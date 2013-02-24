@@ -9,18 +9,36 @@ public class RtkServer {
 	public final static int RECEIVER_BASE = 1;
 	public final static int RECEIVER_EPHEM = 2;
 
+	/**
+	 * Status: {@link RtkServerStreamStatus.STATE_CLOSE},
+	 * {@link RtkServerStreamStatus.STATE_WAIT},
+	 * {@link RtkServerStreamStatus.STATE_ACTIVE}.
+	 */
+	private int mStatus;
+
 	public RtkServer() {
 		_create();
+		mStatus = RtkServerStreamStatus.STATE_CLOSE;
 	}
 
-	public native boolean start();
+	public boolean start() {
+		final boolean started = _start();
+		mStatus = started ? RtkServerStreamStatus.STATE_WAIT : RtkServerStreamStatus.STATE_ERROR;
+		return started;
+	}
 
-	public native void stop();
-
+	public void stop() {
+		_stop();
+		mStatus = RtkServerStreamStatus.STATE_CLOSE;
+	}
 
 	public RtkServerStreamStatus getStreamStatus(RtkServerStreamStatus status) {
 		if (status == null) status = new RtkServerStreamStatus();
 		_getStreamStatus(status);
+		// XXX
+		if ((mStatus == RtkServerStreamStatus.STATE_WAIT)
+				&& (status.inputStreamRoverStatus > RtkServerStreamStatus.STATE_WAIT))
+			mStatus = RtkServerStreamStatus.STATE_ACTIVE;
 		return status;
 	}
 
@@ -36,6 +54,10 @@ public class RtkServer {
 		return getObservationStatus(RtkServer.RECEIVER_EPHEM, status);
 	}
 
+	public int getStatus(){
+		return mStatus;
+	}
+
 	private RtkServerObservationStatus getObservationStatus(int receiver, RtkServerObservationStatus status) {
 		if (status == null) status = new RtkServerObservationStatus();
 		_getObservationStatus(receiver, status);
@@ -49,6 +71,10 @@ public class RtkServer {
 		_destroy();
 		super.finalize();
 	}
+
+	private native boolean _start();
+
+	private native void _stop();
 
 	private native void _create();
 

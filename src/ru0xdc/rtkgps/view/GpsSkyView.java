@@ -1,10 +1,13 @@
-package ru0xdc.rtkgps;
+package ru0xdc.rtkgps.view;
 
 import java.text.DecimalFormat;
 
+import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtkgps.R;
 import ru0xdc.rtklib.Dops;
 import ru0xdc.rtklib.RtkServerObservationStatus;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -45,10 +48,6 @@ public class GpsSkyView extends View {
 	private final Paint mLeftInfoTextPaint;
 	private final Paint mSatelliteFillPaint, mSatelliteStrokePaint, mSatellitePrnPaint;
 
-
-    public GpsSkyView(Context context) {
-        this(context, null);
-    }
 
     public GpsSkyView(Context context, AttributeSet attrs) {
 
@@ -202,9 +201,13 @@ public class GpsSkyView extends View {
     			getContext().getString(R.string.sky_plot_num_of_sat)
     			, mStatus.ns);
 
-    	final String plotName =
-    			getResources().getStringArray(R.array.rtk_server_receiver)[mStatus.receiver]
-    					+ " " + mBand;
+    	String plotName;
+    	try {
+    		plotName = getResources().getStringArray(ru0xdc.rtkgps.R.array.rtk_server_receiver)[mStatus.receiver]
+    				+ " " + mBand;
+    	}catch (Resources.NotFoundException	e) {
+    		plotName = "Rover L1";
+    	}
 
     	final String gdop = "GDOP: " + mDopsFormatter.format(mDops.gdop);
 

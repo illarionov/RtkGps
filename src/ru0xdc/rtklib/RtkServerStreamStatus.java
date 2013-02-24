@@ -4,7 +4,12 @@ import android.annotation.SuppressLint;
 
 public class RtkServerStreamStatus {
 
+	public final static int STATE_ERROR = -1;
 	public final static int STATE_CLOSE = 0;
+	public final static int STATE_WAIT = 1;
+	public final static int STATE_CONNECT = 2;
+	public final static int STATE_ACTIVE = 3;
+
 
 	/**
 	 * Status of streams
@@ -31,7 +36,36 @@ public class RtkServerStreamStatus {
 	public String mMsg;
 
 	public RtkServerStreamStatus() {
+		clear();
+	}
 
+	public void copyTo(RtkServerStreamStatus dst) {
+		if (dst == null) throw new IllegalArgumentException();
+		dst.setStatus(
+				this.inputStreamRoverStatus,
+				this.inputStreamBaseStationStatus,
+				this.inputStreamCorrectionStatus,
+				this.outputStreamSolution1Status,
+				this.outputStreamSolution2Status,
+				this.logStreamRoverStatus,
+				this.logStreamBaseStationStatus,
+				this.logStreamCorrectionStatus,
+				this.mMsg
+				);
+	}
+
+	public void clear() {
+		setStatus(
+				STATE_CLOSE,
+				STATE_CLOSE,
+				STATE_CLOSE,
+				STATE_CLOSE,
+				STATE_CLOSE,
+				STATE_CLOSE,
+				STATE_CLOSE,
+				STATE_CLOSE,
+				""
+				);
 	}
 
 	void setStatus(int inputStreamRoverStatus,

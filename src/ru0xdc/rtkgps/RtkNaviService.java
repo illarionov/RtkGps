@@ -40,6 +40,10 @@ public class RtkNaviService extends Service {
 		return mRtkServer.getRoverObservationStatus(status);
 	}
 
+	public int getServerStatus() {
+		return mRtkServer.getStatus();
+	}
+
 	/**
 	 * Class used for the client Binder.  Because we know this service always
 	 * runs in the same process as its clients, we don't need to deal with IPC.

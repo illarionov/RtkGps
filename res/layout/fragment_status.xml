@@ -3,14 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/StreamStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:minLines="2"
-        android:textIsSelectable="true" />
     
     <TextView
         android:id="@+id/ObservationStatus"
@@ -18,9 +10,26 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:minLines="5"
+        android:textIsSelectable="true"
+        android:textSize="8sp" />
+
+    <ru0xdc.rtkgps.view.StreamIndicatorsView
+        android:id="@+id/streamIndicatorsView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+         />
+
+    <TextView
+        android:id="@+id/StreamStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:textIsSelectable="true" />
     
-    <ru0xdc.rtkgps.GpsSkyView
+    <ru0xdc.rtkgps.view.GpsSkyView
         android:id="@+id/Sky"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,5 +37,6 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp" />
+    
 
 </LinearLayout>

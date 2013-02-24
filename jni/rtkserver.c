@@ -67,7 +67,7 @@ static void RtkServer__destroy(JNIEnv* env, jobject thiz)
    (*env)->SetLongField(env, thiz, m_object_field, 0L);
 }
 
-static jboolean RtkServer_start(JNIEnv* env, jclass thiz)
+static jboolean RtkServer__start(JNIEnv* env, jclass thiz)
 {
    struct native_ctx_t *nctx;
 
@@ -108,7 +108,7 @@ static jboolean RtkServer_start(JNIEnv* env, jclass thiz)
    solopt[1] = solopt_default;
    solopt[2] = solopt_default;
 
-   LOGV("RtkServer_start()");
+   LOGV("RtkServer__start()");
 
    nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
    if (nctx == NULL) {
@@ -140,12 +140,12 @@ static jboolean RtkServer_start(JNIEnv* env, jclass thiz)
    return JNI_TRUE;
 }
 
-static void RtkServer_stop(JNIEnv* env, jclass thiz)
+static void RtkServer__stop(JNIEnv* env, jclass thiz)
 {
    struct native_ctx_t *nctx;
    char *cmds[3]={0,};
 
-   LOGV("RtkServer_stop()");
+   LOGV("RtkServer__stop()");
 
    nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
    if (nctx == NULL) {
@@ -291,8 +291,8 @@ static void RtkServer__get_observation_status(JNIEnv* env, jclass thiz,
 static JNINativeMethod nativeMethods[] = {
    {"_create", "()V", (void*)RtkServer__create},
    {"_destroy", "()V", (void*)RtkServer__destroy},
-   {"start", "()Z", (void*)RtkServer_start},
-   {"stop", "()V", (void*)RtkServer_stop},
+   {"_start", "()Z", (void*)RtkServer__start},
+   {"_stop", "()V", (void*)RtkServer__stop},
    {"_getStreamStatus", "(Lru0xdc/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status},
    {"_getObservationStatus", "(ILru0xdc/rtklib/RtkServerObservationStatus;)V", (void*)RtkServer__get_observation_status}
 };

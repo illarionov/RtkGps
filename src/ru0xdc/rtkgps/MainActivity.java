@@ -1,8 +1,12 @@
 package ru0xdc.rtkgps;
 
+import static junit.framework.Assert.assertNotNull;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru0xdc.rtkgps.view.GpsSkyView;
+import ru0xdc.rtkgps.view.StreamIndicatorsView;
 import ru0xdc.rtklib.RtkServerObservationStatus;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.annotation.TargetApi;
@@ -18,7 +22,6 @@ import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -253,8 +256,8 @@ ActionBar.OnNavigationListener {
 		private RtkServerStreamStatus mStreamStatus;
 		private RtkServerObservationStatus mRoverObservationStatus;
 		private GpsSkyView mSkyView;
+		private StreamIndicatorsView mStreamIndicatorsView;
 
-		private String mLastStreamStatusStr;
 		private String mLastObsStatusStr;
 
 		public StatusFragment() {
@@ -271,6 +274,7 @@ ActionBar.OnNavigationListener {
 			mStreamStatusTextView = (TextView) v.findViewById(R.id.StreamStatus);
 			mObservationStatusTextView = (TextView) v.findViewById(R.id.ObservationStatus);
 			mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
+			mStreamIndicatorsView = (StreamIndicatorsView)v.findViewById(R.id.streamIndicatorsView);
 			return v;
 		}
 
@@ -308,32 +312,34 @@ ActionBar.OnNavigationListener {
 		void updateStatus() {
 			MainActivity ma;
 			RtkNaviService rtks;
-			String streamStr, obsStr;
+			String obsStr;
+			int serverStatus;
 
 			ma = (MainActivity)getActivity();
 
 			if (ma == null) return;
 
 			rtks = ma.getRtkService();
-			if (rtks == null) return;
-
-			rtks.getStreamStatus(mStreamStatus);
-			rtks.getRoverObservationStatus(mRoverObservationStatus);
-
-			streamStr = mStreamStatus.toString();
-			obsStr = mRoverObservationStatus.toString();
-
-			if ( ! TextUtils.equals(mLastStreamStatusStr, streamStr) ) {
-				mLastStreamStatusStr = streamStr;
-				Log.v(TAG, streamStr);
-				mStreamStatusTextView.setText(streamStr);
+			if (rtks == null) {
+				serverStatus = RtkServerStreamStatus.STATE_CLOSE;
+				// mRoverObservationStatus.clear();
+				mStreamStatus.clear();
+			}else {
+				rtks.getStreamStatus(mStreamStatus);
+				rtks.getRoverObservationStatus(mRoverObservationStatus);
+				serverStatus = rtks.getServerStatus();
 			}
+
+			obsStr = mRoverObservationStatus.toString();
 			if ( ! TextUtils.equals(mLastObsStatusStr, obsStr) ) {
 				mLastObsStatusStr = obsStr;
 				mObservationStatusTextView.setText(obsStr);
 			}
 
+			assertNotNull(mStreamStatus.mMsg);
 			mSkyView.setStats(mRoverObservationStatus);
+			mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
+			mStreamStatusTextView.setText(mStreamStatus.mMsg);
 		}
 	}
 
