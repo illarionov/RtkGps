@@ -1,5 +1,6 @@
 package ru0xdc.rtklib;
 
+
 public class RtkCommon {
 
 	/**
@@ -28,4 +29,5 @@ public class RtkCommon {
 	 * @param dst   DOPs {GDOP,PDOP,HDOP,VDOP}
 	 */
 	static native void dops(final double[] azel, int ns, double elmin, Dops dst);
+
 }

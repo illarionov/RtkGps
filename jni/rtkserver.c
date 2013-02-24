@@ -10,6 +10,7 @@
 
 
 extern int registerRtkCommonNatives(JNIEnv* env);
+extern int registerGTimeNatives(JNIEnv* env);
 
 static jfieldID m_object_field;
 
@@ -376,6 +377,9 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
         goto bail;
 
     if (!registerRtkCommonNatives(env))
+        goto bail;
+
+    if (!registerGTimeNatives(env))
         goto bail;
 
     /* success -- return valid version number */

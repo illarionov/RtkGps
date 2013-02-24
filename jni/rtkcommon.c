@@ -17,9 +17,9 @@ static jobject RtkCommon_get_sat_id(JNIEnv* env, jclass clazz, jint sat_no)
 
 static void RtkCommon_dops(JNIEnv* env, jclass clazz, jdoubleArray j_azel, jint j_ns, jdouble j_elmin, jobject j_dst)
 {
+   static jmethodID set_dops_mid = NULL;
    double dst[4];
    double *azel;
-   jmethodID set_dops_mid;
 
    azel = (*env)->GetDoubleArrayElements(env, j_azel, NULL);
    if (azel == NULL)
@@ -29,13 +29,15 @@ static void RtkCommon_dops(JNIEnv* env, jclass clazz, jdoubleArray j_azel, jint 
 
    (*env)->ReleaseDoubleArrayElements(env, j_azel, azel, 0);
 
-   set_dops_mid = (*env)->GetMethodID(env,
-	 (*env)->GetObjectClass(env, j_dst),
-	 "setDops",
-	 "(DDDD)V");
    if (set_dops_mid == NULL) {
-      LOGV("setDops() not found");
-      return;
+      set_dops_mid = (*env)->GetMethodID(env,
+	    (*env)->GetObjectClass(env, j_dst),
+	    "setDops",
+	    "(DDDD)V");
+      if (set_dops_mid == NULL) {
+	 LOGV("setDops() not found");
+	 return;
+      }
    }
 
    (*env)->CallVoidMethod(env, j_dst, set_dops_mid,

@@ -1,5 +1,7 @@
 package ru0xdc.rtklib;
 
+import android.text.format.Time;
+
 public class GTime {
 
 	/**
@@ -29,5 +31,29 @@ public class GTime {
 		this.time = time;
 		this.sec = sec;
 	}
+
+	public Time getGpsTime(Time dst) {
+		if (dst == null) dst = new Time("UTC");
+		dst.set(this.time * 1000 + (Math.round(this.sec * 1000.0)));
+		return dst;
+	}
+
+	public Time getTime(Time dst) {
+		if (dst == null) dst = new Time("UTC");
+		_getAndroidUtcTime(dst);
+		return dst;
+	}
+
+	/**
+	 * @return GPS week number
+	 */
+	public native int getGpsWeek();
+
+	/**
+	 * @return GPS time of week (s)
+	 */
+	public native double getGpsTow();
+
+	native void _getAndroidUtcTime(Time dst);
 
 }

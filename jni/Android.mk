@@ -10,7 +10,8 @@ LOCAL_CFLAGS += -fvisibility=hidden
 
 LOCAL_SRC_FILES := \
         rtkserver.c \
-	rtkcommon.c
+	rtkcommon.c \
+	gtime.c
 
 LOCAL_STATIC_LIBRARIES := rtklib
 

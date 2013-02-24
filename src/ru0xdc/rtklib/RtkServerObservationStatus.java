@@ -199,9 +199,9 @@ public class RtkServerObservationStatus {
 			receiverName = String.valueOf(this.receiver);
 		}
 
-		String header = String.format("RtkServerObservationStatus %s %d %.3f %d sat-s ",
+		String header = String.format("RtkServerObservationStatus %s week: %d tm: %.3f %d sat-s ",
 				receiverName,
-				this.time.time, this.time.sec,
+				this.time.getGpsWeek(), this.time.getGpsTow(),
 				this.ns);
 		if (this.ns == 0)
 			return header;
