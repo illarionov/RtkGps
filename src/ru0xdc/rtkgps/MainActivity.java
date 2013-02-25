@@ -5,6 +5,7 @@ import static junit.framework.Assert.assertNotNull;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru0xdc.rtkgps.view.GTimeWidget;
 import ru0xdc.rtkgps.view.GpsSkyView;
 import ru0xdc.rtkgps.view.StreamIndicatorsView;
 import ru0xdc.rtklib.RtkServerObservationStatus;
@@ -257,6 +258,7 @@ ActionBar.OnNavigationListener {
 		private RtkServerObservationStatus mRoverObservationStatus;
 		private GpsSkyView mSkyView;
 		private StreamIndicatorsView mStreamIndicatorsView;
+		private GTimeWidget mGTimeWidget;
 
 		private String mLastObsStatusStr;
 
@@ -275,6 +277,7 @@ ActionBar.OnNavigationListener {
 			mObservationStatusTextView = (TextView) v.findViewById(R.id.ObservationStatus);
 			mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
 			mStreamIndicatorsView = (StreamIndicatorsView)v.findViewById(R.id.streamIndicatorsView);
+			mGTimeWidget = (GTimeWidget)v.findViewById(R.id.GTimeWidget);
 			return v;
 		}
 
@@ -340,6 +343,7 @@ ActionBar.OnNavigationListener {
 			mSkyView.setStats(mRoverObservationStatus);
 			mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
 			mStreamStatusTextView.setText(mStreamStatus.mMsg);
+			mGTimeWidget.setTime(mRoverObservationStatus.time);
 		}
 	}
 

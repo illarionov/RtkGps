@@ -25,10 +25,10 @@ static gtime_t get_gtime_t(JNIEnv* env, jobject thiz)
 static void GTime_get_android_utc_time(JNIEnv* env, jobject thiz, jobject j_dst)
 {
    static jmethodID set_time_mid = NULL;
-   gtime_t gt, gtu;
+   gtime_t t;
 
-   gt = get_gtime_t(env, thiz);
-   gtu = gpst2utc(gt);
+   t = get_gtime_t(env, thiz);
+   t = gpst2utc(t);
 
    if (set_time_mid == NULL) {
       set_time_mid = (*env)->GetMethodID(env,
@@ -40,7 +40,7 @@ static void GTime_get_android_utc_time(JNIEnv* env, jobject thiz, jobject j_dst)
 	 return;
       }
    }
-   (*env)->CallVoidMethod(env, j_dst, set_time_mid, 1000 * gtu.time + lround(1000.0 * gt.sec));
+   (*env)->CallVoidMethod(env, j_dst, set_time_mid, (jlong)(1000ll * t.time + llround(1000.0 * t.sec)));
 }
 
 static jint GTime_get_gps_week(JNIEnv* env, jobject thiz)

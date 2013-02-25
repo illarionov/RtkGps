@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <declare-styleable name="GTimeWidget">
+       <attr name="time_format" format="enum">
+           <enum name="gps" value="0"/>
+           <enum name="utc" value="1"/>
+           <enum name="local" value="2"/>
+           <enum name="gps_tow" value="3"/>
+       </attr>
+   </declare-styleable>
+</resources>

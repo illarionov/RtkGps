@@ -25,5 +25,11 @@
         <item>Base</item>
         <item>Emphem</item>
     </string-array>
+    
+    <string name="gtime_format_gps">GPS</string>
+    <string name="gtime_format_utc">UTC</string>
+    <string name="gtime_format_local">Local</string>
+    <string name="gtime_format_gps_tow">GPS TOW</string>
+    
 
 </resources>
