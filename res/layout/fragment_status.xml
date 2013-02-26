@@ -20,8 +20,8 @@
         android:clipChildren="false"
         android:gravity="center_vertical" >
         
-		<ru0xdc.rtkgps.view.GTimeWidget
-		    android:id="@+id/GTimeWidget"
+		<ru0xdc.rtkgps.view.GTimeView
+		    android:id="@+id/gtimeView"
 		    android:layout_width="0dp"
 		    android:layout_height="wrap_content"
 		    android:layout_weight="1"

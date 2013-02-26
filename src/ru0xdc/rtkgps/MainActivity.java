@@ -5,7 +5,7 @@ import static junit.framework.Assert.assertNotNull;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ru0xdc.rtkgps.view.GTimeWidget;
+import ru0xdc.rtkgps.view.GTimeView;
 import ru0xdc.rtkgps.view.GpsSkyView;
 import ru0xdc.rtkgps.view.StreamIndicatorsView;
 import ru0xdc.rtklib.RtkServerObservationStatus;
@@ -17,15 +17,19 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -258,9 +262,11 @@ ActionBar.OnNavigationListener {
 		private RtkServerObservationStatus mRoverObservationStatus;
 		private GpsSkyView mSkyView;
 		private StreamIndicatorsView mStreamIndicatorsView;
-		private GTimeWidget mGTimeWidget;
+		private GTimeView mGTimeView;
 
 		private String mLastObsStatusStr;
+
+		public static final String PREF_TIME_FORMAT = "StatusFragment.PREF_TIME_FORMAT";
 
 		public StatusFragment() {
 			mStreamStatus = new RtkServerStreamStatus();
@@ -277,13 +283,24 @@ ActionBar.OnNavigationListener {
 			mObservationStatusTextView = (TextView) v.findViewById(R.id.ObservationStatus);
 			mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
 			mStreamIndicatorsView = (StreamIndicatorsView)v.findViewById(R.id.streamIndicatorsView);
-			mGTimeWidget = (GTimeWidget)v.findViewById(R.id.GTimeWidget);
+			mGTimeView = (GTimeView)v.findViewById(R.id.gtimeView);
 			return v;
 		}
 
 		@Override
-		public void onStart() {
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
 
+			registerForContextMenu(mGTimeView);
+			final SharedPreferences prefs = getActivity().getPreferences(MODE_PRIVATE);
+			int timeFormat = prefs.getInt(PREF_TIME_FORMAT, -1);
+			if (timeFormat >= 0) {
+				mGTimeView.setTimeFormat(timeFormat);
+			}
+		}
+
+		@Override
+		public void onStart() {
 			super.onStart();
 
 			mStreamStatusUpdateTimer = new Timer();
@@ -308,8 +325,68 @@ ActionBar.OnNavigationListener {
 		@Override
 		public void onStop() {
 			mStreamStatusUpdateTimer.cancel();
-
 			super.onStop();
+		}
+
+		@Override
+		public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
+			super.onCreateContextMenu(menu, v, menuInfo);
+			MenuInflater inflater = getActivity().getMenuInflater();
+
+			if (mGTimeView.equals(v)) {
+				MenuItem item;
+
+				inflater.inflate(R.menu.gtime_format, menu);
+				menu.setHeaderTitle(R.string.gtime_format_context_menu_title);
+
+				switch (mGTimeView.getTimeFormat()) {
+				case GTimeView.TIME_FORMAT_GPS:
+					item = menu.findItem(R.id.gtime_format_gps);
+					break;
+				case GTimeView.TIME_FORMAT_GPS_TOW:
+					item = menu.findItem(R.id.gtime_format_gps_tow);
+					break;
+				case GTimeView.TIME_FORMAT_UTC:
+					item = menu.findItem(R.id.gtime_format_utc);
+					break;
+				case GTimeView.TIME_FORMAT_LOCAL:
+					item = menu.findItem(R.id.gtime_format_local);
+					break;
+				default:
+					throw new IllegalStateException();
+				}
+				item.setChecked(true);
+			}
+		}
+
+		@Override
+		public boolean onContextItemSelected(MenuItem item) {
+			int newFormat;
+
+		    switch (item.getItemId()) {
+		        case R.id.gtime_format_gps:
+		        	newFormat = GTimeView.TIME_FORMAT_GPS;
+		        	break;
+		        case R.id.gtime_format_gps_tow:
+		        	newFormat = GTimeView.TIME_FORMAT_GPS_TOW;
+		        	break;
+		        case R.id.gtime_format_utc:
+		        	newFormat = GTimeView.TIME_FORMAT_UTC;
+		        	break;
+		        case R.id.gtime_format_local:
+		        	newFormat = GTimeView.TIME_FORMAT_LOCAL;
+		        	break;
+		        default:
+		            return super.onContextItemSelected(item);
+		    }
+		    mGTimeView.setTimeFormat(newFormat);
+
+		    final SharedPreferences prefs = getActivity().getPreferences(MODE_PRIVATE);
+		    final SharedPreferences.Editor editor = prefs.edit();
+		    editor.putInt(PREF_TIME_FORMAT, newFormat);
+			editor.commit();
+
+		    return true;
 		}
 
 		void updateStatus() {
@@ -343,7 +420,7 @@ ActionBar.OnNavigationListener {
 			mSkyView.setStats(mRoverObservationStatus);
 			mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
 			mStreamStatusTextView.setText(mStreamStatus.mMsg);
-			mGTimeWidget.setTime(mRoverObservationStatus.time);
+			mGTimeView.setTime(mRoverObservationStatus.time);
 		}
 	}
 

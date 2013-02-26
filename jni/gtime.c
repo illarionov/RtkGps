@@ -22,25 +22,11 @@ static gtime_t get_gtime_t(JNIEnv* env, jobject thiz)
    return gt;
 }
 
-static void GTime_get_android_utc_time(JNIEnv* env, jobject thiz, jobject j_dst)
+static jlong GTime_get_utc_time_millis(JNIEnv* env, jobject thiz)
 {
-   static jmethodID set_time_mid = NULL;
    gtime_t t;
-
-   t = get_gtime_t(env, thiz);
-   t = gpst2utc(t);
-
-   if (set_time_mid == NULL) {
-      set_time_mid = (*env)->GetMethodID(env,
-	    (*env)->GetObjectClass(env, j_dst),
-	    "set",
-	    "(J)V");
-      if (set_time_mid == NULL) {
-	 LOGV("set(long mills) not found");
-	 return;
-      }
-   }
-   (*env)->CallVoidMethod(env, j_dst, set_time_mid, (jlong)(1000ll * t.time + llround(1000.0 * t.sec)));
+   t = gpst2utc(get_gtime_t(env, thiz));
+   return (jlong)(1000ll * t.time + llround(1000.0 * t.sec));
 }
 
 static jint GTime_get_gps_week(JNIEnv* env, jobject thiz)
@@ -73,7 +59,7 @@ static int init_gtime_fields(JNIEnv* env, jclass clazz) {
 
 
 static JNINativeMethod nativeMethods[] = {
-   { "_getAndroidUtcTime", "(Landroid/text/format/Time;)V", (void*)GTime_get_android_utc_time },
+   { "getUtcTimeMillis", "()J", (void*)GTime_get_utc_time_millis },
    { "getGpsWeek", "()I", (void*)GTime_get_gps_week },
    { "getGpsTow", "()D", (void*)GTime_get_gps_tow }
 };

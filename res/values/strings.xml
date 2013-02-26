@@ -26,6 +26,7 @@
         <item>Emphem</item>
     </string-array>
     
+    <string name="gtime_format_context_menu_title">Time format</string>
     <string name="gtime_format_gps">GPS</string>
     <string name="gtime_format_utc">UTC</string>
     <string name="gtime_format_local">Local</string>

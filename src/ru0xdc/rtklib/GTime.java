@@ -1,7 +1,5 @@
 package ru0xdc.rtklib;
 
-import android.text.format.Time;
-
 public class GTime {
 
 	/**
@@ -32,16 +30,18 @@ public class GTime {
 		this.sec = sec;
 	}
 
-	public Time getGpsTime(Time dst) {
-		if (dst == null) dst = new Time("UTC");
-		dst.set(this.time * 1000 + (Math.round(this.sec * 1000.0)));
-		return dst;
-	}
+	/**
+	 *
+	 * @return UTC time in milliseconds since January 1, 1970 00:00:00 UTC
+	 */
+	public native long getUtcTimeMillis();
 
-	public Time getTime(Time dst) {
-		if (dst == null) dst = new Time("UTC");
-		_getAndroidUtcTime(dst);
-		return dst;
+	/**
+	 *
+	 * @return GPS time in milliseconds since January 1, 1970 00:00:00 UTC
+	 */
+	public long getGpsTimeMillis() {
+		return this.time * 1000 + Math.round(this.sec * 1000.0);
 	}
 
 	/**
@@ -54,6 +54,5 @@ public class GTime {
 	 */
 	public native double getGpsTow();
 
-	native void _getAndroidUtcTime(Time dst);
 
 }
