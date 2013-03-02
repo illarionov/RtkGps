@@ -6,7 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import ru0xdc.rtkgps.view.GTimeView;
-import ru0xdc.rtkgps.view.GpsSkyView;
+import ru0xdc.rtkgps.view.SnrView;
 import ru0xdc.rtkgps.view.StreamIndicatorsView;
 import ru0xdc.rtklib.RtkServerObservationStatus;
 import ru0xdc.rtklib.RtkServerStreamStatus;
@@ -260,7 +260,8 @@ ActionBar.OnNavigationListener {
 		private Timer mStreamStatusUpdateTimer;
 		private RtkServerStreamStatus mStreamStatus;
 		private RtkServerObservationStatus mRoverObservationStatus;
-		private GpsSkyView mSkyView;
+		// private GpsSkyView mSkyView;
+		private SnrView mSnrView;
 		private StreamIndicatorsView mStreamIndicatorsView;
 		private GTimeView mGTimeView;
 
@@ -281,7 +282,8 @@ ActionBar.OnNavigationListener {
 			View v = inflater.inflate(R.layout.fragment_status, container, false);
 			mStreamStatusTextView = (TextView) v.findViewById(R.id.StreamStatus);
 			mObservationStatusTextView = (TextView) v.findViewById(R.id.ObservationStatus);
-			mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
+			// mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
+			mSnrView = (SnrView)v.findViewById(R.id.Snr);
 			mStreamIndicatorsView = (StreamIndicatorsView)v.findViewById(R.id.streamIndicatorsView);
 			mGTimeView = (GTimeView)v.findViewById(R.id.gtimeView);
 			return v;
@@ -417,7 +419,8 @@ ActionBar.OnNavigationListener {
 			}
 
 			assertNotNull(mStreamStatus.mMsg);
-			mSkyView.setStats(mRoverObservationStatus);
+			// mSkyView.setStats(mRoverObservationStatus);
+			mSnrView.setStats(mRoverObservationStatus);
 			mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
 			mStreamStatusTextView.setText(mStreamStatus.mMsg);
 			mGTimeView.setTime(mRoverObservationStatus.time);

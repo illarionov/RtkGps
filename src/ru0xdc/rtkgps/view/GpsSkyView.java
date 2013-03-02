@@ -29,18 +29,26 @@ public class GpsSkyView extends View {
 
 	private static final int SAT_RADIUS = 16;
 
-	private static final int COLOR_NOT_VALID_SAT = Color.LTGRAY;
+	static final int COLOR_NOT_VALID_SAT = Color.LTGRAY;
 
 	private static final int SAT_PRN_TEXT_SIZE = 14;
 
 	private static final int GRID_TEXT_SIZE = 16;
 
+	static int SNR_COLORS[] = new int[] {
+		Color.GREEN,
+		Color.rgb(0, 0xaa, 0xff),
+		Color.rgb(0xff, 0, 0xff),
+		Color.BLUE,
+		Color.RED,
+		Color.GRAY
+	};
+
 	private String mBand;
 
-	private RtkServerObservationStatus mStatus;
+	private final RtkServerObservationStatus mStatus;
 	private final Dops mDops;
 
-    private final int mSnrColors[];
     private final DecimalFormat mDopsFormatter;
 
 	private final Paint mGridStrokePaint;
@@ -87,15 +95,6 @@ public class GpsSkyView extends View {
         mSatellitePrnPaint.setColor(Color.WHITE);
         mSatellitePrnPaint.setTextSize(SAT_PRN_TEXT_SIZE);
         mSatellitePrnPaint.setTextAlign(Paint.Align.CENTER);
-
-        mSnrColors     = new int[]   {
-        		Color.GREEN,
-        		Color.rgb(0, 0xaa, 0xff),
-        		Color.rgb(0xff, 0, 0xff),
-        		Color.BLUE,
-        		Color.RED,
-        		Color.GRAY
-        };
 
         mDopsFormatter = new DecimalFormat("0.0");
 
@@ -217,7 +216,7 @@ public class GpsSkyView extends View {
     }
 
 
-    private Paint getSatellitePaint(Paint base, int snr, int valid) {
+    static Paint getSatellitePaint(Paint base, int snr, int valid) {
         int j, color;
         Paint newPaint;
 
@@ -225,11 +224,11 @@ public class GpsSkyView extends View {
         if (valid == 0) {
         	color = COLOR_NOT_VALID_SAT;
         }else {
-        	j = (49 - snr)/(mSnrColors.length-1);
-        	if (j < 0 || j >= (mSnrColors.length-1)) {
-        		j = mSnrColors.length-2;
+        	j = (49 - snr)/(SNR_COLORS.length-1);
+        	if (j < 0 || j >= (SNR_COLORS.length-1)) {
+        		j = SNR_COLORS.length-2;
         	}
-        	color = mSnrColors[j];
+        	color = SNR_COLORS[j];
         }
 
         newPaint.setColor(color);

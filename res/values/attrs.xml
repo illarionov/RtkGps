@@ -9,4 +9,10 @@
        </attr>
        <attr name="time_template" format="string"/>
    </declare-styleable>
+   
+	<declare-styleable name="SnrView">
+	    <attr name="grid_text_size" format="integer"/>
+	    <attr name="grid_text_color" format="color"/>
+	</declare-styleable>
+
 </resources>

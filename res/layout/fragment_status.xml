@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res/ru0xdc.rtkgps"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="1dp"
     android:orientation="vertical" >
     
     <TextView
@@ -39,7 +40,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textIsSelectable="true" />
-    
+
+    <!-- 
     <ru0xdc.rtkgps.view.GpsSkyView
         android:id="@+id/Sky"
         android:layout_width="match_parent"
@@ -48,6 +50,14 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp" />
-    
+         -->
+
+    <ru0xdc.rtkgps.view.SnrView
+        android:id="@+id/Snr"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="1dp" />
 
 </LinearLayout>
