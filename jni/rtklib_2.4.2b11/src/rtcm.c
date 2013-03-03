@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 * rtcm.c : rtcm functions
 *
-*          Copyright (C) 2009-2012 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2009-2013 by T.TAKASU, All rights reserved.
 *
 * references :
 *     [1] RTCM Recommended Standards for Differential GNSS (Global Navigation
@@ -21,6 +21,8 @@
 *     [11] RTCM Paper 034-2012-SC104-693 (draft multiple signal messages)
 *     [12] RTCM Paper 133-2012-SC104-709 (draft QZSS MSM messages)
 *     [13] RTCM Paper 122-2012-SC104-707.r1 (draft MSM messages)
+*     [14] RTCM Standard 10403.2, Differential GNSS (Global Navigation Satellite
+*          Systems) Services - version 3, February 1, 2013
 *
 * version : $Revision:$ $Date:$
 * history : 2009/04/10 1.0  new
@@ -190,7 +192,8 @@ extern int input_rtcm2(rtcm_t *rtcm, unsigned char data)
 *          to be set to the approximate time within 1/2 week in order to resolve
 *          ambiguity of time in rtcm messages.
 *           
-*          supported RTCM 3 messages (ref [2][3][4][5][6][7][8][9][10][11][12])
+*          supported RTCM 3 messages
+*                  (ref [2][3][4][5][6][7][8][9][10][11][12][13][14])
 *
 *            TYPE       GPS     GLOASS    GALILEO    QZSS     COMPASS    SBAS
 *         ----------------------------------------------------------------------
@@ -202,13 +205,13 @@ extern int input_rtcm2(rtcm_t *rtcm, unsigned char data)
 *          NAV       : 1019      1020      1045*     1044*       -         -
 *                        -         -       1046*       -         -         -
 *
-*          MSM 1     : 1071*~    1081*~    1091*~    1111*~    1121*~    1101*~
-*              2     : 1072*~    1082*~    1092*~    1112*~    1122*~    1102*~
-*              3     : 1073*~    1083*~    1093*~    1113*~    1123*~    1103*~
-*              4     : 1074*     1084*     1094*     1114*     1124*     1104*
-*              5     : 1075*     1085*     1095*     1115*     1125*     1105*
-*              6     : 1076*     1086*     1096*     1116*     1126*     1106*
-*              7     : 1077*     1087*     1097*     1117*     1127*     1107*
+*          MSM 1     : 1071~     1081~     1091~     1111*~    1121*~    1101*~
+*              2     : 1072~     1082~     1092~     1112*~    1122*~    1102*~
+*              3     : 1073~     1083~     1093~     1113*~    1123*~    1103*~
+*              4     : 1074      1084      1094      1114*     1124*     1104*
+*              5     : 1075      1085      1095      1115*     1125*     1105*
+*              6     : 1076      1086      1096      1116*     1126*     1106*
+*              7     : 1077      1087      1097      1117*     1127*     1107*
 *
 *          SSR OBT   : 1057      1063      1240*     1246*       -         -
 *              CLK   : 1058      1064      1241*     1247*       -         -

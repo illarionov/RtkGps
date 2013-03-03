@@ -6,7 +6,7 @@
 * options : -DENAGLO   enable GLONASS
 *           -DENAGAL   enable Galileo
 *           -DENAQZS   enable QZSS
-*           -DENACMP   enable Compass
+*           -DENACMP   enable BeiDou
 *           -DNFREQ=n  set number of carrier frequencies
 *           -DMAXOBS=n set max number of obs data in an epoch
 *           -DEXTLEX   enable QZSS LEX extension   (needs qzslex library)
@@ -45,7 +45,7 @@ extern "C" {
 
 /* constants -----------------------------------------------------------------*/
 
-#define VER_RTKLIB  "2.4.2 b10"         /* library version */
+#define VER_RTKLIB  "2.4.2 b11"         /* library version */
 
 #define COPYRIGHT_RTKLIB \
             "Copyright (C) 2007-2013 by T.Takasu\nAll rights reserved."
@@ -78,9 +78,9 @@ extern "C" {
 #define FREQ2_GLO   1.24600E9           /* GLONASS G2 base frequency (Hz) */
 #define DFRQ2_GLO   0.43750E6           /* GLONASS G2 bias frequency (Hz/n) */
 #define FREQ3_GLO   1.202025E9          /* GLONASS G3 frequency (Hz) */
-#define FREQ2_CMP   1.561098E9          /* Compass B1 frequency (Hz) */
-#define FREQ7_CMP   1.20714E9           /* Compass B2 frequency (Hz) */
-#define FREQ6_CMP   1.26852E9           /* Compass B3 frequency (Hz) */
+#define FREQ2_CMP   1.561098E9          /* BeiDou B1 frequency (Hz) */
+#define FREQ7_CMP   1.20714E9           /* BeiDou B2 frequency (Hz) */
+#define FREQ6_CMP   1.26852E9           /* BeiDou B3 frequency (Hz) */
 
 #define EFACT_GPS   1.0                 /* error factor: GPS */
 #define EFACT_GLO   1.5                 /* error factor: GLONASS */
@@ -95,7 +95,7 @@ extern "C" {
 #define SYS_GLO     0x04                /* navigation system: GLONASS */
 #define SYS_GAL     0x08                /* navigation system: Galileo */
 #define SYS_QZS     0x10                /* navigation system: QZSS */
-#define SYS_CMP     0x20                /* navigation system: Compass */
+#define SYS_CMP     0x20                /* navigation system: BeiDou */
 #define SYS_ALL     0xFF                /* navigation system: all */
 
 #define TSYS_GPS    0                   /* time system: GPS time */
@@ -103,7 +103,7 @@ extern "C" {
 #define TSYS_GLO    2                   /* time system: GLONASS time */
 #define TSYS_GAL    3                   /* time system: Galileo time */
 #define TSYS_QZS    4                   /* time system: QZSS time */
-#define TSYS_CMP    5                   /* time system: Compass time */
+#define TSYS_CMP    5                   /* time system: BeiDou time */
 
 #ifndef NFREQ
 #define NFREQ       3                   /* number of carrier frequencies */
@@ -155,9 +155,9 @@ extern "C" {
 #define NSYSQZS     0
 #endif
 #ifdef ENACMP
-#define MINPRNCMP   1                   /* min satellite sat number of Compass */
-#define MAXPRNCMP   35                  /* max satellite sat number of Compass */
-#define NSATCMP     (MAXPRNCMP-MINPRNCMP+1) /* number of Compass satellites */
+#define MINPRNCMP   1                   /* min satellite sat number of BeiDou */
+#define MAXPRNCMP   35                  /* max satellite sat number of BeiDou */
+#define NSATCMP     (MAXPRNCMP-MINPRNCMP+1) /* number of BeiDou satellites */
 #define NSYSCMP     1
 #else
 #define MINPRNCMP   0
@@ -273,7 +273,7 @@ extern "C" {
 #define CODE_L3I    44                  /* obs code: G3I        (GLO) */
 #define CODE_L3Q    45                  /* obs code: G3Q        (GLO) */
 #define CODE_L3X    46                  /* obs code: G3I+Q      (GLO) */
-#define MAXCODE     48                  /* max number of obs code */
+#define MAXCODE     46                  /* max number of obs code */
 
 #define PMODE_SINGLE 0                  /* positioning mode: single */
 #define PMODE_DGPS   1                  /* positioning mode: DGPS/DGNSS */
@@ -364,8 +364,8 @@ extern "C" {
 #define STRFMT_GW10  8                  /* stream format: Furuno GW10 */
 #define STRFMT_JAVAD 9                  /* stream format: JAVAD GRIL/GREIS */
 #define STRFMT_NVS   10                 /* stream format: NVS NVC08C */
-#define STRFMT_LEXR  11                 /* stream format: Furuno LPY-10000 */
-#define STRFMT_ASH   12                 /* stream format: Ashtech (reserved) */
+#define STRFMT_BINEX 11                 /* stream format: BINEX */
+#define STRFMT_LEXR  12                 /* stream format: Furuno LPY-10000 */
 #define STRFMT_SIRF  13                 /* stream format: SiRF    (reserved) */
 #define STRFMT_RINEX 14                 /* stream format: RINEX */
 #define STRFMT_SP3   15                 /* stream format: SP3 */
@@ -373,9 +373,9 @@ extern "C" {
 #define STRFMT_SBAS  17                 /* stream format: SBAS messages */
 #define STRFMT_NMEA  18                 /* stream format: NMEA 0183 */
 #ifndef EXTLEX
-#define MAXRCVFMT    10                 /* max number of receiver format */
+#define MAXRCVFMT    11                 /* max number of receiver format */
 #else
-#define MAXRCVFMT    11
+#define MAXRCVFMT    12
 #endif
 
 #define STR_MODE_R  0x1                 /* stream mode: read */
@@ -761,13 +761,18 @@ typedef struct {        /* navigation data type */
     double utc_glo[4];  /* GLONASS UTC GPS time parameters */
     double utc_gal[4];  /* Galileo UTC GPS time parameters */
     double utc_qzs[4];  /* QZS UTC GPS time parameters */
+    double utc_cmp[4];  /* BeiDou UTC parameters */
+    double utc_sbs[4];  /* SBAS UTC parameters */
     double ion_gps[8];  /* GPS iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
     double ion_gal[4];  /* Galileo iono model parameters {ai0,ai1,ai2,0} */
     double ion_qzs[8];  /* QZSS iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
+    double ion_cmp[8];  /* BeiDou iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
     int leaps;          /* leap seconds (s) */
     double lam[MAXSAT][NFREQ]; /* carrier wave lengths (m) */
     double cbias[MAXSAT][3];   /* code bias (0:p1-p2,1:p1-c1,2:p2-c2) (m) */
     double wlbias[MAXSAT];     /* wide-lane bias (cycle) */
+    double glo_cpbias[4];    /* glonass code-phase bias {1C,1P,2C,2P} (m) */
+    char glo_fcn[MAXPRNGLO]; /* glonass frequency channel number */
     pcv_t pcvs[MAXSAT]; /* satellite antenna pcv */
     sbssat_t sbssat;    /* SBAS satellite corrections */
     sbsion_t sbsion[MAXBAND+1]; /* SBAS ionosphere corrections */
@@ -1085,6 +1090,7 @@ typedef struct {        /* receiver raw data control type */
     obs_t obs;          /* observation data */
     obs_t obuf;         /* observation data buffer */
     nav_t nav;          /* satellite ephemerides */
+    sta_t sta;          /* station parameters */
     int ephsat;         /* sat number of update ephemeris (0:no satellite) */
     sbsmsg_t sbsmsg;    /* SBAS message */
     char msgtype[256];  /* last message type */
@@ -1244,6 +1250,8 @@ extern gtime_t gpst2time(int week, double sec);
 extern double  time2gpst(gtime_t t, int *week);
 extern gtime_t gst2time(int week, double sec);
 extern double  time2gst(gtime_t t, int *week);
+extern gtime_t bdt2time(int week, double sec);
+extern double  time2bdt(gtime_t t, int *week);
 extern char    *time_str(gtime_t t, int n);
 
 extern gtime_t timeadd  (gtime_t t, double sec);
@@ -1446,6 +1454,7 @@ extern int input_stq   (raw_t *raw, unsigned char data);
 extern int input_gw10  (raw_t *raw, unsigned char data);
 extern int input_javad (raw_t *raw, unsigned char data);
 extern int input_nvs   (raw_t *raw, unsigned char data);
+extern int input_bnx   (raw_t *raw, unsigned char data);
 extern int input_lexr  (raw_t *raw, unsigned char data);
 extern int input_oem4f (raw_t *raw, FILE *fp);
 extern int input_oem3f (raw_t *raw, FILE *fp);
@@ -1456,6 +1465,7 @@ extern int input_stqf  (raw_t *raw, FILE *fp);
 extern int input_gw10f (raw_t *raw, FILE *fp);
 extern int input_javadf(raw_t *raw, FILE *fp);
 extern int input_nvsf  (raw_t *raw, FILE *fp);
+extern int input_bnxf  (raw_t *raw, FILE *fp);
 extern int input_lexrf (raw_t *raw, FILE *fp);
 
 extern int gen_ubx (const char *msg, unsigned char *buff);

@@ -523,7 +523,8 @@ static void set_obstype(int format, rnxopt_t *opt)
         {CODE_L1C,CODE_L1S,CODE_L1L,CODE_L1X,CODE_L1Z,CODE_L2S,CODE_L2L,CODE_L2X,
          CODE_L5I,CODE_L5Q,CODE_L5X,CODE_L6S,CODE_L6L,CODE_L6X},
         {CODE_L1C,CODE_L5I,CODE_L5Q,CODE_L5X},
-        {CODE_L1C,CODE_L2C,CODE_L7I,CODE_L7Q,CODE_L7X}
+        {CODE_L2I,CODE_L2Q,CODE_L2X,CODE_L7I,CODE_L7Q,CODE_L7X,CODE_L6I,CODE_L6Q,
+         CODE_L6X}
     };
     /* supported codes by others */
     const unsigned char codes_other[6][8]={
@@ -542,6 +543,7 @@ static void set_obstype(int format, rnxopt_t *opt)
             case STRFMT_OEM3 : codes=codes_oem3 [i]; break;
             case STRFMT_CRES : codes=codes_cres [i]; break;
             case STRFMT_JAVAD: codes=codes_javad[i]; break;
+            case STRFMT_BINEX: codes=codes_rinex[i]; break;
             case STRFMT_RINEX: codes=codes_rinex[i]; break;
             default:           codes=codes_other[i]; break;
         }

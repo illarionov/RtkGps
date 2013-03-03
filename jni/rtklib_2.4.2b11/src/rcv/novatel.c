@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
-* notvatel.c : NovAtel OEM4/OEM3 receiver functions
+* notvatel.c : NovAtel OEM6/OEM5/OEM4/OEM3 receiver functions
 *
-*          Copyright (C) 2007-2012 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2007-2013 by T.TAKASU, All rights reserved.
 *
 * reference :
 *     [1] NovAtel, OM-20000094 Rev6 OEMV Family Firmware Reference Manual, 2008
@@ -33,6 +33,7 @@
 *                           galclockb,galionob
 *           2012/11/08 1.11 support galfnavrawpageb, galinavrawword
 *           2012/11/19 1.12 fix bug on decodeing rangeb
+*           2013/02/23 1.13 fix memory access violation problem on arm
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -86,22 +87,14 @@ static const char rcsid[]="$Id: novatel.c,v 1.2 2008/07/14 00:05:05 TTAKA Exp $"
 #define OFF_FRQNO   -7          /* F/W ver.3.620 */
 
 /* get fields (little-endian) ------------------------------------------------*/
-#define U1(p)       (*((unsigned char *)(p)))
-#define I1(p)       (*((char *)(p)))
-#define U2(p)       (*((unsigned short *)(p)))
-#define I2(p)       (*((short *)(p)))
-#define U4(p)       (*((unsigned int *)(p)))
-#define I4(p)       (*((int *)(p)))
-#define R4(p)       (*((float *)(p)))
+#define U1(p) (*((unsigned char *)(p)))
+#define I1(p) (*((char *)(p)))
+static unsigned short U2(unsigned char *p) {unsigned short u; memcpy(&u,p,2); return u;}
+static unsigned int   U4(unsigned char *p) {unsigned int   u; memcpy(&u,p,4); return u;}
+static int            I4(unsigned char *p) {int            i; memcpy(&i,p,4); return i;}
+static float          R4(unsigned char *p) {float          r; memcpy(&r,p,4); return r;}
+static double         R8(unsigned char *p) {double         r; memcpy(&r,p,8); return r;}
 
-static double R8(const unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
-}
 /* extend sign ---------------------------------------------------------------*/
 static int exsign(unsigned int v, int bits)
 {

@@ -69,6 +69,7 @@ static const char rcsid[]="$Id:$";
 
 #define ERREPH_GLO 5.0            /* error of glonass ephemeris (m) */
 #define TSTEP    60.0             /* integration step glonass ephemeris (s) */
+#define RTOL_KEPLER 1E-14         /* relative tolerance for Kepler equation */
 
 #define DEFURASSR 0.15            /* default accurary of ssr corr (m) */
 #define MAXECORSSR 10.0           /* max orbit correction of ssr (m) */
@@ -190,17 +191,11 @@ extern void eph2pos(gtime_t time, const eph_t *eph, double *rs, double *dts,
     }
     M=eph->M0+(sqrt(mu/(eph->A*eph->A*eph->A))+eph->deln)*tk;
     
-#if 0
-    for (n=0,E=M,sinE=Ek=0.0;fabs(E-Ek)>1E-12;n++) {
-        Ek=E; sinE=sin(Ek); E=M+eph->e*sinE;
-    }
-    cosE=cos(E);
-#else
-    for (n=0,E=M,Ek=0.0;fabs(E-Ek)>1E-12;n++) {
+    for (n=0,E=M,Ek=0.0;fabs(E-Ek)>RTOL_KEPLER;n++) {
         Ek=E; E-=(E-eph->e*sin(E)-M)/(1.0-eph->e*cos(E));
     }
     sinE=sin(E); cosE=cos(E);
-#endif
+    
     trace(4,"kepler: sat=%2d e=%8.5f n=%2d del=%10.3e\n",eph->sat,eph->e,n,E-Ek);
     
     u=atan2(sqrt(1.0-eph->e*eph->e)*sinE,cosE-eph->e)+eph->omg;
@@ -571,7 +566,7 @@ static int satpos_ssr(gtime_t time, gtime_t teph, int sat, const nav_t *nav,
     /* ssr orbit and clock correction (ref [4]) */
     if (fabs(t1)>MAXAGESSR||fabs(t2)>MAXAGESSR) {
         trace(2,"age of ssr error: %s sat=%2d t=%.0f %.0f\n",time_str(time,0),
-              t1,t2);
+              sat,t1,t2);
         *svh=-1;
         return 0;
     }

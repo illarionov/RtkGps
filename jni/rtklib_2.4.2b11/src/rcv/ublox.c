@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 * ublox.c : ublox receiver dependent functions
 *
-*          Copyright (C) 2007-2011 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2007-2013 by T.TAKASU, All rights reserved.
 *
 * reference :
 *     [1] ublox-AG, GPS.G3-X-03002-D, ANTARIS Positioning Engine NMEA and UBX
@@ -15,9 +15,10 @@
 *           2009/09/25 1.4 add function gen_ubx()
 *           2010/01/17 1.5 add time tag adjustment option -tadj sec
 *           2010/10/31 1.6 fix bug on playback disabled for raw data (2.4.0_p9)
-*           2011/05/27 1.4 add almanac decoding
+*           2011/05/27 1.7 add almanac decoding
 *                          add -EPHALL option
 *                          fix problem with ARM compiler
+*           2013/02/23 1.8  fix memory access violation problem on arm
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -39,29 +40,24 @@
 
 static const char rcsid[]="$Id: ublox.c,v 1.2 2008/07/14 00:05:05 TTAKA Exp $";
 
-/* get/set fields (little-endian) --------------------------------------------*/
-#define U1(p)       (*((unsigned char  *)(p)))
-#define U2(p)       (*((unsigned short *)(p)))
-#define U4(p)       (*((unsigned int   *)(p)))
-#define I1(p)       (*((char   *)(p)))
-#define I2(p)       (*((short  *)(p)))
-#define I4(p)       (*((int    *)(p)))
-#define R4(p)       (*((float  *)(p)))
+/* get fields (little-endian) ------------------------------------------------*/
+#define U1(p) (*((unsigned char *)(p)))
+#define I1(p) (*((char *)(p)))
+static unsigned short U2(unsigned char *p) {unsigned short u; memcpy(&u,p,2); return u;}
+static unsigned int   U4(unsigned char *p) {unsigned int   u; memcpy(&u,p,4); return u;}
+static float          R4(unsigned char *p) {float          r; memcpy(&r,p,4); return r;}
+static double         R8(unsigned char *p) {double         r; memcpy(&r,p,8); return r;}
 
-static double R8(const unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
-}
-static void setR8(unsigned char *p, double value)
-{
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *p++=*q++;
-}
+/* set fields (little-endian) ------------------------------------------------*/
+static void setU1(unsigned char *p, unsigned char  u) {*p=u;}
+static void setU2(unsigned char *p, unsigned short u) {memcpy(p,&u,2);}
+static void setU4(unsigned char *p, unsigned int   u) {memcpy(p,&u,4);}
+static void setI1(unsigned char *p, char           i) {*p=(unsigned char)i;}
+static void setI2(unsigned char *p, short          i) {memcpy(p,&i,2);}
+static void setI4(unsigned char *p, int            i) {memcpy(p,&i,4);}
+static void setR4(unsigned char *p, float          r) {memcpy(p,&r,4);}
+static void setR8(unsigned char *p, double         r) {memcpy(p,&r,8);}
+
 /* checksum ------------------------------------------------------------------*/
 static int checksum(unsigned char *buff, int len)
 {
@@ -422,19 +418,19 @@ extern int gen_ubx(const char *msg, unsigned char *buff)
     q+=2;
     for (j=1;prm[i][j-1]>0;j++) {
         switch (prm[i][j-1]) {
-            case FU1 : U1(q)=j<narg?(unsigned char )atoi(args[j]):0; q+=1; break;
-            case FU2 : U2(q)=j<narg?(unsigned short)atoi(args[j]):0; q+=2; break;
-            case FU4 : U4(q)=j<narg?(unsigned int  )atoi(args[j]):0; q+=4; break;
-            case FI1 : I1(q)=j<narg?(char          )atoi(args[j]):0; q+=1; break;
-            case FI2 : I2(q)=j<narg?(short         )atoi(args[j]):0; q+=2; break;
-            case FI4 : I4(q)=j<narg?(int           )atoi(args[j]):0; q+=4; break;
-            case FR4 : R4(q)=j<narg?(float         )atof(args[j]):0; q+=4; break;
+            case FU1 : setU1(q,j<narg?(unsigned char )atoi(args[j]):0); q+=1; break;
+            case FU2 : setU2(q,j<narg?(unsigned short)atoi(args[j]):0); q+=2; break;
+            case FU4 : setU4(q,j<narg?(unsigned int  )atoi(args[j]):0); q+=4; break;
+            case FI1 : setI1(q,j<narg?(char          )atoi(args[j]):0); q+=1; break;
+            case FI2 : setI2(q,j<narg?(short         )atoi(args[j]):0); q+=2; break;
+            case FI4 : setI4(q,j<narg?(int           )atoi(args[j]):0); q+=4; break;
+            case FR4 : setR4(q,j<narg?(float         )atof(args[j]):0); q+=4; break;
             case FR8 : setR8(q,j<narg?(double)atof(args[j]):0); q+=8; break;
             case FS32: sprintf((char *)q,"%-32.32s",j<narg?args[j]:""); q+=32; break;
         }
     }
     n=(int)(q-buff)+2;
-    U2(buff+4)=(unsigned short)(n-8);
+    setU2(buff+4,(unsigned short)(n-8));
     setcs(buff,n);
     
     trace(5,"gen_ubxf: buff=\n"); traceb(5,buff,n);

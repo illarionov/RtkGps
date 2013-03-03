@@ -1,6 +1,6 @@
 include $(CLEAR_VARS)
 
-RTKLIB_PATH := rtklib_2.4.2b10
+RTKLIB_PATH := rtklib_2.4.2b11
 RTKLIB_CFLAGS := -DENAGLO -DENAGAL -DENAQZS -DENACMP -DNFREQ=3 -DTRACE
 
 LOCAL_MODULE    := rtklib
@@ -48,6 +48,7 @@ LOCAL_SRC_FILES := \
         $(RTKLIB_PATH)/src/tle.c
 
 LOCAL_SRC_FILES += \
+        $(RTKLIB_PATH)/src/rcv/binex.c \
 	$(RTKLIB_PATH)/src/rcv/crescent.c \
 	$(RTKLIB_PATH)/src/rcv/gw10.c \
         $(RTKLIB_PATH)/src/rcv/javad.c \

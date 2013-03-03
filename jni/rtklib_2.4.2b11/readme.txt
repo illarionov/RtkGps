@@ -12,7 +12,8 @@ programs (APs) utilizing the library. The features of RTKLIB are:
 
 (1) Supports standard and precise positioning algorithms with:
 
-    GPS, GLONASS, Galileo, QZSS and SBAS (Galileo is not yet formally supported)
+    GPS, GLONASS, Galileo, QZSS, BeiDou and SBAS
+    (BeiDou is not yet formally supported)
 
 (2) Supports various positioning modes with GNSS for both real-time and
     post-processing:
@@ -22,15 +23,16 @@ programs (APs) utilizing the library. The features of RTKLIB are:
 
 (3) Supports many standard formats and protocols for GNSS:
 
-    RINEX 2.10,2.11,2.12 OBS/NAV/GNAV/HNAV, RINEX 3.00 OBS/NAV/CLK, RTCM v.2.3, 
-    RTCM v.3.1, NTRIP 1.0, NMEA 0183,SP3-c, IONEX 1.0, ANTEX 1.3, NGS PCV and
-    EMS 2.0 (see Release Notes for supported RTCM messages)
+    RINEX 2.10,2.11,2.12 OBS/NAV/GNAV/HNAV/LNAV, RINEX 3.00,3.01,3.02 (draft)
+    OBS/NAV/CLK, RTCM v.2.3, RTCM v.3.1,v.3.2, BINEX, NTRIP 1.0, NMEA 0183,
+    SP3-c, IONEX 1.0, ANTEX 1.4, NGS PCV and EMS 2.0 (see Release Notes for
+    supported RTCM messages)
 
 (4) Supports several GNSS receivers' proprietary messages:
 
-    NovAtel: OEM4/V, OEM3, OEMStar, Superstar II, Hemisphere: Eclipse, 
-    Crescent, u-blox: LEA-4T, 5T, 6T and SkyTraq: S1315F, JAVAD and Furuno
-    GW-10-II/III (see Release Notes for supported messages)
+    NovAtel: OEM4/V/6, OEM3, OEMStar, Superstar II, Hemisphere: Eclipse, 
+    Crescent, u-blox: LEA-4T, 5T, 6T, SkyTraq: S1315F, JAVAD, Furuno GW-10-II/
+    III and NVS NV08C BINR (see Release Notes for supported messages)
 
 (6) Supports external communication via: 
 
@@ -52,12 +54,16 @@ programs (APs) utilizing the library. The features of RTKLIB are:
 
 (8) Provides GUI and console (command line) APs:
 
-    - RTKNAVI, RTKRCV   : real-time positioning
-    - RTKPOST, RNX2RTKP : post-processing analysis
-    - RTKPLOT           : visualization of solutions and observation data
-    - RTKCONV, CONVBIN  : RINEX translator for RTCM and receiver raw data log
-    - STRSVR,  STR2STR  : communication utility
-    - NTRIPSRCBROWS     : NTRIP source table browser
+      GUI AP    CUI AP     description
+    --------------------------------------------------------------------------
+    - RTKNAVI   RTKRCV   : real-time positioning
+    - RTKPOST   RNX2RTKP : post-processing analysis
+    - RTKPLOT   -        : visualization of solutions and observation data
+    - RTKCONV   CONVBIN  : RINEX translator for RTCM and receiver raw data log
+    - STRSVR    STR2STR  : communication utility
+    - NTRIPSRCBROWS -    : NTRIP browser
+    - RTKGET    -        : GNSS data downloader
+    - RTKLAUNCH -        : RTKLIB AP launcher
     - Other positioning utilities
 
 All of the executable binary APs for Windows are included in the package as well
@@ -67,7 +73,12 @@ as whole source programs of the library and the APs.
 
 LICENSE
 
-    RTKLIB is distributed under GPLv3. (http://gplv3.fsf.org/)
+    RTKLIB is distributed under BSD 2-clause except for the following exclusive
+    clause. (http://opensource.org/licenses/bsd-license.php)
+
+    The following company and its subsidiaries are not permitted to own and
+    utilize the software since April 2013.
+    - Fujitsu Ltd.
 
 --------------------------------------------------------------------------------
 
@@ -79,14 +90,10 @@ ENVIRONMENT/PORTABILITY
     or -DMKL, the library uses LAPACK/BLAS or Intel MKL for fast matrix
     computation. The console APs are also written in standard C. The library
     and console APs can be built on many environments like gcc on Linux. The GUI
-    APs are written in C++ and utilize Borland VCL for the GUI toolkit. All of
-    the executable binary APs in the package were built by free edition Borland
-    Turbo C++ 2006 (http://www.turboexplorer.com) * on Windows. The binary APs
-    were tested on Windows XP SP3 32bit and Windows 7 64bit. The console APs
-    are also built and tested on Ubuntu 9.04 Linux.
-
-    * Free edition Turbo C++ 2006 is no longer availabile. We plan to change
-    the GUI toolkit for RTKLIB GUI APs to open source one in future versions.
+    APs are written in C++ and utilize Enbarcadero/Borland VCL for the GUI
+    toolkit. All of the executable binary APs in the package were built by
+    Enbarcadero C++ builder XE2 on Windows. The binary APs were tested on Windows
+    7 64bit. The console APs are also built and tested on Ubuntu 11.04 Linux.
 
 --------------------------------------------------------------------------------
 
@@ -108,7 +115,7 @@ PACKAGE
     ./rtknavi     realtime rtk positioning (gui)
     ./rtknavi_mkl realtime rtk positioning (gui)
     ./rtkget      gnss data downloader (gui)
-    ./rtklaunch   ap launcher (gui)
+    ./rtklaunch   rtklib ap launcher (gui)
     ./strsvr      stream server (gui)
     ./srctblbrows ntrip source table browser
     ./appcmn      common application routines
@@ -143,6 +150,7 @@ HISTORY
   ver.2.4.1b8  2013/01/10 beta release for 2.4.2
   ver.2.4.1b9  2013/01/24 beta release for 2.4.2
   ver.2.4.1b10 2013/02/08 beta release for 2.4.2
+  ver.2.4.1b11 2013/02/28 beta release for 2.4.2
 
 --------------------------------------------------------------------------------
 

@@ -20,6 +20,7 @@
 *           2012/10/18 1.3  change receiver options and rinex obs code
 *           2013/01/24 1.4  change compass factor for short pseudorange
 *                           add raw option -NOET
+*           2013/02/23 1.6 fix memory access violation problem on arm
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -32,10 +33,10 @@ static const char rcsid[]="$Id:$";
 /* extract field (little-endian) ---------------------------------------------*/
 #define U1(p) (*((unsigned char *)(p)))
 #define I1(p) (*((char *)(p)))
-#define U2(p) (*((unsigned short *)(p)))
-#define I2(p) (*((short *)(p)))
-#define U4(p) (*((unsigned int *)(p)))
-#define I4(p) (*((int *)(p)))
+static unsigned short U2(unsigned char *p) {unsigned short u; memcpy(&u,p,2); return u;}
+static unsigned int   U4(unsigned char *p) {unsigned int   u; memcpy(&u,p,4); return u;}
+static short          I2(unsigned char *p) {short          i; memcpy(&i,p,2); return i;}
+static int            I4(unsigned char *p) {int            i; memcpy(&i,p,4); return i;}
 
 static float R4(unsigned char *p)
 {
@@ -332,7 +333,7 @@ static int decode_SI(raw_t *raw)
         else if (usi<=192) sat=0;
         else if (usi<=197) sat=satno(SYS_QZS,usi);     /* 193-197: QZSS */
         else if (usi<=210) sat=0;
-        else if (usi<=254) sat=satno(SYS_CMP,usi-210); /* 211-254: Compass */
+        else if (usi<=254) sat=satno(SYS_CMP,usi-210); /* 211-254: BeiDou */
         else               sat=0;
         
         raw->obuf.data[i].time=raw->time;
@@ -744,7 +745,7 @@ static int decode_L1nav(const unsigned char *buff, int sat, raw_t *raw)
     double ion[8]={0},utc[4]={0};
     unsigned char *subfrm,*p;
     unsigned int word;
-    int i,j,sys,week,leaps=0,id=(U4(buff+4)>>8)&7;
+    int i,j,sys,week,leaps=0,id=(U4((unsigned char*)buff+4)>>8)&7;
     
     if (id<1||5<id) {
         trace(2,"navigation subframe format error: id=%d\n",id);
@@ -753,7 +754,7 @@ static int decode_L1nav(const unsigned char *buff, int sat, raw_t *raw)
     subfrm=raw->subfrm[sat-1];
     
     for (i=0,p=subfrm+(id-1)*30;i<10;i++) {
-        word=U4(buff+i*4)>>6;
+        word=U4((unsigned char*)buff+i*4)>>6;
         for (j=16;j>=0;j-=8) {
             *p++=(word>>j)&0xFF;
         }

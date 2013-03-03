@@ -1,7 +1,11 @@
 /*------------------------------------------------------------------------------
 * solution.c : solution functions
 *
-*          Copyright (C) 2007-2011 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2007-2013 by T.TAKASU, All rights reserved.
+*
+* reference :
+*     [1] National Marine Electronic Association and International Marine
+*         Electronics Association, NMEA 0183 version 4.10, August 1, 2012
 *
 * version : $Revision: 1.1 $ $Date: 2008/07/17 21:48:06 $
 * history : 2007/11/03  1.0 new
@@ -31,6 +35,7 @@
 *           2011/01/23  1.9  fix bug on reading nmea solution data
 *                            add api freesolstatbuf()
 *           2012/02/05  1.10 fix bug on output nmea gpgsv
+*           2013/02/18  1.11 support nmea GLGSA,GAGSA,GLCSV,GACSV sentence
 *-----------------------------------------------------------------------------*/
 #include <ctype.h>
 #include "rtklib.h"
@@ -1083,7 +1088,7 @@ extern int outnmea_gsa(unsigned char *buff, const sol_t *sol,
                        const ssat_t *ssat)
 {
     double azel[MAXSAT*2],dop[4];
-    int i,sat,prn,n;
+    int i,sat,sys,nsat,prn[MAXSAT];
     char *p=(char *)buff,*q,sum;
     
     trace(3,"outnmea_gsa:\n");
@@ -1094,19 +1099,62 @@ extern int outnmea_gsa(unsigned char *buff, const sol_t *sol,
         p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
         return p-(char *)buff;
     }
-    p+=sprintf(p,"$GPGSA,A,%d",sol->stat<=0?1:3);
-    for (sat=1,n=0;sat<=MAXSAT&&n<12;sat++) {
+    /* GPGSA: gps/sbas */
+    for (sat=1,nsat=0;sat<=MAXSAT&&nsat<12;sat++) {
         if (!ssat[sat-1].vs||ssat[sat-1].azel[1]<=0.0) continue;
-        if (satsys(sat,&prn)!=SYS_GPS) continue;
-        for (i=0;i<2;i++) azel[i+n*2]=ssat[sat-1].azel[i];
-        p+=sprintf(p,",%02d",prn);
-        n++;
+        sys=satsys(sat,prn+nsat);
+        if (sys!=SYS_GPS&&sys!=SYS_SBS) continue;
+        if (sys==SYS_SBS) prn[nsat]+=33-MINPRNSBS;
+        for (i=0;i<2;i++) azel[i+nsat*2]=ssat[sat-1].azel[i];
+        nsat++;
     }
-    for (i=n;i<12;i++) p+=sprintf(p,",");
-    dops(n,azel,0.0,dop);
-    p+=sprintf(p,",%3.1f,%3.1f,%3.1f",dop[1],dop[2],dop[3]);
-    for (q=(char *)buff+1,sum=0;*q;q++) sum^=*q; /* check-sum */
-    p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
+    if (nsat>0) {
+        p+=sprintf(p,"$GPGSA,A,%d",sol->stat<=0?1:3);
+        for (i=0;i<12;i++) {
+            if (i<nsat) p+=sprintf(p,",%02d",prn[i]);
+            else        p+=sprintf(p,",");
+        }
+        dops(nsat,azel,0.0,dop);
+        p+=sprintf(p,",%3.1f,%3.1f,%3.1f,1",dop[1],dop[2],dop[3]);
+        for (q=(char *)buff+1,sum=0;*q;q++) sum^=*q; /* check-sum */
+        p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
+    }
+    /* GLGSA: glonass */
+    for (sat=1,nsat=0;sat<=MAXSAT&&nsat<12;sat++) {
+        if (!ssat[sat-1].vs||ssat[sat-1].azel[1]<=0.0) continue;
+        if (satsys(sat,prn+nsat)!=SYS_GLO) continue;
+        for (i=0;i<2;i++) azel[i+nsat*2]=ssat[sat-1].azel[i];
+        nsat++;
+    }
+    if (nsat>0) {
+        p+=sprintf(p,"$GLGSA,A,%d",sol->stat<=0?1:3);
+        for (i=0;i<12;i++) {
+            if (i<nsat) p+=sprintf(p,",%02d",prn[i]+64);
+            else        p+=sprintf(p,",");
+        }
+        dops(nsat,azel,0.0,dop);
+        p+=sprintf(p,",%3.1f,%3.1f,%3.1f,2",dop[1],dop[2],dop[3]);
+        for (q=(char *)buff+1,sum=0;*q;q++) sum^=*q; /* check-sum */
+        p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
+    }
+    /* GAGSA: galileo */
+    for (sat=1,nsat=0;sat<=MAXSAT&&nsat<12;sat++) {
+        if (!ssat[sat-1].vs||ssat[sat-1].azel[1]<=0.0) continue;
+        if (satsys(sat,prn+nsat)!=SYS_GAL) continue;
+        for (i=0;i<2;i++) azel[i+nsat*2]=ssat[sat-1].azel[i];
+        nsat++;
+    }
+    if (nsat>0) {
+        p+=sprintf(p,"$GAGSA,A,%d",sol->stat<=0?1:3);
+        for (i=0;i<12;i++) {
+            if (i<nsat) p+=sprintf(p,",%02d",prn[i]+64);
+            else        p+=sprintf(p,",");
+        }
+        dops(nsat,azel,0.0,dop);
+        p+=sprintf(p,",%3.1f,%3.1f,%3.1f,3",dop[1],dop[2],dop[3]);
+        for (q=(char *)buff+1,sum=0;*q;q++) sum^=*q; /* check-sum */
+        p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
+    }
     return p-(char *)buff;
 }
 /* output solution in the form of nmea GSV sentence --------------------------*/
@@ -1125,12 +1173,13 @@ extern int outnmea_gsv(unsigned char *buff, const sol_t *sol,
         p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
         return p-(char *)buff;
     }
+    /* GPGSV: gps/sbas */
     for (sat=1,n=0;sat<MAXSAT&&n<12;sat++) {
         sys=satsys(sat,&prn);
         if (sys!=SYS_GPS&&sys!=SYS_SBS) continue;
         if (ssat[sat-1].vs&&ssat[sat-1].azel[1]>0.0) sats[n++]=sat;
     }
-    nmsg=(n-1)/4+1;
+    nmsg=n<=0?0:(n-1)/4+1;
     
     for (i=k=0;i<nmsg;i++) {
         s=p;
@@ -1138,7 +1187,7 @@ extern int outnmea_gsv(unsigned char *buff, const sol_t *sol,
         
         for (j=0;j<4;j++,k++) {
             if (k<n) {
-                if (satsys(sat,&prn)==SYS_SBS) prn=33+prn-MINPRNSBS;
+                if (satsys(sats[k],&prn)==SYS_SBS) prn+=33-MINPRNSBS;
                 az =ssat[sats[k]-1].azel[0]*R2D; if (az<0.0) az+=360.0;
                 el =ssat[sats[k]-1].azel[1]*R2D;
                 snr=ssat[sats[k]-1].snr[0]*0.25;
@@ -1146,6 +1195,57 @@ extern int outnmea_gsv(unsigned char *buff, const sol_t *sol,
             }
             else p+=sprintf(p,",,,,");
         }
+        p+=sprintf(p,",1"); /* L1C/A */
+        for (q=s+1,sum=0;*q;q++) sum^=*q; /* check-sum */
+        p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
+    }
+    /* GLGSV: glonass */
+    for (sat=1,n=0;sat<MAXSAT&&n<12;sat++) {
+        if (satsys(sat,&prn)!=SYS_GLO) continue;
+        if (ssat[sat-1].vs&&ssat[sat-1].azel[1]>0.0) sats[n++]=sat;
+    }
+    nmsg=n<=0?0:(n-1)/4+1;
+    
+    for (i=k=0;i<nmsg;i++) {
+        s=p;
+        p+=sprintf(p,"$GLGSV,%d,%d,%02d",nmsg,i+1,n);
+        
+        for (j=0;j<4;j++,k++) {
+            if (k<n) {
+                satsys(sats[k],&prn); prn+=64; /* 65-99 */
+                az =ssat[sats[k]-1].azel[0]*R2D; if (az<0.0) az+=360.0;
+                el =ssat[sats[k]-1].azel[1]*R2D;
+                snr=ssat[sats[k]-1].snr[0]*0.25;
+                p+=sprintf(p,",%02d,%02.0f,%03.0f,%02.0f",prn,el,az,snr);
+            }
+            else p+=sprintf(p,",,,,");
+        }
+        p+=sprintf(p,",1"); /* L1C/A */
+        for (q=s+1,sum=0;*q;q++) sum^=*q; /* check-sum */
+        p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
+    }
+    /* GAGSV: galileo */
+    for (sat=1,n=0;sat<MAXSAT&&n<12;sat++) {
+        if (satsys(sat,&prn)!=SYS_GAL) continue;
+        if (ssat[sat-1].vs&&ssat[sat-1].azel[1]>0.0) sats[n++]=sat;
+    }
+    nmsg=n<=0?0:(n-1)/4+1;
+    
+    for (i=k=0;i<nmsg;i++) {
+        s=p;
+        p+=sprintf(p,"$GAGSV,%d,%d,%02d",nmsg,i+1,n);
+        
+        for (j=0;j<4;j++,k++) {
+            if (k<n) {
+                satsys(sats[k],&prn); /* 1-36 */
+                az =ssat[sats[k]-1].azel[0]*R2D; if (az<0.0) az+=360.0;
+                el =ssat[sats[k]-1].azel[1]*R2D;
+                snr=ssat[sats[k]-1].snr[0]*0.25;
+                p+=sprintf(p,",%02d,%02.0f,%03.0f,%02.0f",prn,el,az,snr);
+            }
+            else p+=sprintf(p,",,,,");
+        }
+        p+=sprintf(p,",7"); /* L1BC */
         for (q=s+1,sum=0;*q;q++) sum^=*q; /* check-sum */
         p+=sprintf(p,"*%02X%c%c",sum,0x0D,0x0A);
     }

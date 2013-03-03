@@ -183,13 +183,16 @@ static int enum2str(char *s, const char *comment, int val)
 /* string to enum ------------------------------------------------------------*/
 static int str2enum(const char *str, const char *comment, int *val)
 {
-    char *p,s[128];
+    const char *p;
+    char s[32];
     
-    if ((p=strstr(comment,str))&&*(p-1)==':') { /* string */
+    for (p=comment;;p++) {
+       if (!(p=strstr(p,str))) break;
+       if (*(p-1)!=':') continue;
        for (p-=2;'0'<=*p&&*p<='9';p--) ;
        return sscanf(p+1,"%d",val)==1;
     }
-    sprintf(s,"%s:",str);
+    sprintf(s,"%30.30s:",str);
     if ((p=strstr(comment,s))) { /* number */
         return sscanf(p,"%d",val)==1;
     }

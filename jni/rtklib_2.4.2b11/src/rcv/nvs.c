@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 * nvs.c : NVS receiver dependent functions
 *
-*          Copyright (C) 2012 by M.BAVARO and T.TAKASU, All rights reserved.
+*    Copyright (C) 2012-2013 by M.BAVARO and T.TAKASU, All rights reserved.
 *
 *     [1] Description of BINR messages which is used by RC program for RINEX
 *         files accumulation, NVS
@@ -10,6 +10,7 @@
 * version : $Revision:$ $Date:$
 * history : 2012/01/30 1.0  first version by M.BAVARO
 *           2012/11/08 1.1  modified by T.TAKASU
+*           2013/02/23 1.2  fix memory access violation problem on arm
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -31,23 +32,16 @@
 
 static const char rcsid[]="$Id: nvs.c,v 1.0 2012/01/30 00:05:05 MBAVA Exp $";
 
-/* get/set fields (little-endian) --------------------------------------------*/
-#define U1(p)       (*((unsigned char  *)(p)))
-#define U2(p)       (*((unsigned short *)(p)))
-#define U4(p)       (*((unsigned int   *)(p)))
-#define I1(p)       (*((char   *)(p)))
-#define I2(p)       (*((short  *)(p)))
-#define I4(p)       (*((int    *)(p)))
-#define R4(p)       (*((float  *)(p)))
+/* get fields (little-endian) ------------------------------------------------*/
+#define U1(p) (*((unsigned char *)(p)))
+#define I1(p) (*((char *)(p)))
+static unsigned short U2(unsigned char *p) {unsigned short u; memcpy(&u,p,2); return u;}
+static unsigned int   U4(unsigned char *p) {unsigned int   u; memcpy(&u,p,4); return u;}
+static short          I2(unsigned char *p) {short          i; memcpy(&i,p,2); return i;}
+static int            I4(unsigned char *p) {int            i; memcpy(&i,p,4); return i;}
+static float          R4(unsigned char *p) {float          r; memcpy(&r,p,4); return r;}
+static double         R8(unsigned char *p) {double         r; memcpy(&r,p,8); return r;}
 
-static double R8(const unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
-}
 /* ura values (ref [3] 20.3.3.3.1.1) -----------------------------------------*/
 static const double ura_eph[]={
     2.4,3.4,4.85,6.85,9.65,13.65,24.0,48.0,96.0,192.0,384.0,768.0,1536.0,

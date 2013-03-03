@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 * rtcm3.c : rtcm ver.3 message decorder functions
 *
-*          Copyright (C) 2009-2012 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2009-2013 by T.TAKASU, All rights reserved.
 *
 * options :
 *     -DSSR_DRAFT : comply with RTCM 3 draft SSR format (ref [4])
@@ -15,6 +15,7 @@
 *                           add station id consistency test for obs data
 *           2012/12/25 1.2  change compass msm id table
 *           2013/01/31 1.3  change signal id by the latest draft (ref [13])
+*           2013/02/23 1.4  change reference for rtcm 3 message (ref [14])
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -47,32 +48,38 @@ typedef struct {                    /* multi-signal-message header type */
 } msm_h_t;
 
 /* msm signal id table -------------------------------------------------------*/
-const char *msm_sig_gps[32]={ /* GPS: ref [13] table 3.5-87 */
+const char *msm_sig_gps[32]={
+    /* GPS: ref [13] table 3.5-87, ref [14] table 3.5-91 */
     ""  ,"1C","1P","1W","1Y","1M",""  ,"2C","2P","2W","2Y","2M", /*  1-12 */
     ""  ,""  ,"2S","2L","2X",""  ,""  ,""  ,""  ,"5I","5Q","5X", /* 13-24 */
     ""  ,""  ,""  ,""  ,""  ,"1S","1L","1X"                      /* 25-32 */
 };
-const char *msm_sig_glo[32]={ /* GLONASS: ref [13] table 3.5-93 */
+const char *msm_sig_glo[32]={
+    /* GLONASS: ref [13] table 3.5-93, ref [14] table 3.5-97 */
     ""  ,"1C","1P",""  ,""  ,""  ,""  ,"2C","2P",""  ,"3I","3Q",
     "3X",""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""
 };
-const char *msm_sig_gal[32]={ /* Galileo: ref [13] table 3.5-96 */
+const char *msm_sig_gal[32]={
+    /* Galileo: ref [13] table 3.5-96, ref [14] table 3.5-100 */
     ""  ,"1C","1A","1B","1X","1Z",""  ,"6C","6A","6B","6X","6Z",
     ""  ,"7I","7Q","7X",""  ,"8I","8Q","8X",""  ,"5I","5Q","5X",
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""
 };
-const char *msm_sig_qzs[32]={ /* QZSS: ref [13] table 3.5-T+003 */
+const char *msm_sig_qzs[32]={
+    /* QZSS: ref [13] table 3.5-T+003 */
     ""  ,"1C",""  ,""  ,""  ,"1Z",""  ,""  ,"6S","6L","6X",""  ,
     ""  ,""  ,"2S","2L","2X",""  ,""  ,""  ,""  ,"5I","5Q","5X",
     ""  ,""  ,""  ,""  ,""  ,"1S","1L","1X"
 };
-const char *msm_sig_sbs[32]={ /* SBAS: ref [13] table 3.5-T+005 */
+const char *msm_sig_sbs[32]={
+    /* SBAS: ref [13] table 3.5-T+005 */
     ""  ,"1C",""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,"5I","5Q","5X",
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""
 };
-const char *msm_sig_cmp[32]={ /* BeiDou: ref [13] table 3.5-T+012 */
+const char *msm_sig_cmp[32]={
+    /* BeiDou: ref [13] table 3.5-T+012 */
     ""  ,"2I","2Q","2X",""  ,""  ,""  ,"6I","6Q","6X",""  ,""  ,
     ""  ,"7I","7Q","7X",""  ,""  ,""  ,""  ,""  ,""  ,""  ,""  ,
     ""  ,""  ,""  ,""  ,""  ,""  ,""  ,""
@@ -766,6 +773,66 @@ static int decode_type1020(rtcm_t *rtcm)
     rtcm->ephsat=sat;
     return 2;
 }
+/* decode type 1021: helmert/abridged molodenski -----------------------------*/
+static int decode_type1021(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1021: not supported message\n");
+    return 0;
+}
+/* decode type 1022: moledenski-badekas transfromation -----------------------*/
+static int decode_type1022(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1022: not supported message\n");
+    return 0;
+}
+/* decode type 1023: residual, ellipoidal grid representation ----------------*/
+static int decode_type1023(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1023: not supported message\n");
+    return 0;
+}
+/* decode type 1024: residual, plane grid representation ---------------------*/
+static int decode_type1024(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1024: not supported message\n");
+    return 0;
+}
+/* decode type 1025: projection (types except LCC2SP,OM) ---------------------*/
+static int decode_type1025(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1025: not supported message\n");
+    return 0;
+}
+/* decode type 1026: projection (LCC2SP - lambert conic conformal (2sp)) -----*/
+static int decode_type1026(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1026: not supported message\n");
+    return 0;
+}
+/* decode type 1027: projection (type OM - oblique mercator) -----------------*/
+static int decode_type1027(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1027: not supported message\n");
+    return 0;
+}
+/* decode type 1030: network rtk residual ------------------------------------*/
+static int decode_type1030(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1030: not supported message\n");
+    return 0;
+}
+/* decode type 1031: glonass network rtk residual ----------------------------*/
+static int decode_type1031(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1031: not supported message\n");
+    return 0;
+}
+/* decode type 1032: physical reference station position information ---------*/
+static int decode_type1032(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1032: not supported message\n");
+    return 0;
+}
 /* decode type 1033: receiver and antenna descriptor -------------------------*/
 static int decode_type1033(rtcm_t *rtcm)
 {
@@ -821,6 +888,36 @@ static int decode_type1033(rtcm_t *rtcm)
     
     trace(3,"rtcm3 1033: ant=%s:%s rec=%s:%s:%s\n",des,sno,rec,ver,rsn);
     return 5;
+}
+/* decode type 1034: gps network fkp gradient --------------------------------*/
+static int decode_type1034(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1034: not supported message\n");
+    return 0;
+}
+/* decode type 1035: glonass network fkp gradient ----------------------------*/
+static int decode_type1035(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1035: not supported message\n");
+    return 0;
+}
+/* decode type 1037: glonass network rtk ionospheric correction difference ---*/
+static int decode_type1037(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1037: not supported message\n");
+    return 0;
+}
+/* decode type 1038: glonass network rtk geometic correction difference ------*/
+static int decode_type1038(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1038: not supported message\n");
+    return 0;
+}
+/* decode type 1039: glonass network rtk combined correction difference ------*/
+static int decode_type1039(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1039: not supported message\n");
+    return 0;
 }
 /* decode type 1044: qzss ephemerides (ref [9]) ------------------------------*/
 static int decode_type1044(rtcm_t *rtcm)
@@ -1877,6 +1974,12 @@ static int decode_msm7(rtcm_t *rtcm, int sys)
     rtcm->obsflag=!sync;
     return sync?0:1;
 }
+/* decode type 1230: glonass L1 and L2 code-phase biases ---------------------*/
+static int decode_type1230(rtcm_t *rtcm)
+{
+    trace(2,"rtcm3 1230: not supported message\n");
+    return 0;
+}
 /* decode rtcm ver.3 message -------------------------------------------------*/
 extern int decode_rtcm3(rtcm_t *rtcm)
 {
@@ -1903,7 +2006,22 @@ extern int decode_rtcm3(rtcm_t *rtcm)
         case 1013: ret=decode_type1013(rtcm); break; /* not supported */
         case 1019: ret=decode_type1019(rtcm); break;
         case 1020: ret=decode_type1020(rtcm); break;
+        case 1021: ret=decode_type1021(rtcm); break; /* not supported */
+        case 1022: ret=decode_type1022(rtcm); break; /* not supported */
+        case 1023: ret=decode_type1023(rtcm); break; /* not supported */
+        case 1024: ret=decode_type1024(rtcm); break; /* not supported */
+        case 1025: ret=decode_type1025(rtcm); break; /* not supported */
+        case 1026: ret=decode_type1026(rtcm); break; /* not supported */
+        case 1027: ret=decode_type1027(rtcm); break; /* not supported */
+        case 1030: ret=decode_type1030(rtcm); break; /* not supported */
+        case 1031: ret=decode_type1031(rtcm); break; /* not supported */
+        case 1032: ret=decode_type1032(rtcm); break; /* not supported */
         case 1033: ret=decode_type1033(rtcm); break;
+        case 1034: ret=decode_type1034(rtcm); break; /* not supported */
+        case 1035: ret=decode_type1035(rtcm); break; /* not supported */
+        case 1037: ret=decode_type1037(rtcm); break; /* not supported */
+        case 1038: ret=decode_type1038(rtcm); break; /* not supported */
+        case 1039: ret=decode_type1039(rtcm); break; /* not supported */
         case 1044: ret=decode_type1044(rtcm); break;
         case 1045: ret=decode_type1045(rtcm); break;
         case 1046: ret=decode_type1046(rtcm); break;
@@ -1961,6 +2079,7 @@ extern int decode_rtcm3(rtcm_t *rtcm)
         case 1125: ret=decode_msm5(rtcm,SYS_CMP); break;
         case 1126: ret=decode_msm6(rtcm,SYS_CMP); break;
         case 1127: ret=decode_msm7(rtcm,SYS_CMP); break;
+        case 1230: ret=decode_type1230(rtcm);     break; /* not supported */
         case 1240: ret=decode_ssr1(rtcm,SYS_GAL); break;
         case 1241: ret=decode_ssr2(rtcm,SYS_GAL); break;
         case 1242: ret=decode_ssr3(rtcm,SYS_GAL); break;

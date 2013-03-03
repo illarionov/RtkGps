@@ -185,7 +185,7 @@ static int inputobs(obsd_t *obs, int solq, const prcopt_t *popt)
 {
     gtime_t time={0};
     char path[1024];
-    int i,nu,nr,n=0;
+    int i,ret=0,nu,nr,n=0;
     
     trace(3,"infunc  : revs=%d iobsu=%d iobsr=%d isbs=%d\n",revs,iobsu,iobsr,isbs);
     
@@ -240,13 +240,13 @@ static int inputobs(obsd_t *obs, int solq, const prcopt_t *popt)
                 fp_rtcm=fopen(path,"rb");
                 if (fp_rtcm) {
                     rtcm.time=obs[0].time;
-                    input_rtcm3f(&rtcm,fp_rtcm);
+                    ret=input_rtcm3f(&rtcm,fp_rtcm);
                     trace(2,"rtcm file open: %s\n",path);
                 }
             }
             if (fp_rtcm) {
-                while (timediff(rtcm.time,obs[0].time)<1.0) {
-                    if (input_rtcm3f(&rtcm,fp_rtcm)<-1) break;
+                while (ret!=10||timediff(rtcm.time,obs[0].time)<0.0) {
+                    if ((ret=input_rtcm3f(&rtcm,fp_rtcm))<-1) break;
                 }
                 for (i=0;i<MAXSAT;i++) navs.ssr[i]=rtcm.ssr[i];
             }
@@ -304,6 +304,7 @@ static void procpos(FILE *fp, const prcopt_t *popt, const solopt_t *sopt,
               (popt->mode==PMODE_STATIC||popt->mode==PMODE_PPP_STATIC);
     
     rtkinit(&rtk,popt);
+    rtcm_path[0]='\0';
     
     while ((nobs=inputobs(obs,rtk.sol.stat,popt))>=0) {
         
@@ -1144,11 +1145,14 @@ extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
                     strcpy(ifile[nf++],infile[j]);
                 }
                 else {
-                    /* include next day precise ephemeris */
+                    /* include next day precise ephemeris or rinex brdc nav */
                     ttte=tte;
                     if (ext&&(!strcmp(ext,".sp3")||!strcmp(ext,".SP3")||
                               !strcmp(ext,".eph")||!strcmp(ext,".EPH"))) {
                         ttte=timeadd(ttte,3600.0);
+                    }
+                    else if (strstr(infile[j],"brdc")) {
+                        ttte=timeadd(ttte,7200.0);
                     }
                     nf+=reppaths(infile[j],ifile+nf,MAXINFILE-nf,tts,ttte,"","");
                 }

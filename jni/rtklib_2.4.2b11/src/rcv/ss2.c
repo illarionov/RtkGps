@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 * ss2.c : superstar II receiver dependent functions
 *
-*          Copyright (C) 2007-2011 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2007-2013 by T.TAKASU, All rights reserved.
 *
 * reference:
 *     [1] NovAtel, OM-20000086 Superstar II Firmware Reference Manuall, 2005
@@ -13,6 +13,7 @@
 *           2010/08/20 1.4 fix problem with minus value of time slew in #23
 *                          (2.4.0_p5)
 *           2011/05/27 1.5 fix problem with ARM compiler
+*           2013/02/23 1.6 fix memory access violation problem on arm
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -27,18 +28,11 @@
 static const char rcsid[]="$Id: ss2.c,v 1.2 2008/07/14 00:05:05 TTAKA Exp $";
 
 /* get/set fields (little-endian) --------------------------------------------*/
-#define U1(p)       (*((unsigned char *)(p)))
-#define U2(p)       (*((unsigned short *)(p)))
-#define U4(p)       (*((unsigned int *)(p)))
+#define U1(p) (*((unsigned char *)(p)))
+static unsigned short U2(unsigned char *p) {unsigned short u; memcpy(&u,p,2); return u;}
+static unsigned int   U4(unsigned char *p) {unsigned int   u; memcpy(&u,p,4); return u;}
+static double         R8(unsigned char *p) {double         r; memcpy(&r,p,8); return r;}
 
-static double R8(const unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
-}
 /* checksum ------------------------------------------------------------------*/
 static int chksum(const unsigned char *buff, int len)
 {

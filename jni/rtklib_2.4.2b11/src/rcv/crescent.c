@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 * crescent.c : hemisphere crescent/eclipse receiver dependent functions
 *
-*          Copyright (C) 2007-2011 by T.TAKASU, All rights reserved.
+*          Copyright (C) 2007-2013 by T.TAKASU, All rights reserved.
 *
 * reference :
 *     [1] Hemisphere GPS, Grescent Integrator's Manual, December, 2005
@@ -17,6 +17,7 @@
 *           2011/05/27 1.4 add -EPHALL option
 *                          fix problem with ARM compiler
 *           2011/07/01 1.5 suppress warning
+*           2013/02/23 1.6 fix memory access violation problem on arm
 *-----------------------------------------------------------------------------*/
 #include "rtklib.h"
 
@@ -35,21 +36,15 @@
 static const char rcsid[]="$Id: crescent.c,v 1.2 2008/07/14 00:05:05 TTAKA Exp $";
 
 /* get fields (little-endian) ------------------------------------------------*/
-#define U1(p)       (*((unsigned char *)(p)))
-#define U2(p)       (*((unsigned short *)(p)))
-#define U4(p)       (*((unsigned int *)(p)))
-#define I2(p)       (*((short *)(p)))
-#define I4(p)       (*((int *)(p)))
-#define R4(p)       (*((float *)(p)))
+#define U1(p) (*((unsigned char *)(p)))
+#define I1(p) (*((char *)(p)))
+static unsigned short U2(unsigned char *p) {unsigned short u; memcpy(&u,p,2); return u;}
+static unsigned int   U4(unsigned char *p) {unsigned int   u; memcpy(&u,p,4); return u;}
+static short          I2(unsigned char *p) {short          i; memcpy(&i,p,2); return i;}
+static int            I4(unsigned char *p) {int            i; memcpy(&i,p,4); return i;}
+static float          R4(unsigned char *p) {float          r; memcpy(&r,p,4); return r;}
+static double         R8(unsigned char *p) {double         r; memcpy(&r,p,8); return r;}
 
-static double R8(const unsigned char *p)
-{
-    double value;
-    unsigned char *q=(unsigned char *)&value;
-    int i;
-    for (i=0;i<8;i++) *q++=*p++;
-    return value;
-}
 /* checksum ------------------------------------------------------------------*/
 static int chksum(const unsigned char *buff, int len)
 {

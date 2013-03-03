@@ -324,6 +324,14 @@ extern int init_raw(raw_t *raw)
         if (!(sys=satsys(i+1,NULL))) continue;
         raw->nav.lam[i][j]=sys==SYS_GLO?lam_glo[j]:lam[j];
     }
+    raw->sta.name[0]=raw->sta.marker[0]='\0';
+    raw->sta.antdes[0]=raw->sta.antsno[0]='\0';
+    raw->sta.rectype[0]=raw->sta.recver[0]=raw->sta.recsno[0]='\0';
+    raw->sta.antsetup=raw->sta.itrf=raw->sta.deltype=0;
+    for (i=0;i<3;i++) {
+        raw->sta.pos[i]=raw->sta.del[i]=0.0;
+    }
+    raw->sta.hgt=0.0;
     return 1;
 }
 /* free receiver raw data control ----------------------------------------------
@@ -365,6 +373,7 @@ extern int input_raw(raw_t *raw, int format, unsigned char data)
         case STRFMT_GW10 : return input_gw10 (raw,data);
         case STRFMT_JAVAD: return input_javad(raw,data);
         case STRFMT_NVS  : return input_nvs  (raw,data);
+        case STRFMT_BINEX: return input_bnx  (raw,data);
         case STRFMT_LEXR : return input_lexr (raw,data);
     }
     return 0;
@@ -390,6 +399,7 @@ extern int input_rawf(raw_t *raw, int format, FILE *fp)
         case STRFMT_GW10 : return input_gw10f (raw,fp);
         case STRFMT_JAVAD: return input_javadf(raw,fp);
         case STRFMT_NVS  : return input_nvsf  (raw,fp);
+        case STRFMT_BINEX: return input_bnxf  (raw,fp);
         case STRFMT_LEXR : return input_lexrf (raw,fp);
     }
     return -2;
