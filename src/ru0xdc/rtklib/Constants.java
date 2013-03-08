@@ -37,9 +37,9 @@ public class Constants {
 	/** number of QZSS satellites */
 	public final static int NSATQZS = MAXPRNQZS-MINPRNQZS+1;
 
-	/** min satellite sat number of Compass */
+	/** min satellite sat number of BeiDou */
 	public final static int MINPRNCMP = 1;
-	/** max satellite sat number of Compass */
+	/** max satellite sat number of BeiDou */
 	public final static int MAXPRNCMP = 35;
 	/** number of Compass satellites */
 	public final static int NSATCMP = MAXPRNCMP-MINPRNCMP+1;
@@ -53,4 +53,6 @@ public class Constants {
 
 	public final static int MAXSAT = NSATGPS+NSATGLO+NSATGAL+NSATQZS+NSATCMP+NSATSBS;
 
+	/** max number of solution buffer */
+	public final static int MAXSOLBUF = 256;
 }

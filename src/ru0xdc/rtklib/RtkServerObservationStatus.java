@@ -10,9 +10,9 @@ public class RtkServerObservationStatus {
 
 	/**
 	 * receiver:
-	 * {@link RtkServer.RECEIVER_ROVER},
-	 * {@link RtkServer.RECEIVER_BASE},
-	 * {@link RtkServer.RECEIVER_EPHEM}
+	 * {@link RtkServer#RECEIVER_ROVER},
+	 * {@link RtkServer#RECEIVER_BASE},
+	 * {@link RtkServer#RECEIVER_EPHEM}
 	 */
 	public int receiver;
 

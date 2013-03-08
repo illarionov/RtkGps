@@ -7,7 +7,10 @@ import java.util.TimerTask;
 
 import ru0xdc.rtkgps.view.GTimeView;
 import ru0xdc.rtkgps.view.SnrView;
+import ru0xdc.rtkgps.view.SolutionView;
+import ru0xdc.rtkgps.view.SolutionView.Format;
 import ru0xdc.rtkgps.view.StreamIndicatorsView;
+import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.RtkServerObservationStatus;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.annotation.TargetApi;
@@ -24,6 +27,7 @@ import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -260,18 +264,24 @@ ActionBar.OnNavigationListener {
 		private Timer mStreamStatusUpdateTimer;
 		private RtkServerStreamStatus mStreamStatus;
 		private RtkServerObservationStatus mRoverObservationStatus;
+		private RtkControlResult mRtkStatus;
+
 		// private GpsSkyView mSkyView;
 		private SnrView mSnrView;
 		private StreamIndicatorsView mStreamIndicatorsView;
 		private GTimeView mGTimeView;
+		private SolutionView mSolutionView;
 
 		private String mLastObsStatusStr;
 
 		public static final String PREF_TIME_FORMAT = "StatusFragment.PREF_TIME_FORMAT";
 
+		public static final String PREF_SOLUTION_FORMAT = "StatusFragment.PREF_SOLUTION_FORMAT";
+
 		public StatusFragment() {
 			mStreamStatus = new RtkServerStreamStatus();
 			mRoverObservationStatus = new RtkServerObservationStatus();
+			mRtkStatus = new RtkControlResult();
 		}
 
 		@Override
@@ -286,6 +296,7 @@ ActionBar.OnNavigationListener {
 			mSnrView = (SnrView)v.findViewById(R.id.Snr);
 			mStreamIndicatorsView = (StreamIndicatorsView)v.findViewById(R.id.streamIndicatorsView);
 			mGTimeView = (GTimeView)v.findViewById(R.id.gtimeView);
+			mSolutionView = (SolutionView)v.findViewById(R.id.solutionView);
 			return v;
 		}
 
@@ -298,6 +309,14 @@ ActionBar.OnNavigationListener {
 			int timeFormat = prefs.getInt(PREF_TIME_FORMAT, -1);
 			if (timeFormat >= 0) {
 				mGTimeView.setTimeFormat(timeFormat);
+			}
+			final String solutionFormat = prefs.getString(PREF_SOLUTION_FORMAT, null);
+			if (solutionFormat != null) {
+				try {
+					mSolutionView.setFormat(Format.valueOf(solutionFormat));
+				}catch(IllegalArgumentException ie) {
+					Log.e(TAG, "Invalid format for solutionView: " + solutionFormat);
+				}
 			}
 		}
 
@@ -409,10 +428,14 @@ ActionBar.OnNavigationListener {
 			}else {
 				rtks.getStreamStatus(mStreamStatus);
 				rtks.getRoverObservationStatus(mRoverObservationStatus);
+				rtks.getRtkStatus(mRtkStatus);
 				serverStatus = rtks.getServerStatus();
 			}
 
-			obsStr = mRoverObservationStatus.toString();
+			obsStr = mRtkStatus.sol.toString()
+					+ "\n"
+					+ mRoverObservationStatus.toString();
+
 			if ( ! TextUtils.equals(mLastObsStatusStr, obsStr) ) {
 				mLastObsStatusStr = obsStr;
 				mObservationStatusTextView.setText(obsStr);
@@ -423,6 +446,7 @@ ActionBar.OnNavigationListener {
 			mSnrView.setStats(mRoverObservationStatus);
 			mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
 			mStreamStatusTextView.setText(mStreamStatus.mMsg);
+			mSolutionView.setStats(mRtkStatus);
 			mGTimeView.setTime(mRoverObservationStatus.time);
 		}
 	}

@@ -12,6 +12,8 @@
 extern int registerRtkCommonNatives(JNIEnv* env);
 extern int registerGTimeNatives(JNIEnv* env);
 
+extern void set_gtime(JNIEnv* env, jclass jgtime, gtime_t time);
+
 static jfieldID m_object_field;
 
 static struct {
@@ -200,7 +202,6 @@ static void RtkServer__get_observation_status(JNIEnv* env, jclass thiz,
 {
    struct native_ctx_t *nctx;
    jobject jgtime, jtmp;
-   jmethodID set_gtime_mid;
    int ns;
    int i;
    jint *jsnr;
@@ -236,17 +237,7 @@ static void RtkServer__get_observation_status(JNIEnv* env, jclass thiz,
    if (jgtime == NULL) {
       LOGV("time is null");
    }
-   set_gtime_mid= (*env)->GetMethodID(env,
-	 (*env)->GetObjectClass(env, jgtime),
-	 "setGTime",
-	 "(JD)V");
-   if (set_gtime_mid == NULL) {
-      LOGV("setGTime() not found");
-      return;
-   }
-   (*env)->CallVoidMethod(env, jgtime, set_gtime_mid,
-	 (jlong)time.time,
-	 (jdouble)time.sec);
+   set_gtime(env, jgtime, time);
 
    if (ns == 0)
       return;
@@ -289,12 +280,179 @@ static void RtkServer__get_observation_status(JNIEnv* env, jclass thiz,
 
 }
 
+
+
+static int set_solution_buffer(JNIEnv* env, jobject j_solbuf, const sol_t *solutions, int cnt)
+{
+   int i;
+   static jfieldID m_n_sol_field = NULL;
+   static jmethodID set_solution_method = NULL;
+
+   if (m_n_sol_field == NULL) {
+      jobject claz = (*env)->GetObjectClass(env, j_solbuf);
+      m_n_sol_field = (*env)->GetFieldID(env, claz, "mNSol", "I");
+      if (m_n_sol_field == NULL) {
+	 LOGV("SolutionBuffer$mNSol field not found");
+	 return -1;
+      }
+      set_solution_method = (*env)->GetMethodID(env,
+	    claz,
+	    "setSolution",
+	    "(IJDIIIFFDDDDDDFFFFFFDDDDDD)V"
+	    );
+      if (set_solution_method == NULL) {
+	 LOGV("setSolution() not found");
+	 return;
+      }
+   }
+
+   for (i=0; i<cnt; ++i) {
+      const sol_t *s = &solutions[i];
+      (*env)->CallVoidMethod(env, j_solbuf, set_solution_method,
+	    i,
+	    (jlong)s->time.time,
+	    (jlong)s->time.sec,
+	    (jint)s->type,
+	    (jint)s->stat,
+	    (jint)s->ns,
+	    (jfloat)s->age,
+	    (jfloat)s->ratio,
+	    (jdouble)s->rr[0], (jdouble)s->rr[1], (jdouble)s->rr[2],
+	    (jdouble)s->rr[3], (jdouble)s->rr[4], (jdouble)s->rr[5],
+	    (jfloat)s->qr[0], (jfloat)s->qr[1], (jfloat)s->qr[2],
+	    (jfloat)s->qr[3], (jfloat)s->qr[4], (jfloat)s->qr[5],
+	    (jdouble)s->dtr[0], (jdouble)s->dtr[1], (jdouble)s->dtr[2],
+	    (jdouble)s->dtr[3], (jdouble)s->dtr[4], (jdouble)s->dtr[5]
+	    );
+   }
+
+   (*env)->SetIntField(env, j_solbuf, m_n_sol_field, cnt);
+
+   return cnt;
+}
+
+static void RtkServer__read_solution_buffer(JNIEnv* env, jclass thiz,
+      jobject j_solbuf)
+{
+   struct native_ctx_t *nctx;
+
+   nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
+   if (nctx == NULL) {
+      LOGV("nctx is null");
+      return;
+   }
+
+   rtksvrlock(&nctx->rtksvr);
+   set_solution_buffer(env, j_solbuf, nctx->rtksvr.solbuf, nctx->rtksvr.nsol);
+   nctx->rtksvr.nsol=0;
+   rtksvrunlock(&nctx->rtksvr);
+}
+
+static int set_rtk_status(JNIEnv* env, jobject j_rtk_control_result, rtk_t *status)
+{
+   static jfieldID sol_field_id = NULL;
+   static jmethodID set_solution_method_id = NULL;
+   static jmethodID set_status_method_id = NULL;
+   jobject sol_obj;
+
+   if (sol_field_id == NULL) {
+      jobject claz = (*env)->GetObjectClass(env, j_rtk_control_result);
+      sol_field_id = (*env)->GetFieldID(env, claz, "sol", "Lru0xdc/rtklib/Solution;");
+      if (sol_field_id == NULL) {
+	 LOGV("Solution field not found");
+	 return -1;
+      }
+   }
+   if (set_status_method_id == NULL) {
+      jobject claz = (*env)->GetObjectClass(env, j_rtk_control_result);
+      set_status_method_id = (*env)->GetMethodID(env,
+	    claz,
+	    "setStatus1",
+	    "(DDDDDDIIDILjava/lang/String;)V"
+	    );
+      if (set_status_method_id == NULL) {
+	 LOGV("setStatus1() not found");
+	 return -1;
+      }
+   }
+
+   sol_obj = (*env)->GetObjectField(env, j_rtk_control_result, sol_field_id);
+
+   if (set_solution_method_id == NULL) {
+      jobject claz = (*env)->GetObjectClass(env, sol_obj);
+      set_solution_method_id = (*env)->GetMethodID(env,
+	    claz,
+	    "setSolution",
+	    "(JDIIIFFDDDDDDFFFFFFDDDDDD)V"
+	    );
+      if (set_solution_method_id == NULL) {
+	 LOGV("setSolution() not found");
+	 return -1;
+      }
+   }
+
+   // solution
+   (*env)->CallVoidMethod(env, sol_obj, set_solution_method_id,
+	 (jlong)status->sol.time.time,
+	 (jlong)status->sol.time.sec,
+	 (jint)status->sol.type,
+	 (jint)status->sol.stat,
+	 (jint)status->sol.ns,
+	 (jfloat)status->sol.age,
+	 (jfloat)status->sol.ratio,
+	 (jdouble)status->sol.rr[0], (jdouble)status->sol.rr[1], (jdouble)status->sol.rr[2],
+	 (jdouble)status->sol.rr[3], (jdouble)status->sol.rr[4], (jdouble)status->sol.rr[5],
+	 (jfloat)status->sol.qr[0], (jfloat)status->sol.qr[1], (jfloat)status->sol.qr[2],
+	 (jfloat)status->sol.qr[3], (jfloat)status->sol.qr[4], (jfloat)status->sol.qr[5],
+	 (jdouble)status->sol.dtr[0], (jdouble)status->sol.dtr[1], (jdouble)status->sol.dtr[2],
+	 (jdouble)status->sol.dtr[3], (jdouble)status->sol.dtr[4], (jdouble)status->sol.dtr[5]
+	 );
+
+   // RTK fields
+   {
+      jstring errmsg;
+      if (status->neb == 0) {
+	 errmsg = (*env)->NewStringUTF(env, "");
+      }else {
+	 status->errbuf[status->neb-1] = '\0';
+	 errmsg = (*env)->NewStringUTF(env, status->errbuf);
+      }
+      if (errmsg == NULL)
+	 return -1;
+
+      (*env)->CallVoidMethod(env, j_rtk_control_result, set_status_method_id,
+	 (jdouble)status->rb[0], (jdouble)status->rb[1], (jdouble)status->rb[2],
+	 (jdouble)status->rb[3], (jdouble)status->rb[4], (jdouble)status->rb[5],
+	 status->nx, status->na, (jdouble)status->tt, status->nfix,
+	 errmsg);
+   }
+
+   return 0;
+}
+
+static void RtkServer__get_rtk_status(JNIEnv* env, jclass thiz, jobject j_rtk_control_result)
+{
+   struct native_ctx_t *nctx;
+
+   nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
+   if (nctx == NULL) {
+      LOGV("nctx is null");
+      return;
+   }
+
+   rtksvrlock(&nctx->rtksvr);
+   set_rtk_status(env, j_rtk_control_result, &nctx->rtksvr.rtk);
+   rtksvrunlock(&nctx->rtksvr);
+}
+
 static JNINativeMethod nativeMethods[] = {
    {"_create", "()V", (void*)RtkServer__create},
    {"_destroy", "()V", (void*)RtkServer__destroy},
    {"_start", "()Z", (void*)RtkServer__start},
    {"_stop", "()V", (void*)RtkServer__stop},
    {"_getStreamStatus", "(Lru0xdc/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status},
+   {"_readSolutionBuffer", "(Lru0xdc/rtklib/Solution$SolutionBuffer;)V", (void*)RtkServer__read_solution_buffer},
+   {"_getRtkStatus", "(Lru0xdc/rtklib/RtkControlResult;)V", (void*)RtkServer__get_rtk_status},
    {"_getObservationStatus", "(ILru0xdc/rtklib/RtkServerObservationStatus;)V", (void*)RtkServer__get_observation_status}
 };
 

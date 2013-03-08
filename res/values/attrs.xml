@@ -14,5 +14,15 @@
 	    <attr name="grid_text_size" format="integer"/>
 	    <attr name="grid_text_color" format="color"/>
 	</declare-styleable>
+	
+	<declare-styleable name="SolutionView">
+	    <attr name="format" format="enum">
+           <enum name="wgs84" value="0"  />
+           <enum name="wgs84_float" value="1"/>
+           <enum name="ecef" value="2"/>
+           <enum name="baseline_enu" value="3"/>
+           <enum name="baseline_pyl" value="4"/>
+       </attr>
+	</declare-styleable>
 
 </resources>

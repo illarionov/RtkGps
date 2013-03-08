@@ -1,8 +1,10 @@
 package ru0xdc.rtkgps;
 
+import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.RtkServer;
 import ru0xdc.rtklib.RtkServerObservationStatus;
 import ru0xdc.rtklib.RtkServerStreamStatus;
+import ru0xdc.rtklib.Solution;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -32,16 +34,24 @@ public class RtkNaviService extends Service {
 		return mBinder;
 	}
 
-	public RtkServerStreamStatus getStreamStatus(RtkServerStreamStatus status) {
+	public final RtkServerStreamStatus getStreamStatus(RtkServerStreamStatus status) {
 		return mRtkServer.getStreamStatus(status);
 	}
 
-	public RtkServerObservationStatus getRoverObservationStatus(RtkServerObservationStatus status) {
+	public final RtkServerObservationStatus getRoverObservationStatus(RtkServerObservationStatus status) {
 		return mRtkServer.getRoverObservationStatus(status);
+	}
+
+	public RtkControlResult getRtkStatus(RtkControlResult dst) {
+		return mRtkServer.getRtkStatus(dst);
 	}
 
 	public int getServerStatus() {
 		return mRtkServer.getStatus();
+	}
+
+	public final Solution getLastSolution() {
+		return mRtkServer.getLastSolution();
 	}
 
 	/**

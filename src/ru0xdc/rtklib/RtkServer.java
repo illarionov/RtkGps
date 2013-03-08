@@ -16,9 +16,12 @@ public class RtkServer {
 	 */
 	private int mStatus;
 
+	private final Solution.SolutionBuffer mSolutionBuffer;
+
 	public RtkServer() {
 		_create();
 		mStatus = RtkServerStreamStatus.STATE_CLOSE;
+		mSolutionBuffer = new Solution.SolutionBuffer();
 	}
 
 	public boolean start() {
@@ -58,6 +61,17 @@ public class RtkServer {
 		return mStatus;
 	}
 
+	public Solution getLastSolution() {
+		_readSolutionBuffer(mSolutionBuffer);
+		return mSolutionBuffer.getLastSolution();
+	}
+
+	public RtkControlResult getRtkStatus(RtkControlResult dst) {
+		if (dst == null) dst = new RtkControlResult();
+		_getRtkStatus(dst);
+		return dst;
+	}
+
 	private RtkServerObservationStatus getObservationStatus(int receiver, RtkServerObservationStatus status) {
 		if (status == null) status = new RtkServerObservationStatus();
 		_getObservationStatus(receiver, status);
@@ -83,5 +97,9 @@ public class RtkServer {
 	private native void _getStreamStatus(RtkServerStreamStatus status);
 
 	private native void _getObservationStatus(int receiver, RtkServerObservationStatus status);
+
+	private native void _getRtkStatus(RtkControlResult dst);
+
+	private native void _readSolutionBuffer(Solution.SolutionBuffer dst);
 
 }

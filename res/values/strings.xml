@@ -31,6 +31,39 @@
     <string name="gtime_format_utc">UTC</string>
     <string name="gtime_format_local">Local</string>
     <string name="gtime_format_gps_tow">GPS TOW</string>
-    
 
+    <!-- Solution view -->
+    <string name="solution_view_solution">Solution:</string>
+    <string name="solution_view_age_text_format">Age: %1$.1fs Ratio: %2$.1f #Of sat: %3$d</string>
+    
+    <string name="solution_view_format_wgs84">Lat/Long/Height</string>
+    <string name="solution_view_format_wgs84_float">Lat/Long/Height-Float</string>
+    <string name="solution_view_format_ecef">X/Y/Z-ECEF</string>
+    <string name="solution_view_format_enu_baseline">E/N/U-Baseline</string>
+    <string name="solution_view_format_pyl_baseline">Pitch/Yaw/Length-Baseline</string>
+    
+    <string-array name="solution_view_coordinates_wgs84">
+        <item>Lat:</item>
+        <item>Lon:</item>
+        <item>Height:</item>
+    </string-array>
+
+    <string-array name="solution_view_coordinates_ecef">
+        <item>X:</item>
+        <item>Y:</item>
+        <item>Z:</item>
+    </string-array>
+
+    <string-array name="solution_view_coordinates_baseline_enu">
+        <item>E:</item>
+        <item>N:</item>
+        <item>U:</item>
+    </string-array>
+
+    <string-array name="solution_view_coordinates_baseline_pyl">
+        <item>Pitch:</item>
+        <item>Yaw:</item>
+        <item>Length:</item>
+    </string-array>
+    
 </resources>

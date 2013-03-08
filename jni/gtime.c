@@ -13,6 +13,10 @@ static struct {
    jfieldID sec;
 } ru0xdc_rtklib_gtime_fields;
 
+static struct {
+   jmethodID set_gtime;
+} ru0xdc_rtklib_gtime_methods;
+
 
 static gtime_t get_gtime_t(JNIEnv* env, jobject thiz)
 {
@@ -41,20 +45,32 @@ static jdouble GTime_get_gps_tow(JNIEnv* env, jobject thiz)
    return time2gpst(get_gtime_t(env, thiz), NULL);
 }
 
-static int init_gtime_fields(JNIEnv* env, jclass clazz) {
+static int init_gtime_fields_methods(JNIEnv* env, jclass clazz) {
 
     ru0xdc_rtklib_gtime_fields.time = (*env)->GetFieldID(env, clazz, "time", "J");
     ru0xdc_rtklib_gtime_fields.sec = (*env)->GetFieldID(env, clazz, "sec", "D");
+    ru0xdc_rtklib_gtime_methods.set_gtime = (*env)->GetMethodID(env, clazz, "setGTime", "(JD)V");
 
     if ((ru0xdc_rtklib_gtime_fields.time == NULL)
-	  || (ru0xdc_rtklib_gtime_fields.sec == NULL)) {
-       LOGV("ru0xdc/rtklib/GTime fields not found:%s%s",
+	  || (ru0xdc_rtklib_gtime_fields.sec == NULL)
+	  || (ru0xdc_rtklib_gtime_methods.set_gtime == NULL)
+	  ) {
+       LOGV("ru0xdc/rtklib/GTime fields not found:%s%s%s",
 	     (ru0xdc_rtklib_gtime_fields.time == NULL ? " time" : ""),
-	     (ru0xdc_rtklib_gtime_fields.sec == NULL ? " sec" : ""));
+	     (ru0xdc_rtklib_gtime_fields.sec == NULL ? " sec" : ""),
+	     (ru0xdc_rtklib_gtime_methods.set_gtime == NULL ? " setGTime" : "")
+	     );
        return JNI_FALSE;
     }
 
     return JNI_TRUE;
+}
+
+void set_gtime(JNIEnv* env, jclass jgtime, gtime_t time)
+{
+   (*env)->CallVoidMethod(env, jgtime, ru0xdc_rtklib_gtime_methods.set_gtime,
+	 (jlong)time.time,
+	 (jdouble)time.sec);
 }
 
 
@@ -77,7 +93,7 @@ int registerGTimeNatives(JNIEnv* env) {
 	     / sizeof(nativeMethods[0])) != JNI_OK)
        return JNI_FALSE;
 
-    if ( ! init_gtime_fields(env, clazz))
+    if ( ! init_gtime_fields_methods(env, clazz))
        return JNI_FALSE;
 
     return JNI_TRUE;
