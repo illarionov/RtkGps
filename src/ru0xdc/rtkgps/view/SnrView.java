@@ -235,15 +235,14 @@ public class SnrView extends View {
     			if ((mBand == BAND_ANY || (mBand == BAND_L1))
     					&& (mStatus.freq1Snr[i] > MIN_SNR)) {
     				snr = Math.min(mStatus.freq1Snr[i], MAX_SNR);
-    				Paint p = GpsSkyView.getSatellitePaint(mBarFillPaint,
-    						mStatus.freq1Snr[i],
-    						mStatus.vsat[i]);
+    				mBarFillPaint.setColor(GpsSkyView.getSatellitePaintColor(
+    						mStatus.freq1Snr[i], mStatus.vsat[i]));
     				canvas.drawRect(
     						x1,
     						barBox.bottom - (snr-MIN_SNR) * dbhzHeight,
     						x2,
     						barBox.bottom,
-    						p
+    						mBarFillPaint
     						);
     			}
 
@@ -251,15 +250,14 @@ public class SnrView extends View {
     			if ((mBand == BAND_ANY || (mBand == BAND_L2))
     					&& (mStatus.freq2Snr[i] > MIN_SNR)) {
     				snr = Math.min(mStatus.freq2Snr[i], MAX_SNR);
-    				Paint p = GpsSkyView.getSatellitePaint(mBarFillPaint,
-    						mStatus.freq2Snr[i],
-    						mStatus.vsat[i]);
+    				mBarFillPaint.setColor(GpsSkyView.getSatellitePaintColor(
+    						mStatus.freq2Snr[i], mStatus.vsat[i]));
     				canvas.drawRect(
     						x1,
     						barBox.bottom - (snr-MIN_SNR) * dbhzHeight,
     						x2,
     						barBox.bottom,
-    						p
+    						mBarFillPaint
     						);
     			}
 
@@ -268,15 +266,14 @@ public class SnrView extends View {
     					&& (mStatus.freq3Snr[i] > MIN_SNR)
     					) {
     				snr = Math.min(mStatus.freq3Snr[i], MAX_SNR);
-    				Paint p = GpsSkyView.getSatellitePaint(mBarFillPaint,
-    						mStatus.freq3Snr[i],
-    						mStatus.vsat[i]);
+    				mBarFillPaint.setColor(GpsSkyView.getSatellitePaintColor(
+    						mStatus.freq3Snr[i], mStatus.vsat[i]));
     				canvas.drawRect(
     						x1,
     						barBox.bottom - (snr-MIN_SNR) * dbhzHeight,
     						x2,
     						barBox.bottom,
-    						p
+    						mBarFillPaint
     						);
     			}
     		}

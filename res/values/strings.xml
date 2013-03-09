@@ -4,7 +4,7 @@
     <string name="app_name">RtkGps</string>
     <string name="title_section3">Section 3</string>
     <string name="title_section2">Section 2</string>
-    <string name="title_section1">Section 1</string>
+    <string name="title_section1">Status</string>
 
     <string name="menu_settings">Settings</string>
 	<string name="menu_start_service">Start service</string>
@@ -35,7 +35,7 @@
 
     <!-- Solution view -->
     <string name="solution_view_solution">Solution:</string>
-    <string name="solution_view_age_text_format">Age: %1$.1fs Ratio: %2$.1f #Of sat: %3$d</string>
+    <string name="solution_view_age_text_format">Age: %1$.1fs\nRatio: %2$.1f\n#Of sat: %3$d</string>
     
     <string name="solution_view_format_wgs84">Lat/Long/Height</string>
     <string name="solution_view_format_wgs84_float">Lat/Long/Height-Float</string>

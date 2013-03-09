@@ -1,64 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal" >
 
-	<TableRow
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:paddingBottom="16dp" >
-    
-	    <LinearLayout
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_span="2"
-	        android:orientation="horizontal" >
+	<TableLayout
+    	android:layout_width="wrap_content"
+    	android:layout_height="wrap_content" >
+		<TableRow
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:paddingBottom="16dp" >
+
+			<LinearLayout
+	        	android:layout_width="wrap_content"
+	        	android:layout_height="wrap_content"
+	        	android:layout_span="2"
+	        	android:orientation="horizontal" >
 		
-        	<TextView
-            	android:layout_width="wrap_content"
-            	android:layout_height="wrap_content"
-            	android:layout_marginRight="10dp"
-            	android:text="@string/solution_view_solution"
-            	/>
+        		<TextView
+	            	android:layout_width="wrap_content"
+            		android:layout_height="wrap_content"
+            		android:layout_marginRight="10dp"
+            		android:text="@string/solution_view_solution"
+            		/>
 
-        	<TextView
-        	    android:id="@+id/solution_status"
-        	    android:layout_width="0dp"
-        	    android:layout_height="wrap_content"
-        	    android:gravity="center"
-        	    android:layout_weight="1"
-        	    android:text="None" />
+        		<TextView
+        	    	android:id="@+id/solution_status"
+        	    	android:layout_width="0dp"
+        	    	android:layout_height="wrap_content"
+        	    	android:gravity="center"
+        	    	android:layout_weight="1"
+        	    	android:text="None" />
         	
-        	<view class="ru0xdc.rtkgps.view.SolutionView$SolutionIndicatorView"
-        	    android:id="@+id/solution_indicator_view"
-        	    android:layout_width="wrap_content"
-        	    android:layout_height="wrap_content"
-        	    android:layout_gravity="center"
-        	     />
+        		<view class="ru0xdc.rtkgps.view.SolutionView$SolutionIndicatorView"
+        	    	android:id="@+id/solution_indicator_view"
+        	    	android:layout_width="wrap_content"
+        	    	android:layout_height="wrap_content"
+        	    	android:layout_gravity="center"
+        	     	/>
+        	</LinearLayout>
+    	</TableRow>
 
-        </LinearLayout>
-    	
-    </TableRow>
+		<TableRow
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content" >
 
-	<TableRow
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content" >
+			<TextView
+				android:id="@+id/coord1_name"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:minEms="3"
+				/>
 
-            <TextView
-                android:id="@+id/coord1_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minEms="3"
-                android:text="Lat:" />
-
-            <TextView
-                android:id="@+id/coord1_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:minEms="7"
-                android:text="57" />
-
+			<TextView
+				android:id="@+id/coord1_value"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:gravity="right"
+				android:minEms="7"
+				/>
         </TableRow>
 
         <TableRow
@@ -70,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minEms="3"
-                android:text="Lon:" />
+                />
 
             <TextView
                 android:id="@+id/coord2_value"
@@ -78,8 +80,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:minEms="7"
-                android:text="46" />
-
+                 />
         </TableRow>
 
         <TableRow
@@ -91,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minEms="3"
-                android:text="Height:" />
+                />
 
             <TextView
                 android:id="@+id/coord3_value"
@@ -99,42 +100,32 @@
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:minEms="7"
-                android:text="191" />
-            
-        </TableRow>
-
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="18dp" >
-
-            <TextView
-                android:id="@+id/covariance_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_span="2"
-                android:singleLine="true"
-                android:textColor="@android:color/secondary_text_dark"
-                android:textSize="12sp"
-                android:text="E: 0.028 N: 0.031 U: 0.048m" />
-
-        </TableRow>
-        
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/age_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_span="2"
-                android:singleLine="true"
-                android:textColor="@android:color/secondary_text_dark"
-                android:textSize="12sp" 
                 />
-
         </TableRow>
     </TableLayout>
+    
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="18dp"
+	    android:layout_marginTop="2dp"
+	    android:measureWithLargestChild="false"
+	    android:orientation="vertical" >
+
+		<TextView
+		    android:id="@+id/covariance_text"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:textColor="@android:color/secondary_text_dark"
+		    android:textSize="12sp" />
+
+		<TextView
+		    android:id="@+id/age_text"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:textColor="@android:color/secondary_text_dark"
+		    android:textSize="12sp" />
+
+	</LinearLayout>
+
+</LinearLayout>    

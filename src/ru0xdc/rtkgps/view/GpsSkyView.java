@@ -27,7 +27,7 @@ public class GpsSkyView extends View {
 
 	public static final String BAND_L5 = "L5";
 
-	private static final int SAT_RADIUS = 16;
+	private static final float SAT_RADIUS = 16.0f;
 
 	static final int COLOR_NOT_VALID_SAT = Color.LTGRAY;
 
@@ -125,8 +125,8 @@ public class GpsSkyView extends View {
     	return mBand;
     }
 
-    private void drawSky(Canvas c, int s) {
-        float radius = s / 2;
+    private void drawSky(Canvas c, float s) {
+        float radius = s / 2.0f;
 
         for (double a=0; a<360; a += 45) {
         	int x=(int)((radius-SAT_RADIUS)*Math.sin(Math.toRadians(a)));
@@ -134,9 +134,10 @@ public class GpsSkyView extends View {
         	c.drawLine(radius, radius, radius+x, radius+y, mGridStrokePaint);
         }
 
+        c.drawCircle(radius, radius, elevationToRadius(s,  0.0f), mGridStrokePaint);
         c.drawCircle(radius, radius, elevationToRadius(s, 60.0f), mGridStrokePaint);
         c.drawCircle(radius, radius, elevationToRadius(s, 30.0f), mGridStrokePaint);
-        c.drawCircle(radius, radius, elevationToRadius(s,  0.0f), mGridStrokePaint);
+
 
         final Context ctx = getContext();
         drawTextWithBackground(c, ctx.getString(R.string.sky_plot_north),
@@ -162,13 +163,12 @@ public class GpsSkyView extends View {
     	c.drawText(str, x, y, mSkyTextPaint);
     }
 
-    private void drawSatellites(Canvas canvas, int s) {
+    private void drawSatellites(Canvas canvas, float s) {
 
     	for (int i = 0; i < mStatus.ns; ++i) {
         	int snr;
         	double radius, angle;
             float x, y;
-            Paint thisPaint;
 
         	if (mStatus.el[i] <= 0.0)  continue;
         	if (BAND_L1.equals(mBand)) {
@@ -178,7 +178,8 @@ public class GpsSkyView extends View {
         	}else {
         		snr = mStatus.freq3Snr[i];
         	}
-            thisPaint = getSatellitePaint(mSatelliteFillPaint, snr, mStatus.vsat[i]);
+
+        	mSatelliteFillPaint.setColor(getSatellitePaintColor(snr, mStatus.vsat[i]));
 
             radius = elevationToRadius(s, Math.toDegrees(mStatus.el[i]));
             angle = mStatus.az[i];
@@ -186,7 +187,7 @@ public class GpsSkyView extends View {
             x = (float)((s / 2) + (radius * Math.sin(angle)));
             y = (float)((s / 2) - (radius * Math.cos(angle)));
 
-            canvas.drawCircle(x, y, SAT_RADIUS, thisPaint);
+            canvas.drawCircle(x, y, SAT_RADIUS, mSatelliteFillPaint);
             canvas.drawCircle(x, y, SAT_RADIUS, mSatelliteStrokePaint);
             canvas.drawText(mStatus.getSatId(i),
             		x,
@@ -195,7 +196,7 @@ public class GpsSkyView extends View {
     	}
     }
 
-    private void printInfo(Canvas canvas, int s) {
+    private void printInfo(Canvas canvas, float s) {
     	final String numOfSat = String.format(
     			getContext().getString(R.string.sky_plot_num_of_sat)
     			, mStatus.ns);
@@ -216,11 +217,9 @@ public class GpsSkyView extends View {
     }
 
 
-    static Paint getSatellitePaint(Paint base, int snr, int valid) {
+    static int getSatellitePaintColor(int snr, int valid) {
         int j, color;
-        Paint newPaint;
 
-        newPaint = new Paint(base);
         if (valid == 0) {
         	color = COLOR_NOT_VALID_SAT;
         }else {
@@ -230,14 +229,12 @@ public class GpsSkyView extends View {
         	}
         	color = SNR_COLORS[j];
         }
-
-        newPaint.setColor(color);
-        return newPaint;
+        return color;
     }
 
 
-    private float elevationToRadius(int s, double elev) {
-        return ((s / 2) - SAT_RADIUS) * (90.0f - (float)elev) / 90.0f;
+    private float elevationToRadius(float s, double elev) {
+        return ((s / 2.0f) - SAT_RADIUS) * (90.0f - (float)elev) / 90.0f;
     }
 
     @Override
@@ -251,12 +248,12 @@ public class GpsSkyView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-    	int w, h, s;
+    	float w, h, s;
 
     	super.onDraw(canvas);
 
-    	w = canvas.getWidth();
-    	h = canvas.getHeight();
+    	w = getWidth() - getPaddingLeft() - getPaddingRight();
+    	h = getHeight() - getPaddingTop() - getPaddingBottom();
     	s = (w < h) ? w : h;
 
     	drawSky(canvas, s);

@@ -184,7 +184,7 @@ public class SolutionView extends TableLayout {
 			mTextViewCoord3Value.setText(strHeight);
 			mTextViewCovariance.setText(String.format(
 					Locale.US,
-					"N:%6.3f E:%6.3f U:%6.3f m",
+					"N:%6.3f\nE:%6.3f\nU:%6.3f m",
 					Math.sqrt(Qe[4] < 0 ? 0 : Qe[4]),
 					Math.sqrt(Qe[0] < 0 ? 0 : Qe[0]),
 					Math.sqrt(Qe[8] < 0 ? 0 : Qe[8])
@@ -196,7 +196,7 @@ public class SolutionView extends TableLayout {
 			mTextViewCoord3Value.setText(mCoordEcefFormatter.format(sol.rr[2]));
 			mTextViewCovariance.setText(String.format(
 					Locale.US,
-					"X:%6.3f Y:%6.3f Z:%6.3f m",
+					"X:%6.3f\nY:%6.3f\nZ:%6.3f m",
 					Math.sqrt(sol.qr[0] < 0 ? 0 : sol.qr[0]),
 					Math.sqrt(sol.qr[1] < 0 ? 0 : sol.qr[1]),
 					Math.sqrt(sol.qr[2] < 0 ? 0 : sol.qr[2])
@@ -250,7 +250,7 @@ public class SolutionView extends TableLayout {
 			mTextViewCoord3Value.setText(v3);
 			mTextViewCovariance.setText(String.format(
 					Locale.US,
-					"E:%6.3f N:%6.3f U:%6.3f m",
+					"E:%6.3f\nN:%6.3f\nU:%6.3f m",
 					Math.sqrt(Qe[0] < 0 ? 0 : Qe[0]),
 					Math.sqrt(Qe[4] < 0 ? 0 : Qe[4]),
 					Math.sqrt(Qe[8] < 0 ? 0 : Qe[8])
@@ -282,7 +282,13 @@ public class SolutionView extends TableLayout {
 
 	private void updateCoordinatesHeader() {
 		final String headers[];
-		headers = getResources().getStringArray(mSolutionFormat.mHeadersArrayId);
+
+		if (isInEditMode()) {
+			headers = new String[] {"Lat:", "Lon:", "height:"};
+		}else {
+			headers = getResources().getStringArray(mSolutionFormat.mHeadersArrayId);
+		}
+
 		mTextViewCoord1Name.setText(headers[0]);
 		mTextViewCoord2Name.setText(headers[1]);
 		mTextViewCoord3Name.setText(headers[2]);

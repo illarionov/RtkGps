@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import ru0xdc.rtkgps.view.GTimeView;
+import ru0xdc.rtkgps.view.GpsSkyView;
 import ru0xdc.rtkgps.view.SnrView;
 import ru0xdc.rtkgps.view.SolutionView;
 import ru0xdc.rtkgps.view.SolutionView.Format;
@@ -22,7 +23,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 public class StatusFragment extends Fragment {
 
@@ -39,21 +38,16 @@ public class StatusFragment extends Fragment {
 
 	static final String TAG = StatusFragment.class.getSimpleName();
 
-	private TextView mStreamStatusTextView;
-	private TextView mObservationStatusTextView;
-
 	private Timer mStreamStatusUpdateTimer;
 	private RtkServerStreamStatus mStreamStatus;
 	private RtkServerObservationStatus mRoverObservationStatus;
 	private RtkControlResult mRtkStatus;
 
-	// private GpsSkyView mSkyView;
+	private GpsSkyView mSkyView;
 	private SnrView mSnrView;
 	private StreamIndicatorsView mStreamIndicatorsView;
 	private GTimeView mGTimeView;
 	private SolutionView mSolutionView;
-
-	private String mLastObsStatusStr;
 
 	public static final String PREF_TIME_FORMAT = "StatusFragment.PREF_TIME_FORMAT";
 
@@ -71,9 +65,7 @@ public class StatusFragment extends Fragment {
 		// Create a new TextView and set its text to the fragment's section
 		// number argument value.
 		View v = inflater.inflate(R.layout.fragment_status, container, false);
-		mStreamStatusTextView = (TextView) v.findViewById(R.id.StreamStatus);
-		mObservationStatusTextView = (TextView) v.findViewById(R.id.ObservationStatus);
-		// mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
+		mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
 		mSnrView = (SnrView)v.findViewById(R.id.Snr);
 		mStreamIndicatorsView = (StreamIndicatorsView)v.findViewById(R.id.streamIndicatorsView);
 		mGTimeView = (GTimeView)v.findViewById(R.id.gtimeView);
@@ -201,7 +193,6 @@ public class StatusFragment extends Fragment {
 	void updateStatus() {
 		MainActivity ma;
 		RtkNaviService rtks;
-		String obsStr;
 		int serverStatus;
 
 		ma = (MainActivity)getActivity();
@@ -220,20 +211,10 @@ public class StatusFragment extends Fragment {
 			serverStatus = rtks.getServerStatus();
 		}
 
-		obsStr = mRtkStatus.sol.toString()
-				+ "\n"
-				+ mRoverObservationStatus.toString();
-
-		if ( ! TextUtils.equals(mLastObsStatusStr, obsStr) ) {
-			mLastObsStatusStr = obsStr;
-			mObservationStatusTextView.setText(obsStr);
-		}
-
 		assertNotNull(mStreamStatus.mMsg);
-		// mSkyView.setStats(mRoverObservationStatus);
+		mSkyView.setStats(mRoverObservationStatus);
 		mSnrView.setStats(mRoverObservationStatus);
 		mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
-		mStreamStatusTextView.setText(mStreamStatus.mMsg);
 		mSolutionView.setStats(mRtkStatus);
 		mGTimeView.setTime(mRoverObservationStatus.time);
 	}
