@@ -16,23 +16,46 @@ import android.widget.TextView;
 
 public class GTimeView extends TextView {
 
-	public final static int TIME_FORMAT_GPS = 0;
+	public enum Format {
 
-	public final static int TIME_FORMAT_UTC = 1;
+		GPS(0, R.string.gtime_format_gps),
 
-	public final static int TIME_FORMAT_LOCAL = 2;
+		UTC(1, R.string.gtime_format_utc),
 
-	public final static int TIME_FORMAT_GPS_TOW = 3;
+		LOCAL(2, R.string.gtime_format_local),
 
-	private final static int DEFAULT_TIME_FORMAT = TIME_FORMAT_LOCAL;
+		GPS_TOW(3, R.string.gtime_format_gps_tow);
 
-	private final static String DEFAULT_TIME_TEMPLATE = "yyyy/MM/dd HH:mm:ss.SSS";
+		final int mStyledAttributeValue;
+		final int mDescriptionId;
+
+		private Format(int styledAttributeValue, int descriptionId) {
+			mStyledAttributeValue = styledAttributeValue;
+			mDescriptionId = descriptionId;
+		}
+
+		static Format valueOfStyledAttr(int val) {
+			for (Format f: Format.values()) {
+				if (f.mStyledAttributeValue == val)
+					return f;
+			}
+			throw new IllegalArgumentException();
+		}
+
+		public int getDescriptionResId() {
+			return mDescriptionId;
+		}
+	}
 
 	@SuppressWarnings("unused")
 	private static final boolean DBG = BuildConfig.DEBUG & true;
 	static final String TAG = GTimeView.class.getSimpleName();
 
-	private int mTimeFormat;
+	private final static Format DEFAULT_TIME_FORMAT = Format.LOCAL;
+
+	private final static String DEFAULT_TIME_TEMPLATE = "yyyy/MM/dd HH:mm:ss.SSS";
+
+	private Format mTimeFormat;
 
 	private String mTimeTemplate;
 
@@ -57,9 +80,11 @@ public class GTimeView extends TextView {
                 attrs, R.styleable.GTimeView, 0, 0);
 
         try {
-        	mTimeFormat = a.getInt(R.styleable.GTimeView_time_format,
-        			DEFAULT_TIME_FORMAT
+        	final int formatVal = a.getInt(R.styleable.GTimeView_time_format,
+        			DEFAULT_TIME_FORMAT.mStyledAttributeValue
         			);
+        	mTimeFormat = Format.valueOfStyledAttr(formatVal);
+
         	mTimeTemplate = a.getString(R.styleable.GTimeView_time_template);
         	if (mTimeTemplate == null) mTimeTemplate = DEFAULT_TIME_TEMPLATE;
         }finally {
@@ -70,7 +95,7 @@ public class GTimeView extends TextView {
         updateTextViewValue();
     }
 
-    public void setTimeFormat(int timeFormat) {
+    public void setTimeFormat(Format timeFormat) {
     	if (timeFormat != mTimeFormat) {
     		mTimeFormat = timeFormat;
     		updateTimeFormatter();
@@ -88,7 +113,7 @@ public class GTimeView extends TextView {
     	}
     }
 
-    public int getTimeFormat() {
+    public Format getTimeFormat() {
     	return mTimeFormat;
     }
 
@@ -104,18 +129,18 @@ public class GTimeView extends TextView {
 
     private void updateTimeFormatter() {
     	switch (mTimeFormat) {
-		case TIME_FORMAT_GPS:
+		case GPS:
 			mGTimeFormatter = new SimpleDateFormat(mTimeTemplate, Locale.US);
 			mGTimeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 			break;
-		case TIME_FORMAT_UTC:
+		case UTC:
 			mGTimeFormatter = new SimpleDateFormat(mTimeTemplate, Locale.US);
 			mGTimeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 			break;
-		case TIME_FORMAT_LOCAL:
+		case LOCAL:
 			mGTimeFormatter = new SimpleDateFormat(mTimeTemplate, Locale.US);
 			break;
-		case TIME_FORMAT_GPS_TOW:
+		case GPS_TOW:
 			mGTimeFormatter = null;
 			break;
     	}
@@ -126,21 +151,21 @@ public class GTimeView extends TextView {
 
     	try {
     		switch (mTimeFormat) {
-    		case TIME_FORMAT_GPS:
+    		case GPS:
     			mGTimeDate.setTime(mGTime.getGpsTimeMillis());
     			time = mGTimeFormatter.format(mGTimeDate)
     					+ " "
     					+ getResources().getString(R.string.gtime_format_gps)
     					;
     			break;
-    		case TIME_FORMAT_UTC:
+    		case UTC:
     			mGTimeDate.setTime(mGTime.getUtcTimeMillis());
     			time = mGTimeFormatter.format(mGTimeDate)
     					+ " "
     					+ getResources().getString(R.string.gtime_format_utc)
     					;
     			break;
-    		case TIME_FORMAT_LOCAL:
+    		case LOCAL:
     			mGTimeDate.setTime(mGTime.getUtcTimeMillis());
     			mGTimeFormatter.setTimeZone(TimeZone.getDefault());
     			time = mGTimeFormatter.format(mGTimeDate)
@@ -148,7 +173,7 @@ public class GTimeView extends TextView {
     					+ getResources().getString(R.string.gtime_format_local)
     					;
     			break;
-    		case TIME_FORMAT_GPS_TOW:
+    		case GPS_TOW:
     			time = String.format(Locale.US,
     					"week %04d %.3f s", mGTime.getGpsWeek(),
     					mGTime.getGpsTow()

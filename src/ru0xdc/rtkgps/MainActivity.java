@@ -1,39 +1,19 @@
 package ru0xdc.rtkgps;
 
-import static junit.framework.Assert.assertNotNull;
-
-import java.util.Timer;
-import java.util.TimerTask;
-
-import ru0xdc.rtkgps.view.GTimeView;
-import ru0xdc.rtkgps.view.SnrView;
-import ru0xdc.rtkgps.view.SolutionView;
-import ru0xdc.rtkgps.view.SolutionView.Format;
-import ru0xdc.rtkgps.view.StreamIndicatorsView;
-import ru0xdc.rtklib.RtkControlResult;
-import ru0xdc.rtklib.RtkServerObservationStatus;
-import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -253,201 +233,6 @@ ActionBar.OnNavigationListener {
 			textView.setText(Integer.toString(getArguments().getInt(
 					ARG_SECTION_NUMBER)));
 			return textView;
-		}
-	}
-
-	public static class StatusFragment extends Fragment {
-
-		private TextView mStreamStatusTextView;
-		private TextView mObservationStatusTextView;
-
-		private Timer mStreamStatusUpdateTimer;
-		private RtkServerStreamStatus mStreamStatus;
-		private RtkServerObservationStatus mRoverObservationStatus;
-		private RtkControlResult mRtkStatus;
-
-		// private GpsSkyView mSkyView;
-		private SnrView mSnrView;
-		private StreamIndicatorsView mStreamIndicatorsView;
-		private GTimeView mGTimeView;
-		private SolutionView mSolutionView;
-
-		private String mLastObsStatusStr;
-
-		public static final String PREF_TIME_FORMAT = "StatusFragment.PREF_TIME_FORMAT";
-
-		public static final String PREF_SOLUTION_FORMAT = "StatusFragment.PREF_SOLUTION_FORMAT";
-
-		public StatusFragment() {
-			mStreamStatus = new RtkServerStreamStatus();
-			mRoverObservationStatus = new RtkServerObservationStatus();
-			mRtkStatus = new RtkControlResult();
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			// Create a new TextView and set its text to the fragment's section
-			// number argument value.
-			View v = inflater.inflate(R.layout.fragment_status, container, false);
-			mStreamStatusTextView = (TextView) v.findViewById(R.id.StreamStatus);
-			mObservationStatusTextView = (TextView) v.findViewById(R.id.ObservationStatus);
-			// mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
-			mSnrView = (SnrView)v.findViewById(R.id.Snr);
-			mStreamIndicatorsView = (StreamIndicatorsView)v.findViewById(R.id.streamIndicatorsView);
-			mGTimeView = (GTimeView)v.findViewById(R.id.gtimeView);
-			mSolutionView = (SolutionView)v.findViewById(R.id.solutionView);
-			return v;
-		}
-
-		@Override
-		public void onActivityCreated(Bundle savedInstanceState) {
-			super.onActivityCreated(savedInstanceState);
-
-			registerForContextMenu(mGTimeView);
-			final SharedPreferences prefs = getActivity().getPreferences(MODE_PRIVATE);
-			int timeFormat = prefs.getInt(PREF_TIME_FORMAT, -1);
-			if (timeFormat >= 0) {
-				mGTimeView.setTimeFormat(timeFormat);
-			}
-			final String solutionFormat = prefs.getString(PREF_SOLUTION_FORMAT, null);
-			if (solutionFormat != null) {
-				try {
-					mSolutionView.setFormat(Format.valueOf(solutionFormat));
-				}catch(IllegalArgumentException ie) {
-					Log.e(TAG, "Invalid format for solutionView: " + solutionFormat);
-				}
-			}
-		}
-
-		@Override
-		public void onStart() {
-			super.onStart();
-
-			mStreamStatusUpdateTimer = new Timer();
-			mStreamStatusUpdateTimer.scheduleAtFixedRate(
-					new TimerTask() {
-						Runnable updateStatusRunnable = new Runnable() {
-							@Override
-							public void run() {
-								StatusFragment.this.updateStatus();
-							}
-						};
-						@Override
-						public void run() {
-							Activity a = getActivity();
-							if (a == null) return;
-							a.runOnUiThread(updateStatusRunnable);
-						}
-					}, 200, 250);
-		}
-
-
-		@Override
-		public void onStop() {
-			mStreamStatusUpdateTimer.cancel();
-			super.onStop();
-		}
-
-		@Override
-		public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
-			super.onCreateContextMenu(menu, v, menuInfo);
-			MenuInflater inflater = getActivity().getMenuInflater();
-
-			if (mGTimeView.equals(v)) {
-				MenuItem item;
-
-				inflater.inflate(R.menu.gtime_format, menu);
-				menu.setHeaderTitle(R.string.gtime_format_context_menu_title);
-
-				switch (mGTimeView.getTimeFormat()) {
-				case GTimeView.TIME_FORMAT_GPS:
-					item = menu.findItem(R.id.gtime_format_gps);
-					break;
-				case GTimeView.TIME_FORMAT_GPS_TOW:
-					item = menu.findItem(R.id.gtime_format_gps_tow);
-					break;
-				case GTimeView.TIME_FORMAT_UTC:
-					item = menu.findItem(R.id.gtime_format_utc);
-					break;
-				case GTimeView.TIME_FORMAT_LOCAL:
-					item = menu.findItem(R.id.gtime_format_local);
-					break;
-				default:
-					throw new IllegalStateException();
-				}
-				item.setChecked(true);
-			}
-		}
-
-		@Override
-		public boolean onContextItemSelected(MenuItem item) {
-			int newFormat;
-
-		    switch (item.getItemId()) {
-		        case R.id.gtime_format_gps:
-		        	newFormat = GTimeView.TIME_FORMAT_GPS;
-		        	break;
-		        case R.id.gtime_format_gps_tow:
-		        	newFormat = GTimeView.TIME_FORMAT_GPS_TOW;
-		        	break;
-		        case R.id.gtime_format_utc:
-		        	newFormat = GTimeView.TIME_FORMAT_UTC;
-		        	break;
-		        case R.id.gtime_format_local:
-		        	newFormat = GTimeView.TIME_FORMAT_LOCAL;
-		        	break;
-		        default:
-		            return super.onContextItemSelected(item);
-		    }
-		    mGTimeView.setTimeFormat(newFormat);
-
-		    final SharedPreferences prefs = getActivity().getPreferences(MODE_PRIVATE);
-		    final SharedPreferences.Editor editor = prefs.edit();
-		    editor.putInt(PREF_TIME_FORMAT, newFormat);
-			editor.commit();
-
-		    return true;
-		}
-
-		void updateStatus() {
-			MainActivity ma;
-			RtkNaviService rtks;
-			String obsStr;
-			int serverStatus;
-
-			ma = (MainActivity)getActivity();
-
-			if (ma == null) return;
-
-			rtks = ma.getRtkService();
-			if (rtks == null) {
-				serverStatus = RtkServerStreamStatus.STATE_CLOSE;
-				// mRoverObservationStatus.clear();
-				mStreamStatus.clear();
-			}else {
-				rtks.getStreamStatus(mStreamStatus);
-				rtks.getRoverObservationStatus(mRoverObservationStatus);
-				rtks.getRtkStatus(mRtkStatus);
-				serverStatus = rtks.getServerStatus();
-			}
-
-			obsStr = mRtkStatus.sol.toString()
-					+ "\n"
-					+ mRoverObservationStatus.toString();
-
-			if ( ! TextUtils.equals(mLastObsStatusStr, obsStr) ) {
-				mLastObsStatusStr = obsStr;
-				mObservationStatusTextView.setText(obsStr);
-			}
-
-			assertNotNull(mStreamStatus.mMsg);
-			// mSkyView.setStats(mRoverObservationStatus);
-			mSnrView.setStats(mRoverObservationStatus);
-			mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
-			mStreamStatusTextView.setText(mStreamStatus.mMsg);
-			mSolutionView.setStats(mRtkStatus);
-			mGTimeView.setTime(mRoverObservationStatus.time);
 		}
 	}
 

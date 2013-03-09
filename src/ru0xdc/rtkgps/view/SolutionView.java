@@ -71,6 +71,10 @@ public class SolutionView extends TableLayout {
 			}
 			throw new IllegalArgumentException();
 		}
+
+		public int getDescriptionResId() {
+			return mDescriptionId;
+		}
 	}
 
 	public static final Format DEFAULT_SOLUTION_FORMAT = Format.WGS84;
@@ -141,6 +145,10 @@ public class SolutionView extends TableLayout {
 			updateCoordinatesHeader();
 			clearCoordinates();
 		}
+	}
+
+	public Format getFormat() {
+		return mSolutionFormat;
 	}
 
 	private void updateCoordinates(RtkControlResult rtk) {
