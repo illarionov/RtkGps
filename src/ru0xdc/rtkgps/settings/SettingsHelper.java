@@ -18,8 +18,9 @@ public class SettingsHelper {
 
 	public static void setDefaultValues(Context ctx, boolean force) {
 
-		// XXX Settings1Fragment, SuolutionOutputFragment
+		// XXX SuolutionOutputFragment
 
+		ProcessingOptions1Fragment.setDefaultValues(ctx, force);
 		InputRoverFragment.setDefaultValues(ctx, force);
 		InputBaseFragment.setDefaultValues(ctx, force);
 		InputCorrectionFragment.setDefaultValues(ctx, force);
