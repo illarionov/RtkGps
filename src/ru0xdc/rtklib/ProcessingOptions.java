@@ -5,6 +5,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtklib.constants.Constants;
+import ru0xdc.rtklib.constants.EarthTideCorrectionType;
 import ru0xdc.rtklib.constants.EphemerisOption;
 import ru0xdc.rtklib.constants.IonosphereOption;
 import ru0xdc.rtklib.constants.NavigationSystem;
@@ -117,8 +119,8 @@ public class ProcessingOptions {
 	/** dynamics model (0:none,1:velociy,2:accel) */
 	int dynamics;
 
-	/** earth tide correction (0:off,1-:on) */
-	boolean tidecorr;
+	/** earth tide correction (0:off,1:solid,2:solid+otl+pole) */
+	int tidecorr;
 
 	/** number of filter iteration */
 	int niter;
@@ -399,15 +401,15 @@ public class ProcessingOptions {
 	/**
 	 * @return Earth tides correction
 	 */
-	public boolean getEarthTidersCorrection() {
-		return this.tidecorr;
+	public EarthTideCorrectionType getEarthTidersCorrection() {
+		return EarthTideCorrectionType.valueOf(this.tidecorr);
 	}
 
 	/**
 	 * @param on Earth tides correction
 	 */
-	public void setEarthTidesCorrection(boolean on) {
-		this.tidecorr = on;
+	public void setEarthTidesCorrection(EarthTideCorrectionType type) {
+		this.tidecorr = type.getRtklibId();
 	}
 
 	/**

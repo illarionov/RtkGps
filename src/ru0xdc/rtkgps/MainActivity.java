@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 import ru0xdc.rtkgps.settings.InputStreamSettingsActivity;
 import ru0xdc.rtkgps.settings.SettingsActivity;
 import ru0xdc.rtkgps.settings.SettingsHelper;
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
@@ -15,7 +14,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -53,16 +51,15 @@ ActionBar.OnNavigationListener {
 		// Set up the dropdown list navigation in the action bar.
 		actionBar.setListNavigationCallbacks(
 				// Specify a SpinnerAdapter to populate the dropdown list.
-				new ArrayAdapter<String>(getActionBarThemedContextCompat(),
+				new ArrayAdapter<String>(getActionBar().getThemedContext(),
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, new String[] {
 					getString(R.string.title_status)}), this);
 
 		if (savedInstanceState == null) {
 			SettingsHelper.setDefaultValues(this, false);
+			startRtkService();
 		}
-
-		startRtkService();
 	}
 
 	@Override
@@ -71,20 +68,6 @@ ActionBar.OnNavigationListener {
 		if (!mRtkServiceBound) {
 			final Intent intent = new Intent(this, RtkNaviService.class);
 			bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-		}
-	}
-
-	/**
-	 * Backward-compatible version of {@link ActionBar#getThemedContext()} that
-	 * simply returns the {@link android.app.Activity} if
-	 * <code>getThemedContext</code> is unavailable.
-	 */
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-	private Context getActionBarThemedContextCompat() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			return getActionBar().getThemedContext();
-		} else {
-			return this;
 		}
 	}
 

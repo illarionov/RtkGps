@@ -9,7 +9,7 @@
 
     	<fragment
         	android:id="@+id/settings1Fragment"
-        	class="ru0xdc.rtkgps.settings.Settings1Fragment"
+        	class="ru0xdc.rtkgps.settings.ProcessingOptions1Fragment"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content" />
     

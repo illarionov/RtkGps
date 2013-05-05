@@ -38,7 +38,7 @@ public class SettingsHelper {
 
 		settings = new RtkServerSettings();
 
-		procOpts = Settings1Fragment.readPrefs(ctx);
+		procOpts = ProcessingOptions1Fragment.readPrefs(ctx);
 		settings.setProcessingOptions(procOpts);
 
 		solOptsBase = SolutionOutputSettingsFragment.readPrefs(ctx);

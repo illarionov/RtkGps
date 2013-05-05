@@ -1,4 +1,4 @@
-package ru0xdc.rtklib;
+package ru0xdc.rtklib.constants;
 
 
 public class Constants {

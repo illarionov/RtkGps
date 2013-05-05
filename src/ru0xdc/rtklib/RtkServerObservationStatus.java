@@ -3,6 +3,8 @@ package ru0xdc.rtklib;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
+import ru0xdc.rtklib.constants.Constants;
+
 import junit.framework.Assert;
 import android.annotation.SuppressLint;
 

@@ -70,8 +70,6 @@ public class RtkNaviService extends Service {
 	@Override
 	public void onCreate() {
 		final RtkServerSettings settings;
-		// IInputStream inputBase, inputRover, inputCorrection;
-
 		super.onCreate();
 
 		settings = SettingsHelper.loadSettings(this);

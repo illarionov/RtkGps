@@ -235,7 +235,6 @@
     <string name="procopt_rec_dynamics_title">Rec dynamics</string>
     <string name="procopt_rec_dynamics_summary">Estimate receiver velocity and acceleration</string>
     <string name="procopt_rec_earth_tides_correction_title">Earth tides correction</string>
-    <string name="procopt_rec_earth_tides_correction_summary">Apply earth tides correction</string>
 
     <!-- Ionosphere correction -->
     <string name="procopt_ionosphere_correction_title">Ionosphere correction</string>
@@ -269,9 +268,6 @@
     <string name="procopt_raim_fde_title">RAIM FDE</string>
     <string name="procopt_raim_fde_summary">Enable RAIM failure detection and exclusion</string>
 
-    <!-- Solution options -->
-
-
     <!-- Output header -->
     <string name="solopt_output_header_title">Output header</string>
     <string name="solopt_output_header_summary">Set whether the header is output or not</string>
@@ -284,6 +280,11 @@
     <string name="solopt_lat_lon_format_title">Latitude/Longitude Format</string>
     <string name="solopt_lat_lon_format_dialog_title">Latitude/Longitude Format</string>
 
+    <!-- Earth tide correction -->
+    <string name="earth_tide_correction_off">OFF</string>
+    <string name="earth_tide_correction_solid">Solid</string>
+    <string name="earth_tide_correction_solid_otl_pole">Solid, ocean, pole</string>
+    
     <string-array name="solopt_lat_lon_format_entries">
         <item>ddd.dddddddd : Degree</item>
         <item>ddd mm ss.sss : Degree minute second</item>

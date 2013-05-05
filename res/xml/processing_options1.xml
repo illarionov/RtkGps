@@ -33,9 +33,8 @@
         android:key="rec_dynamics"
         android:summary="@string/procopt_rec_dynamics_summary"
         android:title="@string/procopt_rec_dynamics_title" />
-    <CheckBoxPreference
+    <ru0xdc.rtkgps.settings.widget.EarthTideCorrectionPreference
         android:key="rec_earth_tides_correction"
-        android:summary="@string/procopt_rec_earth_tides_correction_summary"
         android:title="@string/procopt_rec_earth_tides_correction_title" />
 
     <ListPreference

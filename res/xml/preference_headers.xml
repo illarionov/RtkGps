@@ -32,7 +32,7 @@
     
     
     <header 
-        android:fragment="ru0xdc.rtkgps.settings.Settings1Fragment"
+        android:fragment="ru0xdc.rtkgps.settings.ProcessingOptions1Fragment"
         android:title="@string/procopt_category_processing_options_1"
          />
     <header 

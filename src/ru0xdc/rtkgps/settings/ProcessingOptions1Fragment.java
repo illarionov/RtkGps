@@ -7,8 +7,10 @@ import java.util.Set;
 
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
+import ru0xdc.rtkgps.settings.widget.EarthTideCorrectionPreference;
 import ru0xdc.rtkgps.view.MultiSelectListPreferenceWorkaround;
 import ru0xdc.rtklib.ProcessingOptions;
+import ru0xdc.rtklib.constants.EarthTideCorrectionType;
 import ru0xdc.rtklib.constants.EphemerisOption;
 import ru0xdc.rtklib.constants.IonosphereOption;
 import ru0xdc.rtklib.constants.NavigationSystem;
@@ -29,10 +31,10 @@ import android.text.TextUtils;
 import android.util.Log;
 
 
-public class Settings1Fragment extends PreferenceFragment {
+public class ProcessingOptions1Fragment extends PreferenceFragment {
 
 	private static final boolean DBG = BuildConfig.DEBUG & true;
-	static final String TAG = Settings1Fragment.class.getSimpleName();
+	static final String TAG = ProcessingOptions1Fragment.class.getSimpleName();
 
 	static final String SHARED_PREFS_NAME = "Settings1";
 
@@ -59,7 +61,7 @@ public class Settings1Fragment extends PreferenceFragment {
 	private ListPreference mElevationMaskPref;
 	private ListPreference mSnrMaskPref;
 	private CheckBoxPreference mRecDynamicsPref;
-	private CheckBoxPreference mEarthTidesCorrPref;
+	private EarthTideCorrectionPreference mEarthTidesCorrPref;
 	private ListPreference mIonosphereCorrectionPref;
 	private ListPreference mTroposphereCorrectionPref;
 	private ListPreference mSatEphemClockPref;
@@ -73,7 +75,7 @@ public class Settings1Fragment extends PreferenceFragment {
 		super.onCreate(savedInstanceState);
 
 		getPreferenceManager().setSharedPreferencesName(SHARED_PREFS_NAME);
-		addPreferencesFromResource(R.xml.settings1);
+		addPreferencesFromResource(R.xml.processing_options1);
 
 		mProcessingOptions = readPrefs(getActivity());
 
@@ -110,7 +112,7 @@ public class Settings1Fragment extends PreferenceFragment {
 			}else if (mRecDynamicsPref.equals(preference)) {
 				mProcessingOptions.setRecDynamics((Boolean)newValue);
 			}else if (mEarthTidesCorrPref.equals(preference)) {
-				mProcessingOptions.setEarthTidesCorrection((Boolean)newValue);
+				mProcessingOptions.setEarthTidesCorrection(EarthTideCorrectionType.valueOf(newValue.toString()));
 			}else if (mIonosphereCorrectionPref.equals(preference)) {
 				mProcessingOptions.setIonosphereCorrection(IonosphereOption.valueOf(newValue.toString()));
 			}else if (mTroposphereCorrectionPref.equals(preference)) {
@@ -181,9 +183,8 @@ public class Settings1Fragment extends PreferenceFragment {
 		mRecDynamicsPref.setChecked(mProcessingOptions.getRecDynamics());
 
 		// Earth tides correction
-		mEarthTidesCorrPref = (CheckBoxPreference)findPreference(KEY_EARTH_TIDES_CORRECTION);
+		mEarthTidesCorrPref = (EarthTideCorrectionPreference)findPreference(KEY_EARTH_TIDES_CORRECTION);
 		mEarthTidesCorrPref.setOnPreferenceChangeListener(mOnPreferenceChangeListener);
-		mRecDynamicsPref.setChecked(mProcessingOptions.getEarthTidersCorrection());
 
 		// Ionosphere correction
 		mIonosphereCorrectionPref = (ListPreference)findPreference(KEY_IONOSPHERE_CORRECTION);
@@ -266,6 +267,9 @@ public class Settings1Fragment extends PreferenceFragment {
 
     	summary = r.getString(mProcessingOptions.getSatEphemerisOption().getNameResId());
     	mSatEphemClockPref.setSummary(summary);
+
+    	summary = r.getString(mProcessingOptions.getEarthTidersCorrection().getNameResId());
+    	mEarthTidesCorrPref.setSummary(summary);
     }
 
     public static ProcessingOptions readPrefs(Context ctx) {
@@ -299,7 +303,14 @@ public class Settings1Fragment extends PreferenceFragment {
     	if (v != null) opts.setSnrMask(Integer.valueOf(v));
 
     	opts.setRecDynamics(prefs.getBoolean(KEY_REC_DYNAMICS, opts.getRecDynamics()));
-    	opts.setEarthTidesCorrection(prefs.getBoolean(KEY_EARTH_TIDES_CORRECTION, opts.getEarthTidersCorrection()));
+
+    	try {
+    		v = prefs.getString(KEY_EARTH_TIDES_CORRECTION, null);
+    	}catch (ClassCastException cce) {
+    		cce.printStackTrace();
+    		v = null;
+    	}
+    	if (v != null) opts.setEarthTidesCorrection(EarthTideCorrectionType.valueOf(v));
 
     	v = prefs.getString(KEY_IONOSPHERE_CORRECTION, null);
     	if (v != null) opts.setIonosphereCorrection(IonosphereOption.valueOf(v));
