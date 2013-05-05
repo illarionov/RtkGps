@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="?android:dividerHorizontal"
+        android:dividerPadding="10dp"
+        android:orientation="vertical"
+        android:showDividers="middle" >
+        
+        <LinearLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="64dp" />
+        
+    	<Button
+    	    android:id="@android:id/closeButton"
+    	    android:layout_width="match_parent"
+    	    android:layout_height="wrap_content"
+    	    android:onClick="closeButtonClicked"
+    	    android:text="@android:string/ok"
+    	    style="@android:style/Widget.Holo.Button.Borderless"
+    	     />
+        
+	</LinearLayout>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <SwitchPreference
+        android:key="enable"
+        android:title="@string/input_streams_settings_enable_rover_title" />
+    
+    <ru0xdc.rtkgps.settings.widget.StreamTypePreference
+        android:key="type"
+        android:title="@string/streams_settings_type_title"
+        android:dependency="enable" />
+    
+	<Preference
+        android:key="stream_settings_button"
+        android:dependency="enable"
+        android:title="@string/streams_settings_button_title"
+        android:persistent="false" />
+    
+    <ru0xdc.rtkgps.settings.widget.StreamFormatPreference
+        android:key="format"
+        android:title="@string/streams_settings_format_title"
+        android:dependency="enable" />
+        
+    <EditTextPreference
+        android:key="commands_at_startup"
+        android:title="@string/input_streams_settings_commands_at_startup_title"
+        android:dependency="enable"
+        android:inputType="textLongMessage"
+         />
+    
+	<EditTextPreference
+        android:key="commands_at_shutdown"
+        android:title="@string/input_streams_settings_commands_at_shutdown_title"
+        android:dependency="enable"
+        android:inputType="textLongMessage"
+         />
+	
+	<EditTextPreference
+        android:key="receiver_option"
+        android:title="@string/input_streams_settings_receiver_option_title"
+        android:dependency="enable" />
+    
+	<ListPreference
+	    android:key="transmit_gpgga_to_base"
+	    android:title="@string/input_streams_settings_transmit_gpgga_to_base_title"
+	    android:dependency="enable"
+	    android:entries="@array/input_streams_settings_transmit_gpgga_entries"
+	    android:entryValues="@array/input_streams_settings_transmit_gpgga_vaues"
+	    />
+	
+	 <EditTextPreference
+        android:key="transmit_gpgga_latitude"
+        android:title="@string/input_streams_settings_transmit_gpgga_lat_title"
+        android:inputType="number|numberSigned|numberDecimal"
+        />
+	 
+	<EditTextPreference
+        android:key="transmit_gpgga_longitude"
+        android:title="@string/input_streams_settings_transmit_gpgga_lon_title"
+        android:inputType="number|numberSigned|numberDecimal"
+        />
+	
+</PreferenceScreen>

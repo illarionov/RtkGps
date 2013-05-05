@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <EditTextPreference
+        android:key="stream_file_filename"
+        android:title="@string/file_filename_title"
+        android:defaultValue=""
+        />    
+
+</PreferenceScreen>

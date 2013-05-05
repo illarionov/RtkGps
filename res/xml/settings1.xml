@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <ListPreference
+        android:dialogTitle="@string/procopt_positioning_mode_dialog_title"
+        android:key="positioning_mode"
+        android:title="@string/procopt_positioning_mode_title" />
+    <ListPreference
+        android:dialogTitle="@string/procopt_number_of_freqencies_dialog_title"
+        android:entries="@array/procopt_number_of_frequencies_entries"
+        android:entryValues="@array/procopt_number_of_frequencies_values"
+        android:key="number_of_frequencies"
+        android:title="@string/procopt_number_of_freqencies_title" />
+
+    <ru0xdc.rtkgps.view.MultiSelectListPreferenceWorkaround
+        android:dialogTitle="@string/procopt_navigation_system_dialog_title"
+        android:key="navigation_system"
+        android:title="@string/procopt_navigation_system_title" />
+
+    <ListPreference
+        android:dialogTitle="@string/procopt_elevation_mask_dialog_title"
+        android:entries="@array/procopt_elevation_mask_entries"
+        android:entryValues="@array/procopt_elevation_mask_entries"
+        android:key="elevation_mask"
+        android:title="@string/procopt_elevation_mask_title" />
+    <ListPreference
+        android:dialogTitle="@string/procopt_snr_mask_dialog_title"
+        android:entries="@array/procopt_snr_entries"
+        android:entryValues="@array/procopt_snr_entries"
+        android:key="snr_mask"
+        android:title="@string/procopt_snr_mask_title" />
+
+    <CheckBoxPreference
+        android:key="rec_dynamics"
+        android:summary="@string/procopt_rec_dynamics_summary"
+        android:title="@string/procopt_rec_dynamics_title" />
+    <CheckBoxPreference
+        android:key="rec_earth_tides_correction"
+        android:summary="@string/procopt_rec_earth_tides_correction_summary"
+        android:title="@string/procopt_rec_earth_tides_correction_title" />
+
+    <ListPreference
+        android:dialogTitle="@string/procopt_ionosphere_correction_dialog_title"
+        android:key="ionosphere_correction"
+        android:title="@string/procopt_ionosphere_correction_title" />
+    <ListPreference
+        android:dialogTitle="@string/procopt_troposphere_correction_dialog_title"
+        android:key="troposphere_correction"
+        android:title="@string/procopt_troposphere_correction_title" />
+    <ListPreference
+        android:dialogTitle="@string/procopt_satellite_ephemeris_clock_dialog_title"
+        android:key="satellite_ephemeris_clock"
+        android:title="@string/procopt_satellite_ephemeris_clock_title" />
+
+    <CheckBoxPreference
+        android:key="sat_antenna_pcv"
+        android:summary="@string/procopt_sat_antenna_pcv_summary"
+        android:title="@string/procopt_sat_antenna_pcv_title" />
+    <CheckBoxPreference
+        android:key="receiver_antenna_pcv"
+        android:summary="@string/procopt_receiver_antenna_pcv_summary"
+        android:title="@string/procopt_receiver_antenna_pcv_title" />
+    <CheckBoxPreference
+        android:key="phase_windup_correction"
+        android:summary="@string/procopt_phase_windup_correction_summary"
+        android:title="@string/procopt_phase_windup_correction_title" />
+    <CheckBoxPreference
+        android:key="exclude_eclipsing_sat_measurements"
+        android:summary="@string/procopt_exclude_eclipsing_sat_measurements_summary"
+        android:title="@string/procopt_exclude_eclipsing_sat_measurements_title" />
+    <CheckBoxPreference
+        android:key="raim_fde"
+        android:summary="@string/procopt_raim_fde_summary"
+        android:title="@string/procopt_raim_fde_title" />
+</PreferenceScreen>

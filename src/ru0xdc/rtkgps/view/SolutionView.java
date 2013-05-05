@@ -13,7 +13,7 @@ import ru0xdc.rtklib.RtkCommon.Deg2Dms;
 import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.Solution;
-import ru0xdc.rtklib.Solution.Status;
+import ru0xdc.rtklib.Solution.SolutionStatus;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -304,7 +304,7 @@ public class SolutionView extends TableLayout {
 
 		private float mIndicatorWidth, mIndicatorHeight;
 
-		private Solution.Status mStatus;
+		private Solution.SolutionStatus mStatus;
 
 		public SolutionIndicatorView(Context context, AttributeSet attrs) {
 			super(context, attrs);
@@ -314,13 +314,13 @@ public class SolutionView extends TableLayout {
 			mIndicatorWidth = DEFAULT_INDICATOR_WIDTH * density;
 			mIndicatorHeight = DEFAULT_INDICATOR_HEIGHT * density;
 
-			mStatus = Status.NONE;
+			mStatus = SolutionStatus.NONE;
 
 	        mIndicatorPaint = new Paint();
 			mIndicatorPaint.setColor(DEFAULT_COLOR_STATE_CLOSE);
 		}
 
-		public void setStatus(Solution.Status status) {
+		public void setStatus(Solution.SolutionStatus status) {
 			mStatus = status;
 			invalidate();
 		}

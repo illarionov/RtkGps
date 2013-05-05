@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <EditTextPreference
+        android:key="stream_ntrip_client_host"
+        android:title="@string/ntrip_client_host_title"
+        android:inputType="textUri"
+        android:defaultValue="gps.0xdc.ru"
+        />
+    
+    <EditTextPreference
+        android:key="stream_ntrip_client_port"
+        android:title="@string/ntrip_client_port_title"
+        android:inputType="number"
+        android:defaultValue="2101"
+        />
+    
+    <EditTextPreference
+        android:key="stream_ntrip_client_mountpoint"
+        android:title="@string/ntrip_client_mountpoint_title"
+        android:defaultValue="gag27-rtcm"
+        />
+    
+    <EditTextPreference
+        android:key="stream_ntrip_client_user"
+        android:title="@string/ntrip_client_user_title"
+        android:inputType="textPersonName"
+        android:defaultValue="osm"
+        />
+    
+	<EditTextPreference
+        android:key="stream_ntrip_client_password"
+        android:title="@string/ntrip_client_password_title"
+        android:inputType="textVisiblePassword"
+        android:defaultValue="osm"
+        />
+
+</PreferenceScreen>

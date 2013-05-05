@@ -10,6 +10,7 @@ import ru0xdc.rtkgps.R;
 import ru0xdc.rtklib.GTime;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
@@ -105,7 +106,7 @@ public class GTimeView extends TextView {
     }
 
     public void setTimeTemplate(String timeTemplate) {
-    	if (timeTemplate != mTimeTemplate) {
+    	if (!TextUtils.equals(timeTemplate, mTimeTemplate)) {
     		mTimeTemplate = timeTemplate;
     		updateTimeFormatter();
     		updateTextViewValue();

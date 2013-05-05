@@ -6,6 +6,7 @@ trash
 gen
 local.properties
 
+.apt_generated/
 .lint4jprefs
 lint.xml
 proguard/

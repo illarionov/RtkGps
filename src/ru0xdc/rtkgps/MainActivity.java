@@ -1,26 +1,29 @@
 package ru0xdc.rtkgps;
 
+import java.io.File;
+
+import javax.annotation.Nonnull;
+
+import ru0xdc.rtkgps.settings.InputStreamSettingsActivity;
+import ru0xdc.rtkgps.settings.SettingsActivity;
+import ru0xdc.rtkgps.settings.SettingsHelper;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
-public class MainActivity extends FragmentActivity implements
+public class MainActivity extends Activity implements
 ActionBar.OnNavigationListener {
 
 	@SuppressWarnings("unused")
@@ -53,9 +56,11 @@ ActionBar.OnNavigationListener {
 				new ArrayAdapter<String>(getActionBarThemedContextCompat(),
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, new String[] {
-					getString(R.string.title_section1),
-					getString(R.string.title_section2),
-					getString(R.string.title_section3), }), this);
+					getString(R.string.title_status)}), this);
+
+		if (savedInstanceState == null) {
+			SettingsHelper.setDefaultValues(this, false);
+		}
 
 		startRtkService();
 	}
@@ -171,7 +176,10 @@ ActionBar.OnNavigationListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
-			// TODO
+			showSettings();
+			break;
+		case R.id.menu_input_stream_settings:
+			showInputStreamSettings();
 			break;
 		case R.id.menu_start_service:
 			startRtkService();
@@ -185,6 +193,16 @@ ActionBar.OnNavigationListener {
 		return true;
 	}
 
+	private void showSettings() {
+		final Intent intent = new Intent(this, SettingsActivity.class);
+		startActivity(intent);
+	}
+
+	private void showInputStreamSettings() {
+		final Intent intent = new Intent(this, InputStreamSettingsActivity.class);
+		startActivity(intent);
+	}
+
 	@Override
 	public boolean onNavigationItemSelected(int position, long id) {
 		Fragment fragment;
@@ -196,44 +214,18 @@ ActionBar.OnNavigationListener {
 			fragment = new StatusFragment();
 			break;
 		default:
-			fragment = new DummySectionFragment();
-			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-			fragment.setArguments(args);
-			break;
+			throw new IllegalStateException();
 		}
 
-		getSupportFragmentManager().beginTransaction()
+		getFragmentManager().beginTransaction()
 			.replace(R.id.container, fragment).commit();
 
 		return true;
 	}
 
-	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
-
-		public DummySectionFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			// Create a new TextView and set its text to the fragment's section
-			// number argument value.
-			TextView textView = new TextView(getActivity());
-			textView.setGravity(Gravity.CENTER);
-			textView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
-			return textView;
-		}
+	@Nonnull
+	public static File getFileStorageDirectory() {
+		return new File(Environment.getExternalStorageDirectory(), "RtkGps/");
 	}
 
 	static {

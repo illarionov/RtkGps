@@ -4,15 +4,10 @@
 #include <strings.h>
 
 #include "rtklib.h"
+#include "rtkjni.h"
 
 #define TAG "nativeRtkServer"
 #define LOGV(...) showmsg(__VA_ARGS__)
-
-
-extern int registerRtkCommonNatives(JNIEnv* env);
-extern int registerGTimeNatives(JNIEnv* env);
-
-extern void set_gtime(JNIEnv* env, jclass jgtime, gtime_t time);
 
 static jfieldID m_object_field;
 
@@ -141,6 +136,146 @@ static jboolean RtkServer__start(JNIEnv* env, jclass thiz)
    }
 
    return JNI_TRUE;
+}
+
+
+static jboolean RtkServer__rtksvrstart(JNIEnv* env, jclass thiz,
+      jint j_cycle,
+      jint j_buffsize,
+      jintArray j_strs,
+      jobjectArray j_paths,
+      jintArray j_format,
+      jint j_navsel,
+      jobjectArray j_cmds,
+      jobjectArray j_rcvopts,
+      jint j_nmea_cycle,
+      jint j_nmea_req,
+      jdoubleArray j_nmeapos,
+      jobject j_procopt,
+      jobject j_solopt1,
+      jobject j_solopt2
+      ) {
+
+   struct native_ctx_t *nctx;
+   int i;
+   jobject obj;
+   jboolean res;
+
+   /* Input stream types */
+   int strs[8];
+   /* input stream paths */
+   const char *paths[8] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL };
+   jstring paths_jstring[8] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL };
+   /* input stream formats (STRFMT_???) */
+   int format[3];
+   /* input stream start commands */
+   const char *cmds[3] = {NULL, NULL, NULL};
+   jstring cmds_jstring[3] = {NULL, NULL, NULL};
+   /* receiver options */
+   const char *rcvopts[3] = {NULL, NULL, NULL};
+   char *rcvopts_jstring[3] = {NULL, NULL, NULL};
+   /* rtk processing options */
+   prcopt_t prcopt;
+   /* solution options */
+   solopt_t solopt[2];
+   /* nmea position */
+   double nmeapos[3];
+
+   res = JNI_FALSE;
+   for (i=0; i<sizeof(paths)/sizeof(paths[0]); ++i) {
+      paths_jstring[i] = (*env)->GetObjectArrayElement(env, j_paths, i);
+      if ((*env)->ExceptionOccurred(env))
+	 goto rtksvrstart_end;
+      if (paths_jstring[i] != NULL) {
+	 paths[i] = (*env)->GetStringUTFChars(env, paths_jstring[i], NULL);
+	 if (paths[i] == NULL)
+	    goto rtksvrstart_end;
+      }
+   }
+   for (i=0; i<sizeof(cmds)/sizeof(cmds[0]); ++i) {
+      cmds_jstring[i] = (*env)->GetObjectArrayElement(env, j_cmds, i);
+      if ((*env)->ExceptionOccurred(env))
+	 goto rtksvrstart_end;
+      if (cmds_jstring[i] != NULL) {
+	 cmds[i] = (*env)->GetStringUTFChars(env, cmds_jstring[i], NULL);
+	 if (cmds[i] == NULL)
+	    goto rtksvrstart_end;
+      }
+   }
+   for (i=0; i<sizeof(rcvopts)/sizeof(rcvopts[0]); ++i) {
+      rcvopts_jstring[i] = (*env)->GetObjectArrayElement(env, j_rcvopts, i);
+      if ((*env)->ExceptionOccurred(env))
+	 goto rtksvrstart_end;
+      if (rcvopts_jstring[i] != NULL) {
+	 rcvopts[i] = (*env)->GetStringUTFChars(env, rcvopts_jstring[i], NULL);
+	 if (rcvopts[i] == NULL)
+	    goto rtksvrstart_end;
+      }
+   }
+
+   (*env)->GetIntArrayRegion(env, j_strs, 0,
+	 sizeof(strs)/sizeof(strs[0]), strs);
+   if ((*env)->ExceptionOccurred(env))
+      goto rtksvrstart_end;
+
+   (*env)->GetIntArrayRegion(env, j_format, 0,
+	 sizeof(format)/sizeof(format[0]), format);
+   if ((*env)->ExceptionOccurred(env))
+      goto rtksvrstart_end;
+
+   (*env)->GetDoubleArrayRegion(env, j_nmeapos, 0,
+	 sizeof(nmeapos)/sizeof(nmeapos[0]), nmeapos);
+   if ((*env)->ExceptionOccurred(env))
+      goto rtksvrstart_end;
+
+   solution_options2solopt_t(env, j_solopt1, &solopt[0]);
+   solution_options2solopt_t(env, j_solopt2, &solopt[1]);
+   processing_options2prcopt_t(env, j_procopt, &prcopt);
+
+   nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
+   if (nctx == NULL) {
+      LOGV("nctx is null");
+      goto rtksvrstart_end;
+   }
+
+   if (!rtksvrstart(
+	    &nctx->rtksvr,
+	    /* SvrCycle ms */ j_cycle,
+	    /* SvrBuffSize */ j_buffsize,
+	    /* stream types */ strs,
+	    /* paths */ (char **)paths,
+	    /* input stream format */ format,
+	    /* NavSelect */ j_navsel,
+	    /* input stream start commands */ (char **)cmds,
+	    /* receiver options */ (char **)rcvopts,
+	    /* nmea request cycle ms */ j_nmea_cycle,
+	    /* nmea request type */ j_nmea_req,
+	    /* transmitted nmea position  */ nmeapos,
+	    /* rtk processing options */&prcopt,
+	    /* solution options */ solopt,
+	    /* monitor stream */ &nctx->monistr
+	    )) {
+      traceclose();
+   }else {
+      res = JNI_TRUE;
+   }
+
+rtksvrstart_end:
+
+   for (i=0; i<sizeof(paths)/sizeof(paths[0]); ++i) {
+      if (paths[i] != NULL)
+	 (*env)->ReleaseStringUTFChars(env, paths_jstring[i], paths[i]);
+   }
+   for (i=0; i<sizeof(cmds)/sizeof(cmds[0]); ++i) {
+      if (cmds[i] != NULL)
+	 (*env)->ReleaseStringUTFChars(env, cmds_jstring[i], cmds[i]);
+   }
+   for (i=0; i<sizeof(rcvopts)/sizeof(rcvopts[0]); ++i) {
+      if (rcvopts[i] != NULL)
+	 (*env)->ReleaseStringUTFChars(env, rcvopts_jstring[i], rcvopts[i]);
+   }
+
+   return res;
 }
 
 static void RtkServer__stop(JNIEnv* env, jclass thiz)
@@ -280,8 +415,6 @@ static void RtkServer__get_observation_status(JNIEnv* env, jclass thiz,
 
 }
 
-
-
 static int set_solution_buffer(JNIEnv* env, jobject j_solbuf, const sol_t *solutions, int cnt)
 {
    int i;
@@ -302,7 +435,7 @@ static int set_solution_buffer(JNIEnv* env, jobject j_solbuf, const sol_t *solut
 	    );
       if (set_solution_method == NULL) {
 	 LOGV("setSolution() not found");
-	 return;
+	 return -1;
       }
    }
 
@@ -449,6 +582,7 @@ static JNINativeMethod nativeMethods[] = {
    {"_create", "()V", (void*)RtkServer__create},
    {"_destroy", "()V", (void*)RtkServer__destroy},
    {"_start", "()Z", (void*)RtkServer__start},
+   {"_rtksvrstart", "(II[I[Ljava/lang/String;[II[Ljava/lang/String;[Ljava/lang/String;II[DLru0xdc/rtklib/ProcessingOptions;Lru0xdc/rtklib/SolutionOptions;Lru0xdc/rtklib/SolutionOptions;)Z", (void*)RtkServer__rtksvrstart},
    {"_stop", "()V", (void*)RtkServer__stop},
    {"_getStreamStatus", "(Lru0xdc/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status},
    {"_readSolutionBuffer", "(Lru0xdc/rtklib/Solution$SolutionBuffer;)V", (void*)RtkServer__read_solution_buffer},
@@ -498,7 +632,7 @@ static int init_observation_status_fields(JNIEnv* env) {
     return JNI_TRUE;
 }
 
-static int registerNatives(JNIEnv* env) {
+int registerRtkServerNatives(JNIEnv* env) {
     /* look up the class */
     jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServer");
 
@@ -517,34 +651,5 @@ static int registerNatives(JNIEnv* env) {
        return JNI_FALSE;
 
     return JNI_TRUE;
-}
-
-JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
-{
-    JNIEnv* env = NULL;
-    jint result = -1;
-
-    (void)reserved;
-
-    LOGV("Entering JNI_OnLoad");
-
-    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
-        goto bail;
-
-    if (!registerNatives(env))
-        goto bail;
-
-    if (!registerRtkCommonNatives(env))
-        goto bail;
-
-    if (!registerGTimeNatives(env))
-        goto bail;
-
-    /* success -- return valid version number */
-    result = JNI_VERSION_1_6;
-
-bail:
-    LOGV("Leaving JNI_OnLoad (result=0x%x)", result);
-    return result;
 }
 

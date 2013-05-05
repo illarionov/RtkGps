@@ -1,5 +1,6 @@
 package ru0xdc.rtklib;
 
+
 public class Constants {
 
 	/** number of carrier frequencies */
@@ -55,4 +56,5 @@ public class Constants {
 
 	/** max number of solution buffer */
 	public final static int MAXSOLBUF = 256;
+
 }

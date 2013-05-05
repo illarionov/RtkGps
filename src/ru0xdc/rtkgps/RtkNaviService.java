@@ -1,8 +1,10 @@
 package ru0xdc.rtkgps;
 
+import ru0xdc.rtkgps.settings.SettingsHelper;
 import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.RtkServer;
 import ru0xdc.rtklib.RtkServerObservationStatus;
+import ru0xdc.rtklib.RtkServerSettings;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import ru0xdc.rtklib.Solution;
 import android.app.Notification;
@@ -67,7 +69,13 @@ public class RtkNaviService extends Service {
 
 	@Override
 	public void onCreate() {
+		final RtkServerSettings settings;
+		// IInputStream inputBase, inputRover, inputCorrection;
+
 		super.onCreate();
+
+		settings = SettingsHelper.loadSettings(this);
+		mRtkServer.setServerSettings(settings);
 
 		if (!mRtkServer.start()) {
 			Log.e(TAG, "rtkSrvStart() error");

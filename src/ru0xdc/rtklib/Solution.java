@@ -12,7 +12,10 @@ public class Solution {
 
 	public static final int TYPE_ENU_BASELINE = 1;
 
-	public static enum Status {
+	/**
+	 * Solution status SOLQ_XXX
+	 */
+	public static enum SolutionStatus {
 
 		NONE(0, "None"),
 		FIX(1, "Fixed"),
@@ -24,17 +27,17 @@ public class Solution {
 		DR(7, "Dead reconing")
 		;
 
-		private final int mSolqId;
+		private final int mRtklibId;
 		private final String mDescription;
 
-		private Status(int solqId, String name) {
-			mSolqId = solqId;
+		private SolutionStatus(int solqId, String name) {
+			mRtklibId = solqId;
 			mDescription = name;
 		}
 
-		public static Status valueOf(int solqId) {
-			for (Status v: Status.values()) {
-				if (v.mSolqId == solqId) {
+		public static SolutionStatus valueOf(int solqId) {
+			for (SolutionStatus v: SolutionStatus.values()) {
+				if (v.mRtklibId == solqId) {
 					return v;
 				}
 			}
@@ -77,7 +80,7 @@ public class Solution {
 	/**
 	 * solution status
 	 */
-	public Status status;
+	public SolutionStatus status;
 
 	/**
 	 * number of valid satellites
@@ -101,7 +104,7 @@ public class Solution {
 		dtr = new double[6];
 		ns=0;
 		type=TYPE_XYZ_ECEF;
-		status = Status.NONE;
+		status = SolutionStatus.NONE;
 	}
 
 	public void copyTo(Solution dst) {
@@ -146,7 +149,7 @@ public class Solution {
 			) {
 		this.time.setGTime(time_time, time_sec);
 		this.type = type;
-		this.status = Status.valueOf(status);
+		this.status = SolutionStatus.valueOf(status);
 		this.ns = ns;
 		this.age = age;
 		this.ratio = ratio;

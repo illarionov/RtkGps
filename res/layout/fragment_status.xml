@@ -29,7 +29,6 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-
 	<ru0xdc.rtkgps.view.SolutionView
 		android:id="@+id/solutionView"
 		android:layout_width="wrap_content"
@@ -39,14 +38,14 @@
 		android:layout_marginRight="5dp"
 		android:layout_marginTop="10dp"
 		/>
-
+	
 	<ru0xdc.rtkgps.view.GpsSkyView
 	    android:id="@+id/Sky"
 	    android:layout_width="match_parent"
 	    android:layout_height="0dp"
 	    android:layout_gravity="center_horizontal"
 	    android:layout_weight="1" />
-
+	
 	<ru0xdc.rtkgps.view.SnrView
 	    android:id="@+id/Snr"
 	    android:layout_width="match_parent"
@@ -55,5 +54,17 @@
 	    android:layout_marginLeft="1dp"
 	    android:layout_marginRight="1dp"
 	    android:layout_weight="5" />
+
+	<TextView
+        android:id="@+id/streamStatus" 
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"
+        android:textSize="10sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="3dp"
+        />
 
 </LinearLayout>

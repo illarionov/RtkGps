@@ -2,26 +2,23 @@
 <resources>
 
     <string name="app_name">RtkGps</string>
-    <string name="title_section3">Section 3</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section1">Status</string>
-
+    <string name="title_status">Status</string>
+	<string name="title_activity_input_stream_settings">Input stream settings</string>
     <string name="menu_settings">Settings</string>
-	<string name="menu_start_service">Start service</string>
-	<string name="menu_stop_service">Stop service</string>
-	<string name="menu_select_solution_format">Select solution format</string>
-	<string name="menu_select_gtime_format">Select time format</string>
-    
+    <string name="menu_start_service">Start service</string>
+    <string name="menu_stop_service">Stop service</string>
+    <string name="menu_select_solution_format">Select solution format</string>
+    <string name="menu_select_gtime_format">Select time format</string>
+    <string name="menu_input_stream_settings">Configure Input streams</string>
     <string name="local_service_started">Local service started</string>
     <string name="local_service_stopped">Local service stopped</string>
     <string name="local_service_label">RtkGps</string>
-    
     <string name="sky_plot_north">N</string>
     <string name="sky_plot_west">W</string>
     <string name="sky_plot_south">S</string>
     <string name="sky_plot_east">E</string>
     <string name="sky_plot_num_of_sat"># of Sat: %d</string>
-    
+
     <string-array name="rtk_server_receiver">
         <item>Rover</item>
         <item>Base</item>
@@ -36,35 +33,389 @@
     <!-- Solution view -->
     <string name="solution_view_solution">Solution:</string>
     <string name="solution_view_age_text_format">Age: %1$.1fs\nRatio: %2$.1f\n#Of sat: %3$d</string>
-    
-    <string name="solution_view_format_wgs84">Lat/Long/Height</string>
-    <string name="solution_view_format_wgs84_float">Lat/Long/Height-Float</string>
-    <string name="solution_view_format_ecef">X/Y/Z-ECEF</string>
-    <string name="solution_view_format_enu_baseline">E/N/U-Baseline</string>
-    <string name="solution_view_format_pyl_baseline">Pitch/Yaw/Length-Baseline</string>
-    
+    <string name="solution_view_format_wgs84">Lat/Lon/Height</string>
+    <string name="solution_view_format_wgs84_float">Lat/Lon/Height — Float</string>
+    <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
+    <string name="solution_view_format_enu_baseline">E/N/U — Baseline</string>
+    <string name="solution_view_format_pyl_baseline">Pitch/Yaw/Length — Baseline</string>
+
     <string-array name="solution_view_coordinates_wgs84">
         <item>Lat:</item>
         <item>Lon:</item>
         <item>Height:</item>
     </string-array>
-
     <string-array name="solution_view_coordinates_ecef">
         <item>X:</item>
         <item>Y:</item>
         <item>Z:</item>
     </string-array>
-
     <string-array name="solution_view_coordinates_baseline_enu">
         <item>E:</item>
         <item>N:</item>
         <item>U:</item>
     </string-array>
-
     <string-array name="solution_view_coordinates_baseline_pyl">
         <item>Pitch:</item>
         <item>Yaw:</item>
         <item>Length:</item>
     </string-array>
+
+    <!-- PMODE_XXX positioning mode -->
+    <string name="pmode_single">Single</string>
+    <string name="pmode_dgps">DGPS/DGNSS</string>
+    <string name="pmode_kinema">Kinematic</string>
+    <string name="pmode_static">Static</string>
+    <string name="pmode_moveb">Moving — base</string>
+    <string name="pmode_fixed">Fixed</string>
+    <string name="pmode_ppp_kinema">PPP — Kinemaric</string>
+    <string name="pmode_ppp_static">PPP — Static</string>
+    <string name="pmode_ppp_fixed">PPP — Fixed</string>
+
+    <!-- SYS_XXX Navigation system -->
+    <string name="navsys_none">None</string>
+    <string name="navsys_gps">GPS</string>
+    <string name="navsys_sbs">SBAS</string>
+    <string name="navsys_glo">GLONASS</string>
+    <string name="navsys_gal">Galileo</string>
+    <string name="navsys_qzs">QZSS</string>
+    <string name="navsys_cmp">BeiDou</string>
+    <string name="navsys_all">All</string>
+
+    <!-- TIMES_XXX Time system -->
+    <string name="times_gpst">GPS time</string>
+    <string name="times_utc">UTC</string>
+    <string name="times_jst">JST</string>
+
+    <!-- SOLF_XXX  Solution Format -->
+    <string name="solf_llh">Lat/Long/Height</string>
+    <string name="solf_xyz">X/Y/Z — ECEF</string>
+    <string name="solf_enu">E/N/U — Baseline</string>
+    <string name="solf_nmea">NMEA 0183</string>
+    <string name="solf_gsif">GSI-F1/2/3</string>
+
+    <!-- STRFMT_XXX Stream format -->
+    <string name="strfmt_rtcm2">RTCM 2</string>
+    <string name="strfmt_rtcm3">RTCM 3</string>
+    <string name="strfmt_oem4">NovAtel OEMV/4</string>
+    <string name="strfmt_oem3">NovAtel OEMV/3</string>
+    <string name="strfmt_ubx">u-blox LEA-*T</string>
+    <string name="strfmt_ss2">NovAtel Superstar II</string>
+    <string name="strfmt_cres">Hemisphere</string>
+    <string name="strfmt_stq">SkyTraq S1315F</string>
+    <string name="strfmt_gw10">Furuno GW10</string>
+    <string name="strfmt_javad">JAVAD GRIL/GREIS</string>
+    <string name="strfmt_nvs">NVS NVC08C</string>
+    <string name="strfmt_binex">BINEX</string>
+    <string name="strfmt_lexr">Furuno LPY-10000</string>
+    <string name="strfmt_sirf">SiRF</string>
+    <string name="strfmt_rinex">RINEX</string>
+    <string name="strfmt_sp3">SP3</string>
+    <string name="strfmt_rnxclk">RINEX CLK</string>
+    <string name="strfmt_sbas">SBAS messages</string>
+    <string name="strfmt_nmea">NMEA 0183</string>
+
+    <!-- STR_XXX Stream type -->
+    <string name="str_none">None</string>
+    <string name="str_serial">Serial</string>
+    <string name="str_file">File</string>
+    <string name="str_tcpsvr">TCP Server</string>
+    <string name="str_tcpcli">TCP Client</string>
+    <string name="str_udp">UDP</string>
+    <string name="str_ntripsvr">NTRIP server</string>
+    <string name="str_ntripcli">NTRIP client</string>
+    <string name="str_ftp">FTP</string>
+    <string name="str_http">HTTP</string>
+
+    <!-- IONOOPT_XXX Ionosphere option -->
+    <string name="ionoopt_off">Off</string>
+    <string name="ionoopt_brdc">Broadcast model</string>
+    <string name="ionoopt_sbas">SBAS model</string>
+    <string name="ionoopt_iflc">L1/L2 or L1/L5 iono-free LC</string>
+    <string name="ionoopt_est">Estimate STEC</string>
+    <string name="ionoopt_tec">IONEX TEC model</string>
+    <string name="ionoopt_qzs">QZSS broadcast model</string>
+    <string name="ionoopt_lex">QZSS LEX ionospehre</string>
+    <string name="ionoopt_stec">SLANT TEC model</string>
+
+    <!-- TROPOPT_XXX Troposphere option -->
+    <string name="tropopt_off">Off</string>
+    <string name="tropopt_saas">Saastamoinen model</string>
+    <string name="tropopt_sbas">SBAS model</string>
+    <string name="tropopt_est">ZTD estimation</string>
+    <string name="tropopt_estg">ZTD+grad estimation</string>
+    <string name="tropopt_cor">ZTD correction</string>
+    <string name="tropopt_corg">ZTD+grad correction</string>
+
+    <!-- GEOID_XXX geoid model -->
+    <string name="geoid_embedded">Embedded</string>
+    <string name="geoid_egm96_m150">EGM96 15x15\'</string>
+    <string name="geoid_egm2008_m25">EGM2008 2.5x2.5\'</string>
+    <string name="geoid_egm2008_m10">EGM2008 1.0x1.0\'</string>
+    <string name="geoid_gsi2000_m15">GSI geoid 2000 1.0x1.5\'</string>
+
+    <!-- EPHOPT_XXX Exhemeris Options -->
+    <string name="ephopt_brdc">Broadcast ephemeris</string>
+    <string name="ephopt_prec">Precise ephemeris</string>
+    <string name="ephopt_sbas">Broadcast + SBAS</string>
+    <string name="ephopt_ssrapc">Broadcast + SSR APC</string>
+    <string name="ephopt_ssrcom">Broadcast + SSR CoM</string>
+    <string name="ephopt_lex">QZSS LEX ephemeris</string>
+
+    <!-- Procession options -->
+    <string name="procopt_category_processing_options_1">Processing options 1</string>
+    <string name="procopt_category_processing_options_2">Processing options 2</string>
+    <string name="procopt_category_solution_options">Solution options</string>
+    <string name="procopt_category_statistics">Statistics</string>
+    <string name="procopt_category_positions">Positions</string>
+    <string name="procopt_category_files">Files</string>
+    <string name="procopt_category_misc">Misc</string>
+
+    <!-- Positionong mode -->
+    <string name="procopt_positioning_mode_title">Positioning mode</string>
+    <string name="procopt_positioning_mode_dialog_title">Select positioning mode</string>
+
+    <!-- Number of frequencies -->
+    <string name="procopt_number_of_freqencies_title">Frequencies</string>
+    <string name="procopt_number_of_freqencies_dialog_title">Select number of frequencies</string>
+
+    <string-array name="procopt_number_of_frequencies_entries">
+        <item>L1</item>
+        <item>L1 + L2</item>
+        <item>L1 + L2 + L5</item>
+    </string-array>
+    <string-array name="procopt_number_of_frequencies_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <!-- Navigation system -->
+    <string name="procopt_navigation_system_title">Navigation system</string>
+    <string name="procopt_navigation_system_dialog_title">Select navigation system</string>
+
+    <!-- Elevation mask -->
+    <string name="procopt_elevation_mask_title">Elevation mask (°)</string>
+    <string name="procopt_elevation_mask_dialog_title">Select elevation mask (°)</string>
+
+    <string-array name="procopt_elevation_mask_entries">
+        <item>0</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+        <item>35</item>
+        <item>40</item>
+        <item>45</item>
+        <item>50</item>
+        <item>55</item>
+        <item>60</item>
+        <item>65</item>
+        <item>70</item>
+    </string-array>
+
+    <!-- SNR mask -->
+    <string name="procopt_snr_mask_title">SNR mask (dbHz)</string>
+    <string name="procopt_snr_mask_dialog_title">Select SNR mask (dbHz)</string>
+
+    <string-array name="procopt_snr_entries">
+        <item>0</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+        <item>35</item>
+        <item>40</item>
+    </string-array>
+
+    <!-- Rec dynamics / Earth tides correction -->
+    <string name="procopt_rec_dynamics_title">Rec dynamics</string>
+    <string name="procopt_rec_dynamics_summary">Estimate receiver velocity and acceleration</string>
+    <string name="procopt_rec_earth_tides_correction_title">Earth tides correction</string>
+    <string name="procopt_rec_earth_tides_correction_summary">Apply earth tides correction</string>
+
+    <!-- Ionosphere correction -->
+    <string name="procopt_ionosphere_correction_title">Ionosphere correction</string>
+    <string name="procopt_ionosphere_correction_dialog_title">Select ionosphere correction method</string>
+
+    <!-- Troposphere correcton -->
+    <string name="procopt_troposphere_correction_title">Troposphere correction</string>
+    <string name="procopt_troposphere_correction_dialog_title">Select troposphere correction method</string>
+
+    <!-- Satellite Ephemeris/Clock -->
+    <string name="procopt_satellite_ephemeris_clock_title">Satellite Ephemeris/Clock</string>
+    <string name="procopt_satellite_ephemeris_clock_dialog_title">Satellite Ephemeris/Clock</string>
+
+    <!-- Sat PCV -->
+    <string name="procopt_sat_antenna_pcv_title">Satellite PCV</string>
+    <string name="procopt_sat_antenna_pcv_summary">Use satellite antenna phase center variation</string>
+
+    <!-- Receiver PCV -->
+    <string name="procopt_receiver_antenna_pcv_title">Receiver PCV</string>
+    <string name="procopt_receiver_antenna_pcv_summary">Use receiver antenna phase center variation</string>
+
+    <!-- Phase windup correction -->
+    <string name="procopt_phase_windup_correction_title">Phase windup correction</string>
+    <string name="procopt_phase_windup_correction_summary">Apply phase windup correction</string>
+
+    <!-- Exclude eclipsing sat measurements -->
+    <string name="procopt_exclude_eclipsing_sat_measurements_title">Reject eclipsing satellite</string>
+    <string name="procopt_exclude_eclipsing_sat_measurements_summary">Exclude measurements of eclipsing satellite</string>
+
+    <!-- RAIM FDE -->
+    <string name="procopt_raim_fde_title">RAIM FDE</string>
+    <string name="procopt_raim_fde_summary">Enable RAIM failure detection and exclusion</string>
+
+    <!-- Solution options -->
+
+
+    <!-- Output header -->
+    <string name="solopt_output_header_title">Output header</string>
+    <string name="solopt_output_header_summary">Set whether the header is output or not</string>
+
+    <!-- Time format -->
+    <string name="solopt_time_format_title">Time format</string>
+    <string name="solopt_time_format_dialog_title">Set the format of time</string>
+
+    <!-- Latitude/Longitude Format -->
+    <string name="solopt_lat_lon_format_title">Latitude/Longitude Format</string>
+    <string name="solopt_lat_lon_format_dialog_title">Latitude/Longitude Format</string>
+
+    <string-array name="solopt_lat_lon_format_entries">
+        <item>ddd.dddddddd : Degree</item>
+        <item>ddd mm ss.sss : Degree minute second</item>
+    </string-array>
+    <string-array name="solopt_lat_lon_format_entry_values">
+        <item>degree</item>
+        <item>dms</item>
+    </string-array>
+
+    <!-- Field Separator -->
+    <string name="solopt_field_separator_title">Field Separator</string>
+
+    <!-- Height -->
+    <string name="solopt_height_title">Height</string>
+    <string name="solopt_height_dialog_title">Set the type of height</string>
+
+    <string-array name="solopt_height_entries">
+        <item>Ellipsoidal</item>
+        <item>Geodetic</item>
+    </string-array>
+    <string-array name="solopt_height_entry_values">
+        <item>Ellipsoidal</item>
+        <item>Geodetic</item>
+    </string-array>
+
+    <!-- Geoid model -->
+    <string name="solopt_geoid_model_title">Geoid Model</string>
+    <string name="solopt_geoid_model_dialog_title">Select geoid Model</string>
+
+    <!-- Nmea interval -->
+    <string name="solopt_nmea_interval_rmc_gga_title">Nmea interval (s) for RMC/GGA messages</string>
+    <string name="solopt_nmea_interval_gsa_gsv_title">Nmea interval (s) for GSA/GSV messages</string>
+
+    <!-- Output solution status -->
+    <string name="solopt_output_solution_status_title">Output solution status</string>
+    <string name="solopt_output_solution_status_dialog_title">Set the output level of the solution status file</string>
+
+    <string-array name="solopt_output_solution_status_entries">
+        <item>OFF</item>
+        <item>States</item>
+        <item>Residuals</item>
+    </string-array>
+    <string-array name="solopt_output_solution_status_entry_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- Debug trace -->
+    <string name="solopt_debug_trace_title">Debug trace</string>
+    <string name="solopt_debug_trace_dialog_title">Set the output level of debug trace file</string>
+
+    <string-array name="solopt_debug_trace_entries">
+        <item>OFF</item>
+        <item>Level 1</item>
+        <item>Level 2</item>
+        <item>Level 3</item>
+        <item>Level 4</item>
+        <item>Level 5</item>
+    </string-array>
+    <string-array name="solopt_debug_trace_entry_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <!-- Settings headers -->
+    <string name="settings_header_input_rover">Input Rover</string>
+    <string name="settings_header_input_base">Input Base</string>
+    <string name="settings_header_input_correction">Input Correction</string>
+    
+    <string name="settings_header_output_solution1">Output Solution 1</string>
+    <string name="settings_header_output_solution2">Output Solution 2</string>
+    
+    <string name="settings_header_log_rover">Log Stream Rover</string>
+    <string name="settings_header_log_base">Log Stream Base</string>
+    <string name="settings_header_log_correction">Log Stream Correction</string>
+    
+    <!-- Input streams settings -->
+	<string name="streams_settings_type_title">Type</string>
+    <string name="streams_settings_format_title">Format</string>
+    <string name="streams_settings_button_title">Stream settings&#8230;</string>
+    <string name="input_streams_settings_enable_rover_title">Enable rover</string>
+    <string name="input_streams_settings_enable_base_title">Enable base</string>
+    <string name="input_streams_settings_enable_correction_title">Enable correction</string>
+    <string name="input_streams_settings_rover_category_title">Rover settings</string>
+    <string name="input_streams_settings_base_category_title">Base settings</string>
+    <string name="input_streams_settings_correction_category_title">Correction settings</string>
+    <string name="input_streams_settings_commands_at_startup_title">Commands at startup</string>
+    <string name="input_streams_settings_commands_at_shutdown_title">Commands at shutdown</string>
+    <string name="input_streams_settings_receiver_option_title">Receiver option</string>
+    <string name="input_streams_settings_transmit_gpgga_to_base_title">Transmit GPGGA to Base Station</string>
+    <string name="input_streams_settings_transmit_gpgga_lat_title">Latitude</string>
+    <string name="input_streams_settings_transmit_gpgga_lon_title">Longitude</string> 
+    
+	<string-array name="input_streams_settings_transmit_gpgga_entries">
+        <item>OFF</item>
+        <item>Latitude/Longitude</item>
+        <item>Single solution</item>
+    </string-array>
+    <string-array name="input_streams_settings_transmit_gpgga_vaues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    
+    
+    <!-- Output stream settings -->
+    <string name="output_streams_settings_enable_solution1_title">Enable Solution 1</string>
+    <string name="output_streams_settings_enable_solution2_title">Enable Solution 2</string>
+
+    
+    <!-- Log stream settings -->
+    <string name="log_streams_settings_enable_rover_title">Log rover</string>
+    <string name="log_streams_settings_enable_base_title">Log base </string>
+    <string name="log_streams_settings_enable_correction_title">Log correction</string>
+    
+    <string name="ntrip_client_dialog_title">NTRIP client settings</string>
+    <string name="ntrip_client_host_title">Host</string>
+    <string name="ntrip_client_port_title">Port</string>
+    <string name="ntrip_client_mountpoint_title">NTRIP Mountpoint</string>
+    <string name="ntrip_client_user_title">NTRIP user</string>
+    <string name="ntrip_client_password_title">NTRIP password</string>
+    <string name="file_filename_title">Filename</string>
+    
+	<string name="tcp_client_dialog_title">TCP client settings</string>
+    <string name="tcp_client_host_title">Host</string>
+    <string name="tcp_client_port_title">Port</string>
+    
+    <string name="file_dialog_title">File settings</string>
     
 </resources>

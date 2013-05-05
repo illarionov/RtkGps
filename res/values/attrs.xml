@@ -25,4 +25,9 @@
        </attr>
 	</declare-styleable>
 
+	<declare-styleable name="StreamSettings">
+	    <attr name="key_prefix" format="string" />
+	    <attr name="title_enable_stream" format="reference" />
+	    <attr name="stream_type_preference_class" format="string"/>
+	</declare-styleable>
 </resources>

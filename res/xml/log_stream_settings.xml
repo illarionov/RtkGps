@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+	<SwitchPreference
+        android:key="enable"
+        android:title="@string/log_streams_settings_enable_rover_title" />
+    
+    <ru0xdc.rtkgps.settings.widget.StreamTypePreference
+        android:key="type"
+        android:title="@string/streams_settings_type_title"
+        android:dependency="enable" />
+    
+	<Preference
+        android:key="stream_settings_button"
+        android:dependency="enable"
+        android:title="@string/streams_settings_button_title"
+        android:persistent="false" />
+
+</PreferenceScreen>

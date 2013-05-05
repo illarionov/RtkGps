@@ -17,12 +17,13 @@ import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import butterknife.InjectView;
+import butterknife.Views;
 
 public class StatusFragment extends Fragment {
 
@@ -43,11 +47,12 @@ public class StatusFragment extends Fragment {
 	private RtkServerObservationStatus mRoverObservationStatus;
 	private RtkControlResult mRtkStatus;
 
-	private GpsSkyView mSkyView;
-	private SnrView mSnrView;
-	private StreamIndicatorsView mStreamIndicatorsView;
-	private GTimeView mGTimeView;
-	private SolutionView mSolutionView;
+	@InjectView(R.id.Sky) GpsSkyView mSkyView;
+	@InjectView(R.id.Snr) SnrView mSnrView;
+	@InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
+	@InjectView(R.id.gtimeView) GTimeView mGTimeView;
+	@InjectView(R.id.solutionView) SolutionView mSolutionView;
+	@InjectView(R.id.streamStatus) TextView mStreamStatusView;
 
 	public static final String PREF_TIME_FORMAT = "StatusFragment.PREF_TIME_FORMAT";
 
@@ -65,11 +70,8 @@ public class StatusFragment extends Fragment {
 		// Create a new TextView and set its text to the fragment's section
 		// number argument value.
 		View v = inflater.inflate(R.layout.fragment_status, container, false);
-		mSkyView = (GpsSkyView)v.findViewById(R.id.Sky);
-		mSnrView = (SnrView)v.findViewById(R.id.Snr);
-		mStreamIndicatorsView = (StreamIndicatorsView)v.findViewById(R.id.streamIndicatorsView);
-		mGTimeView = (GTimeView)v.findViewById(R.id.gtimeView);
-		mSolutionView = (SolutionView)v.findViewById(R.id.solutionView);
+		Views.inject(this, v);
+
 		return v;
 	}
 
@@ -82,32 +84,6 @@ public class StatusFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		final SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-
-		// GTimeView format
-		try {
-			String timeFormat = prefs.getString(PREF_TIME_FORMAT, null);
-			if (timeFormat != null) {
-				mGTimeView.setTimeFormat(GTimeView.Format.valueOf(timeFormat));
-			}
-		}catch(ClassCastException cce) {
-			cce.printStackTrace();
-		}catch(IllegalArgumentException iae) {
-			iae.printStackTrace();
-		}
-
-		// SolutionView format
-		try {
-			final String solutionFormat = prefs.getString(PREF_SOLUTION_FORMAT, null);
-			if (solutionFormat != null) {
-				mSolutionView.setFormat(Format.valueOf(solutionFormat));
-			}
-		}catch(ClassCastException cce) {
-			cce.printStackTrace();
-		}catch(IllegalArgumentException iae) {
-			iae.printStackTrace();
-		}
 
 		// long click listeners
 		mGTimeView.setOnLongClickListener(new OnLongClickListener() {
@@ -150,6 +126,24 @@ public class StatusFragment extends Fragment {
 				}, 200, 250);
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		final SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+		updateGTimeFormat(prefs);
+		updateSolutionFormat(prefs);
+
+		prefs.registerOnSharedPreferenceChangeListener(mPrefsChangedListener);
+	}
+
+	@Override
+	public void onPause() {
+		final SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+		prefs.unregisterOnSharedPreferenceChangeListener(mPrefsChangedListener);
+
+		super.onPause();
+	}
 
 	@Override
 	public void onStop() {
@@ -178,15 +172,28 @@ public class StatusFragment extends Fragment {
 	    return true;
 	}
 
+	private final OnSharedPreferenceChangeListener mPrefsChangedListener = new OnSharedPreferenceChangeListener() {
+
+		@Override
+		public void onSharedPreferenceChanged(
+				SharedPreferences sharedPreferences, String key) {
+			if (PREF_TIME_FORMAT.equals(key)) {
+				updateGTimeFormat(sharedPreferences);
+			}else if (PREF_SOLUTION_FORMAT.equals(key)) {
+				updateSolutionFormat(sharedPreferences);
+			}
+		}
+	};
+
 	private void showSelectSolutionViewDialog() {
     	SelectSolutionViewFormatDialog.newInstance(mSolutionView.getFormat())
-	 	.show(getChildFragmentManager(),
+	 	.show(getActivity().getFragmentManager(),
 			 "Select Solution View Format Dialog");
 	}
 
 	private void showSelectTimeFormatDialog() {
     	SelectTimeFormatDialog.newInstance(mGTimeView.getTimeFormat())
-	 	.show(getChildFragmentManager(),
+	 	.show(getActivity().getFragmentManager(),
 			 "Select Time Format Dialog");
 	}
 
@@ -212,6 +219,7 @@ public class StatusFragment extends Fragment {
 		}
 
 		assertNotNull(mStreamStatus.mMsg);
+		mStreamStatusView.setText(mStreamStatus.mMsg);
 		mSkyView.setStats(mRoverObservationStatus);
 		mSnrView.setStats(mRoverObservationStatus);
 		mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
@@ -219,14 +227,31 @@ public class StatusFragment extends Fragment {
 		mGTimeView.setTime(mRoverObservationStatus.time);
 	}
 
-	public void setGTimeFormat(GTimeView.Format newFormat) {
-		mGTimeView.setTimeFormat(newFormat);
+	void updateGTimeFormat(SharedPreferences prefs) {
+		try {
+			String timeFormat = prefs.getString(PREF_TIME_FORMAT, null);
+			if (timeFormat != null) {
+				mGTimeView.setTimeFormat(GTimeView.Format.valueOf(timeFormat));
+			}
+		}catch(ClassCastException cce) {
+			cce.printStackTrace();
+		}catch(IllegalArgumentException iae) {
+			iae.printStackTrace();
+		}
 	}
 
-	public void setSolutionFormat(SolutionView.Format newFormat) {
-		mSolutionView.setFormat(newFormat);
+	void updateSolutionFormat(SharedPreferences prefs) {
+		try {
+			final String solutionFormat = prefs.getString(PREF_SOLUTION_FORMAT, null);
+			if (solutionFormat != null) {
+				mSolutionView.setFormat(Format.valueOf(solutionFormat));
+			}
+		}catch(ClassCastException cce) {
+			cce.printStackTrace();
+		}catch(IllegalArgumentException iae) {
+			iae.printStackTrace();
+		}
 	}
-
 
 	public static class SelectTimeFormatDialog extends DialogFragment {
 
@@ -277,11 +302,6 @@ public class StatusFragment extends Fragment {
 			final SharedPreferences.Editor editor = prefs.edit();
 			editor.putString(PREF_TIME_FORMAT, newFormat.name());
 			editor.commit();
-
-			final StatusFragment parent = (StatusFragment)getParentFragment();
-			if (parent != null) {
-				parent.setGTimeFormat(newFormat);
-			}
 			dismiss();
 		}
 	}
@@ -335,11 +355,6 @@ public class StatusFragment extends Fragment {
 			final SharedPreferences.Editor editor = prefs.edit();
 			editor.putString(PREF_SOLUTION_FORMAT, newFormat.name());
 			editor.commit();
-
-			final StatusFragment parent = (StatusFragment)getParentFragment();
-			if (parent != null) {
-				parent.setSolutionFormat(newFormat);
-			}
 			dismiss();
 		}
 	}

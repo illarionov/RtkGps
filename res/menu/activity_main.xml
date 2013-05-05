@@ -13,5 +13,12 @@
 		android:id="@+id/menu_settings"
 		android:orderInCategory="100"
 		android:showAsAction="never"
-		android:title="@string/menu_settings"/>   
+		android:title="@string/menu_settings"/>
+	
+	<item
+		android:id="@+id/menu_input_stream_settings"
+		android:orderInCategory="100"
+		android:showAsAction="never"
+		android:title="@string/menu_input_stream_settings"/>
+	
 </menu>

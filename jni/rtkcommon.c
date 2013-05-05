@@ -61,7 +61,17 @@ static void RtkCommon__ecef2pos(JNIEnv* env, jclass clazz, jdouble x,
    (*env)->SetDoubleArrayRegion(env, j_pos, 0, 3, pos);
 }
 
-static jdouble RtkCommon__ecef2enu(JNIEnv* env, jclass clazz, jdouble j_lat,
+static void RtkCommon__pos2ecef(JNIEnv* env, jclass clazz, jdouble lat,
+      jdouble lon, jdouble height, jdoubleArray j_pos)
+{
+   double r[3] = {lat, lon, height};
+   double pos[3];
+
+   pos2ecef(r, pos);
+   (*env)->SetDoubleArrayRegion(env, j_pos, 0, 3, pos);
+}
+
+static void RtkCommon__ecef2enu(JNIEnv* env, jclass clazz, jdouble j_lat,
       jdouble j_lon, jdoubleArray j_r, jdoubleArray j_e)
 {
    double pos[2] = {j_lat, j_lon};
@@ -124,6 +134,7 @@ static JNINativeMethod nativeMethods[] = {
    {"norm", "([D)D", (void*)RtkCommon_norm},
    {"_ecef2pos", "(DDD[D)V", (void*)RtkCommon__ecef2pos},
    {"_ecef2enu", "(DD[D[D)V", (void*)RtkCommon__ecef2enu},
+   {"_pos2ecef", "(DDD[D)V", (void*)RtkCommon__pos2ecef},
    {"_covenu", "(DD[D[D)V", (void*)RtkCommon__covenu},
 };
 

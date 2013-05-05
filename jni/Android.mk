@@ -9,9 +9,12 @@ LOCAL_MODULE    := rtkgps
 LOCAL_CFLAGS += -fvisibility=hidden
 
 LOCAL_SRC_FILES := \
-        rtkserver.c \
+	gtime.c \
+	prcopt.c \
+	rtkjni.c \
 	rtkcommon.c \
-	gtime.c
+        rtkserver.c \
+	solopt.c
 
 LOCAL_STATIC_LIBRARIES := rtklib
 

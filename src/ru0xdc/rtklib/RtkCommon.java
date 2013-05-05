@@ -3,6 +3,8 @@ package ru0xdc.rtklib;
 import java.util.Arrays;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 
 public class RtkCommon {
 
@@ -102,6 +104,33 @@ public class RtkCommon {
 		return ecef2pos(ecefPos.getX(), ecefPos.getY(), ecefPos.getZ(), null);
 	}
 
+
+
+	/**
+	 * transform geodetic position to ecef position
+	 * @param lat I latitude (rad, WGS84)
+	 * @param lon I longitude (rad, WGS84)
+	 * @param height I ellipsoidal height (m)
+	 * @param dst O  ecef position {x,y,z} (m)
+	 */
+	static native void _pos2ecef(double lat, double lon, double height, double dst[]);
+
+	/**
+	 * transform geodetic position to ecef position
+	 * @param lat I latitude (rad, WGS84)
+	 * @param lon I longitude (rad, WGS84)
+	 * @param height I ellipsoidal height (m)
+	 * @param dst O  ecef position {x,y,z} (m)
+	 */
+	public static Position3d pos2ecef(double lat, double lon, double height, @Nullable Position3d dst) {
+		if (dst == null) {
+			dst = new Position3d();
+		}
+		_pos2ecef(lat, lon, height, dst.mPos);
+		return dst;
+	}
+
+
 	/**
 	 * transform ecef covariance to local tangental coordinate
 	 * @param lat, lon I geodetic position {lat,lon} (rad)
@@ -185,6 +214,11 @@ public class RtkCommon {
 			setValues(a, b, c);
 		}
 
+		public Position3d(Position3d src) {
+			this();
+			setValues(src);
+		}
+
 		public double getLat() {
 			return mPos[0];
 		}
@@ -209,19 +243,22 @@ public class RtkCommon {
 			return mPos[2];
 		}
 
-		public void setValues(double a, double b, double c) {
+		public Position3d setValues(double a, double b, double c) {
 			mPos[0] = a;
 			mPos[1] = b;
 			mPos[2] = c;
+			return this;
 		}
 
-		public void setValues(double values[]) {
+		public Position3d setValues(double values[]) {
 			if (values.length != mPos.length) throw new IllegalArgumentException();
 			System.arraycopy(values, 0, mPos, 0, mPos.length);
+			return this;
 		}
 
-		public void setValues(Position3d src) {
+		public Position3d setValues(Position3d src) {
 			setValues(src.mPos);
+			return this;
 		}
 
 		public double[] getValues() {

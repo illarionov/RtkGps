@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+	<CheckBoxPreference
+		android:key="output_header"
+		android:title="@string/solopt_output_header_title"
+		android:summary="@string/solopt_output_header_summary"
+        />
+
+	<ListPreference
+        android:key="time_format"
+        android:title="@string/solopt_time_format_title"
+        android:dialogTitle="@string/solopt_time_format_dialog_title"
+        />
+	
+	<ListPreference
+	    android:key="lat_lon_format"
+	    android:title="@string/solopt_lat_lon_format_title"
+	    android:dialogTitle="@string/solopt_lat_lon_format_dialog_title"
+	    android:entries="@array/solopt_lat_lon_format_entries" 
+	    android:entryValues="@array/solopt_lat_lon_format_entry_values"
+	    />
+	
+	<EditTextPreference
+	    android:key="field_separator"
+	    android:title="@string/solopt_field_separator_title" 
+	    />
+	
+	<ListPreference
+	    android:key="height"
+	    android:title="@string/solopt_height_title"
+	    android:dialogTitle="@string/solopt_height_dialog_title"
+	    android:entries="@array/solopt_height_entries"
+	    android:entryValues="@array/solopt_height_entry_values"
+	    />
+	
+	<ListPreference 
+	    android:key="geoid_model"
+	    android:title="@string/solopt_geoid_model_title"
+	    android:dialogTitle="@string/solopt_geoid_model_dialog_title"
+	    />
+	
+	<EditTextPreference
+	    android:key="nmea_interval_rmc_gga"
+	    android:title="@string/solopt_nmea_interval_rmc_gga_title"
+	    android:numeric="decimal"
+	    />
+
+	<EditTextPreference
+	    android:key="nmea_interval_gsa_gsv"
+	    android:title="@string/solopt_nmea_interval_gsa_gsv_title"
+	    android:numeric="decimal"
+	    />
+	
+	<ListPreference
+	    android:key="output_solution_status"
+	    android:title="@string/solopt_output_solution_status_title"
+	    android:dialogTitle="@string/solopt_output_solution_status_dialog_title"
+	    android:entries="@array/solopt_output_solution_status_entries"
+	    android:entryValues="@array/solopt_output_solution_status_entry_values" 
+	    />
+	
+	<ListPreference
+	    android:key="debug_trace"
+	    android:title="@string/solopt_debug_trace_title"
+	    android:dialogTitle="@string/solopt_debug_trace_dialog_title"
+	    android:entries="@array/solopt_debug_trace_entries"
+	    android:entryValues="@array/solopt_debug_trace_entry_values"
+	    />
+
+</PreferenceScreen>
