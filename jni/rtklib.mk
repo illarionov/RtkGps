@@ -1,6 +1,6 @@
 include $(CLEAR_VARS)
 
-RTKLIB_PATH := rtklib_2.4.2b11
+RTKLIB_PATH := rtklib_2.4.2
 RTKLIB_CFLAGS := -DENAGLO -DENAGAL -DENAQZS -DENACMP -DNFREQ=3 -DTRACE
 
 LOCAL_MODULE    := rtklib
@@ -38,11 +38,9 @@ LOCAL_SRC_FILES := \
         $(RTKLIB_PATH)/src/rtcm.c \
         $(RTKLIB_PATH)/src/rtkcmn.c \
         $(RTKLIB_PATH)/src/rtkpos.c \
-        $(RTKLIB_PATH)/src/rtkpos_gsi.c \
         $(RTKLIB_PATH)/src/rtksvr.c \
         $(RTKLIB_PATH)/src/sbas.c \
         $(RTKLIB_PATH)/src/solution.c \
-        $(RTKLIB_PATH)/src/stec.c \
         $(RTKLIB_PATH)/src/stream.c \
         $(RTKLIB_PATH)/src/streamsvr.c \
         $(RTKLIB_PATH)/src/tle.c
@@ -66,6 +64,9 @@ LOCAL_SRC_FILES += log.c
 
 TARGET-process-src-files-tags += $(call add-src-files-target-cflags, \
    $(RTKLIB_PATH)/src/download.c, -DS_IREAD=S_IRUSR)
+TARGET-process-src-files-tags += $(call add-src-files-target-cflags, \
+   $(RTKLIB_PATH)/src/rtkcmn.c, -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC)
+
 
 include $(BUILD_STATIC_LIBRARY)
 
