@@ -188,13 +188,13 @@ public class StreamIndicatorsView extends View {
 
         x += mIndicatorSpacing;
 
-        // Log stream base
-        x += mIndicatorWidth + mIndicatorSpacing;
-        drawIndicator(canvas, x, y, mStatus.logStreamBaseStationStatus);
-
         // Log stream rover
         x += mIndicatorWidth + mIndicatorSpacing;
         drawIndicator(canvas, x, y, mStatus.logStreamRoverStatus);
+
+        // Log stream base
+        x += mIndicatorWidth + mIndicatorSpacing;
+        drawIndicator(canvas, x, y, mStatus.logStreamBaseStationStatus);
 
         // Log stream corrections
         x += mIndicatorWidth + mIndicatorSpacing;

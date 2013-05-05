@@ -8,7 +8,7 @@ import java.util.Set;
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
 import ru0xdc.rtkgps.settings.widget.EarthTideCorrectionPreference;
-import ru0xdc.rtkgps.view.MultiSelectListPreferenceWorkaround;
+import ru0xdc.rtkgps.settings.widget.MultiSelectListPreferenceWorkaround;
 import ru0xdc.rtklib.ProcessingOptions;
 import ru0xdc.rtklib.constants.EarthTideCorrectionType;
 import ru0xdc.rtklib.constants.EphemerisOption;

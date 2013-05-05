@@ -1,4 +1,4 @@
-package ru0xdc.rtkgps.view;
+package ru0xdc.rtkgps.settings.widget;
 
 import java.util.Set;
 
