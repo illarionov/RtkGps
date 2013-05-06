@@ -367,15 +367,15 @@ static void RtkServer__get_observation_status(JNIEnv* env, jclass thiz,
    // Set number of satellites
    (*env)->SetIntField(env, status_obj, obs_status_fields.ns, ns);
 
+   if (ns == 0)
+      return;
+
    // Set time
    jgtime = (*env)->GetObjectField(env, status_obj, obs_status_fields.time);
    if (jgtime == NULL) {
       LOGV("time is null");
    }
    set_gtime(env, jgtime, time);
-
-   if (ns == 0)
-      return;
 
    // Satellite data
    jtmp = (*env)->GetObjectField(env, status_obj, obs_status_fields.sat);
