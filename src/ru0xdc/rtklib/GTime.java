@@ -54,5 +54,9 @@ public class GTime {
 	 */
 	public native double getGpsTow();
 
+	@Override
+	public String toString() {
+		return "time: " + time + " sec: " + sec;
+	}
 
 }
