@@ -235,12 +235,14 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
 		Set<String> navSystemSet = new HashSet<String>();
 		for (NavigationSystem ns: opts.getNavigationSystem()) navSystemSet.add(ns.name());
 
+		String elmask = String.valueOf(Math.round(Math.toDegrees(opts.getElevationMask())));
+
 		prefs
 			.edit()
 			.putString(KEY_POSITIONING_MODE, opts.getPositioningMode().name())
 			.putString(KEY_NUMBER_OF_FREQUENCIES, String.valueOf(opts.getNumberOfFrequencies()))
 			.putStringSet(KEY_NAVIGATION_SYSTEM, navSystemSet)
-			.putString(KEY_ELEVATION_MASK, String.valueOf(Math.toDegrees(opts.getElevationMask())))
+			.putString(KEY_ELEVATION_MASK, elmask)
 			.putString(KEY_SNR_MASK, String.valueOf(opts.getSnrMask()))
 			.putBoolean(KEY_REC_DYNAMICS, opts.getRecDynamics())
 			.putString(KEY_EARTH_TIDES_CORRECTION, opts.getEarthTidersCorrection().name())
@@ -267,7 +269,7 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
 
 		prefs = ctx.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
 
-		final boolean needUpdate = force || !prefs.contains(InputRoverFragment.KEY_ENABLE);
+		final boolean needUpdate = force || !prefs.contains(KEY_POSITIONING_MODE);
 
 		if (needUpdate) {
 			setValue(ctx, new ProcessingOptions());

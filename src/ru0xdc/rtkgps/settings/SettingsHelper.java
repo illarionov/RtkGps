@@ -77,11 +77,11 @@ public class SettingsHelper {
 			 .putString(InputRoverFragment.KEY_RECEIVER_OPTION, "")
 			  ;
 			e.commit();
-		}
 
-		StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
-		StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
-		StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
+			StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+			StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+			StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+		}
 	}
 
 	static void setOutputStreamDefaultValues(Context ctx, String sharedPrefsName, boolean force) {
@@ -117,10 +117,11 @@ public class SettingsHelper {
 			 .putString(LogRoverFragment.KEY_TYPE, StreamType.NTRIPCLI.name())
 			  ;
 			e.commit();
+			StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+			StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+			StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
 		}
-		StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
-		StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
-		StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
+
 	}
 
 
