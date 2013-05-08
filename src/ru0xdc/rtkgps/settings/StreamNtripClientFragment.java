@@ -138,11 +138,17 @@ public class StreamNtripClientFragment extends PreferenceFragment {
     		path.append('@');
     	}
 
+    	if (TextUtils.isEmpty(host)) host = "localhost";
+
     	path.append(host);
     	if (!TextUtils.isEmpty(port)) {
     		path.append(':').append(port);
     	}
-    	path.append('/').append(mountpoint);
+
+    	path.append('/');
+
+    	if (!TextUtils.isEmpty(mountpoint)) path.append(mountpoint);
+
     	if (!TextUtils.isEmpty(str)) {
     		path.append(':').append(str);
     	}
@@ -160,6 +166,10 @@ public class StreamNtripClientFragment extends PreferenceFragment {
     			prefs.getString(KEY_MOUNTPOINT, ""),
     			null
     			);
+    }
+
+    public static String readSummary(SharedPreferences prefs) {
+    	return "ntrip://" + readPath(prefs);
     }
 
 }

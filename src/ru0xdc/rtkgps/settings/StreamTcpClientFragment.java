@@ -110,4 +110,9 @@ public class StreamTcpClientFragment extends PreferenceFragment {
     			);
     }
 
+    public static String readSummary(SharedPreferences prefs) {
+    	return "tcp:" + readPath(prefs);
+    }
+
+
 }

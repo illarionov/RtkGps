@@ -101,11 +101,17 @@ public class LogRoverFragment extends PreferenceFragment {
 
 	private void refresh() {
 		final StreamTypePreference typePref;
+		final Preference settingsPref;
 
 		if (DBG) Log.v(getSharedPreferenceName(), "refresh()");
 
 		typePref = (StreamTypePreference) findPreference(KEY_TYPE);
     	typePref.setSummary(getString(typePref.getValueT().getNameResId()));
+
+    	settingsPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
+    	settingsPref.setSummary(SettingsHelper.readLogStreamSumary(getPreferenceManager().getSharedPreferences()));
+
+
 	}
 
     private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {

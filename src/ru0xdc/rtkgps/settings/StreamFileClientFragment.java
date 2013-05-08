@@ -21,6 +21,8 @@ public class StreamFileClientFragment extends PreferenceFragment {
 
 	private static final String KEY_FILENAME = "stream_file_filename";
 
+	private final static String DEFAULT_FILENAME = "stream.log";
+
 	private final PreferenceChangeListener mPreferenceChangeListener;
 
 	private String mSharedPrefsName;
@@ -106,11 +108,18 @@ public class StreamFileClientFragment extends PreferenceFragment {
     	filename = prefs.getString(KEY_FILENAME, null);
     	if (filename == null)  throw new IllegalStateException("setDefaultValues() must be called");
 
+    	if (filename.length() == 0) filename = DEFAULT_FILENAME;
+
     	path =  (new File(MainActivity.getFileStorageDirectory(), filename)).getAbsolutePath();
 
     	if (DBG) Log.v("StreamFileClientFragment", "file path: " + path);
 
     	return path;
     }
+
+    public static String readSummary(SharedPreferences prefs) {
+    	return "file://" + readPath(prefs);
+    }
+
 
 }

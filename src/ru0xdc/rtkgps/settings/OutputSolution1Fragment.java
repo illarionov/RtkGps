@@ -124,6 +124,7 @@ public class OutputSolution1Fragment extends PreferenceFragment {
 	private void refresh() {
 		final StreamTypePreference typePref;
 		final SolutionFormatPreference formatPref;
+		final Preference settingsPref;
 
 		if (DBG) Log.v(getSharedPreferenceName(), "refresh()");
 
@@ -132,6 +133,10 @@ public class OutputSolution1Fragment extends PreferenceFragment {
 
     	typePref.setSummary(getString(typePref.getValueT().getNameResId()));
     	formatPref.setSummary(getString(formatPref.getValueT().getNameResId()));
+
+    	settingsPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
+    	settingsPref.setSummary(SettingsHelper.readOutputStreamSumary(getPreferenceManager().getSharedPreferences()));
+
 	}
 
     private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {

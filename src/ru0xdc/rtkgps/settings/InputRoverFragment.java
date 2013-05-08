@@ -139,7 +139,7 @@ public class InputRoverFragment extends PreferenceFragment {
 		final StreamTypePreference typePref;
 		final StreamFormatPreference formatPref;
 		final EditTextPreference startupCommandsPref, shutdownCommandsPref, receiverOptionPref;
-		//final Preference settingsButtonPref;
+		final Preference settingsButtonPref;
 
 		if (DBG) Log.v(getSharedPreferenceName(), "refresh()");
 
@@ -148,13 +148,14 @@ public class InputRoverFragment extends PreferenceFragment {
 		startupCommandsPref = (EditTextPreference)findPreference(KEY_COMMANDS_AT_STARTUP);
 		shutdownCommandsPref = (EditTextPreference)findPreference(KEY_COMMANDS_AT_SHUTDOWN);
 		receiverOptionPref = (EditTextPreference)findPreference(KEY_RECEIVER_OPTION);
-		//settingsButtonPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
+		settingsButtonPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
 
     	typePref.setSummary(getString(typePref.getValueT().getNameResId()));
     	formatPref.setSummary(getString(formatPref.getValueT().getNameResId()));
     	startupCommandsPref.setSummary(startupCommandsPref.getText());
     	shutdownCommandsPref.setSummary(shutdownCommandsPref.getText());
     	receiverOptionPref.setSummary(receiverOptionPref.getText());
+    	settingsButtonPref.setSummary(SettingsHelper.readInputStreamSumary(getPreferenceManager().getSharedPreferences()));
 	}
 
     private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {

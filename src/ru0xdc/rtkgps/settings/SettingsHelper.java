@@ -98,10 +98,10 @@ public class SettingsHelper {
 			 .putString(OutputSolution1Fragment.KEY_FORMAT, StreamFormat.RTCM3.name())
 			  ;
 			e.commit();
+			StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+			StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+			StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
 		}
-		StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
-		StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
-		StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, force);
 	}
 
 	static void setLogStreamDefaultValues(Context ctx, String sharedPrefsName, boolean force) {
@@ -123,7 +123,6 @@ public class SettingsHelper {
 		}
 
 	}
-
 
 	@Nonnull
 	static InputStream readInputStreamPrefs(Context ctx, String sharedPrefsName) {
@@ -230,5 +229,47 @@ public class SettingsHelper {
 		return path;
 	}
 
+	@Nonnull
+	static String readInputStreamSumary(SharedPreferences prefs) {
+		StreamType type;
+		type = StreamType.valueOf(prefs.getString(InputRoverFragment.KEY_TYPE, StreamType.NONE.name()));
+		return readStreamSummary(type, prefs);
+	}
+
+	@Nonnull
+	static String readOutputStreamSumary(SharedPreferences prefs) {
+		StreamType type;
+		type = StreamType.valueOf(prefs.getString(OutputSolution1Fragment.KEY_TYPE, StreamType.NONE.name()));
+		return readStreamSummary(type, prefs);
+	}
+
+	@Nonnull
+	static String readLogStreamSumary(SharedPreferences prefs) {
+		StreamType type;
+		type = StreamType.valueOf(prefs.getString(LogRoverFragment.KEY_TYPE, StreamType.NONE.name()));
+		return readStreamSummary(type, prefs);
+	}
+
+	@Nonnull
+	static String readStreamSummary(StreamType type, SharedPreferences prefs) {
+		String summary;
+		switch(type) {
+		case FILE:
+			summary = StreamFileClientFragment.readSummary(prefs);
+			break;
+		case NTRIPCLI:
+			summary = StreamNtripClientFragment.readSummary(prefs);
+			break;
+		case TCPCLI:
+			summary = StreamTcpClientFragment.readSummary(prefs);
+			break;
+		case NONE:
+			summary="";
+			break;
+		default:
+			throw new IllegalArgumentException();
+		}
+		return summary;
+	}
 
 }
