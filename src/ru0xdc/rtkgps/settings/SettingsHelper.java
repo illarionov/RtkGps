@@ -95,7 +95,7 @@ public class SettingsHelper {
 			SharedPreferences.Editor e = prefs.edit();
 			e.putBoolean(OutputSolution1Fragment.KEY_ENABLE, false)
 			 .putString(OutputSolution1Fragment.KEY_TYPE, StreamType.NTRIPCLI.name())
-			 .putString(OutputSolution1Fragment.KEY_FORMAT, StreamFormat.RTCM3.name())
+			 .putString(OutputSolution1Fragment.KEY_FORMAT, SolutionFormat.LLH.name())
 			  ;
 			e.commit();
 			StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
