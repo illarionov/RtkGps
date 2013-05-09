@@ -34,7 +34,7 @@
         <service android:name=".RtkNaviService" />
 
         <activity
-            android:name=".settings.InputStreamSettingsActivity"
+            android:name=".settings.StreamSettingsActivity"
             android:label="@string/title_activity_input_stream_settings"
             android:parentActivityName="ru0xdc.rtkgps.MainActivity" >
         </activity>

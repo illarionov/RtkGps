@@ -1,36 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
-        
-    <header 
-        android:fragment="ru0xdc.rtkgps.settings.InputRoverFragment"
-        android:title="@string/settings_header_input_rover" />
-    <header 
-        android:fragment="ru0xdc.rtkgps.settings.InputBaseFragment"
-        android:title="@string/settings_header_input_base" />
-    <header 
-        android:fragment="ru0xdc.rtkgps.settings.InputCorrectionFragment"
-        android:title="@string/settings_header_input_correction" />
-    
-	<header 
-        	android:title="@string/settings_header_output_solution1"
-        	android:fragment="ru0xdc.rtkgps.settings.OutputSolution1Fragment" 
-        	/>
-    <header 
-        	android:title="@string/settings_header_output_solution2"
-        	android:fragment="ru0xdc.rtkgps.settings.OutputSolution2Fragment"
-        	 />
-        
-    <header 
-        	android:title="@string/settings_header_log_rover"
-        	android:fragment="ru0xdc.rtkgps.settings.LogRoverFragment" />
-    <header 
-        	android:title="@string/settings_header_log_base"
-        	android:fragment="ru0xdc.rtkgps.settings.LogBaseFragment" />
-    <header 
-        	android:title="@string/settings_header_log_correction"
-        	android:fragment="ru0xdc.rtkgps.settings.LogCorrectionFragment" />
-    
-    
     <header 
         android:fragment="ru0xdc.rtkgps.settings.ProcessingOptions1Fragment"
         android:title="@string/procopt_category_processing_options_1"

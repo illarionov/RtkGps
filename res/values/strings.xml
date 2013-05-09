@@ -4,12 +4,16 @@
     <string name="app_name">RtkGps</string>
     <string name="title_status">Status</string>
 	<string name="title_activity_input_stream_settings">Input stream settings</string>
+	<string name="title_activity_output_stream_settings">Output stream settings</string>
+	<string name="title_activity_log_stream_settings">Log stream settings</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_start_service">Start service</string>
     <string name="menu_stop_service">Stop service</string>
     <string name="menu_select_solution_format">Select solution format</string>
     <string name="menu_select_gtime_format">Select time format</string>
     <string name="menu_input_stream_settings">Configure Input streams</string>
+    <string name="menu_output_stream_settings">Configure Output streams</string>
+    <string name="menu_log_stream_settings">Configure Log streams</string>
     <string name="local_service_started">Local service started</string>
     <string name="local_service_stopped">Local service stopped</string>
     <string name="local_service_label">RtkGps</string>
@@ -373,9 +377,9 @@
     <string name="input_streams_settings_enable_rover_title">Enable rover</string>
     <string name="input_streams_settings_enable_base_title">Enable base</string>
     <string name="input_streams_settings_enable_correction_title">Enable correction</string>
-    <string name="input_streams_settings_rover_category_title">Rover settings</string>
-    <string name="input_streams_settings_base_category_title">Base settings</string>
-    <string name="input_streams_settings_correction_category_title">Correction settings</string>
+    <string name="input_streams_settings_rover_tab_title">Input Rover</string>
+    <string name="input_streams_settings_base_tab_title">Input Base</string>
+    <string name="input_streams_settings_correction_tab_title">Input Correction</string>
     <string name="input_streams_settings_commands_at_startup_title">Commands at startup</string>
     <string name="input_streams_settings_commands_at_shutdown_title">Commands at shutdown</string>
     <string name="input_streams_settings_receiver_option_title">Receiver option</string>
@@ -398,12 +402,16 @@
     <!-- Output stream settings -->
     <string name="output_streams_settings_enable_solution1_title">Enable Solution 1</string>
     <string name="output_streams_settings_enable_solution2_title">Enable Solution 2</string>
-
+    <string name="output_streams_settings_solution1_tab_title">Solution 1</string>
+    <string name="output_streams_settings_solution2_tab_title">Solution 2</string>
     
     <!-- Log stream settings -->
     <string name="log_streams_settings_enable_rover_title">Log rover</string>
     <string name="log_streams_settings_enable_base_title">Log base </string>
     <string name="log_streams_settings_enable_correction_title">Log correction</string>
+    <string name="log_stream_settings_rover_tab_title">Log Rover</string>
+    <string name="log_stream_settings_base_tab_title">Log Base</string>
+    <string name="log_stream_settings_correction_tab_title">Log Correction</string>
     
     <string name="ntrip_client_dialog_title">NTRIP client settings</string>
     <string name="ntrip_client_host_title">Host</string>

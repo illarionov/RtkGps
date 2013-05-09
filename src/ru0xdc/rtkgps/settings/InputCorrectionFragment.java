@@ -67,7 +67,7 @@ public class InputCorrectionFragment extends InputRoverFragment {
 		findPreference(KEY_ENABLE).setTitle(R.string.input_streams_settings_enable_correction_title);
 
 		typePref = (StreamTypePreference)findPreference(KEY_TYPE);
-		typePref.setTitle(R.string.input_streams_settings_correction_category_title);
+		typePref.setTitle(R.string.input_streams_settings_correction_tab_title);
 		typePref.setValues(CORRECTION_STREAM_TYPES);
 		typePref.setDefaultValue(DEFAULT_STREAM_TYPE);
 

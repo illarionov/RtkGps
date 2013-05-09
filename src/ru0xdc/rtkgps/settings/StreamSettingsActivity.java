@@ -6,15 +6,21 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
 import android.view.MenuItem;
 
-public class InputStreamSettingsActivity extends Activity implements
+public class StreamSettingsActivity extends Activity implements
 		ActionBar.TabListener {
+
+	public static final String ARG_STEAM =  "stream";
+
+	public static final int STREAM_INPUT_SETTINGS = 0;
+	public static final int STREAM_OUTPUT_SETTINGS = 1;
+	public static final int STREAM_LOG_SETTINGS = 2;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -24,7 +30,7 @@ public class InputStreamSettingsActivity extends Activity implements
 	 * intensive, it may be best to switch to a
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-	SectionsPagerAdapter mSectionsPagerAdapter;
+	FragmentPagerAdapter mSectionsPagerAdapter;
 
 	/**
 	 * The {@link ViewPager} that will host the section contents.
@@ -42,10 +48,26 @@ public class InputStreamSettingsActivity extends Activity implements
 		// Show the Up button in the action bar.
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getFragmentManager());
+		final int stream = getIntent().getIntExtra(ARG_STEAM, STREAM_INPUT_SETTINGS);
+		switch (stream) {
+		case STREAM_INPUT_SETTINGS:
+			mSectionsPagerAdapter = new InputStreamSettingsPagerAdapter(
+					getFragmentManager(), getResources());
+			setTitle(R.string.title_activity_input_stream_settings);
+			break;
+		case STREAM_OUTPUT_SETTINGS:
+			mSectionsPagerAdapter = new OutputStreamSettingsPagerAdapter(
+					getFragmentManager(), getResources());
+			setTitle(R.string.title_activity_output_stream_settings);
+			break;
+		case STREAM_LOG_SETTINGS:
+			mSectionsPagerAdapter = new LogStreamSettingsPagerAdapter(
+					getFragmentManager(), getResources());
+			setTitle(R.string.title_activity_log_stream_settings);
+			break;
+		default:
+			throw new IllegalArgumentException("Wrong ARG_STEAM");
+		}
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -72,13 +94,6 @@ public class InputStreamSettingsActivity extends Activity implements
 					.setText(mSectionsPagerAdapter.getPageTitle(i))
 					.setTabListener(this));
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.input_stream_settings, menu);
-		return true;
 	}
 
 	@Override
@@ -120,10 +135,13 @@ public class InputStreamSettingsActivity extends Activity implements
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
 	 */
-	public class SectionsPagerAdapter extends FragmentPagerAdapter {
+	private static class InputStreamSettingsPagerAdapter extends FragmentPagerAdapter {
 
-		public SectionsPagerAdapter(FragmentManager fm) {
+		private final Resources mResources;
+
+		public InputStreamSettingsPagerAdapter(FragmentManager fm, Resources r) {
 			super(fm);
+			mResources = r;
 		}
 
 		@Override
@@ -156,13 +174,108 @@ public class InputStreamSettingsActivity extends Activity implements
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
-				return getString(R.string.input_streams_settings_rover_category_title);
+				return mResources.getString(R.string.input_streams_settings_rover_tab_title);
 			case 1:
-				return getString(R.string.input_streams_settings_base_category_title);
+				return mResources.getString(R.string.input_streams_settings_base_tab_title);
 			case 2:
-				return getString(R.string.input_streams_settings_correction_category_title);
+				return mResources.getString(R.string.input_streams_settings_correction_tab_title);
 			}
 			return null;
 		}
 	}
+
+	private static class OutputStreamSettingsPagerAdapter extends FragmentPagerAdapter {
+
+		private final Resources mResources;
+
+		public OutputStreamSettingsPagerAdapter(FragmentManager fm, Resources r) {
+			super(fm);
+			mResources = r;
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			final Fragment fragment;
+
+			switch (position) {
+			case 0:
+				fragment = new OutputSolution1Fragment();
+				break;
+			case 1:
+				fragment = new OutputSolution1Fragment();
+				break;
+			default:
+				throw new IllegalStateException();
+			}
+
+			return fragment;
+		}
+
+		@Override
+		public int getCount() {
+			return 2;
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position) {
+
+			switch (position) {
+			case 0:
+				return mResources.getString(R.string.output_streams_settings_solution1_tab_title);
+			case 1:
+				return mResources.getString(R.string.output_streams_settings_solution2_tab_title);
+			}
+			return null;
+		}
+	}
+
+	private static class LogStreamSettingsPagerAdapter extends FragmentPagerAdapter {
+
+		private final Resources mResources;
+
+		public LogStreamSettingsPagerAdapter(FragmentManager fm, Resources r) {
+			super(fm);
+			mResources = r;
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			final Fragment fragment;
+
+			switch (position) {
+			case 0:
+				fragment = new LogRoverFragment();
+				break;
+			case 1:
+				fragment = new LogBaseFragment();
+				break;
+			case 2:
+				fragment = new LogCorrectionFragment();
+				break;
+			default:
+				throw new IllegalStateException();
+			}
+
+			return fragment;
+		}
+
+		@Override
+		public int getCount() {
+			return 3;
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position) {
+			switch (position) {
+			case 0:
+				return mResources.getString(R.string.log_stream_settings_rover_tab_title);
+			case 1:
+				return mResources.getString(R.string.log_stream_settings_base_tab_title);
+			case 2:
+				return mResources.getString(R.string.log_stream_settings_correction_tab_title);
+			}
+			return null;
+		}
+	}
+
 }

@@ -4,7 +4,7 @@ import java.io.File;
 
 import javax.annotation.Nonnull;
 
-import ru0xdc.rtkgps.settings.InputStreamSettingsActivity;
+import ru0xdc.rtkgps.settings.StreamSettingsActivity;
 import ru0xdc.rtkgps.settings.SettingsActivity;
 import ru0xdc.rtkgps.settings.SettingsHelper;
 import android.app.ActionBar;
@@ -164,6 +164,12 @@ ActionBar.OnNavigationListener {
 		case R.id.menu_input_stream_settings:
 			showInputStreamSettings();
 			break;
+		case R.id.menu_output_stream_settings:
+			showOutputStreamSettings();
+			break;
+		case R.id.menu_log_stream_settings:
+			showLogStreamSettings();
+			break;
 		case R.id.menu_start_service:
 			startRtkService();
 			break;
@@ -182,9 +188,23 @@ ActionBar.OnNavigationListener {
 	}
 
 	private void showInputStreamSettings() {
-		final Intent intent = new Intent(this, InputStreamSettingsActivity.class);
+		final Intent intent = new Intent(this, StreamSettingsActivity.class);
+		intent.putExtra(StreamSettingsActivity.ARG_STEAM, StreamSettingsActivity.STREAM_INPUT_SETTINGS);
 		startActivity(intent);
 	}
+
+	private void showOutputStreamSettings() {
+		final Intent intent = new Intent(this, StreamSettingsActivity.class);
+		intent.putExtra(StreamSettingsActivity.ARG_STEAM, StreamSettingsActivity.STREAM_OUTPUT_SETTINGS);
+		startActivity(intent);
+	}
+
+	private void showLogStreamSettings() {
+		final Intent intent = new Intent(this, StreamSettingsActivity.class);
+		intent.putExtra(StreamSettingsActivity.ARG_STEAM, StreamSettingsActivity.STREAM_LOG_SETTINGS);
+		startActivity(intent);
+	}
+
 
 	@Override
 	public boolean onNavigationItemSelected(int position, long id) {

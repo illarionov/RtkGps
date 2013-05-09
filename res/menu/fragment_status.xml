@@ -3,9 +3,12 @@
 	<item
 		android:id="@+id/menu_select_gtime_format"
 		android:showAsAction="never"
-		android:title="@string/menu_select_gtime_format"/>
+		android:title="@string/menu_select_gtime_format"
+		android:orderInCategory="150"		/>
 	<item
 		android:id="@+id/menu_select_solution_format"
 		android:showAsAction="never"
-		android:title="@string/menu_select_solution_format"/>
+		android:title="@string/menu_select_solution_format"
+		android:orderInCategory="150"
+		/>
 </menu>
