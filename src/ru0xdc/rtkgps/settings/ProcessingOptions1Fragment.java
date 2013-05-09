@@ -81,6 +81,7 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
 	@Override
     public void onResume() {
         super.onResume();
+        updateEnable();
         reloadSummaries();
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(mPreferenceChangeListener);
     }
@@ -170,6 +171,29 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
     	mEarthTidesCorrPref.setSummary(mEarthTidesCorrPref.getEntry());
     }
 
+    private void updateEnable() {
+    	PositioningMode posMode;
+    	final boolean rel, ppp;
+
+    	posMode = PositioningMode.valueOf(mPositioningModePref.getValue());
+
+    	rel = posMode.isRelative();
+    	// rtk = posMode.isRtk();
+    	ppp = posMode.isPpp();
+    	//ar = rtk || ppp;
+
+    	mNumberOfFrequenciesPref.setEnabled(rel);
+    	findPreference(KEY_REC_DYNAMICS).setEnabled(rel);
+    	mEarthTidesCorrPref.setEnabled(rel || ppp);
+
+    	findPreference(KEY_SAT_ANTENNA_PCV).setEnabled(ppp);
+    	findPreference(KEY_RECEIVER_ANTENNA_PCV).setEnabled(ppp);
+    	findPreference(KEY_PHASE_WINDUP_CORRECTION).setEnabled(ppp);
+    	findPreference(KEY_EXCLUDE_ECLIPSING).setEnabled(ppp);
+
+
+    }
+
     public static ProcessingOptions readPrefs(Context ctx) {
     	final ProcessingOptions opts;
     	final SharedPreferences prefs;
@@ -223,6 +247,7 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
 		@Override
 		public void onSharedPreferenceChanged(
 				SharedPreferences sharedPreferences, String key) {
+			updateEnable();
 			reloadSummaries();
 		}
     };

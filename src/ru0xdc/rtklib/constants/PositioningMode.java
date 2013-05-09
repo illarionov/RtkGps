@@ -54,6 +54,27 @@ public enum PositioningMode implements IHasRtklibId {
 		throw new IllegalArgumentException();
 	}
 
+	public boolean isRelative() {
+		return DGPS.equals(this)
+				|| KINEMA.equals(this)
+				|| STATIC.equals(this)
+				|| MOVEB.equals(this)
+				|| FIXED.equals(this);
+	}
+
+	public boolean isPpp() {
+		return PPP_KINEMA.equals(this)
+				|| PPP_STATIC.equals(this)
+				|| PPP_FIXED.equals(this);
+	}
+
+	public boolean isRtk() {
+		return KINEMA.equals(this)
+				|| STATIC.equals(this)
+				|| MOVEB.equals(this)
+				|| FIXED.equals(this);
+	}
+
 	public static CharSequence[] getEntries(Resources r) {
 		final PositioningMode values[] = values();
 		final CharSequence res[] = new CharSequence[values.length];
