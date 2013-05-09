@@ -1,7 +1,6 @@
 package ru0xdc.rtklib.constants;
 
 import ru0xdc.rtkgps.R;
-import android.content.res.Resources;
 
 /**
  * Stream format STRFMT_XXX
@@ -72,19 +71,5 @@ public enum StreamFormat implements IHasRtklibId {
             if (v.mRtklibId == rtklibId) return v;
         }
         throw new IllegalArgumentException();
-    }
-
-    public static CharSequence[] getEntries(Resources r) {
-        final StreamFormat values[] = values();
-        final CharSequence res[] = new CharSequence[values.length];
-        for (int i=0; i<values.length; ++i) res[i] = r.getString(values[i].mNameResId);
-        return res;
-    }
-
-    public static CharSequence[] getEntryValues() {
-        final StreamFormat values[] = values();
-        final CharSequence res[] = new CharSequence[values.length];
-        for (int i=0; i<values.length; ++i) res[i] = values[i].name();
-        return res;
     }
 }

@@ -1,7 +1,6 @@
 package ru0xdc.rtklib.constants;
 
 import ru0xdc.rtkgps.R;
-import android.content.res.Resources;
 
 /**
  * Positioning mode PMODE_XXX
@@ -73,19 +72,5 @@ public enum PositioningMode implements IHasRtklibId {
                 || STATIC.equals(this)
                 || MOVEB.equals(this)
                 || FIXED.equals(this);
-    }
-
-    public static CharSequence[] getEntries(Resources r) {
-        final PositioningMode values[] = values();
-        final CharSequence res[] = new CharSequence[values.length];
-        for (int i=0; i<values.length; ++i) res[i] = r.getString(values[i].mNameResId);
-        return res;
-    }
-
-    public static CharSequence[] getEntryValues() {
-        final PositioningMode values[] = values();
-        final CharSequence res[] = new CharSequence[values.length];
-        for (int i=0; i<values.length; ++i) res[i] = values[i].name();
-        return res;
     }
 }

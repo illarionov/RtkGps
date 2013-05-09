@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <ListPreference
+    <ru0xdc.rtkgps.settings.widget.PositioningModePreference
         android:dialogTitle="@string/procopt_positioning_mode_dialog_title"
         android:key="positioning_mode"
         android:title="@string/procopt_positioning_mode_title" />
@@ -37,15 +37,15 @@
         android:key="rec_earth_tides_correction"
         android:title="@string/procopt_rec_earth_tides_correction_title" />
 
-    <ListPreference
+    <ru0xdc.rtkgps.settings.widget.IonosphereCorrectionPreference
         android:dialogTitle="@string/procopt_ionosphere_correction_dialog_title"
         android:key="ionosphere_correction"
         android:title="@string/procopt_ionosphere_correction_title" />
-    <ListPreference
+    <ru0xdc.rtkgps.settings.widget.TroposphereCorrectionPreference
         android:dialogTitle="@string/procopt_troposphere_correction_dialog_title"
         android:key="troposphere_correction"
         android:title="@string/procopt_troposphere_correction_title" />
-    <ListPreference
+    <ru0xdc.rtkgps.settings.widget.EphemerisOptionPreference
         android:dialogTitle="@string/procopt_satellite_ephemeris_clock_dialog_title"
         android:key="satellite_ephemeris_clock"
         android:title="@string/procopt_satellite_ephemeris_clock_title" />

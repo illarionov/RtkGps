@@ -8,7 +8,11 @@ import java.util.Set;
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
 import ru0xdc.rtkgps.settings.widget.EarthTideCorrectionPreference;
+import ru0xdc.rtkgps.settings.widget.EphemerisOptionPreference;
+import ru0xdc.rtkgps.settings.widget.IonosphereCorrectionPreference;
 import ru0xdc.rtkgps.settings.widget.MultiSelectListPreferenceWorkaround;
+import ru0xdc.rtkgps.settings.widget.PositioningModePreference;
+import ru0xdc.rtkgps.settings.widget.TroposphereCorrectionPreference;
 import ru0xdc.rtklib.ProcessingOptions;
 import ru0xdc.rtklib.constants.EarthTideCorrectionType;
 import ru0xdc.rtklib.constants.EphemerisOption;
@@ -52,15 +56,15 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
     static final String KEY_RAIM_FDE = "raim_fde";
 
     // Settings 1
-    private ListPreference mPositioningModePref;
+    private PositioningModePreference mPositioningModePref;
     private ListPreference mNumberOfFrequenciesPref;
     private MultiSelectListPreferenceWorkaround mNavigationSystem;
     private ListPreference mElevationMaskPref;
     private ListPreference mSnrMaskPref;
     private EarthTideCorrectionPreference mEarthTidesCorrPref;
-    private ListPreference mIonosphereCorrectionPref;
-    private ListPreference mTroposphereCorrectionPref;
-    private ListPreference mSatEphemClockPref;
+    private IonosphereCorrectionPreference mIonosphereCorrectionPref;
+    private TroposphereCorrectionPreference mTroposphereCorrectionPref;
+    private EphemerisOptionPreference mSatEphemClockPref;
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
@@ -98,9 +102,7 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
         ProcessingOptions opts = readPrefs(getActivity());
 
         // Positioning mode
-        mPositioningModePref = (ListPreference)findPreference(KEY_POSITIONING_MODE);
-        mPositioningModePref.setEntries(PositioningMode.getEntries(r));
-        mPositioningModePref.setEntryValues(PositioningMode.getEntryValues());
+        mPositioningModePref = (PositioningModePreference)findPreference(KEY_POSITIONING_MODE);
 
         // Number of frequencies
         mNumberOfFrequenciesPref = (ListPreference)findPreference(KEY_NUMBER_OF_FREQUENCIES);
@@ -122,19 +124,13 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
         mEarthTidesCorrPref = (EarthTideCorrectionPreference)findPreference(KEY_EARTH_TIDES_CORRECTION);
 
         // Ionosphere correction
-        mIonosphereCorrectionPref = (ListPreference)findPreference(KEY_IONOSPHERE_CORRECTION);
-        mIonosphereCorrectionPref.setEntries(IonosphereOption.getEntries(r));
-        mIonosphereCorrectionPref.setEntryValues(IonosphereOption.getEntryValues());
+        mIonosphereCorrectionPref = (IonosphereCorrectionPreference)findPreference(KEY_IONOSPHERE_CORRECTION);
 
         // Troposphere correction
-        mTroposphereCorrectionPref = (ListPreference)findPreference(KEY_TROPOSPHERE_CORRECTION);
-        mTroposphereCorrectionPref.setEntries(TroposphereOption.getEntries(r));
-        mTroposphereCorrectionPref.setEntryValues(TroposphereOption.getEntryValues());
+        mTroposphereCorrectionPref = (TroposphereCorrectionPreference)findPreference(KEY_TROPOSPHERE_CORRECTION);
 
         // Satellite Ephemeris/Clock
-        mSatEphemClockPref = (ListPreference)findPreference(KEY_SAT_EPHEM_CLOCK);
-        mSatEphemClockPref.setEntries(EphemerisOption.getEntries(r));
-        mSatEphemClockPref.setEntryValues(EphemerisOption.getEntryValues());
+        mSatEphemClockPref = (EphemerisOptionPreference)findPreference(KEY_SAT_EPHEM_CLOCK);
 
         mSnrMaskPref = (ListPreference)findPreference(KEY_SNR_MASK);
     }
