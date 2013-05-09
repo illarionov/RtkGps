@@ -31,13 +31,15 @@ public class ProcessingOptions {
      */
     public static class SnrMask {
 
-        boolean enableRover;
-        boolean enableBase;
+        // Used in native code
+        private boolean enableRover;
+        private boolean enableBase;
 
         /** mask (dBHz) at 5,10,...85 deg */
-        final double maskL1[];
-        final double maskL2[];
-        final double maskL5[];
+        // Used in native code
+        private final double maskL1[];
+        private final double maskL2[];
+        private final double maskL5[];
 
         public SnrMask() {
             enableRover = enableBase = false;
@@ -73,247 +75,259 @@ public class ProcessingOptions {
         }
     }
 
+    static class Native {
 
-    /** positioning mode (PMODE_???) */
-    int mode;
+        /** positioning mode (PMODE_???) */
+        private int mode;
 
-    /** solution type (0:forward,1:backward,2:combined) */
-    int soltype;
+        /** solution type (0:forward,1:backward,2:combined) */
+        private int soltype;
 
-    /** number of frequencies (1:L1,2:L1+L2,3:L1+L2+L5) */
-    private int nf;
+        /** number of frequencies (1:L1,2:L1+L2,3:L1+L2+L5) */
+        private int nf;
 
-    /** navigation system */
-    int navsys;
+        /** navigation system */
+        private int navsys;
 
-    /** elevation mask angle (rad) */
-    double elmin;
+        /** elevation mask angle (rad) */
+        private double elmin;
 
-    /** SNR mask */
-    final SnrMask snrmask;
+        /** SNR mask */
+        private final SnrMask snrmask;
 
-    /** satellite ephemeris/clock (EPHOPT_???) */
-    int sateph;
+        /** satellite ephemeris/clock (EPHOPT_???) */
+        private int sateph;
 
-    /** AR mode (0:off,1:continuous,2:instantaneous,3:fix and hold) */
-    int modear;
+        /** AR mode (0:off,1:continuous,2:instantaneous,3:fix and hold) */
+        private int modear;
 
-    /** GLONASS AR mode (0:off,1:on,2:auto cal,3:ext cal) */
-    int glomodear;
+        /** GLONASS AR mode (0:off,1:on,2:auto cal,3:ext cal) */
+        private int glomodear;
 
-    /** obs outage count to reset bias */
-    int maxout;
+        /** obs outage count to reset bias */
+        private int maxout;
 
-    /** min lock count to fix ambiguity */
-    int minlock;
+        /** min lock count to fix ambiguity */
+        private int minlock;
 
-    /** min fix count to hold ambiguity */
-    int minfix;
+        /** min fix count to hold ambiguity */
+        private int minfix;
 
-    /** ionosphere option (IONOOPT_???) */
-    int ionoopt;
+        /** ionosphere option (IONOOPT_???) */
+        private int ionoopt;
 
-    /** troposphere option (TROPOPT_???) */
-    int tropopt;
+        /** troposphere option (TROPOPT_???) */
+        private int tropopt;
 
-    /** dynamics model (0:none,1:velociy,2:accel) */
-    int dynamics;
+        /** dynamics model (0:none,1:velociy,2:accel) */
+        private int dynamics;
 
-    /** earth tide correction (0:off,1:solid,2:solid+otl+pole) */
-    int tidecorr;
+        /** earth tide correction (0:off,1:solid,2:solid+otl+pole) */
+        private int tidecorr;
 
-    /** number of filter iteration */
-    int niter;
+        /** number of filter iteration */
+        private int niter;
 
-    /** code smoothing window size (0:none) */
-    int codesmooth;
+        /** code smoothing window size (0:none) */
+        private int codesmooth;
 
-    /** interpolate reference obs (for post mission)  */
-    int intpref;
+        /** interpolate reference obs (for post mission)  */
+        private int intpref;
 
-    /** SBAS correction options */
-    int sbascorr;
+        /** SBAS correction options */
+        private int sbascorr;
 
-    /** SBAS satellite selection (0:all) */
-    int sbassatsel;
+        /** SBAS satellite selection (0:all) */
+        private int sbassatsel;
 
-    /** rover position for fixed mode */
-    int rovpos;
+        /** rover position for fixed mode */
+        private int rovpos;
 
-    /**
-     * base position for relative mode
-     * 	 (0:pos in prcopt,  1:average of single pos,
-     *  2:read from file, 3:rinex header, 4:rtcm pos)
-     */
-    int refpos;
+        /**
+         * base position for relative mode
+         *   (0:pos in prcopt,  1:average of single pos,
+         *  2:read from file, 3:rinex header, 4:rtcm pos)
+         */
+        private int refpos;
 
-    /** code/phase error ratio */
-    double eratioL1;
-    double eratioL2;
-    double eratioL5;
+        /** code/phase error ratio */
+        private double eratioL1;
+        private double eratioL2;
+        private double eratioL5;
 
-    /** measurement error factor */
-    double errPhaseA;
-    double errPhaseB;
-    double errPhaseC;
-    double errDopplerFreq;
+        /** measurement error factor */
+        private double errPhaseA;
+        private double errPhaseB;
+        private double errPhaseC;
+        private double errDopplerFreq;
 
-    /** initial-state std */
-    double stdBias;
-    double stdIono;
-    double stdTrop;
+        /** initial-state std */
+        private double stdBias;
+        private double stdIono;
+        private double stdTrop;
 
-    /** process-noise std */
-    double prnBias;
-    double prnIono;
-    double prnTrop;
-    double prnAcch;
-    double prnAccv;
+        /** process-noise std */
+        private double prnBias;
+        private double prnIono;
+        private double prnTrop;
+        private double prnAcch;
+        private double prnAccv;
 
-    /** satellite clock stability (sec/sec) */
-    double sclkstab;
+        /** satellite clock stability (sec/sec) */
+        private double sclkstab;
 
-    /** AR validation threshold */
-    double thresar_0, thresar_1, thresar_2, thresar_3;
+        /** AR validation threshold */
+        private double thresar_0, thresar_1, thresar_2, thresar_3;
 
-    /** elevation mask of AR for rising satellite (deg) */
-    double elmaskar;
+        /** elevation mask of AR for rising satellite (deg) */
+        private double elmaskar;
 
-    /** elevation mask to hold ambiguity (deg) */
-    double elmaskhold;
+        /** elevation mask to hold ambiguity (deg) */
+        private double elmaskhold;
 
-    /** slip threshold of geometry-free phase (m)  */
-    double thresslip;
+        /** slip threshold of geometry-free phase (m)  */
+        private double thresslip;
 
-    /** max difference of time (sec) */
-    double maxtdiff;
+        /** max difference of time (sec) */
+        private double maxtdiff;
 
-    /** reject threshold of innovation (m) */
-    double maxinno;
+        /** reject threshold of innovation (m) */
+        private double maxinno;
 
-    /** reject threshold of gdop */
-    double maxgdop;
+        /** reject threshold of gdop */
+        private double maxgdop;
 
-    /** baseline length constraint {const,sigma} (m) */
-    double baselineConst;
-    double baselineSigma;
+        /** baseline length constraint {const,sigma} (m) */
+        private double baselineConst;
+        private double baselineSigma;
 
-    /** rover position for fixed mode {x,y,z} (ecef) (m) */
-    double ruX, ruY, ruZ;
+        /** rover position for fixed mode {x,y,z} (ecef) (m) */
+        private double ruX, ruY, ruZ;
 
-    /** base position for relative mode {x,y,z} (ecef) (m) */
-    double baseX, baseY, baseZ;
+        /** base position for relative mode {x,y,z} (ecef) (m) */
+        private double baseX, baseY, baseZ;
 
-    /** antenna types {rover,base} */
-    String anttypeBase, anttypeRover;
+        /** antenna types {rover,base} */
+        private String anttypeBase, anttypeRover;
 
-    /** antenna delta {{rov_e,rov_n,rov_u},{ref_e,ref_n,ref_u}} */
-    double antdelRovE, antdelRovN, antdelRovU;
-    double antdelRefE, antdelRefN, antdelRefU;
+        /** antenna delta {{rov_e,rov_n,rov_u},{ref_e,ref_n,ref_u}} */
+        private double antdelRovE, antdelRovN, antdelRovU;
+        private double antdelRefE, antdelRefN, antdelRefU;
 
-    /** XXX: receiver antenna parameters {rov,base} */
-    // PcvT pcvrRover,pcvrBase;
+        /** XXX: receiver antenna parameters {rov,base} */
+        // PcvT pcvrRover,pcvrBase;
 
-    /** excluded satellites */
-    final boolean exsats[];
+        /** excluded satellites */
+        private final boolean exsats[];
 
-    /** rinex options */
-    String rnxoptBase, rnxoptRover;
+        /** rinex options */
+        private String rnxoptBase, rnxoptRover;
 
-    /** positioning options */
-    final int posopt[];
+        /** positioning options */
+        private final int posopt[];
 
-    /** XXX: extended receiver error model */
-    // ExtErr exterr;
+        /** XXX: extended receiver error model */
+        // ExtErr exterr;
 
-    native void _loadDefaults();
+        public Native() {
+            exsats = new boolean[Constants.MAXSAT];
+            posopt = new int[6];
+            snrmask = new SnrMask();
+            _loadDefaults();
+        }
 
-    public ProcessingOptions() {
-        exsats = new boolean[Constants.MAXSAT];
-        posopt = new int[6];
-        snrmask = new SnrMask();
-        _loadDefaults();
+        native void _loadDefaults();
+
     }
 
+    private final Native mNative;
+
+    public ProcessingOptions() {
+        mNative = new Native();
+    }
+
+    Native getNative() {
+        return mNative;
+    }
 
     public void setValues(ProcessingOptions src) {
-        mode = src.mode;
-        soltype = src.soltype;
-        nf = src.nf;
-        navsys = src.navsys;
-        elmin = src.elmin;
-        snrmask.setValues(src.snrmask);
-        sateph = src.sateph;
-        modear = src.modear;
-        glomodear = src.glomodear;
-        maxout = src.maxout;
-        minlock = src.minlock;
-        minfix = src.minfix;
-        ionoopt = src.ionoopt;
-        tropopt = src.tropopt;
-        dynamics = src.dynamics;
-        tidecorr = src.tidecorr;
-        niter = src.niter;
-        codesmooth = src.codesmooth;
-        intpref = src.intpref;
-        sbascorr = src.sbascorr;
-        sbassatsel = src.sbassatsel;
-        rovpos = src.rovpos;
-        refpos = src.refpos;
-        eratioL1 = src.eratioL1;
-        eratioL2 = src.eratioL2;
-        eratioL5 = src.eratioL5;
-        errPhaseA = src.errPhaseA;
-        errPhaseB = src.errPhaseB;
-        errPhaseC = src.errPhaseC;
-        errDopplerFreq = src.errDopplerFreq;
-        stdBias = src.stdBias;
-        stdIono = src.stdIono;
-        stdTrop = src.stdTrop;
-        prnBias = src.prnBias;
-        prnIono = src.prnIono;
-        prnTrop = src.prnTrop;
-        prnAcch = src.prnAcch;
-        prnAccv = src.prnAccv;
-        sclkstab = src.sclkstab;
-        thresar_0 = src.thresar_0;
-        thresar_1 = src.thresar_1;
-        thresar_2 = src.thresar_2;
-        thresar_3 = src.thresar_3;
-        elmaskar = src.elmaskar;
-        elmaskhold = src.elmaskhold;
-        thresslip = src.thresslip;
-        maxtdiff = src.maxtdiff;
-        maxinno = src.maxinno;
-        maxgdop = src.maxgdop;
-        baselineConst = src.baselineConst;
-        baselineSigma = src.baselineSigma;
-        ruX = src.ruX;
-        ruY = src.ruY;
-        ruZ = src.ruZ;
-        baseX =src.baseX;
-        baseY = src.baseY;
-        baseZ = src.baseZ;
-        anttypeBase = src.anttypeBase;
-        anttypeRover = src.anttypeRover;
-        antdelRovE = src.antdelRovE;
-        antdelRovN = src.antdelRovN;
-        antdelRovU = src.antdelRovU;
-        antdelRefE = src.antdelRefE;
-        antdelRefN = src.antdelRefN;
-        antdelRefU = src.antdelRefU;
-        System.arraycopy(src.exsats, 0, exsats, 0, exsats.length);
-        rnxoptBase = src.rnxoptBase;
-        rnxoptRover = src.rnxoptRover;
-        System.arraycopy(src.posopt, 0, posopt, 0, posopt.length);
+        mNative.mode = src.mNative.mode;
+        mNative.soltype = src.mNative.soltype;
+        mNative.nf = src.mNative.nf;
+        mNative.navsys = src.mNative.navsys;
+        mNative.elmin = src.mNative.elmin;
+        mNative.snrmask.setValues(src.mNative.snrmask);
+        mNative.sateph = src.mNative.sateph;
+        mNative.modear = src.mNative.modear;
+        mNative.glomodear = src.mNative.glomodear;
+        mNative.maxout = src.mNative.maxout;
+        mNative.minlock = src.mNative.minlock;
+        mNative.minfix = src.mNative.minfix;
+        mNative.ionoopt = src.mNative.ionoopt;
+        mNative.tropopt = src.mNative.tropopt;
+        mNative.dynamics = src.mNative.dynamics;
+        mNative.tidecorr = src.mNative.tidecorr;
+        mNative.niter = src.mNative.niter;
+        mNative.codesmooth = src.mNative.codesmooth;
+        mNative.intpref = src.mNative.intpref;
+        mNative.sbascorr = src.mNative.sbascorr;
+        mNative.sbassatsel = src.mNative.sbassatsel;
+        mNative.rovpos = src.mNative.rovpos;
+        mNative.refpos = src.mNative.refpos;
+        mNative.eratioL1 = src.mNative.eratioL1;
+        mNative.eratioL2 = src.mNative.eratioL2;
+        mNative.eratioL5 = src.mNative.eratioL5;
+        mNative.errPhaseA = src.mNative.errPhaseA;
+        mNative.errPhaseB = src.mNative.errPhaseB;
+        mNative.errPhaseC = src.mNative.errPhaseC;
+        mNative.errDopplerFreq = src.mNative.errDopplerFreq;
+        mNative.stdBias = src.mNative.stdBias;
+        mNative.stdIono = src.mNative.stdIono;
+        mNative.stdTrop = src.mNative.stdTrop;
+        mNative.prnBias = src.mNative.prnBias;
+        mNative.prnIono = src.mNative.prnIono;
+        mNative.prnTrop = src.mNative.prnTrop;
+        mNative.prnAcch = src.mNative.prnAcch;
+        mNative.prnAccv = src.mNative.prnAccv;
+        mNative.sclkstab = src.mNative.sclkstab;
+        mNative.thresar_0 = src.mNative.thresar_0;
+        mNative.thresar_1 = src.mNative.thresar_1;
+        mNative.thresar_2 = src.mNative.thresar_2;
+        mNative.thresar_3 = src.mNative.thresar_3;
+        mNative.elmaskar = src.mNative.elmaskar;
+        mNative.elmaskhold = src.mNative.elmaskhold;
+        mNative.thresslip = src.mNative.thresslip;
+        mNative.maxtdiff = src.mNative.maxtdiff;
+        mNative.maxinno = src.mNative.maxinno;
+        mNative.maxgdop = src.mNative.maxgdop;
+        mNative.baselineConst = src.mNative.baselineConst;
+        mNative.baselineSigma = src.mNative.baselineSigma;
+        mNative.ruX = src.mNative.ruX;
+        mNative.ruY = src.mNative.ruY;
+        mNative.ruZ = src.mNative.ruZ;
+        mNative.baseX =src.mNative.baseX;
+        mNative.baseY = src.mNative.baseY;
+        mNative.baseZ = src.mNative.baseZ;
+        mNative.anttypeBase = src.mNative.anttypeBase;
+        mNative.anttypeRover = src.mNative.anttypeRover;
+        mNative.antdelRovE = src.mNative.antdelRovE;
+        mNative.antdelRovN = src.mNative.antdelRovN;
+        mNative.antdelRovU = src.mNative.antdelRovU;
+        mNative.antdelRefE = src.mNative.antdelRefE;
+        mNative.antdelRefN = src.mNative.antdelRefN;
+        mNative.antdelRefU = src.mNative.antdelRefU;
+        System.arraycopy(src.mNative.exsats, 0, mNative.exsats, 0, mNative.exsats.length);
+        mNative.rnxoptBase = src.mNative.rnxoptBase;
+        mNative.rnxoptRover = src.mNative.rnxoptRover;
+        System.arraycopy(src.mNative.posopt, 0, mNative.posopt, 0, mNative.posopt.length);
     }
 
     public PositioningMode getPositioningMode() {
-        return PositioningMode.valueOf(mode);
+        return PositioningMode.valueOf(mNative.mode);
     }
 
     public ProcessingOptions setPositioningMode(PositioningMode mode) {
-        this.mode = mode.getRtklibId();
+        this.mNative.mode = mode.getRtklibId();
         return this;
     }
 
@@ -321,7 +335,7 @@ public class ProcessingOptions {
      * @return nf (1:L1,2:L1+L2,3:L1+L2+L5)
      */
     public int getNumberOfFrequencies() {
-        return nf;
+        return mNative.nf;
     }
 
     /**
@@ -329,7 +343,7 @@ public class ProcessingOptions {
      */
     public void setNumberOfFrequencies(int nf) {
         if (nf < 1 || nf > Constants.NFREQ) throw new IllegalArgumentException();
-        this.nf = nf;
+        this.mNative.nf = nf;
     }
 
     /**
@@ -338,7 +352,7 @@ public class ProcessingOptions {
     public Set<NavigationSystem> getNavigationSystem() {
         EnumSet<NavigationSystem> res = EnumSet.noneOf(NavigationSystem.class);
         for (NavigationSystem ns: NavigationSystem.values()) {
-            if ((navsys & ns.getRtklibId()) != 0) res.add(ns);
+            if ((mNative.navsys & ns.getRtklibId()) != 0) res.add(ns);
         }
 
         return res;
@@ -352,99 +366,99 @@ public class ProcessingOptions {
         for (NavigationSystem ns: nss) {
             res |= ns.getRtklibId();
         }
-        navsys = res;
-        if (DBG) Log.v(TAG, "setNavigationSystem() navsys: %x" + navsys);
+        mNative.navsys = res;
+        if (DBG) Log.v(TAG, "setNavigationSystem() navsys: %x" + mNative.navsys);
     }
 
     /**
      * @return elevation mask angle (rad)
      */
     public double getElevationMask() {
-        return elmin;
+        return mNative.elmin;
     }
 
     /**
      * @param elevation mask angle (rad)
      */
     public void setElevationMask(double elmin) {
-        this.elmin = elmin;
+        this.mNative.elmin = elmin;
     }
 
     /**
      * @param SNR mask
      */
     public void setSnrMask(int mask) {
-        this.snrmask.setSnrMask(mask);
+        this.mNative.snrmask.setSnrMask(mask);
     }
 
     /**
      * @return SNR mask
      */
     public int getSnrMask() {
-        return this.snrmask.getSnrMask();
+        return this.mNative.snrmask.getSnrMask();
     }
 
     /**
      * @return Rec dynamics
      */
     public boolean getRecDynamics() {
-        return this.dynamics != 0;
+        return this.mNative.dynamics != 0;
     }
 
     /**
      * @param on rec dynamics
      */
     public void setRecDynamics(boolean on) {
-        this.dynamics = on ? 1 : 0;
+        this.mNative.dynamics = on ? 1 : 0;
     }
 
     /**
      * @return Earth tides correction
      */
     public EarthTideCorrectionType getEarthTidersCorrection() {
-        return EarthTideCorrectionType.valueOf(this.tidecorr);
+        return EarthTideCorrectionType.valueOf(this.mNative.tidecorr);
     }
 
     /**
      * @param on Earth tides correction
      */
     public void setEarthTidesCorrection(EarthTideCorrectionType type) {
-        this.tidecorr = type.getRtklibId();
+        this.mNative.tidecorr = type.getRtklibId();
     }
 
     /**
      * @return Ionosphere correction
      */
     public IonosphereOption getIonosphereCorrection() {
-        return IonosphereOption.valueOf(ionoopt);
+        return IonosphereOption.valueOf(mNative.ionoopt);
     }
 
     /**
      * @param Set Ionosphere correction
      */
     public void setIonosphereCorrection(IonosphereOption corr) {
-        ionoopt = corr.getRtklibId();
+        mNative.ionoopt = corr.getRtklibId();
     }
 
     /**
      * @return Troposphere correction
      */
     public TroposphereOption getTroposphereCorrection() {
-        return TroposphereOption.valueOf(tropopt);
+        return TroposphereOption.valueOf(mNative.tropopt);
     }
 
     /**
      * @param Set Troposphere correction
      */
     public void setTroposphereCorrection(TroposphereOption corr) {
-        tropopt = corr.getRtklibId();
+        mNative.tropopt = corr.getRtklibId();
     }
 
     /**
      * @return Satellite Ephemeris/Clock
      */
     public EphemerisOption getSatEphemerisOption() {
-        return EphemerisOption.valueOf(sateph);
+        return EphemerisOption.valueOf(mNative.sateph);
     }
 
     /**
@@ -452,21 +466,21 @@ public class ProcessingOptions {
      * @param Set satellite Ephemeris/Clock
      */
     public void setSatEphemerisOption(EphemerisOption opt) {
-        this.sateph = opt.getRtklibId();
+        this.mNative.sateph = opt.getRtklibId();
     }
 
     /**
      * @return satellite antenna model enabled
      */
     public boolean isSatAntennaPcvEnabled() {
-        return posopt[0] != 0;
+        return mNative.posopt[0] != 0;
     }
 
     /**
      * @param enable satellite antenna model
      */
     public void setSatAntennaPcvEnabled(boolean enable) {
-        posopt[0] = enable ? 1 : 0;
+        mNative.posopt[0] = enable ? 1 : 0;
     }
 
     /**
@@ -474,7 +488,7 @@ public class ProcessingOptions {
      * @return receiver antenna model enabled
      */
     public boolean isReceiverAntennaPcvEnabled() {
-        return posopt[1] != 0;
+        return mNative.posopt[1] != 0;
     }
 
     /**
@@ -482,42 +496,42 @@ public class ProcessingOptions {
      * @param enable receiver antenna model
      */
     public void setReceiverAntennaPcvEnabled(boolean enable) {
-        posopt[1] = enable ? 1 : 0;
+        mNative.posopt[1] = enable ? 1 : 0;
     }
 
     /**
      * @return phase windup correction enabled
      */
     public boolean isPhaseWindupCorrectionEnabled() {
-        return posopt[2] != 0;
+        return mNative.posopt[2] != 0;
     }
 
     /**
      * @param enable phase windup correction
      */
     public void setPhaseWindupCorrectionEnabled(boolean enable) {
-        posopt[2] = enable ? 1 : 0;
+        mNative.posopt[2] = enable ? 1 : 0;
     }
 
     /**
      * @return measurements of eclipsing satellite excluded
      */
     public boolean isExcludeEclipsingSatMeasurements() {
-        return posopt[3] != 0;
+        return mNative.posopt[3] != 0;
     }
 
     /**
      * @param exclude measurements of eclipsing satellite
      */
     public void setExcludeEclipsingSatMeasurements(boolean exclude) {
-        posopt[3] = exclude ? 1 : 0;
+        mNative.posopt[3] = exclude ? 1 : 0;
     }
 
     /**
      * @return raim fde (failure detection and exclution) enabled
      */
     public boolean isRaimFdeEnabled() {
-        return posopt[4] != 0;
+        return mNative.posopt[4] != 0;
     }
 
     /**
@@ -525,7 +539,7 @@ public class ProcessingOptions {
      * @param enable raim fde (failure detection and exclution)
      */
     public void setRaimFdeEnabled(boolean enable) {
-        posopt[4] = enable ? 1 : 0;
+        mNative.posopt[4] = enable ? 1 : 0;
     }
 
 }

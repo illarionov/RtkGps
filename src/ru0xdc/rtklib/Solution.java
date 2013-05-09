@@ -6,6 +6,7 @@ import java.util.Locale;
 import ru0xdc.rtklib.RtkCommon.Matrix3x3;
 import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.constants.Constants;
+import ru0xdc.rtklib.constants.SolutionStatus;
 
 public class Solution {
 
@@ -14,127 +15,126 @@ public class Solution {
     public static final int TYPE_ENU_BASELINE = 1;
 
     /**
-     * Solution status SOLQ_XXX
-     */
-    public static enum SolutionStatus {
-
-        NONE(0, "None"),
-        FIX(1, "Fixed"),
-        FLOAT(2, "Float"),
-        SBAS(3, "SBAS"),
-        DGPS(4, "DGPS/DGNSS"),
-        SINGLE(5, "Single"),
-        PPP(6, "PPP"),
-        DR(7, "Dead reconing")
-        ;
-
-        private final int mRtklibId;
-        private final String mDescription;
-
-        private SolutionStatus(int solqId, String name) {
-            mRtklibId = solqId;
-            mDescription = name;
-        }
-
-        public static SolutionStatus valueOf(int solqId) {
-            for (SolutionStatus v: SolutionStatus.values()) {
-                if (v.mRtklibId == solqId) {
-                    return v;
-                }
-            }
-            throw new IllegalArgumentException();
-        }
-
-        public String getDescription() {
-            return mDescription;
-        }
-    };
-
-
-    /**
      * time (GPST)
      */
-    public final GTime time;
+    private final GTime mTime;
 
     /**
      * position/velocity (m|m/s)  {x,y,z,vx,vy,vz} or {e,n,u,ve,vn,vu}
      */
-    public final double rr[];
+    private final double mRr[];
 
     /**
      * position variance/covariance (m^2)
      * {c_xx,c_yy,c_zz,c_xy,c_yz,c_zx} or
      * {c_ee,c_nn,c_uu,c_en,c_nu,c_ue}
      */
-    public final float qr[];
+    private final float mQr[];
 
     /**
      * receiver clock bias to time systems (s)
      */
-    public final double dtr[];
+    private final double mDtr[];
 
     /**
      * type {@link #TYPE_XYZ_ECEF}, {@link #TYPE_ENU_BASELINE}
      */
-    public int type;
+    private int mType;
 
     /**
      * solution status
      */
-    public SolutionStatus status;
+    private SolutionStatus mStatus;
 
     /**
      * number of valid satellites
      */
-    public int ns;
+    private int mNs;
 
     /**
      * age of differential (s)
      */
-    public float age;
+    private float mAge;
 
     /**
      * AR ratio factor for valiation
      */
-    public float ratio;
+    private float mRatio;
 
     public Solution() {
-        time = new GTime();
-        rr = new double[6];
-        qr = new float[6];
-        dtr = new double[6];
-        ns=0;
-        type=TYPE_XYZ_ECEF;
-        status = SolutionStatus.NONE;
+        mTime = new GTime();
+        mRr = new double[6];
+        mQr = new float[6];
+        mDtr = new double[6];
+        mNs=0;
+        mType=TYPE_XYZ_ECEF;
+        mStatus = SolutionStatus.NONE;
     }
 
     public void copyTo(Solution dst) {
         if (dst == null) throw new IllegalArgumentException();
 
-        this.time.copyTo(dst.time);
-        System.arraycopy(this.rr, 0, dst.rr, 0, this.rr.length);
-        System.arraycopy(this.qr, 0, dst.rr, 0, this.qr.length);
-        System.arraycopy(this.dtr, 0, dst.dtr, 0, this.dtr.length);
-        dst.type = this.type;
-        dst.status = this.status;
-        dst.ns = this.ns;
-        dst.age = this.age;
-        dst.ratio = this.ratio;
+        this.mTime.copyTo(dst.mTime);
+        System.arraycopy(this.mRr, 0, dst.mRr, 0, this.mRr.length);
+        System.arraycopy(this.mQr, 0, dst.mRr, 0, this.mQr.length);
+        System.arraycopy(this.mDtr, 0, dst.mDtr, 0, this.mDtr.length);
+        dst.mType = this.mType;
+        dst.mStatus = this.mStatus;
+        dst.mNs = this.mNs;
+        dst.mAge = this.mAge;
+        dst.mRatio = this.mRatio;
     }
 
     public Matrix3x3 getQrMatrix() {
         double m[] = new double[9];
-        m[0] = qr[0];
-        m[4] = qr[1];
-        m[8] = qr[2];
-        m[1] = m[3] = qr[3];
-        m[5] = m[7] = qr[4];
-        m[2] = m[6] = qr[5];
+        m[0] = mQr[0];
+        m[4] = mQr[1];
+        m[8] = mQr[2];
+        m[1] = m[3] = mQr[3];
+        m[5] = m[7] = mQr[4];
+        m[2] = m[6] = mQr[5];
         return new Matrix3x3(m);
     }
 
     public Position3d getPosition() {
-        return new Position3d(rr[0], rr[1], rr[2]);
+        return new Position3d(mRr[0], mRr[1], mRr[2]);
+    }
+
+    /**
+     * @return position variance/covariance (m^2)
+     * {c_xx,c_yy,c_zz,c_xy,c_yz,c_zx} or
+     * {c_ee,c_nn,c_uu,c_en,c_nu,c_ue}
+     */
+    public float[] getPositionVariance() {
+        return Arrays.copyOf(mQr, mQr.length);
+    }
+
+    /**
+     * @return age of differential (s)
+     */
+    public float getAge() {
+        return mAge;
+    }
+
+    /**
+     * @return AR ratio factor for valiation
+     */
+    public double getRatio() {
+        return mRatio;
+    }
+
+    /**
+     * @return number of valid satellites
+     */
+    public int getNs() {
+        return mNs;
+    }
+
+    /**
+     * position/velocity (m|m/s)  {x,y,z,vx,vy,vz} or {e,n,u,ve,vn,vu}
+     */
+    public double[] getPosVelocity() {
+        return mRr;
     }
 
     void setSolution(
@@ -148,32 +148,39 @@ public class Solution {
             float qr0, float qr1, float qr2, float qr3, float qr4, float qr5,
             double dtr0, double dtr1, double dtr2, double dtr3, double dtr4, double dtr5
             ) {
-        this.time.setGTime(time_time, time_sec);
-        this.type = type;
-        this.status = SolutionStatus.valueOf(status);
-        this.ns = ns;
-        this.age = age;
-        this.ratio = ratio;
-        this.rr[0] = rr0;
-        this.rr[1] = rr1;
-        this.rr[2] = rr2;
-        this.rr[3] = rr3;
-        this.rr[4] = rr4;
-        this.rr[5] = rr5;
+        this.mTime.setGTime(time_time, time_sec);
+        this.mType = type;
+        this.mStatus = SolutionStatus.valueOf(status);
+        this.mNs = ns;
+        this.mAge = age;
+        this.mRatio = ratio;
+        this.mRr[0] = rr0;
+        this.mRr[1] = rr1;
+        this.mRr[2] = rr2;
+        this.mRr[3] = rr3;
+        this.mRr[4] = rr4;
+        this.mRr[5] = rr5;
 
-        this.qr[0] = qr0;
-        this.qr[1] = qr1;
-        this.qr[2] = qr2;
-        this.qr[3] = qr3;
-        this.qr[4] = qr4;
-        this.qr[5] = qr5;
+        this.mQr[0] = qr0;
+        this.mQr[1] = qr1;
+        this.mQr[2] = qr2;
+        this.mQr[3] = qr3;
+        this.mQr[4] = qr4;
+        this.mQr[5] = qr5;
 
-        this.dtr[0] = dtr0;
-        this.dtr[1] = dtr1;
-        this.dtr[2] = dtr2;
-        this.dtr[3] = dtr3;
-        this.dtr[4] = dtr4;
-        this.dtr[5] = dtr5;
+        this.mDtr[0] = dtr0;
+        this.mDtr[1] = dtr1;
+        this.mDtr[2] = dtr2;
+        this.mDtr[3] = dtr3;
+        this.mDtr[4] = dtr4;
+        this.mDtr[5] = dtr5;
+    }
+
+    /**
+     * @return solution status
+     */
+    public final SolutionStatus getSolutionStatus() {
+        return mStatus;
     }
 
     @Override
@@ -183,11 +190,11 @@ public class Solution {
                         "rr: %.3f %.3f %.3f %.3f %.3f %.3f\n" +
                         "qr: %.3f %.3f %.3f %.3f %.3f %.3f\n" +
                         "dtr: %.3f %.3f %.3f %.3f %.3f %.3f\n",
-                        time.getGpsWeek(), time.getGpsTow(),
-                        type, status.mDescription, ns, age, ratio,
-                        rr[0], rr[1], rr[2], rr[3], rr[4], rr[5],
-                        qr[0], qr[1], qr[2], qr[3], qr[4], qr[5],
-                        dtr[0], dtr[1], dtr[2], dtr[3], dtr[4], dtr[5]
+                        mTime.getGpsWeek(), mTime.getGpsTow(),
+                        mType, mStatus.name(), mNs, mAge, mRatio,
+                        mRr[0], mRr[1], mRr[2], mRr[3], mRr[4], mRr[5],
+                        mQr[0], mQr[1], mQr[2], mQr[3], mQr[4], mQr[5],
+                        mDtr[0], mDtr[1], mDtr[2], mDtr[3], mDtr[4], mDtr[5]
                 );
     }
 

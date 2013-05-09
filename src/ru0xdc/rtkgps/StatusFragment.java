@@ -224,7 +224,7 @@ public class StatusFragment extends Fragment {
         mSnrView.setStats(mRoverObservationStatus);
         mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
         mSolutionView.setStats(mRtkStatus);
-        mGTimeView.setTime(mRoverObservationStatus.time);
+        mGTimeView.setTime(mRoverObservationStatus.getTime());
     }
 
     void updateGTimeFormat(SharedPreferences prefs) {

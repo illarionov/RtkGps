@@ -60,6 +60,7 @@ static void RtkServer__destroy(JNIEnv* env, jobject thiz)
       return;
    }
    rtksvrstop(&nctx->rtksvr,cmds);
+   rtksvrfree(&nctx->rtksvr);
 
    free(nctx);
    (*env)->SetLongField(env, thiz, m_object_field, 0L);
@@ -582,16 +583,32 @@ static JNINativeMethod nativeMethods[] = {
    {"_create", "()V", (void*)RtkServer__create},
    {"_destroy", "()V", (void*)RtkServer__destroy},
    {"_start", "()Z", (void*)RtkServer__start},
-   {"_rtksvrstart", "(II[I[Ljava/lang/String;[II[Ljava/lang/String;[Ljava/lang/String;II[DLru0xdc/rtklib/ProcessingOptions;Lru0xdc/rtklib/SolutionOptions;Lru0xdc/rtklib/SolutionOptions;)Z", (void*)RtkServer__rtksvrstart},
+   {"_rtksvrstart", "("
+	 "I"
+	 "I"
+	 "[I"
+	 "[Ljava/lang/String;"
+	 "[I"
+	 "I"
+	 "[Ljava/lang/String;"
+	 "[Ljava/lang/String;"
+	 "I"
+	 "I"
+	 "[D"
+	 "Lru0xdc/rtklib/ProcessingOptions$Native;"
+	 "Lru0xdc/rtklib/SolutionOptions$Native;"
+	 "Lru0xdc/rtklib/SolutionOptions$Native;"
+	 ")Z"
+	 , (void*)RtkServer__rtksvrstart},
    {"_stop", "()V", (void*)RtkServer__stop},
    {"_getStreamStatus", "(Lru0xdc/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status},
    {"_readSolutionBuffer", "(Lru0xdc/rtklib/Solution$SolutionBuffer;)V", (void*)RtkServer__read_solution_buffer},
    {"_getRtkStatus", "(Lru0xdc/rtklib/RtkControlResult;)V", (void*)RtkServer__get_rtk_status},
-   {"_getObservationStatus", "(ILru0xdc/rtklib/RtkServerObservationStatus;)V", (void*)RtkServer__get_observation_status}
+   {"_getObservationStatus", "(ILru0xdc/rtklib/RtkServerObservationStatus$Native;)V", (void*)RtkServer__get_observation_status}
 };
 
 static int init_observation_status_fields(JNIEnv* env) {
-    jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServerObservationStatus");
+    jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServerObservationStatus$Native");
 
     if (clazz == NULL)
        return JNI_FALSE;

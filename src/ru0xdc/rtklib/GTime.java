@@ -5,12 +5,14 @@ public class GTime {
     /**
      * time (s) expressed by standard time_t
      */
-    public long time;
+    // Used in native code
+    private long time;
 
     /**
      * fraction of second under 1 s
      */
-    public double sec;
+    // Used in native code
+    private double sec;
 
     public GTime() {
         this(0, 0.0);

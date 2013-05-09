@@ -4,8 +4,9 @@ import java.text.DecimalFormat;
 
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
-import ru0xdc.rtklib.Dops;
+import ru0xdc.rtklib.RtkCommon.Dops;
 import ru0xdc.rtklib.RtkServerObservationStatus;
+import ru0xdc.rtklib.RtkServerObservationStatus.SatStatus;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -47,7 +48,7 @@ public class GpsSkyView extends View {
     private String mBand;
 
     private final RtkServerObservationStatus mStatus;
-    private final Dops mDops;
+    private final ru0xdc.rtklib.RtkCommon.Dops mDops;
 
     private final DecimalFormat mDopsFormatter;
 
@@ -164,32 +165,40 @@ public class GpsSkyView extends View {
     }
 
     private void drawSatellites(Canvas canvas, float s) {
+        final int numSatellites;
+        final SatStatus satStatus;
 
-        for (int i = 0; i < mStatus.ns; ++i) {
+        numSatellites = mStatus.getNumSatellites();
+        satStatus = new SatStatus();
+
+        for (int i = 0; i < numSatellites; ++i) {
             int snr;
             double radius, angle;
             float x, y;
 
-            if (mStatus.el[i] <= 0.0)  continue;
+            mStatus.getSatStatus(i, satStatus);
+
+            if (satStatus.getElevation() <= 0.0)  continue;
             if (BAND_L1.equals(mBand)) {
-                snr = mStatus.freq1Snr[i];
+                snr = satStatus.getFreq1Snr();
             }else if (BAND_L2.equals(mBand)) {
-                snr = mStatus.freq2Snr[i];
+                snr = satStatus.getFreq2Snr();
             }else {
-                snr = mStatus.freq3Snr[i];
+                snr = satStatus.getFreq2Snr();
             }
 
-            mSatelliteFillPaint.setColor(getSatellitePaintColor(snr, mStatus.vsat[i]));
+            mSatelliteFillPaint.setColor(getSatellitePaintColor(snr,
+                    satStatus.isValid()));
 
-            radius = elevationToRadius(s, Math.toDegrees(mStatus.el[i]));
-            angle = mStatus.az[i];
+            radius = elevationToRadius(s, Math.toDegrees(satStatus.getElevation()));
+            angle = satStatus.getAzimuth();
 
             x = (float)((s / 2) + (radius * Math.sin(angle)));
             y = (float)((s / 2) - (radius * Math.cos(angle)));
 
             canvas.drawCircle(x, y, SAT_RADIUS, mSatelliteFillPaint);
             canvas.drawCircle(x, y, SAT_RADIUS, mSatelliteStrokePaint);
-            canvas.drawText(mStatus.getSatId(i),
+            canvas.drawText(satStatus.getSatId(),
                     x,
                     (int)(y + 0.4f*SAT_PRN_TEXT_SIZE),
                     mSatellitePrnPaint);
@@ -199,17 +208,17 @@ public class GpsSkyView extends View {
     private void printInfo(Canvas canvas, float s) {
         final String numOfSat = String.format(
                 getContext().getString(R.string.sky_plot_num_of_sat)
-                , mStatus.ns);
+                , mStatus.getNumSatellites());
 
         String plotName;
         try {
-            plotName = getResources().getStringArray(ru0xdc.rtkgps.R.array.rtk_server_receiver)[mStatus.receiver]
+            plotName = getResources().getStringArray(ru0xdc.rtkgps.R.array.rtk_server_receiver)[mStatus.getReceiver()]
                     + " " + mBand;
         }catch (Resources.NotFoundException	e) {
             plotName = "Rover L1";
         }
 
-        final String gdop = "GDOP: " + mDopsFormatter.format(mDops.gdop);
+        final String gdop = "GDOP: " + mDopsFormatter.format(mDops.getGdop());
 
         canvas.drawText(plotName, 0, 2f * SAT_PRN_TEXT_SIZE, mLeftInfoTextPaint);
         canvas.drawText(numOfSat, 0, s - SAT_PRN_TEXT_SIZE, mLeftInfoTextPaint);
@@ -217,10 +226,10 @@ public class GpsSkyView extends View {
     }
 
 
-    static int getSatellitePaintColor(int snr, int valid) {
+    static int getSatellitePaintColor(int snr, boolean valid) {
         int j, color;
 
-        if (valid == 0) {
+        if (!valid) {
             color = COLOR_NOT_VALID_SAT;
         }else {
             j = (49 - snr)/(SNR_COLORS.length-1);

@@ -3,7 +3,6 @@ package ru0xdc.rtkgps.view;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Locale;
 
 import ru0xdc.rtkgps.BuildConfig;
@@ -13,7 +12,7 @@ import ru0xdc.rtklib.RtkCommon.Deg2Dms;
 import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.Solution;
-import ru0xdc.rtklib.Solution.SolutionStatus;
+import ru0xdc.rtklib.constants.SolutionStatus;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -133,10 +132,11 @@ public class SolutionView extends TableLayout {
     }
 
     public void setStats(RtkControlResult status) {
-        mTextViewSolutionStatus.setText(status.sol.status.getDescription());
-        mSolutionIndicatorView.setStatus(status.sol.status);
+        final Solution sol = status.getSolution();
+        mTextViewSolutionStatus.setText(sol.getSolutionStatus().getNameResId());
+        mSolutionIndicatorView.setStatus(sol.getSolutionStatus());
         updateCoordinates(status);
-        updateAgeText(status.sol);
+        updateAgeText(sol);
     }
 
     public void setFormat(Format format) {
@@ -154,7 +154,10 @@ public class SolutionView extends TableLayout {
     private void updateCoordinates(RtkControlResult rtk) {
         RtkCommon.Position3d roverPos;
         double Qe[];
-        final Solution sol = rtk.sol;
+        final Solution sol = rtk.getSolution();
+        final Position3d roverEcefPos;
+
+        roverEcefPos = sol.getPosition();
 
         switch (mSolutionFormat) {
         case WGS84:
@@ -162,12 +165,11 @@ public class SolutionView extends TableLayout {
             String strLat, strLon, strHeight;
             RtkCommon.Matrix3x3 cov;
 
-
-            if (RtkCommon.norm(Arrays.copyOf(sol.rr, 3)) <= 0.0) {
+            if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
                 break;
             }
 
-            roverPos = RtkCommon.ecef2pos(sol.rr[0], sol.rr[1], sol.rr[2]);
+            roverPos = RtkCommon.ecef2pos(roverEcefPos);
             cov = sol.getQrMatrix();
             Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
             if (mSolutionFormat == Format.WGS84) {
@@ -191,20 +193,21 @@ public class SolutionView extends TableLayout {
                     ));
             break;
         case ECEF:
-            mTextViewCoord1Value.setText(mCoordEcefFormatter.format(sol.rr[0]));
-            mTextViewCoord2Value.setText(mCoordEcefFormatter.format(sol.rr[1]));
-            mTextViewCoord3Value.setText(mCoordEcefFormatter.format(sol.rr[2]));
+            final float[] qr = sol.getPositionVariance();
+            mTextViewCoord1Value.setText(mCoordEcefFormatter.format(roverEcefPos.getX()));
+            mTextViewCoord2Value.setText(mCoordEcefFormatter.format(roverEcefPos.getY()));
+            mTextViewCoord3Value.setText(mCoordEcefFormatter.format(roverEcefPos.getZ()));
             mTextViewCovariance.setText(String.format(
                     Locale.US,
                     "X:%6.3f\nY:%6.3f\nZ:%6.3f m",
-                    Math.sqrt(sol.qr[0] < 0 ? 0 : sol.qr[0]),
-                    Math.sqrt(sol.qr[1] < 0 ? 0 : sol.qr[1]),
-                    Math.sqrt(sol.qr[2] < 0 ? 0 : sol.qr[2])
+                    Math.sqrt(qr[0] < 0 ? 0 : qr[0]),
+                    Math.sqrt(qr[1] < 0 ? 0 : qr[1]),
+                    Math.sqrt(qr[2] < 0 ? 0 : qr[2])
                     ));
             break;
         case ENU_BASELINE:
         case PYL_BASELINE:
-            final Position3d baseEcefPos, roverEcefPos;
+            final Position3d baseEcefPos;
             final Position3d baselineVector;
             final Position3d enu;
             final Position3d basePos;
@@ -212,7 +215,6 @@ public class SolutionView extends TableLayout {
             String v1, v2, v3;
 
             baseEcefPos = rtk.getBasePosition();
-            roverEcefPos = sol.getPosition();
 
             baselineVector = new Position3d(
                     roverEcefPos.getX() - baseEcefPos.getX(),
@@ -273,9 +275,9 @@ public class SolutionView extends TableLayout {
         mTextViewAge.setText(String.format(
                 Locale.US,
                 format,
-                sol.age,
-                sol.ratio,
-                sol.ns
+                sol.getAge(),
+                sol.getRatio(),
+                sol.getNs()
                 ));
 
     }
@@ -304,7 +306,7 @@ public class SolutionView extends TableLayout {
 
         private float mIndicatorWidth, mIndicatorHeight;
 
-        private Solution.SolutionStatus mStatus;
+        private SolutionStatus mStatus;
 
         public SolutionIndicatorView(Context context, AttributeSet attrs) {
             super(context, attrs);
@@ -320,7 +322,7 @@ public class SolutionView extends TableLayout {
             mIndicatorPaint.setColor(DEFAULT_COLOR_STATE_CLOSE);
         }
 
-        public void setStatus(Solution.SolutionStatus status) {
+        public void setStatus(SolutionStatus status) {
             mStatus = status;
             invalidate();
         }

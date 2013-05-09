@@ -3,11 +3,163 @@ package ru0xdc.rtklib;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
+
 import junit.framework.Assert;
+import ru0xdc.rtklib.RtkCommon.Dops;
 import ru0xdc.rtklib.constants.Constants;
 import android.annotation.SuppressLint;
 
 public class RtkServerObservationStatus {
+
+    public static class SatStatus {
+
+        private int mSatNumber;
+        private double mAz;
+        private double mEl;
+        private int mFreq1Snr;
+        private int mFreq2Snr;
+        private int mFreq3Snr;
+        private boolean mValid;
+
+        public SatStatus() {
+        }
+
+        SatStatus(int satNumber, double az, double el,
+                int freq1Snr, int freq2Snr, int freq3Snr, boolean valid) {
+            this();
+            setValues(satNumber, az, el, freq1Snr, freq2Snr, freq3Snr, valid);
+        }
+
+        void setValues(int satNumber, double az, double el,
+                int freq1Snr, int freq2Snr, int freq3Snr, boolean valid) {
+            mSatNumber = satNumber;
+            mAz = az;
+            mEl = el;
+            mFreq1Snr = freq1Snr;
+            mFreq2Snr = freq2Snr;
+            mFreq3Snr = freq3Snr;
+            mValid = valid;
+        }
+
+
+        /**
+         * @return satellite Number
+         */
+        public int getSatNumber() {
+            return mSatNumber;
+        }
+
+        /**
+         * @return satellite id (Gnn,Rnn,Enn,Jnn,Cnn or nnn)
+         */
+        public String getSatId() {
+            return RtkCommon.getSatId(mSatNumber);
+        }
+
+        /**
+         * @return valid satellite flag
+         */
+        public boolean isValid() {
+            return mValid;
+        }
+
+        /**
+         * @return satellite azimuth angles (rad)
+         */
+        public double getAzimuth() {
+            return mAz;
+        }
+
+        /**
+         * @return satellite elevation angles (rad)
+         */
+        public double getElevation() {
+            return mEl;
+        }
+
+        /**
+         * @return satellite snr for freq1 (dBHz)
+         */
+        public int getFreq1Snr() {
+            return mFreq1Snr;
+        }
+
+        /**
+         * @return satellite snr for freq2 (dBHz)
+         */
+        public int getFreq2Snr() {
+            return mFreq2Snr;
+        }
+
+        /**
+         * @return satellite snr for freq3 (dBHz)
+         */
+        public int getFreq3Snr() {
+            return mFreq3Snr;
+        }
+    }
+
+    static class Native {
+        /**
+         * Number of satellites
+         */
+        private int ns;
+
+        /**
+         * time of observation data
+         */
+        private final GTime time;
+
+        /**
+         * satellite ID numbers
+         */
+        private final int sat[];
+
+        /**
+         * satellite azimuth angles (rad)
+         */
+        private final double az[];
+
+        /**
+         * satellite elevation angles (rad)
+         */
+        private final double el[];
+
+        /**
+         * satellite snr for freq1 (dBHz)
+         */
+        private final int freq1Snr[];
+
+        /**
+         * satellite snr for freq2 (dBHz)
+         */
+        private final int freq2Snr[];
+
+        /**
+         * satellite snr for freq3 (dBHz)
+         */
+        private final int freq3Snr[];
+
+        /**
+         * valid satellite flag
+         */
+        private final int vsat[];
+
+        public Native() {
+            ns = 0;
+            time = new GTime();
+            sat = new int[Constants.MAXSAT];
+            az = new double[Constants.MAXSAT];
+            el = new double[Constants.MAXSAT];
+            freq1Snr = new int[Constants.MAXSAT];
+            freq2Snr = new int[Constants.MAXSAT];
+            freq3Snr = new int[Constants.MAXSAT];
+            vsat = new int[Constants.MAXSAT];
+        }
+
+    }
 
     /**
      * receiver:
@@ -15,81 +167,35 @@ public class RtkServerObservationStatus {
      * {@link RtkServer#RECEIVER_BASE},
      * {@link RtkServer#RECEIVER_EPHEM}
      */
-    public int receiver;
+    private int receiver;
 
-    /**
-     * Number of satellites
-     */
-    public int ns;
-
-    /**
-     * time of observation data
-     */
-    public final GTime time;
-
-    /**
-     * satellite ID numbers
-     */
-    public final int sat[];
-
-    /**
-     * satellite azimuth angles (rad)
-     */
-    public final double az[];
-
-    /**
-     * satellite elevation angles (rad)
-     */
-    public final double el[];
-
-    /**
-     * satellite snr for freq1 (dBHz)
-     */
-    public final int freq1Snr[];
-
-    /**
-     * satellite snr for freq2 (dBHz)
-     */
-    public final int freq2Snr[];
-
-    /**
-     * satellite snr for freq3 (dBHz)
-     */
-    public final int freq3Snr[];
-
-    /**
-     * valid satellite flag
-     */
-    public final int vsat[];
+    private Native mNative;
 
     public RtkServerObservationStatus() {
-        ns = 0;
-        time = new GTime();
-        sat = new int[Constants.MAXSAT];
-        az = new double[Constants.MAXSAT];
-        el = new double[Constants.MAXSAT];
-        freq1Snr = new int[Constants.MAXSAT];
-        freq2Snr = new int[Constants.MAXSAT];
-        freq3Snr = new int[Constants.MAXSAT];
-        vsat = new int[Constants.MAXSAT];
+        this(RtkServer.RECEIVER_ROVER);
+    }
+
+    public RtkServerObservationStatus(int receiver) {
+        this.receiver = receiver;
+        mNative = new Native();
     }
 
     public void clear() {
-        this.ns = 0;
+        this.mNative.ns = 0;
         this.receiver = RtkServer.RECEIVER_ROVER;
     }
 
     public void copyTo(RtkServerObservationStatus dst) {
         if (dst == null) throw new IllegalArgumentException();
-        dst.ns = ns;
-        time.copyTo(dst.time);
-        System.arraycopy(sat, 0, dst.sat, 0, ns);
-        System.arraycopy(az, 0, dst.az, 0, ns);
-        System.arraycopy(el, 0, dst.el, 0, ns);
-        System.arraycopy(freq1Snr, 0, dst.freq1Snr, 0, ns);
-        System.arraycopy(freq2Snr, 0, dst.freq2Snr, 0, ns);
-        System.arraycopy(freq3Snr, 0, dst.freq3Snr, 0, ns);
-        System.arraycopy(vsat, 0, dst.vsat, 0, ns);
+        dst.mNative.ns = mNative.ns;
+        mNative.time.copyTo(dst.mNative.time);
+        System.arraycopy(mNative.sat, 0, dst.mNative.sat, 0, mNative.ns);
+        System.arraycopy(mNative.az, 0, dst.mNative.az, 0, mNative.ns);
+        System.arraycopy(mNative.el, 0, dst.mNative.el, 0, mNative.ns);
+        System.arraycopy(mNative.freq1Snr, 0, dst.mNative.freq1Snr, 0, mNative.ns);
+        System.arraycopy(mNative.freq2Snr, 0, dst.mNative.freq2Snr, 0, mNative.ns);
+        System.arraycopy(mNative.freq3Snr, 0, dst.mNative.freq3Snr, 0, mNative.ns);
+        System.arraycopy(mNative.vsat, 0, dst.mNative.vsat, 0, mNative.ns);
     }
 
     @Override
@@ -103,14 +209,14 @@ public class RtkServerObservationStatus {
 
         RtkServerObservationStatus lhs = (RtkServerObservationStatus)o;
 
-        final boolean  res = ((ns == lhs.ns)
-                && time.equals(lhs.time)
-                && Arrays.equals(Arrays.copyOf(az, ns), Arrays.copyOf(lhs.az, lhs.ns))
-                && Arrays.equals(Arrays.copyOf(el, ns), Arrays.copyOf(lhs.el, lhs.ns))
-                && Arrays.equals(Arrays.copyOf(freq1Snr, ns), Arrays.copyOf(lhs.freq1Snr, lhs.ns))
-                && Arrays.equals(Arrays.copyOf(freq2Snr, ns), Arrays.copyOf(lhs.freq2Snr, lhs.ns))
-                && Arrays.equals(Arrays.copyOf(freq3Snr, ns), Arrays.copyOf(lhs.freq3Snr, lhs.ns))
-                && Arrays.equals(Arrays.copyOf(vsat, ns), Arrays.copyOf(lhs.vsat, lhs.ns))
+        final boolean  res = ((mNative.ns == lhs.mNative.ns)
+                && mNative.time.equals(lhs.mNative.time)
+                && Arrays.equals(Arrays.copyOf(mNative.az, mNative.ns), Arrays.copyOf(lhs.mNative.az, lhs.mNative.ns))
+                && Arrays.equals(Arrays.copyOf(mNative.el, mNative.ns), Arrays.copyOf(lhs.mNative.el, lhs.mNative.ns))
+                && Arrays.equals(Arrays.copyOf(mNative.freq1Snr, mNative.ns), Arrays.copyOf(lhs.mNative.freq1Snr, lhs.mNative.ns))
+                && Arrays.equals(Arrays.copyOf(mNative.freq2Snr, mNative.ns), Arrays.copyOf(lhs.mNative.freq2Snr, lhs.mNative.ns))
+                && Arrays.equals(Arrays.copyOf(mNative.freq3Snr, mNative.ns), Arrays.copyOf(lhs.mNative.freq3Snr, lhs.mNative.ns))
+                && Arrays.equals(Arrays.copyOf(mNative.vsat, mNative.ns), Arrays.copyOf(lhs.mNative.vsat, lhs.mNative.ns))
                 );
         if (res) Assert.assertTrue(hashCode() == lhs.hashCode());
         return res;
@@ -119,28 +225,71 @@ public class RtkServerObservationStatus {
     @Override
     public int hashCode() {
         int result = 0xab6f75;
-        result += 31 * result + ns;
-        if (ns == 0) return result;
+        result += 31 * result + mNative.ns;
+        if (mNative.ns == 0) return result;
 
-        result += 31 * result + time.hashCode();
-        for (int i=0; i<ns; ++i) {
-            result += 31 * result + sat[i];
-            long doubleFieldBits = Double.doubleToLongBits(az[i]);
+        result += 31 * result + mNative.time.hashCode();
+        for (int i=0; i<mNative.ns; ++i) {
+            result += 31 * result + mNative.sat[i];
+            long doubleFieldBits = Double.doubleToLongBits(mNative.az[i]);
             result = 31 * result + (int) (doubleFieldBits ^ (doubleFieldBits >>> 32));
-            doubleFieldBits = Double.doubleToLongBits(el[i]);
+            doubleFieldBits = Double.doubleToLongBits(mNative.el[i]);
             result = 31 * result + (int) (doubleFieldBits ^ (doubleFieldBits >>> 32));
-            result += 31 * result + freq1Snr[i];
-            result += 31 * result + freq2Snr[i];
-            result += 31 * result + freq3Snr[i];
-            result += 31 * result + vsat[i];
+            result += 31 * result + mNative.freq1Snr[i];
+            result += 31 * result + mNative.freq2Snr[i];
+            result += 31 * result + mNative.freq3Snr[i];
+            result += 31 * result + mNative.vsat[i];
         }
 
         return result;
     }
 
-    public String getSatId(int pos) {
-        if (pos >= this.ns) throw new IllegalArgumentException();
-        return RtkCommon.getSatId(sat[pos]);
+    Native getNative() {
+        return mNative;
+    }
+
+    /**
+     * @return receiver:
+     * {@link RtkServer#RECEIVER_ROVER},
+     * {@link RtkServer#RECEIVER_BASE},
+     * {@link RtkServer#RECEIVER_EPHEM}
+     */
+    public int getReceiver() {
+        return receiver;
+    }
+
+    /**
+     * Number of satellites
+     */
+    @Nonnegative
+    public int getNumSatellites() {
+        return mNative.ns;
+    }
+
+    /**
+     * @param number sattelite number
+     * @param dst Destination
+     * @return Satellite status
+     */
+    public SatStatus getSatStatus(int number, @Nullable SatStatus dst) {
+        if (number < 0 || number >= mNative.ns) {
+            throw new IllegalArgumentException();
+        }
+        if (dst == null) dst = new SatStatus();
+        dst.setValues(
+                mNative.sat[number],
+                mNative.az[number],
+                mNative.el[number],
+                mNative.freq1Snr[number],
+                mNative.freq2Snr[number],
+                mNative.freq3Snr[number],
+                mNative.vsat[number] != 0
+                );
+        return dst;
+    }
+
+    public GTime getTime() {
+        return mNative.time;
     }
 
     public Dops getDops() {
@@ -158,16 +307,16 @@ public class RtkServerObservationStatus {
             dst = new Dops();
         }
 
-        if (this.ns == 0) {
+        if (this.mNative.ns == 0) {
             return dst;
         }
 
-        final double azel[] = new double[this.ns*2];
+        final double azel[] = new double[this.mNative.ns*2];
         dopsNs = 0;
-        for (int i=0; i<ns; ++i) {
-            if (this.vsat[i] != 0) {
-                azel[2*dopsNs] = this.az[i];
-                azel[2*dopsNs+1] = this.el[i];
+        for (int i=0; i<mNative.ns; ++i) {
+            if (this.mNative.vsat[i] != 0) {
+                azel[2*dopsNs] = this.mNative.az[i];
+                azel[2*dopsNs+1] = this.mNative.el[i];
                 dopsNs += 1;
             }
         }
@@ -202,36 +351,36 @@ public class RtkServerObservationStatus {
 
         String header = String.format("RtkServerObservationStatus %s week: %d tm: %.3f %d sat-s ",
                 receiverName,
-                this.time.getGpsWeek(), this.time.getGpsTow(),
-                this.ns);
-        if (this.ns == 0)
+                this.mNative.time.getGpsWeek(), this.mNative.time.getGpsTow(),
+                this.mNative.ns);
+        if (this.mNative.ns == 0)
             return header;
 
-        String tmp[] = new String[this.ns];
+        String tmp[] = new String[this.mNative.ns];
         DecimalFormat df = new DecimalFormat("###");
 
         sb = new StringBuffer(600);
         sb.append(header);
 
-        for (int i=0; i<this.ns; ++i) {
-            tmp[i] = RtkCommon.getSatId(sat[i]);
+        for (int i=0; i<this.mNative.ns; ++i) {
+            tmp[i] = RtkCommon.getSatId(mNative.sat[i]);
         }
 
         sb.append("\nprn: ");
         sb.append(Arrays.toString(tmp));
         sb.append("\nf1 snr: ");
-        sb.append(Arrays.toString(Arrays.copyOf(this.freq1Snr, this.ns)));
+        sb.append(Arrays.toString(Arrays.copyOf(this.mNative.freq1Snr, this.mNative.ns)));
         sb.append("\nvalid: ");
-        sb.append(Arrays.toString(Arrays.copyOf(this.vsat, this.ns)));
+        sb.append(Arrays.toString(Arrays.copyOf(this.mNative.vsat, this.mNative.ns)));
 
-        for (int i=0; i<this.ns; ++i) {
-            tmp[i] = df.format(Math.toDegrees(this.az[i]));
+        for (int i=0; i<this.mNative.ns; ++i) {
+            tmp[i] = df.format(Math.toDegrees(this.mNative.az[i]));
         }
         sb.append("\naz: ");
         sb.append(Arrays.toString(tmp));
 
-        for (int i=0; i<this.ns; ++i) {
-            tmp[i] = df.format(Math.toDegrees(this.el[i]));
+        for (int i=0; i<this.mNative.ns; ++i) {
+            tmp[i] = df.format(Math.toDegrees(this.mNative.el[i]));
         }
         sb.append("\nel: ");
         sb.append(Arrays.toString(tmp));

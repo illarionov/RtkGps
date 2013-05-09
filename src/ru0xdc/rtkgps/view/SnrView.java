@@ -4,6 +4,7 @@ import static junit.framework.Assert.assertTrue;
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
 import ru0xdc.rtklib.RtkServerObservationStatus;
+import ru0xdc.rtklib.RtkServerObservationStatus.SatStatus;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -174,8 +175,11 @@ public class SnrView extends View {
         final float paddingRight;
         final float paddingLeft;
         float interBarWidth;
+        final int numSatellites;
+        final SatStatus satStatus;
 
-        if (mStatus.ns == 0) return;
+        numSatellites = mStatus.getNumSatellites();
+        if (numSatellites == 0) return;
 
         gridRect = getGridRect();
         density = getResources().getDisplayMetrics().density;
@@ -198,7 +202,7 @@ public class SnrView extends View {
             return;
         }
 
-        final float barBoxWidth = (gridRect.right - gridRect.left) / mStatus.ns;
+        final float barBoxWidth = (gridRect.right - gridRect.left) / numSatellites;
         final float dbhzHeight = (gridRect.bottom - gridRect.top) / (MAX_SNR-MIN_SNR);
         final RectF barBox = new RectF();
 
@@ -206,7 +210,9 @@ public class SnrView extends View {
             interBarWidth = 0.0f;
         }
 
-        for (int i=0; i<mStatus.ns; ++i) {
+        satStatus = new SatStatus();
+
+        for (int i=0; i<numSatellites; ++i) {
             float snr;
             final float x1, x2;
 
@@ -221,22 +227,24 @@ public class SnrView extends View {
             x2 = barBox.right - interBarWidth/2.0f;
             assertTrue(x2>=x1);
 
+            mStatus.getSatStatus(i, satStatus);
+
             // Text
             canvas.drawText(
-                    mStatus.getSatId(i),
+                    satStatus.getSatId(),
                     barBox.left + barBoxWidth/2.0f,
                     gridRect.bottom + mGridTextPaint.getTextSize(),
                     mGridTextPaint
                     );
 
             // Fill
-            if (mStatus.vsat[i] != 0) {
+            if (satStatus.isValid()) {
                 // L1
                 if ((mBand == BAND_ANY || (mBand == BAND_L1))
-                        && (mStatus.freq1Snr[i] > MIN_SNR)) {
-                    snr = Math.min(mStatus.freq1Snr[i], MAX_SNR);
+                        && (satStatus.getFreq1Snr() > MIN_SNR)) {
+                    snr = Math.min(satStatus.getFreq1Snr(), MAX_SNR);
                     mBarFillPaint.setColor(GpsSkyView.getSatellitePaintColor(
-                            mStatus.freq1Snr[i], mStatus.vsat[i]));
+                            satStatus.getFreq1Snr(), true));
                     canvas.drawRect(
                             x1,
                             barBox.bottom - (snr-MIN_SNR) * dbhzHeight,
@@ -248,10 +256,10 @@ public class SnrView extends View {
 
                 // L2
                 if ((mBand == BAND_ANY || (mBand == BAND_L2))
-                        && (mStatus.freq2Snr[i] > MIN_SNR)) {
-                    snr = Math.min(mStatus.freq2Snr[i], MAX_SNR);
+                        && (satStatus.getFreq2Snr() > MIN_SNR)) {
+                    snr = Math.min(satStatus.getFreq2Snr(), MAX_SNR);
                     mBarFillPaint.setColor(GpsSkyView.getSatellitePaintColor(
-                            mStatus.freq2Snr[i], mStatus.vsat[i]));
+                            satStatus.getFreq2Snr(), true));
                     canvas.drawRect(
                             x1,
                             barBox.bottom - (snr-MIN_SNR) * dbhzHeight,
@@ -263,11 +271,11 @@ public class SnrView extends View {
 
                 // L5
                 if ((mBand == BAND_ANY || (mBand == BAND_L5))
-                        && (mStatus.freq3Snr[i] > MIN_SNR)
+                        && (satStatus.getFreq3Snr() > MIN_SNR)
                         ) {
-                    snr = Math.min(mStatus.freq3Snr[i], MAX_SNR);
+                    snr = Math.min(satStatus.getFreq3Snr(), MAX_SNR);
                     mBarFillPaint.setColor(GpsSkyView.getSatellitePaintColor(
-                            mStatus.freq3Snr[i], mStatus.vsat[i]));
+                            satStatus.getFreq3Snr(), true));
                     canvas.drawRect(
                             x1,
                             barBox.bottom - (snr-MIN_SNR) * dbhzHeight,
@@ -279,8 +287,8 @@ public class SnrView extends View {
             }
 
             // Stroke
-            snr = Math.max(mStatus.freq1Snr[i],
-                    Math.max(mStatus.freq2Snr[i], mStatus.freq3Snr[i]));
+            snr = Math.max(satStatus.getFreq1Snr(),
+                    Math.max(satStatus.getFreq2Snr(), satStatus.getFreq3Snr()));
             if (snr > MAX_SNR) snr = MAX_SNR;
             if (snr > MIN_SNR) {
                 float yTop = barBox.bottom - (snr - MIN_SNR) * dbhzHeight;

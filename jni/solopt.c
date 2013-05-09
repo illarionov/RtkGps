@@ -9,6 +9,9 @@
 #define TAG "nativeSolutionOptions"
 #define LOGV(...) showmsg(__VA_ARGS__)
 
+#define SOLUTION_OPTIONS_CLASS "ru0xdc/rtklib/SolutionOptions$Native"
+
+
 static struct {
    jfieldID posf;
    jfieldID times;
@@ -35,6 +38,15 @@ void solution_options2solopt_t(JNIEnv* env, jobject thiz, solopt_t *dst)
 {
    int string_size;
    jstring str;
+   jclass clazz;
+
+   clazz = (*env)->FindClass(env, SOLUTION_OPTIONS_CLASS);
+   if (clazz == NULL)
+      return;
+   if (!(*env)->IsInstanceOf(env, thiz, clazz)) {
+      (*env)->ThrowNew(env, (*env)->FindClass(env, "Ljava/lang/ClassCastException"), NULL);
+      return;
+   }
 
 #define GET_FIELD(_name, _type) { dst->_name = (*env)->Get ## _type ## Field(env, thiz, ru0xdc_rtklib_solopt_fields._name); }
    GET_FIELD(posf, Int)
@@ -103,7 +115,7 @@ static int init_solopt_fields_methods(JNIEnv* env, jclass clazz) {
 #define INIT_FIELD(_name, _type) { \
       ru0xdc_rtklib_solopt_fields._name = (*env)->GetFieldID(env, clazz, #_name, _type); \
       if (ru0xdc_rtklib_solopt_fields._name == NULL) { \
-	 LOGV("ru0xdc/rtklib/SolutionOptions$%s not found", #_name); \
+	 LOGV("ru0xdc/rtklib/SolutionOptions$Native$%s not found", #_name); \
 	 return JNI_FALSE; \
       } \
       }
@@ -140,7 +152,7 @@ int registerSolutionOptionsNatives(JNIEnv* env) {
     int result = -1;
 
     /* look up the class */
-    jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/SolutionOptions");
+    jclass clazz = (*env)->FindClass(env, SOLUTION_OPTIONS_CLASS);
 
     if (clazz == NULL)
        return JNI_FALSE;

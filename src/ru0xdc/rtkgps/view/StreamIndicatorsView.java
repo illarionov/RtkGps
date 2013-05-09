@@ -158,15 +158,15 @@ public class StreamIndicatorsView extends View {
         y = getPaddingTop();
 
         // Input stream rover
-        drawIndicator(canvas, x, y, mStatus.inputStreamRoverStatus);
+        drawIndicator(canvas, x, y, mStatus.getInputRoverStatus());
 
         // Input stream base
         x += mIndicatorWidth + mIndicatorSpacing;
-        drawIndicator(canvas, x, y, mStatus.inputStreamBaseStationStatus);
+        drawIndicator(canvas, x, y, mStatus.getInputBaseStatus());
 
         // Input stream correction
         x += mIndicatorWidth + mIndicatorSpacing;
-        drawIndicator(canvas, x, y, mStatus.inputStreamCorrectionStatus);
+        drawIndicator(canvas, x, y, mStatus.getInputCorrectionStatus());
 
         x += mIndicatorWidth;
         drawArrow(canvas, x, y);
@@ -180,25 +180,25 @@ public class StreamIndicatorsView extends View {
 
         // Output stream solution 1
         x += getArrowSize();
-        drawIndicator(canvas, x, y, mStatus.outputStreamSolution1Status);
+        drawIndicator(canvas, x, y, mStatus.getOutputSolution1Status());
 
         // Output stream solution 2
         x += mIndicatorWidth + mIndicatorSpacing;
-        drawIndicator(canvas, x, y, mStatus.outputStreamSolution2Status);
+        drawIndicator(canvas, x, y, mStatus.getOutputSolution2Status());
 
         x += mIndicatorSpacing;
 
         // Log stream rover
         x += mIndicatorWidth + mIndicatorSpacing;
-        drawIndicator(canvas, x, y, mStatus.logStreamRoverStatus);
+        drawIndicator(canvas, x, y, mStatus.getLogRoverStatus());
 
         // Log stream base
         x += mIndicatorWidth + mIndicatorSpacing;
-        drawIndicator(canvas, x, y, mStatus.logStreamBaseStationStatus);
+        drawIndicator(canvas, x, y, mStatus.getLogBaseStatus());
 
         // Log stream corrections
         x += mIndicatorWidth + mIndicatorSpacing;
-        drawIndicator(canvas, x, y, mStatus.logStreamCorrectionStatus);
+        drawIndicator(canvas, x, y, mStatus.getLogCorrectionStatus());
     }
 
     private void drawArrow(Canvas canvas, float x, float y) {

@@ -47,9 +47,9 @@ public class RtkServer {
                 mSettings.getNmeaRequestCycle(),
                 mSettings.getNmeaRequestType(),
                 mSettings.getTransmittedPos().getValues(),
-                mSettings.getProcessingOptions(),
-                mSettings.getSolutionOptions1(),
-                mSettings.getSolutionOptions2()
+                mSettings.getProcessingOptions().getNative(),
+                mSettings.getSolutionOptions1().getNative(),
+                mSettings.getSolutionOptions2().getNative()
                 );
 
         mStatus = started ? RtkServerStreamStatus.STATE_WAIT : RtkServerStreamStatus.STATE_ERROR;
@@ -66,7 +66,7 @@ public class RtkServer {
         _getStreamStatus(status);
         // XXX
         if ((mStatus == RtkServerStreamStatus.STATE_WAIT)
-                && (status.inputStreamRoverStatus > RtkServerStreamStatus.STATE_WAIT))
+                && (status.getInputRoverStatus() > RtkServerStreamStatus.STATE_WAIT))
             mStatus = RtkServerStreamStatus.STATE_ACTIVE;
         return status;
     }
@@ -104,9 +104,8 @@ public class RtkServer {
     }
 
     private RtkServerObservationStatus getObservationStatus(int receiver, RtkServerObservationStatus status) {
-        if (status == null) status = new RtkServerObservationStatus();
-        _getObservationStatus(receiver, status);
-        status.receiver = receiver;
+        if (status == null) status = new RtkServerObservationStatus(receiver);
+        _getObservationStatus(receiver, status.getNative());
         return status;
     }
 
@@ -127,7 +126,7 @@ public class RtkServer {
 
     private native void _getStreamStatus(RtkServerStreamStatus status);
 
-    private native void _getObservationStatus(int receiver, RtkServerObservationStatus status);
+    private native void _getObservationStatus(int receiver, RtkServerObservationStatus.Native status);
 
     private native void _getRtkStatus(RtkControlResult dst);
 
@@ -179,9 +178,9 @@ public class RtkServer {
             int nmeacycle,
             int nmeareq,
             double nmeapos[],
-            ProcessingOptions procopt,
-            SolutionOptions solopt_1,
-            SolutionOptions solopt_2
+            ProcessingOptions.Native procopt,
+            SolutionOptions.Native solopt_1,
+            SolutionOptions.Native solopt_2
             );
 
 }

@@ -9,6 +9,9 @@
 #define TAG "nativeProcessingOptions"
 #define LOGV(...) showmsg(__VA_ARGS__)
 
+#define PROCESSING_OPTIONS_CLASS "ru0xdc/rtklib/ProcessingOptions$Native"
+#define SNR_MASK_CLASS "ru0xdc/rtklib/ProcessingOptions$SnrMask"
+
 static struct {
    jfieldID mode;
    jfieldID soltype;
@@ -98,6 +101,15 @@ void processing_options2prcopt_t(JNIEnv* env, jobject thiz, prcopt_t *dst)
    int string_size;
    jstring jstr;
    jobject jarr;
+   jclass clazz;
+
+   clazz = (*env)->FindClass(env, PROCESSING_OPTIONS_CLASS);
+   if (clazz == NULL)
+      return;
+   if (!(*env)->IsInstanceOf(env, thiz, clazz)) {
+      (*env)->ThrowNew(env, (*env)->FindClass(env, "Ljava/lang/ClassCastException"), NULL);
+      return;
+   }
 
    *dst = prcopt_default;
 
@@ -341,7 +353,7 @@ static int init_prcopt_fields_methods(JNIEnv* env, jclass clazz)
 #define INIT_FIELD(_name, _type) { \
       ru0xdc_rtklib_prcopt_fields._name = (*env)->GetFieldID(env, clazz, #_name, _type); \
       if (ru0xdc_rtklib_prcopt_fields._name == NULL) { \
-	 LOGV("ru0xdc/rtklib/ProcessingOptions$%s not found", #_name); \
+	 LOGV("ru0xdc/rtklib/ProcessingOptions$Native$%s not found", #_name); \
 	 return JNI_FALSE; \
       } \
       }
@@ -452,8 +464,8 @@ int registerProcessingOptionsNatives(JNIEnv* env) {
    int result = -1;
 
     /* look up the class */
-    prcopt_clazz = (*env)->FindClass(env, "ru0xdc/rtklib/ProcessingOptions");
-    snrmask_clazz = (*env)->FindClass(env, "ru0xdc/rtklib/ProcessingOptions$SnrMask");
+    prcopt_clazz = (*env)->FindClass(env, PROCESSING_OPTIONS_CLASS);
+    snrmask_clazz = (*env)->FindClass(env, SNR_MASK_CLASS);
 
     if (prcopt_clazz == NULL)
        return JNI_FALSE;

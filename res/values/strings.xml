@@ -90,6 +90,16 @@
     <string name="times_utc">UTC</string>
     <string name="times_jst">JST</string>
 
+    <!-- SOLQ_XXX Solution status -->
+    <string name="solq_none">None</string>
+    <string name="solq_fix">Fixed</string>
+    <string name="solq_float">Float</string>
+    <string name="solq_sbas">SBAS</string>
+    <string name="solq_dgps">DGPS/DGNSS</string>
+    <string name="solq_single">Single</string>
+    <string name="solq_ppp">PPP</string>
+    <string name="solq_dr">Dead reconing</string>
+    
     <!-- SOLF_XXX  Solution Format -->
     <string name="solf_llh">Lat/Long/Height</string>
     <string name="solf_xyz">X/Y/Z — ECEF</string>

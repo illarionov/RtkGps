@@ -1,5 +1,8 @@
 package ru0xdc.rtklib;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+
 import ru0xdc.rtklib.constants.GeoidModel;
 import ru0xdc.rtklib.constants.SolutionFormat;
 import ru0xdc.rtklib.constants.TimeSystem;
@@ -11,76 +14,77 @@ import android.text.TextUtils;
  */
 public class SolutionOptions {
 
-    /** solution format (SOLF_??? {@link SolutionFormat}) */
-    public int posf;
+    private final Native mNative;
 
-    /** time system (TIMES_??? {@link TimeSystem}) */
-    public int times;
 
-    /** time format (0:sssss.s,1:yyyy/mm/dd hh:mm:ss.s) */
-    public int timef;
+    static class Native {
 
-    /** time digits under decimal point */
-    int timeu;
+        /** solution format (SOLF_??? {@link SolutionFormat}) */
+        private int posf;
 
-    /** latitude/longitude format (0:ddd.ddd,1:ddd mm ss) */
-    int degf;
+        /** time system (TIMES_??? {@link TimeSystem}) */
+        private int times;
 
-    /** output header (0:no,1:yes) */
-    boolean outhead;
+        /** time format (0:sssss.s,1:yyyy/mm/dd hh:mm:ss.s) */
+        private int timef;
 
-    /** output processing options (0:no,1:yes)  */
-    boolean outopt;
+        /** time digits under decimal point */
+        private int timeu;
 
-    /** datum (0:WGS84,1:Tokyo) */
-    int datum;
+        /** latitude/longitude format (0:ddd.ddd,1:ddd mm ss) */
+        private int degf;
 
-    /** height (0:ellipsoidal,1:geodetic) */
-    int height;
+        /** output header (0:no,1:yes) */
+        private boolean outhead;
 
-    /** geoid model (0:EGM96,1:JGD2000) */
-    int geoid;
+        /** output processing options (0:no,1:yes)  */
+        private boolean outopt;
 
-    /** solution of static mode (0:all,1:single)  */
-    int solstatic;
+        /** datum (0:WGS84,1:Tokyo) */
+        private int datum;
 
-    /** solution statistics level (0:off,1:states,2:residuals) */
-    int sstat;
+        /** height (0:ellipsoidal,1:geodetic) */
+        private int height;
 
-    /** debug trace level (0:off,1-5:debug) */
-    int trace;
+        /** geoid model (0:EGM96,1:JGD2000) */
+        private int geoid;
 
-    /** NMEA GPRMC, GPGGA output interval (s) (<0:no,0:all) */
-    double nmeaintv_rmcgga;
+        /** solution of static mode (0:all,1:single)  */
+        private int solstatic;
 
-    /** NMEA GPGSV output interval (s) (<0:no,0:all) */
-    double nmeaintv_gsv;
+        /** solution statistics level (0:off,1:states,2:residuals) */
+        private int sstat;
 
-    /** field separator */
-    String sep;
+        /** debug trace level (0:off,1-5:debug) */
+        private int trace;
 
-    /** program name */
-    String prog;
+        /** NMEA GPRMC, GPGGA output interval (s) (<0:no,0:all) */
+        private double nmeaintv_rmcgga;
 
-    native void _loadDefaults();
+        /** NMEA GPGSV output interval (s) (<0:no,0:all) */
+        private double nmeaintv_gsv;
+
+        /** field separator */
+        private String sep;
+
+        /** program name */
+        private String prog;
+
+        native void _loadDefaults();
+
+        public Native() {
+            _loadDefaults();
+        }
+    }
 
     public SolutionOptions() {
-        _loadDefaults();
+        mNative = new Native();
     }
 
     public SolutionOptions(SolutionOptions src) {
+        this();
         if (src == null) throw new IllegalArgumentException();
         setValues(src);
-    }
-
-    public void setValues(SolutionOptions src) {
-        if (src == null) throw new IllegalArgumentException();
-        setValues(src.posf, src.times,
-                src.timef, src.timeu, src.degf, src.outhead, src.outopt,
-                src.datum, src.height, src.geoid, src.solstatic, src.sstat,
-                src.trace, src.nmeaintv_rmcgga, src.nmeaintv_gsv,
-                src.sep, src.prog
-                );
     }
 
     void setValues(
@@ -102,134 +106,153 @@ public class SolutionOptions {
             String sep,
             String prog
             ) {
-        this.posf = posf;
-        this.times = times;
-        this.timef = timef;
-        this.timeu = timeu;
-        this.degf = degf;
-        this.outhead = outhead;
-        this.outopt = outopt;
-        this.datum = datum;
-        this.height = height;
-        this.geoid = geoid;
-        this.solstatic = solstatic;
-        this.sstat = sstat;
-        this.trace = trace;
-        this.nmeaintv_rmcgga = nmeaintv_rmcgga;
-        this.nmeaintv_gsv = nmeaintv_gsv;
-        this.sep = sep;
-        this.prog = prog;
+        mNative.posf = posf;
+        mNative.times = times;
+        mNative.timef = timef;
+        mNative.timeu = timeu;
+        mNative.degf = degf;
+        mNative.outhead = outhead;
+        mNative.outopt = outopt;
+        mNative.datum = datum;
+        mNative.height = height;
+        mNative.geoid = geoid;
+        mNative.solstatic = solstatic;
+        mNative.sstat = sstat;
+        mNative.trace = trace;
+        mNative.nmeaintv_rmcgga = nmeaintv_rmcgga;
+        mNative.nmeaintv_gsv = nmeaintv_gsv;
+        mNative.sep = sep;
+        mNative.prog = prog;
+    }
+
+    public void setValues(SolutionOptions src) {
+        if (src == null) throw new IllegalArgumentException();
+        setValues(src.mNative.posf, src.mNative.times,
+                src.mNative.timef, src.mNative.timeu, src.mNative.degf,
+                src.mNative.outhead, src.mNative.outopt,
+                src.mNative.datum, src.mNative.height, src.mNative.geoid,
+                src.mNative.solstatic, src.mNative.sstat,
+                src.mNative.trace, src.mNative.nmeaintv_rmcgga,
+                src.mNative.nmeaintv_gsv,
+                src.mNative.sep, src.mNative.prog
+                );
+    }
+
+    Native getNative() {
+        return mNative;
     }
 
     public SolutionFormat getSolutionFormat() {
-        return SolutionFormat.valueOf(this.posf);
+        return SolutionFormat.valueOf(this.mNative.posf);
     }
 
     public SolutionOptions setSolutionFormat(SolutionFormat format) {
-        this.posf = format.getRtklibId();
+        this.mNative.posf = format.getRtklibId();
         return this;
     }
 
     public TimeSystem getTimeSystem() {
-        return TimeSystem.valueOf(this.times);
+        return TimeSystem.valueOf(this.mNative.times);
     }
 
     public SolutionOptions setTimeSystem(TimeSystem timeSystem) {
-        this.times = timeSystem.getRtklibId();
+        this.mNative.times = timeSystem.getRtklibId();
         return this;
     }
 
 
     public boolean getOutHead() {
-        return outhead;
+        return mNative.outhead;
     }
 
     public SolutionOptions setOutHead(boolean outHead) {
-        this.outhead = outHead;
+        this.mNative.outhead = outHead;
         return this;
     }
 
     /** latitude/longitude format (0:ddd.ddd,1:ddd mm ss) */
     public int getLatLonFormat() {
-        return this.degf;
+        return this.mNative.degf;
     }
 
     /** set latitude/longitude format (0:ddd.ddd,1:ddd mm ss) */
     public SolutionOptions setLatLonFormat(int format) {
         if (format != 0 && format != 1) throw new IllegalArgumentException();
-        this.degf = format;
+        this.mNative.degf = format;
         return this;
     }
 
     public String getFieldSeparator() {
-        return this.sep;
+        return this.mNative.sep;
     }
 
-    public SolutionOptions setFieldSeparator(String separator) {
+    public SolutionOptions setFieldSeparator(@Nonnull String separator) {
         if (separator == null) throw new NullPointerException();
-        if (!TextUtils.equals(this.sep, separator)) this.sep = separator;
+        if (!TextUtils.equals(this.mNative.sep, separator)) this.mNative.sep = separator;
         return this;
     }
 
     public boolean isEllipsoidalHeight() {
-        return this.height == 0;
+        return this.mNative.height == 0;
     }
 
     public SolutionOptions setIsEllipsoidalHeight(boolean v) {
-        this.height = v ? 0 : 1;
+        this.mNative.height = v ? 0 : 1;
         return this;
     }
 
     public GeoidModel getGeoidModel() {
-        return GeoidModel.valueOf(this.geoid);
+        return GeoidModel.valueOf(this.mNative.geoid);
     }
 
     public SolutionOptions setGeoidModel(GeoidModel model) {
-        this.geoid = model.getRtklibId();
+        this.mNative.geoid = model.getRtklibId();
         return this;
     }
 
+    @Nonnegative
     public double getNmeaIntervalRmcGga() {
-        return this.nmeaintv_rmcgga;
+        return this.mNative.nmeaintv_rmcgga;
     }
 
-    public SolutionOptions setNmeaIntervalRmcGga(double interval) {
+    public SolutionOptions setNmeaIntervalRmcGga(@Nonnegative double interval) {
         if (interval < 0) throw new IllegalArgumentException();
-        this.nmeaintv_rmcgga = interval;
+        this.mNative.nmeaintv_rmcgga = interval;
         return this;
     }
 
+    @Nonnegative
     public double getNmeaIntervalGsv() {
-        return this.nmeaintv_gsv;
+        return this.mNative.nmeaintv_gsv;
     }
 
-    public SolutionOptions setNmeaIntervalGsv(double interval) {
+    public SolutionOptions setNmeaIntervalGsv(@Nonnegative double interval) {
         if (interval < 0) throw new IllegalArgumentException();
-        this.nmeaintv_gsv = interval;
+        this.mNative.nmeaintv_gsv = interval;
         return this;
     }
 
     /** solution statistics level (0:off,1:states,2:residuals) */
     public int getSolutionStatsLevel() {
-        return this.sstat;
+        return this.mNative.sstat;
     }
 
     /** solution statistics level (0:off,1:states,2:residuals) */
     public SolutionOptions setSolutionStatsLevel(int level) {
         if (level < 0 || level > 2) throw new IllegalArgumentException();
-        this.sstat = level;
+        this.mNative.sstat = level;
         return this;
     }
 
     /** debug trace level (0:off,1-5:debug) */
     public int getDebugTraceLevel() {
-        return this.trace;
+        return this.mNative.trace;
     }
 
     /** debug trace level (0:off,1-5:debug) */
     public SolutionOptions setDebugTraceLevel(int level) {
         if (level < 0 || level > 5) throw new IllegalArgumentException();
-        this.trace = level;
+        this.mNative.trace = level;
         return this;
     }
 

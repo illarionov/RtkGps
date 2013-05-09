@@ -312,6 +312,54 @@ public class RtkCommon {
     }
 
     /**
+     * DOP (dilution of precision)
+     *
+     */
+    public static class Dops {
+
+        private final double mDops[];
+
+        public Dops() {
+            mDops = new double[4];
+        }
+
+        public Dops(double gdop, double pdop, double hdop, double vdop) {
+            this();
+            setDops(gdop, pdop, hdop, vdop);
+        }
+
+        public void copyTo(Dops dst) {
+            if (dst == null) throw new IllegalArgumentException();
+            System.arraycopy(dst.mDops, 0, mDops, 0, mDops.length);
+        }
+
+        // Used in native code
+        void setDops(double gdop, double pdop, double hdop, double vdop) {
+            mDops[0] = gdop;
+            mDops[1] = pdop;
+            mDops[2] = hdop;
+            mDops[3] = vdop;
+        }
+
+        public double getGdop() {
+            return mDops[0];
+        }
+
+        public double getPdop() {
+            return mDops[1];
+        }
+
+        public double getHdop() {
+            return mDops[2];
+        }
+
+        public double getVdop() {
+            return mDops[3];
+        }
+    }
+
+
+    /**
      * convert degree to degree-minute-second
      */
     public static class Deg2Dms {

@@ -7,34 +7,35 @@ public class RtkControlResult {
     /**
      * RTK solution
      */
-    public final Solution sol;
+    // Used in native code
+    private final Solution sol;
 
     /**
      * base position/velocity (ecef) (m|m/s)
      */
-    public final double rb[];
+    private final double mRb[];
 
     /**
      * number of float states
      */
-    public int nx;
+    private int mNx;
 
     /**
      * number of fixed states
      */
-    public int na;
+    private int mNa;
 
     /**
      * time difference between current and previous (s)
      */
-    double tt;
+    private double mTt;
 
     // XXX: *x, *P, *xa, *Pa
 
     /**
      * number of continuous fixes of ambiguity
      */
-    int nfix;
+    private int mNfix;
 
     // XXX:  ambc ssat opt
 
@@ -42,11 +43,11 @@ public class RtkControlResult {
     /**
      * error message buffer
      */
-    String errMsg;
+    private String mErrMsg;
 
     public RtkControlResult() {
         sol = new Solution();
-        rb = new double[6];
+        mRb = new double[6];
     }
 
     void setStatus1(double rb0, double rb1, double rb2,
@@ -54,22 +55,72 @@ public class RtkControlResult {
             int nx, int na, double tt, int nfix,
             String errMsg
             ) {
-        this.rb[0] = rb0;
-        this.rb[1] = rb1;
-        this.rb[2] = rb2;
-        this.rb[3] = rb3;
-        this.rb[4] = rb4;
-        this.rb[5] = rb5;
+        this.mRb[0] = rb0;
+        this.mRb[1] = rb1;
+        this.mRb[2] = rb2;
+        this.mRb[3] = rb3;
+        this.mRb[4] = rb4;
+        this.mRb[5] = rb5;
 
-        this.nx = nx;
-        this.na = na;
-        this.tt = tt;
-        this.nfix = nfix;
-        this.errMsg = errMsg;
+        this.mNx = nx;
+        this.mNa = na;
+        this.mTt = tt;
+        this.mNfix = nfix;
+        this.mErrMsg = errMsg;
     }
 
     public Position3d getBasePosition() {
-        return new Position3d(this.rb[0], this.rb[1], this.rb[2]);
+        return new Position3d(this.mRb[0], this.mRb[1], this.mRb[2]);
     }
+
+    /**
+     * @return RTK solution
+     */
+    public final Solution getSolution() {
+        return sol;
+    }
+
+    /**
+     * @return base position/velocity (ecef) (m|m/s)
+     */
+    public double[] getRb() {
+        return mRb;
+    }
+
+    /**
+     * @return number of float states
+     */
+    public int getNx() {
+        return mNx;
+    }
+    /**
+     * @return number of fixed states
+     */
+    public int getNa() {
+        return mNa;
+    }
+
+    /**
+     * @return time difference between current and previous (s)
+     */
+    public double getTt() {
+        return mTt;
+    }
+
+    /**
+     * @return number of continuous fixes of ambiguity
+     */
+    public int getNfix() {
+        return mNfix;
+    }
+
+    /**
+     * @return error message buffer
+     */
+    public String getErrMsg() {
+        return mErrMsg;
+    }
+
+
 
 }
