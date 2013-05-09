@@ -6,12 +6,12 @@ import android.util.AttributeSet;
 
 public class StreamFormatPreference extends EnumListPreference<StreamFormat> {
 
-	public StreamFormatPreference(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
+    public StreamFormatPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
-	public StreamFormatPreference(Context context) {
-		super(context);
-	}
+    public StreamFormatPreference(Context context) {
+        super(context);
+    }
 
 }

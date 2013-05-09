@@ -17,49 +17,49 @@ import android.view.View;
 
 public class GpsSkyView extends View {
 
-	@SuppressWarnings("unused")
-	private static final boolean DBG = BuildConfig.DEBUG & true;
-	static final String TAG = GpsSkyView.class.getSimpleName();
+    @SuppressWarnings("unused")
+    private static final boolean DBG = BuildConfig.DEBUG & true;
+    static final String TAG = GpsSkyView.class.getSimpleName();
 
-	public static final String BAND_L1 = "L1";
+    public static final String BAND_L1 = "L1";
 
-	public static final String BAND_L2 = "L2";
+    public static final String BAND_L2 = "L2";
 
-	public static final String BAND_L5 = "L5";
+    public static final String BAND_L5 = "L5";
 
-	private static final float SAT_RADIUS = 16.0f;
+    private static final float SAT_RADIUS = 16.0f;
 
-	static final int COLOR_NOT_VALID_SAT = Color.LTGRAY;
+    static final int COLOR_NOT_VALID_SAT = Color.LTGRAY;
 
-	private static final int SAT_PRN_TEXT_SIZE = 14;
+    private static final int SAT_PRN_TEXT_SIZE = 14;
 
-	private static final int GRID_TEXT_SIZE = 16;
+    private static final int GRID_TEXT_SIZE = 16;
 
-	static int SNR_COLORS[] = new int[] {
-		Color.GREEN,
-		Color.rgb(0, 0xaa, 0xff),
-		Color.rgb(0xff, 0, 0xff),
-		Color.BLUE,
-		Color.RED,
-		Color.GRAY
-	};
+    static int SNR_COLORS[] = new int[] {
+        Color.GREEN,
+        Color.rgb(0, 0xaa, 0xff),
+        Color.rgb(0xff, 0, 0xff),
+        Color.BLUE,
+        Color.RED,
+        Color.GRAY
+    };
 
-	private String mBand;
+    private String mBand;
 
-	private final RtkServerObservationStatus mStatus;
-	private final Dops mDops;
+    private final RtkServerObservationStatus mStatus;
+    private final Dops mDops;
 
     private final DecimalFormat mDopsFormatter;
 
-	private final Paint mGridStrokePaint;
-	private final Paint mSkyTextPaint, mSkyTextBackgroundPaint;
-	private final Paint mLeftInfoTextPaint;
-	private final Paint mSatelliteFillPaint, mSatelliteStrokePaint, mSatellitePrnPaint;
+    private final Paint mGridStrokePaint;
+    private final Paint mSkyTextPaint, mSkyTextBackgroundPaint;
+    private final Paint mLeftInfoTextPaint;
+    private final Paint mSatelliteFillPaint, mSatelliteStrokePaint, mSatellitePrnPaint;
 
 
     public GpsSkyView(Context context, AttributeSet attrs) {
 
-    	super(context, attrs);
+        super(context, attrs);
 
         mStatus = new RtkServerObservationStatus();
         mDops = new Dops();
@@ -102,9 +102,9 @@ public class GpsSkyView extends View {
     }
 
     public void setStats(RtkServerObservationStatus status) {
-    	status.copyTo(mStatus);
-    	mStatus.getDops(mDops);
-    	invalidate();
+        status.copyTo(mStatus);
+        mStatus.getDops(mDops);
+        invalidate();
     }
 
     /**
@@ -112,26 +112,26 @@ public class GpsSkyView extends View {
      * @param band {@link BAND_L1}, {@link BAND_L2}, {@link BAND_L5}
      */
     public void setFreqBand(final String band) {
-    	if (!TextUtils.equals(band, BAND_L1)
-    			&& !TextUtils.equals(band, BAND_L2)
-    			&& !TextUtils.equals(band, BAND_L5)
-    			) throw new IllegalArgumentException();
+        if (!TextUtils.equals(band, BAND_L1)
+                && !TextUtils.equals(band, BAND_L2)
+                && !TextUtils.equals(band, BAND_L5)
+                ) throw new IllegalArgumentException();
 
-    	mBand = band;
-    	invalidate();
+        mBand = band;
+        invalidate();
     }
 
     public String getBand() {
-    	return mBand;
+        return mBand;
     }
 
     private void drawSky(Canvas c, float s) {
         float radius = s / 2.0f;
 
         for (double a=0; a<360; a += 45) {
-        	int x=(int)((radius-SAT_RADIUS)*Math.sin(Math.toRadians(a)));
-        	int y=(int)((radius-SAT_RADIUS)*Math.cos(Math.toRadians(a)));
-        	c.drawLine(radius, radius, radius+x, radius+y, mGridStrokePaint);
+            int x=(int)((radius-SAT_RADIUS)*Math.sin(Math.toRadians(a)));
+            int y=(int)((radius-SAT_RADIUS)*Math.cos(Math.toRadians(a)));
+            c.drawLine(radius, radius, radius+x, radius+y, mGridStrokePaint);
         }
 
         c.drawCircle(radius, radius, elevationToRadius(s,  0.0f), mGridStrokePaint);
@@ -141,45 +141,45 @@ public class GpsSkyView extends View {
 
         final Context ctx = getContext();
         drawTextWithBackground(c, ctx.getString(R.string.sky_plot_north),
-        		radius,
-        		SAT_RADIUS + 0.4f * GRID_TEXT_SIZE
-        		);
+                radius,
+                SAT_RADIUS + 0.4f * GRID_TEXT_SIZE
+                );
         drawTextWithBackground(c, ctx.getString(R.string.sky_plot_east),
-        		2.0f * radius - SAT_RADIUS,
-        		radius + 0.4f * GRID_TEXT_SIZE
-        		);
+                2.0f * radius - SAT_RADIUS,
+                radius + 0.4f * GRID_TEXT_SIZE
+                );
         drawTextWithBackground(c, ctx.getString(R.string.sky_plot_south),
-        		radius,
-        		2.0f * radius - SAT_RADIUS  + 0.4f * GRID_TEXT_SIZE
-        		);
+                radius,
+                2.0f * radius - SAT_RADIUS  + 0.4f * GRID_TEXT_SIZE
+                );
         drawTextWithBackground(c, ctx.getString(R.string.sky_plot_west),
-        		SAT_RADIUS,
-        		(radius + 0.4f*GRID_TEXT_SIZE)
-        		);
+                SAT_RADIUS,
+                (radius + 0.4f*GRID_TEXT_SIZE)
+                );
     }
 
     private void drawTextWithBackground(Canvas c, String str, float x, float y) {
-    	c.drawText(str, x, y, mSkyTextBackgroundPaint);
-    	c.drawText(str, x, y, mSkyTextPaint);
+        c.drawText(str, x, y, mSkyTextBackgroundPaint);
+        c.drawText(str, x, y, mSkyTextPaint);
     }
 
     private void drawSatellites(Canvas canvas, float s) {
 
-    	for (int i = 0; i < mStatus.ns; ++i) {
-        	int snr;
-        	double radius, angle;
+        for (int i = 0; i < mStatus.ns; ++i) {
+            int snr;
+            double radius, angle;
             float x, y;
 
-        	if (mStatus.el[i] <= 0.0)  continue;
-        	if (BAND_L1.equals(mBand)) {
-        		snr = mStatus.freq1Snr[i];
-        	}else if (BAND_L2.equals(mBand)) {
-        		snr = mStatus.freq2Snr[i];
-        	}else {
-        		snr = mStatus.freq3Snr[i];
-        	}
+            if (mStatus.el[i] <= 0.0)  continue;
+            if (BAND_L1.equals(mBand)) {
+                snr = mStatus.freq1Snr[i];
+            }else if (BAND_L2.equals(mBand)) {
+                snr = mStatus.freq2Snr[i];
+            }else {
+                snr = mStatus.freq3Snr[i];
+            }
 
-        	mSatelliteFillPaint.setColor(getSatellitePaintColor(snr, mStatus.vsat[i]));
+            mSatelliteFillPaint.setColor(getSatellitePaintColor(snr, mStatus.vsat[i]));
 
             radius = elevationToRadius(s, Math.toDegrees(mStatus.el[i]));
             angle = mStatus.az[i];
@@ -190,30 +190,30 @@ public class GpsSkyView extends View {
             canvas.drawCircle(x, y, SAT_RADIUS, mSatelliteFillPaint);
             canvas.drawCircle(x, y, SAT_RADIUS, mSatelliteStrokePaint);
             canvas.drawText(mStatus.getSatId(i),
-            		x,
-            		(int)(y + 0.4f*SAT_PRN_TEXT_SIZE),
-            		mSatellitePrnPaint);
-    	}
+                    x,
+                    (int)(y + 0.4f*SAT_PRN_TEXT_SIZE),
+                    mSatellitePrnPaint);
+        }
     }
 
     private void printInfo(Canvas canvas, float s) {
-    	final String numOfSat = String.format(
-    			getContext().getString(R.string.sky_plot_num_of_sat)
-    			, mStatus.ns);
+        final String numOfSat = String.format(
+                getContext().getString(R.string.sky_plot_num_of_sat)
+                , mStatus.ns);
 
-    	String plotName;
-    	try {
-    		plotName = getResources().getStringArray(ru0xdc.rtkgps.R.array.rtk_server_receiver)[mStatus.receiver]
-    				+ " " + mBand;
-    	}catch (Resources.NotFoundException	e) {
-    		plotName = "Rover L1";
-    	}
+        String plotName;
+        try {
+            plotName = getResources().getStringArray(ru0xdc.rtkgps.R.array.rtk_server_receiver)[mStatus.receiver]
+                    + " " + mBand;
+        }catch (Resources.NotFoundException	e) {
+            plotName = "Rover L1";
+        }
 
-    	final String gdop = "GDOP: " + mDopsFormatter.format(mDops.gdop);
+        final String gdop = "GDOP: " + mDopsFormatter.format(mDops.gdop);
 
-    	canvas.drawText(plotName, 0, 2f * SAT_PRN_TEXT_SIZE, mLeftInfoTextPaint);
-    	canvas.drawText(numOfSat, 0, s - SAT_PRN_TEXT_SIZE, mLeftInfoTextPaint);
-    	canvas.drawText(gdop, s - 8*SAT_PRN_TEXT_SIZE, s - SAT_PRN_TEXT_SIZE, mLeftInfoTextPaint);
+        canvas.drawText(plotName, 0, 2f * SAT_PRN_TEXT_SIZE, mLeftInfoTextPaint);
+        canvas.drawText(numOfSat, 0, s - SAT_PRN_TEXT_SIZE, mLeftInfoTextPaint);
+        canvas.drawText(gdop, s - 8*SAT_PRN_TEXT_SIZE, s - SAT_PRN_TEXT_SIZE, mLeftInfoTextPaint);
     }
 
 
@@ -221,13 +221,13 @@ public class GpsSkyView extends View {
         int j, color;
 
         if (valid == 0) {
-        	color = COLOR_NOT_VALID_SAT;
+            color = COLOR_NOT_VALID_SAT;
         }else {
-        	j = (49 - snr)/(SNR_COLORS.length-1);
-        	if (j < 0 || j >= (SNR_COLORS.length-1)) {
-        		j = SNR_COLORS.length-2;
-        	}
-        	color = SNR_COLORS[j];
+            j = (49 - snr)/(SNR_COLORS.length-1);
+            if (j < 0 || j >= (SNR_COLORS.length-1)) {
+                j = SNR_COLORS.length-2;
+            }
+            color = SNR_COLORS[j];
         }
         return color;
     }
@@ -248,17 +248,17 @@ public class GpsSkyView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-    	float w, h, s;
+        float w, h, s;
 
-    	super.onDraw(canvas);
+        super.onDraw(canvas);
 
-    	w = getWidth() - getPaddingLeft() - getPaddingRight();
-    	h = getHeight() - getPaddingTop() - getPaddingBottom();
-    	s = (w < h) ? w : h;
+        w = getWidth() - getPaddingLeft() - getPaddingRight();
+        h = getHeight() - getPaddingTop() - getPaddingBottom();
+        s = (w < h) ? w : h;
 
-    	drawSky(canvas, s);
-    	drawSatellites(canvas, s);
-    	printInfo(canvas, s);
+        drawSky(canvas, s);
+        drawSatellites(canvas, s);
+        printInfo(canvas, s);
     }
 
 }

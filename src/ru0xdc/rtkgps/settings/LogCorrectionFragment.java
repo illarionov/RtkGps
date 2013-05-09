@@ -8,30 +8,30 @@ import android.content.Context;
 
 public class LogCorrectionFragment extends LogRoverFragment {
 
-	static final String SHARED_PREFS_NAME = "LogCorrection";
+    static final String SHARED_PREFS_NAME = "LogCorrection";
 
-	public LogCorrectionFragment() {
-		super();
-	}
+    public LogCorrectionFragment() {
+        super();
+    }
 
-	@Override
-	protected String getSharedPreferenceName() {
-		return SHARED_PREFS_NAME;
-	}
+    @Override
+    protected String getSharedPreferenceName() {
+        return SHARED_PREFS_NAME;
+    }
 
-	@Override
-	protected void initPreferenceScreen() {
-		super.initPreferenceScreen();
-		findPreference(KEY_ENABLE).setTitle(R.string.log_streams_settings_enable_correction_title);
-	}
+    @Override
+    protected void initPreferenceScreen() {
+        super.initPreferenceScreen();
+        findPreference(KEY_ENABLE).setTitle(R.string.log_streams_settings_enable_correction_title);
+    }
 
-	@Nonnull
-	public static LogStream readPrefs(Context ctx) {
-		return SettingsHelper.readLogStreamPrefs(ctx, SHARED_PREFS_NAME);
-	}
+    @Nonnull
+    public static LogStream readPrefs(Context ctx) {
+        return SettingsHelper.readLogStreamPrefs(ctx, SHARED_PREFS_NAME);
+    }
 
-	public static void setDefaultValues(Context ctx, boolean force) {
-    	SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+    public static void setDefaultValues(Context ctx, boolean force) {
+        SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
     }
 
 }

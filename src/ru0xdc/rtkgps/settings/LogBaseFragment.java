@@ -9,30 +9,30 @@ import android.content.Context;
 
 public class LogBaseFragment extends LogRoverFragment {
 
-	static final String SHARED_PREFS_NAME = "LogBase";
+    static final String SHARED_PREFS_NAME = "LogBase";
 
-	public LogBaseFragment() {
-		super();
-	}
+    public LogBaseFragment() {
+        super();
+    }
 
-	@Override
-	protected String getSharedPreferenceName() {
-		return SHARED_PREFS_NAME;
-	}
+    @Override
+    protected String getSharedPreferenceName() {
+        return SHARED_PREFS_NAME;
+    }
 
-	@Override
-	protected void initPreferenceScreen() {
-		super.initPreferenceScreen();
-		findPreference(KEY_ENABLE).setTitle(R.string.log_streams_settings_enable_base_title);
-	}
+    @Override
+    protected void initPreferenceScreen() {
+        super.initPreferenceScreen();
+        findPreference(KEY_ENABLE).setTitle(R.string.log_streams_settings_enable_base_title);
+    }
 
-	@Nonnull
-	public static LogStream readPrefs(Context ctx) {
-		return SettingsHelper.readLogStreamPrefs(ctx, SHARED_PREFS_NAME);
-	}
+    @Nonnull
+    public static LogStream readPrefs(Context ctx) {
+        return SettingsHelper.readLogStreamPrefs(ctx, SHARED_PREFS_NAME);
+    }
 
     public static void setDefaultValues(Context ctx, boolean force) {
-    	SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+        SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
     }
 
 }

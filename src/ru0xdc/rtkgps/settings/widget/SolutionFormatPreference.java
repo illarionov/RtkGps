@@ -6,13 +6,13 @@ import android.util.AttributeSet;
 
 public class SolutionFormatPreference extends EnumListPreference<SolutionFormat> {
 
-	public SolutionFormatPreference(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
+    public SolutionFormatPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
-	public SolutionFormatPreference(Context context) {
-		super(context);
-	}
+    public SolutionFormatPreference(Context context) {
+        super(context);
+    }
 
 
 }

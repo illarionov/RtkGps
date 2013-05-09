@@ -12,72 +12,72 @@ import android.view.View;
 
 public class StreamIndicatorsView extends View {
 
-	private final static int DEFAULT_COLOR_STATE_CLOSE = Color.DKGRAY;
+    private final static int DEFAULT_COLOR_STATE_CLOSE = Color.DKGRAY;
 
-	private final static int DEFAULT_COLOR_STATE_WAIT = Color.rgb(255, 127, 0);
+    private final static int DEFAULT_COLOR_STATE_WAIT = Color.rgb(255, 127, 0);
 
-	private final static int DEFAULT_COLOR_STATE_CONNECT = Color.rgb(0, 100, 0);
+    private final static int DEFAULT_COLOR_STATE_CONNECT = Color.rgb(0, 100, 0);
 
-	private final static int DEFAULT_COLOR_STATE_ACTIVE = Color.GREEN;
+    private final static int DEFAULT_COLOR_STATE_ACTIVE = Color.GREEN;
 
-	private final static int DEFAULT_COLOR_STATE_ERROR = Color.RED;
+    private final static int DEFAULT_COLOR_STATE_ERROR = Color.RED;
 
-	private final static int DEFAULT_INDICATOR_WIDTH = 4;
+    private final static int DEFAULT_INDICATOR_WIDTH = 4;
 
-	private final static int DEFAULT_INDICATOR_HEIGHT = 9;
+    private final static int DEFAULT_INDICATOR_HEIGHT = 9;
 
-	private final static int DEFAULT_INDICATOR_SPACING = 2;
+    private final static int DEFAULT_INDICATOR_SPACING = 2;
 
-	private final static String ARROW = "→";
+    private final static String ARROW = "→";
 
-	@SuppressWarnings("unused")
-	private static final boolean DBG = BuildConfig.DEBUG & true;
-	static final String TAG = StreamIndicatorsView.class.getSimpleName();
+    @SuppressWarnings("unused")
+    private static final boolean DBG = BuildConfig.DEBUG & true;
+    static final String TAG = StreamIndicatorsView.class.getSimpleName();
 
-	private final Paint mStreamIndicatorPaint;
+    private final Paint mStreamIndicatorPaint;
 
-	private final Paint mArrayPaint;
+    private final Paint mArrayPaint;
 
-	private final RtkServerStreamStatus mStatus;
+    private final RtkServerStreamStatus mStatus;
 
-	private int mServerStatus;
+    private int mServerStatus;
 
-	private float mIndicatorWidth, mIndicatorHeight, mIndicatorSpacing;
+    private float mIndicatorWidth, mIndicatorHeight, mIndicatorSpacing;
 
 
-	public StreamIndicatorsView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+    public StreamIndicatorsView(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
-		mStatus = new RtkServerStreamStatus();
-		mServerStatus = RtkServerStreamStatus.STATE_CLOSE;
+        mStatus = new RtkServerStreamStatus();
+        mServerStatus = RtkServerStreamStatus.STATE_CLOSE;
 
-		final float density = getResources().getDisplayMetrics().density;
+        final float density = getResources().getDisplayMetrics().density;
 
-		mIndicatorWidth = DEFAULT_INDICATOR_WIDTH * density;
-		mIndicatorHeight = DEFAULT_INDICATOR_HEIGHT * density;
-		mIndicatorSpacing = DEFAULT_INDICATOR_SPACING * density;
+        mIndicatorWidth = DEFAULT_INDICATOR_WIDTH * density;
+        mIndicatorHeight = DEFAULT_INDICATOR_HEIGHT * density;
+        mIndicatorSpacing = DEFAULT_INDICATOR_SPACING * density;
 
-		mStreamIndicatorPaint = new Paint();
-		mStreamIndicatorPaint.setColor(DEFAULT_COLOR_STATE_CLOSE);
+        mStreamIndicatorPaint = new Paint();
+        mStreamIndicatorPaint.setColor(DEFAULT_COLOR_STATE_CLOSE);
 
-		mArrayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mArrayPaint.setColor(Color.LTGRAY);
-		mArrayPaint.setTextSize(DEFAULT_INDICATOR_HEIGHT*density);
-		mArrayPaint.setTextScaleX(1.5f);
+        mArrayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mArrayPaint.setColor(Color.LTGRAY);
+        mArrayPaint.setTextSize(DEFAULT_INDICATOR_HEIGHT*density);
+        mArrayPaint.setTextScaleX(1.5f);
 
-	}
-
-	public void setStats(RtkServerStreamStatus status, int serverStatus) {
-    	status.copyTo(mStatus);
-    	mServerStatus = serverStatus;
-    	invalidate();
     }
 
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		setMeasuredDimension(measureWidth(widthMeasureSpec),
-				measureHeight(heightMeasureSpec));
-	}
+    public void setStats(RtkServerStreamStatus status, int serverStatus) {
+        status.copyTo(mStatus);
+        mServerStatus = serverStatus;
+        invalidate();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(measureWidth(widthMeasureSpec),
+                measureHeight(heightMeasureSpec));
+    }
 
     /**
      * Determines the width of this view
@@ -129,29 +129,29 @@ public class StreamIndicatorsView extends View {
     }
 
     private int getMinWidth() {
-    	float res;
+        float res;
 
-    	res = mIndicatorWidth * 9;
-    	res += mIndicatorSpacing * 7;
-    	res += 2 * getArrowSize();
+        res = mIndicatorWidth * 9;
+        res += mIndicatorSpacing * 7;
+        res += 2 * getArrowSize();
 
-    	return (int)Math.floor(res);
+        return (int)Math.floor(res);
     }
 
     private int getMinHeight() {
-    	return (int)(mIndicatorHeight + getPaddingTop() + getPaddingBottom());
+        return (int)(mIndicatorHeight + getPaddingTop() + getPaddingBottom());
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-    	float x, y;
+        float x, y;
         super.onDraw(canvas);
 
         if ((canvas.getWidth() < getMinWidth())
-        		|| (canvas.getHeight() < getMinHeight())
-        		) {
-        	Log.d(TAG, "Canvas too small");
-        	return;
+                || (canvas.getHeight() < getMinHeight())
+                ) {
+            Log.d(TAG, "Canvas too small");
+            return;
         }
 
         x = getPaddingLeft();
@@ -202,39 +202,39 @@ public class StreamIndicatorsView extends View {
     }
 
     private void drawArrow(Canvas canvas, float x, float y) {
-    	canvas.drawText(ARROW, x, y+mIndicatorHeight/1.3f, mArrayPaint);
+        canvas.drawText(ARROW, x, y+mIndicatorHeight/1.3f, mArrayPaint);
     }
 
     private float getArrowSize() {
-    	return mArrayPaint.measureText(ARROW);
+        return mArrayPaint.measureText(ARROW);
     }
 
     private void drawIndicator(Canvas canvas, float x, float y, int status) {
-    	int color;
-    	switch (status) {
-    	case RtkServerStreamStatus.STATE_ERROR:
-    		color = DEFAULT_COLOR_STATE_ERROR;
-    		break;
-    	case RtkServerStreamStatus.STATE_CLOSE:
-    		color = DEFAULT_COLOR_STATE_CLOSE;
-    		break;
-    	case RtkServerStreamStatus.STATE_CONNECT:
-    		color = DEFAULT_COLOR_STATE_CONNECT;
-    		break;
-    	case RtkServerStreamStatus.STATE_ACTIVE:
-    		color = DEFAULT_COLOR_STATE_ACTIVE;
-    		break;
-    	case RtkServerStreamStatus.STATE_WAIT:
-    		color = DEFAULT_COLOR_STATE_WAIT;
-    		break;
-    	default:
-    		color = DEFAULT_COLOR_STATE_ERROR;
-    		break;
-    	}
+        int color;
+        switch (status) {
+        case RtkServerStreamStatus.STATE_ERROR:
+            color = DEFAULT_COLOR_STATE_ERROR;
+            break;
+        case RtkServerStreamStatus.STATE_CLOSE:
+            color = DEFAULT_COLOR_STATE_CLOSE;
+            break;
+        case RtkServerStreamStatus.STATE_CONNECT:
+            color = DEFAULT_COLOR_STATE_CONNECT;
+            break;
+        case RtkServerStreamStatus.STATE_ACTIVE:
+            color = DEFAULT_COLOR_STATE_ACTIVE;
+            break;
+        case RtkServerStreamStatus.STATE_WAIT:
+            color = DEFAULT_COLOR_STATE_WAIT;
+            break;
+        default:
+            color = DEFAULT_COLOR_STATE_ERROR;
+            break;
+        }
 
-    	mStreamIndicatorPaint.setColor(color);
-    	canvas.drawRect(x, y, x+mIndicatorWidth,
-    			y+mIndicatorHeight, mStreamIndicatorPaint);
+        mStreamIndicatorPaint.setColor(color);
+        canvas.drawRect(x, y, x+mIndicatorWidth,
+                y+mIndicatorHeight, mStreamIndicatorPaint);
     }
 
 
