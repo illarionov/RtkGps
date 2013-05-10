@@ -28,6 +28,10 @@ struct native_ctx_t {
    stream_t monistr;                       // monitor stream
 };
 
+
+static jboolean open_trace_file(JNIEnv* env, int trace_level, gtime_t timestamp);
+static jboolean open_solution_status_file(JNIEnv* env, int level, gtime_t timestamp);
+
 static void RtkServer__create(JNIEnv* env, jobject thiz)
 {
    struct native_ctx_t *nctx;
@@ -114,6 +118,8 @@ static jboolean RtkServer__start(JNIEnv* env, jclass thiz)
       LOGV("nctx is null");
       return JNI_FALSE;
    }
+
+
 
    if (!rtksvrstart(
 	    &nctx->rtksvr,
@@ -239,6 +245,19 @@ static jboolean RtkServer__rtksvrstart(JNIEnv* env, jclass thiz,
       goto rtksvrstart_end;
    }
 
+   {
+      /* Open trace / solution files */
+      gtime_t now;
+      now = timeget();
+      if (solopt[0].trace > 0)
+	 open_trace_file(env, solopt[0].trace, now);
+      if (solopt[0].sstat > 0)
+	 open_solution_status_file(env, solopt[0].sstat, now);
+   }
+
+   if ((*env)->ExceptionOccurred(env))
+      goto rtksvrstart_end;
+
    if (!rtksvrstart(
 	    &nctx->rtksvr,
 	    /* SvrCycle ms */ j_cycle,
@@ -256,7 +275,6 @@ static jboolean RtkServer__rtksvrstart(JNIEnv* env, jclass thiz,
 	    /* solution options */ solopt,
 	    /* monitor stream */ &nctx->monistr
 	    )) {
-      traceclose();
    }else {
       res = JNI_TRUE;
    }
@@ -276,6 +294,11 @@ rtksvrstart_end:
 	 (*env)->ReleaseStringUTFChars(env, rcvopts_jstring[i], rcvopts[i]);
    }
 
+   if (!res) {
+      traceclose();
+      rtkclosestat();
+   }
+
    return res;
 }
 
@@ -293,8 +316,80 @@ static void RtkServer__stop(JNIEnv* env, jclass thiz)
    }
 
    rtksvrstop(&nctx->rtksvr,cmds);
+
+   traceclose();
+   rtkclosestat();
 }
 
+
+static jboolean get_path_in_storage_dir(JNIEnv* env, char *filename, size_t bufsize)
+{
+   jclass clazz;
+   jmethodID get_path_in_dir_mid;
+   jstring j_filename;
+   jstring j_path;
+
+   clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServer");
+   if (clazz == NULL)
+      return JNI_FALSE;
+
+   get_path_in_dir_mid = (*env)->GetStaticMethodID(env, clazz, "getPathInStorageDirectory",
+	 "(Ljava/lang/String;)Ljava/lang/String;");
+   if (get_path_in_dir_mid == NULL)
+      return JNI_FALSE;
+
+   j_filename = (*env)->NewStringUTF(env, filename);
+   if (j_filename == NULL)
+      return JNI_FALSE;
+
+   j_path = (*env)->CallStaticObjectMethod(env, clazz, get_path_in_dir_mid, j_filename);
+   if (j_path == NULL)
+      return JNI_FALSE;
+
+   j_str2buf(env, j_path, filename, bufsize);
+
+}
+
+static jboolean open_trace_file(JNIEnv* env, int trace_level, gtime_t timestamp)
+{
+   double ep[6];
+   char filename[1024];
+
+   if (trace_level <= 0)
+      return JNI_FALSE;
+
+   time2epoch(utc2gpst(timestamp),ep);
+   sprintf(filename,"rtkgps_%04.0f%02.0f%02.0f%02.0f%02.0f%02.0f.trace",
+	 ep[0],ep[1],ep[2],ep[3],ep[4],ep[5]);
+   if (!get_path_in_storage_dir(env, filename, sizeof(filename)))
+      return JNI_FALSE;
+
+   LOGV("open_trace_file() %s", filename);
+   traceopen(filename);
+   tracelevel(trace_level);
+
+   return JNI_TRUE;
+}
+
+static jboolean open_solution_status_file(JNIEnv* env, int level, gtime_t timestamp)
+{
+   double ep[6];
+   char filename[1024];
+
+   if (level <= 0)
+      return JNI_FALSE;
+
+   time2epoch(utc2gpst(timestamp),ep);
+   sprintf(filename,"rtkgps_%04.0f%02.0f%02.0f%02.0f%02.0f%02.0f.stat",
+	 ep[0],ep[1],ep[2],ep[3],ep[4],ep[5]);
+   if (!get_path_in_storage_dir(env, filename, sizeof(filename)))
+      return JNI_FALSE;
+
+   LOGV("open_solution_status_file() %s", filename);
+   rtkopenstat(filename, level);
+
+   return JNI_TRUE;
+}
 
 static void RtkServer__get_stream_status(JNIEnv* env, jclass thiz, jobject status_obj)
 {

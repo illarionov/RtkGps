@@ -1,5 +1,12 @@
 package ru0xdc.rtklib;
 
+import java.io.File;
+
+import javax.annotation.Nonnull;
+
+import ru0xdc.rtkgps.MainActivity;
+
+
 
 
 public class RtkServer {
@@ -107,6 +114,12 @@ public class RtkServer {
         if (status == null) status = new RtkServerObservationStatus(receiver);
         _getObservationStatus(receiver, status.getNative());
         return status;
+    }
+
+    @Nonnull
+    // getPathInStorageDirectory() is used by native code, do not remove or rename
+    public static String getPathInStorageDirectory(@Nonnull String filename) {
+        return new File(MainActivity.getFileStorageDirectory(), filename).getAbsolutePath();
     }
 
 
