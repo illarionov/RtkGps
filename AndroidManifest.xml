@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -31,7 +32,14 @@
         </activity>
 
         <activity android:name=".settings.SettingsActivity" />
-        <service android:name=".RtkNaviService" />
+        <service 
+            android:name=".RtkNaviService"
+            android:exported="false" >
+			<intent-filter>
+			    <action android:name="ru0xdc.rtkgps.RtkNaviService.START" />
+                <action android:name="ru0xdc.rtkgps.RtkNaviService.STOP" />
+			</intent-filter>
+		</service>
 
         <activity
             android:name=".settings.StreamSettingsActivity"

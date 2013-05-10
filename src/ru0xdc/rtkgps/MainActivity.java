@@ -104,20 +104,15 @@ public class MainActivity extends Activity implements ActionBar.OnNavigationList
     }
 
     private void startRtkService() {
-        if (!mRtkServiceBound) {
-            final Intent intent = new Intent(this, RtkNaviService.class);
-            startService(intent);
-            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        }
+        final Intent intent = new Intent(RtkNaviService.ACTION_START);
+        intent.setClass(this, RtkNaviService.class);
+        startService(intent);
     }
 
     private void stopRtkService() {
-        if (mRtkServiceBound) {
-            mRtkService.stopSelf();
-            unbindService(mConnection);
-            mRtkServiceBound = false;
-            mRtkService = null;
-        }
+        final Intent intent = new Intent(RtkNaviService.ACTION_STOP);
+        intent.setClass(this, RtkNaviService.class);
+        startService(intent);
     }
 
     public RtkNaviService getRtkService() {
@@ -149,7 +144,7 @@ public class MainActivity extends Activity implements ActionBar.OnNavigationList
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean serviceActive = mRtkServiceBound;
+        boolean serviceActive = mRtkServiceBound && (mRtkService.isServiceStarted());
         menu.findItem(R.id.menu_start_service).setVisible(!serviceActive);
         menu.findItem(R.id.menu_stop_service).setVisible(serviceActive);
         return super.onPrepareOptionsMenu(menu);

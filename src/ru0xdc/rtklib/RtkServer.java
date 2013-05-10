@@ -88,6 +88,11 @@ public class RtkServer {
         return getObservationStatus(RtkServer.RECEIVER_EPHEM, status);
     }
 
+    /**
+     * @return Status: {@link RtkServerStreamStatus.STATE_CLOSE},
+     * {@link RtkServerStreamStatus.STATE_WAIT},
+     * {@link RtkServerStreamStatus.STATE_ACTIVE}.
+     */
     public int getStatus(){
         return mStatus;
     }
