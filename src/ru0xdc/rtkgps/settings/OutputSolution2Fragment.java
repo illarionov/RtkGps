@@ -11,6 +11,18 @@ public class OutputSolution2Fragment extends OutputSolution1Fragment {
 
     static final String SHARED_PREFS_NAME = "OutputSolution2";
 
+    private static final SettingsHelper.OutputStreamDefaults DEFAULTS = new SettingsHelper.OutputStreamDefaults();
+
+    static {
+        DEFAULTS
+            .setEnabled(false)
+            .setFileClientDefaults(
+                new StreamFileClientFragment.Value()
+                    .setFilename("solution2.pos")
+                );
+    }
+
+
     public OutputSolution2Fragment() {
         super();
     }
@@ -32,6 +44,6 @@ public class OutputSolution2Fragment extends OutputSolution1Fragment {
     }
 
     public static void setDefaultValues(Context ctx, boolean force) {
-        SettingsHelper.setOutputStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+        SettingsHelper.setOutputStreamDefaultValues(ctx, SHARED_PREFS_NAME, force, DEFAULTS);
     }
 }

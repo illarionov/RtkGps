@@ -43,6 +43,16 @@ public class OutputSolution1Fragment extends PreferenceFragment {
 
     private static final SolutionFormat DEFAULT_SOLUTION_FORMAT = SolutionFormat.LLH;
 
+    private static final SettingsHelper.OutputStreamDefaults DEFAULTS = new SettingsHelper.OutputStreamDefaults();
+
+    static {
+        DEFAULTS.setFileClientDefaults(
+                new StreamFileClientFragment.Value()
+                    .setFilename("solution1.pos")
+                );
+    }
+
+
     public OutputSolution1Fragment() {
         mPreferenceChangeListener = new PreferenceChangeListener();
     }
@@ -173,6 +183,6 @@ public class OutputSolution1Fragment extends PreferenceFragment {
     }
 
     public static void setDefaultValues(Context ctx, boolean force) {
-        SettingsHelper.setOutputStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+        SettingsHelper.setOutputStreamDefaultValues(ctx, SHARED_PREFS_NAME, force, DEFAULTS);
     }
 }

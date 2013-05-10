@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class StreamFileClientFragment extends PreferenceFragment {
@@ -21,11 +20,26 @@ public class StreamFileClientFragment extends PreferenceFragment {
 
     private static final String KEY_FILENAME = "stream_file_filename";
 
-    private final static String DEFAULT_FILENAME = "stream.log";
-
     private final PreferenceChangeListener mPreferenceChangeListener;
 
     private String mSharedPrefsName;
+
+
+    public static final class Value {
+        private String filename;
+
+        public static final String DEFAULT_FILENAME = "stream.log";
+
+        public Value() {
+            filename = DEFAULT_FILENAME;
+        }
+
+        public Value setFilename(@Nonnull String filename) {
+            if (filename == null) throw new NullPointerException();
+            this.filename = filename;
+            return this;
+        }
+    }
 
     public StreamFileClientFragment() {
         super();
@@ -63,10 +77,13 @@ public class StreamFileClientFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.stream_file_settings);
     }
 
-
-    public static void setDefaultValues(Context ctx, String sharedPrefsName, boolean force) {
-        PreferenceManager.setDefaultValues(ctx, sharedPrefsName,
-                Context.MODE_PRIVATE, R.xml.stream_file_settings, force);
+    public static void setDefaultValue(Context ctx, String sharedPrefsName, Value value) {
+        final SharedPreferences prefs;
+        prefs = ctx.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE);
+        prefs
+            .edit()
+            .putString(KEY_FILENAME, value.filename)
+            .apply();
     }
 
     @Override
@@ -108,7 +125,7 @@ public class StreamFileClientFragment extends PreferenceFragment {
         filename = prefs.getString(KEY_FILENAME, null);
         if (filename == null)  throw new IllegalStateException("setDefaultValues() must be called");
 
-        if (filename.length() == 0) filename = DEFAULT_FILENAME;
+        if (filename.length() == 0) filename = Value.DEFAULT_FILENAME;
 
         path =  (new File(MainActivity.getFileStorageDirectory(), filename)).getAbsolutePath();
 

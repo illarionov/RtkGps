@@ -39,9 +39,9 @@ public class InputRoverFragment extends PreferenceFragment {
         StreamType.FILE
     };
 
-    static final StreamType DEFAULT_STREAM_TYPE = StreamType.NTRIPCLI;
+    protected static final StreamType DEFAULT_STREAM_TYPE = StreamType.NTRIPCLI;
 
-    static final StreamFormat INPUT_STREAM_FORMATS[] = new StreamFormat[] {
+    protected static final StreamFormat INPUT_STREAM_FORMATS[] = new StreamFormat[] {
         StreamFormat.RTCM2,
         StreamFormat.RTCM3,
         StreamFormat.OEM3,
@@ -57,6 +57,15 @@ public class InputRoverFragment extends PreferenceFragment {
     };
 
     protected static final StreamFormat DEFAULT_STREAM_FORMAT = StreamFormat.RTCM3;
+
+    private static final SettingsHelper.InputStreamDefaults DEFAULTS = new SettingsHelper.InputStreamDefaults();
+
+    static {
+        DEFAULTS.setFileClientDefaults(
+                new StreamFileClientFragment.Value()
+                    .setFilename("input_rover.rtcm3")
+                );
+    }
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
@@ -167,7 +176,7 @@ public class InputRoverFragment extends PreferenceFragment {
     };
 
     public static void setDefaultValues(Context ctx, boolean force) {
-        SettingsHelper.setInputStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+        SettingsHelper.setInputStreamDefaultValues(ctx, SHARED_PREFS_NAME, force, DEFAULTS);
     }
 
     @Nonnull

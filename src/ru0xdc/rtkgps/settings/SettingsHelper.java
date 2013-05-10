@@ -16,9 +16,97 @@ import android.content.SharedPreferences;
 
 public class SettingsHelper {
 
-    public static void setDefaultValues(Context ctx, boolean force) {
 
-        // XXX SuolutionOutputFragment
+    static class StreamDefaultsBase {
+
+        protected boolean enable;
+        protected StreamType type;
+        protected StreamFileClientFragment.Value fileClientDefaults;
+        protected StreamNtripClientFragment.Value ntripClientDefaults;
+        protected StreamTcpClientFragment.Value tcpClientDefaults;
+
+        public StreamDefaultsBase() {
+            enable = true;
+            type = StreamType.NTRIPCLI;
+            fileClientDefaults = new StreamFileClientFragment.Value();
+            ntripClientDefaults = new StreamNtripClientFragment.Value();
+            tcpClientDefaults = new StreamTcpClientFragment.Value();
+        }
+
+        public StreamDefaultsBase setEnabled(boolean enabled) {
+            enable = enabled;
+            return this;
+        }
+
+        public StreamDefaultsBase setType(StreamType type) {
+            this.type = type;
+            return this;
+        }
+
+        public StreamDefaultsBase setFileClientDefaults(StreamFileClientFragment.Value defaults) {
+            this.fileClientDefaults = defaults;
+            return this;
+        }
+
+        public StreamDefaultsBase setNtripClientDEfaults(StreamNtripClientFragment.Value defaults) {
+            this.ntripClientDefaults = defaults;
+            return this;
+        }
+
+        public StreamDefaultsBase setTcpClientDefaults(StreamTcpClientFragment.Value defaults) {
+            this.tcpClientDefaults = defaults;
+            return this;
+        }
+    }
+
+    static class InputStreamDefaults extends StreamDefaultsBase {
+
+        private StreamFormat format;
+        private String commandsAtStartup;
+        private String commandsAtShutdown;
+        private String receiverOption;
+
+        public InputStreamDefaults() {
+            super();
+            format = StreamFormat.RTCM3;
+            commandsAtStartup = "";
+            commandsAtShutdown = "";
+            receiverOption = "";
+        }
+
+        public InputStreamDefaults setFormat(StreamFormat format) {
+            this.format = format;
+            return this;
+        }
+
+    }
+
+    static class OutputStreamDefaults extends StreamDefaultsBase {
+
+        private SolutionFormat format;
+
+        public OutputStreamDefaults() {
+            super();
+            type = StreamType.FILE;
+            format = SolutionFormat.LLH;
+        }
+
+        public OutputStreamDefaults setFormat(SolutionFormat format) {
+            this.format = format;
+            return this;
+        }
+    }
+
+    static class LogStreamDefaults extends StreamDefaultsBase {
+
+        public LogStreamDefaults() {
+            super();
+            type = StreamType.FILE;
+        }
+    }
+
+
+    public static void setDefaultValues(Context ctx, boolean force) {
 
         ProcessingOptions1Fragment.setDefaultValues(ctx, force);
         InputRoverFragment.setDefaultValues(ctx, force);
@@ -60,7 +148,11 @@ public class SettingsHelper {
         return settings;
     }
 
-    static void setInputStreamDefaultValues(Context ctx, String sharedPrefsName, boolean force) {
+    static void setInputStreamDefaultValues(Context ctx,
+            String sharedPrefsName,
+            boolean force,
+            InputStreamDefaults defaults
+            ) {
         final SharedPreferences prefs;
 
         prefs = ctx.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE);
@@ -69,22 +161,23 @@ public class SettingsHelper {
 
         if (needUpdate) {
             SharedPreferences.Editor e = prefs.edit();
-            e.putBoolean(InputRoverFragment.KEY_ENABLE, false)
-            .putString(InputRoverFragment.KEY_TYPE, StreamType.NTRIPCLI.name())
-            .putString(InputRoverFragment.KEY_FORMAT, StreamFormat.RTCM3.name())
-            .putString(InputRoverFragment.KEY_COMMANDS_AT_STARTUP, "")
-            .putString(InputRoverFragment.KEY_COMMANDS_AT_SHUTDOWN, "")
-            .putString(InputRoverFragment.KEY_RECEIVER_OPTION, "")
+            e.putBoolean(InputRoverFragment.KEY_ENABLE, defaults.enable)
+            .putString(InputRoverFragment.KEY_TYPE, defaults.type.name())
+            .putString(InputRoverFragment.KEY_FORMAT, defaults.format.name())
+            .putString(InputRoverFragment.KEY_COMMANDS_AT_STARTUP, defaults.commandsAtStartup)
+            .putString(InputRoverFragment.KEY_COMMANDS_AT_SHUTDOWN, defaults.commandsAtShutdown)
+            .putString(InputRoverFragment.KEY_RECEIVER_OPTION, defaults.receiverOption)
             ;
             e.commit();
 
-            StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
-            StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
-            StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+            StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
+            StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
+            StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.tcpClientDefaults);
         }
     }
 
-    static void setOutputStreamDefaultValues(Context ctx, String sharedPrefsName, boolean force) {
+    static void setOutputStreamDefaultValues(Context ctx, String sharedPrefsName, boolean force,
+            OutputStreamDefaults defaults) {
         final SharedPreferences prefs;
 
         prefs = ctx.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE);
@@ -93,18 +186,18 @@ public class SettingsHelper {
 
         if (needUpdate) {
             SharedPreferences.Editor e = prefs.edit();
-            e.putBoolean(OutputSolution1Fragment.KEY_ENABLE, false)
-            .putString(OutputSolution1Fragment.KEY_TYPE, StreamType.NTRIPCLI.name())
-            .putString(OutputSolution1Fragment.KEY_FORMAT, SolutionFormat.LLH.name())
+            e.putBoolean(OutputSolution1Fragment.KEY_ENABLE, defaults.enable)
+            .putString(OutputSolution1Fragment.KEY_TYPE, defaults.type.name())
+            .putString(OutputSolution1Fragment.KEY_FORMAT, defaults.format.name())
             ;
             e.commit();
-            StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
-            StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
-            StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+            StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
+            StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
+            StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName,  defaults.tcpClientDefaults);
         }
     }
 
-    static void setLogStreamDefaultValues(Context ctx, String sharedPrefsName, boolean force) {
+    static void setLogStreamDefaultValues(Context ctx, String sharedPrefsName, boolean force, LogStreamDefaults defaults) {
         final SharedPreferences prefs;
 
         prefs = ctx.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE);
@@ -113,13 +206,13 @@ public class SettingsHelper {
 
         if (needUpdate) {
             SharedPreferences.Editor e = prefs.edit();
-            e.putBoolean(LogRoverFragment.KEY_ENABLE, false)
-            .putString(LogRoverFragment.KEY_TYPE, StreamType.NTRIPCLI.name())
+            e.putBoolean(LogRoverFragment.KEY_ENABLE, defaults.enable)
+            .putString(LogRoverFragment.KEY_TYPE, defaults.type.name())
             ;
             e.commit();
-            StreamFileClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
-            StreamNtripClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
-            StreamTcpClientFragment.setDefaultValues(ctx, sharedPrefsName, true);
+            StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
+            StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
+            StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.tcpClientDefaults);
         }
 
     }

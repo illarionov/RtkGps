@@ -202,7 +202,7 @@ ActionBar.TabListener {
                 fragment = new OutputSolution1Fragment();
                 break;
             case 1:
-                fragment = new OutputSolution1Fragment();
+                fragment = new OutputSolution2Fragment();
                 break;
             default:
                 throw new IllegalStateException();

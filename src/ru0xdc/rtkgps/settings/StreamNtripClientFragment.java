@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -27,6 +26,59 @@ public class StreamNtripClientFragment extends PreferenceFragment {
     private final PreferenceChangeListener mPreferenceChangeListener;
 
     private String mSharedPrefsName;
+
+    public static final class Value {
+        private String host;
+        private int port;
+        private String mountpoint;
+        private String user;
+        private String password;
+
+        public static final String DEFAULT_HOST = "gps.0xdc.ru";
+        public static final int DEFULT_PORT = 2101;
+        public static final String DEFAULT_MOUNTPOUNT = "gag27-rtcm";
+        public static final String DEFAULT_USER = "osm";
+        public static final String DEFAULT_PASSWORD = "osm";
+
+        public Value() {
+            host = DEFAULT_HOST;
+            port = DEFULT_PORT;
+            mountpoint = DEFAULT_MOUNTPOUNT;
+            user = DEFAULT_USER;
+            password = DEFAULT_PASSWORD;
+        }
+
+        public Value setHost(@Nonnull String host) {
+            if (host == null) throw new NullPointerException();
+            this.host = host;
+            return this;
+        }
+
+        public Value setPort(int port) {
+            if (port <= 0 || port > 65535) throw new IllegalArgumentException();
+            this.port = port;
+            return this;
+        }
+
+        public Value setMountpoint(@Nonnull String mountpoint) {
+            if (mountpoint == null) throw new NullPointerException();
+            this.mountpoint = mountpoint;
+            return this;
+        }
+
+        public Value setUser(@Nonnull String user) {
+            if (user == null) throw new NullPointerException();
+            this.user = user;
+            return this;
+        }
+
+        public Value setPassword(@Nonnull String password) {
+            if (password == null) throw new NullPointerException();
+            this.password = password;
+            return this;
+        }
+
+    }
 
     public StreamNtripClientFragment() {
         super();
@@ -64,9 +116,17 @@ public class StreamNtripClientFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.stream_ntrip_client_settings);
     }
 
-    public static void setDefaultValues(Context ctx, String sharedPrefsName, boolean force) {
-        PreferenceManager.setDefaultValues(ctx, sharedPrefsName,
-                Context.MODE_PRIVATE, R.xml.stream_ntrip_client_settings, force);
+    public static void setDefaultValue(Context ctx, String sharedPrefsName, Value value) {
+        final SharedPreferences prefs;
+        prefs = ctx.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE);
+
+        prefs.edit()
+            .putString(KEY_HOST, value.host)
+            .putString(KEY_PORT, String.valueOf(value.port))
+            .putString(KEY_MOUNTPOINT, value.mountpoint)
+            .putString(KEY_USER, value.user)
+            .putString(KEY_PASSWORD, value.password)
+            .apply();
     }
 
     @Override

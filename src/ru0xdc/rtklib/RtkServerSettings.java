@@ -187,11 +187,6 @@ public class RtkServerSettings {
 
     private final static int DEFAULT_NMEA_REQUEST_CYCLE = 1000;
 
-    private final static InputStream DEFAULT_INPUT_ROVER = new InputStream(
-            StreamType.NTRIPCLI,
-            "osm:osm@gps.0xdc.ru:2101/gag27-rtcm:",
-            StreamFormat.RTCM3
-            );
 
     /** server cycle (ms) */
     private int mServerCycleMs;
@@ -230,7 +225,7 @@ public class RtkServerSettings {
         mNmeaRequestCycle = DEFAULT_NMEA_REQUEST_CYCLE;
         mProcessingOptions = new ProcessingOptions();
         mProcessingOptions.setPositioningMode(PositioningMode.PPP_STATIC);
-        mInputRover = new InputStream(DEFAULT_INPUT_ROVER);
+        mInputRover = new InputStream();
         mInputBase = new InputStream();
         mInputCorrection = new InputStream();
         mOutputSolution1 = new OutputStream();

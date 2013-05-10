@@ -28,6 +28,17 @@ public class LogRoverFragment extends PreferenceFragment {
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
+    private static final SettingsHelper.LogStreamDefaults DEFAULTS = new SettingsHelper.LogStreamDefaults();
+
+    static {
+        DEFAULTS
+            .setFileClientDefaults(
+                new StreamFileClientFragment.Value()
+                    .setFilename("rover.log")
+                );
+    }
+
+
     public LogRoverFragment() {
         mPreferenceChangeListener = new PreferenceChangeListener();
     }
@@ -128,7 +139,7 @@ public class LogRoverFragment extends PreferenceFragment {
     }
 
     public static void setDefaultValues(Context ctx, boolean force) {
-        SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+        SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force, DEFAULTS);
     }
 
 }

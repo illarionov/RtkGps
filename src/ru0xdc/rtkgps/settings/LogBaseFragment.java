@@ -11,6 +11,18 @@ public class LogBaseFragment extends LogRoverFragment {
 
     static final String SHARED_PREFS_NAME = "LogBase";
 
+    private static final SettingsHelper.LogStreamDefaults DEFAULTS = new SettingsHelper.LogStreamDefaults();
+
+    static {
+        DEFAULTS
+            .setEnabled(false)
+            .setFileClientDefaults(
+                new StreamFileClientFragment.Value()
+                    .setFilename("base.log")
+                );
+    }
+
+
     public LogBaseFragment() {
         super();
     }
@@ -32,7 +44,7 @@ public class LogBaseFragment extends LogRoverFragment {
     }
 
     public static void setDefaultValues(Context ctx, boolean force) {
-        SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+        SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force, DEFAULTS);
     }
 
 }

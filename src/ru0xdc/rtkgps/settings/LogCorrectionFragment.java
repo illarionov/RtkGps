@@ -10,6 +10,18 @@ public class LogCorrectionFragment extends LogRoverFragment {
 
     static final String SHARED_PREFS_NAME = "LogCorrection";
 
+    private static final SettingsHelper.LogStreamDefaults DEFAULTS = new SettingsHelper.LogStreamDefaults();
+
+    static {
+        DEFAULTS
+            .setEnabled(false)
+            .setFileClientDefaults(
+                new StreamFileClientFragment.Value()
+                    .setFilename("correction.log")
+                );
+    }
+
+
     public LogCorrectionFragment() {
         super();
     }
@@ -31,7 +43,7 @@ public class LogCorrectionFragment extends LogRoverFragment {
     }
 
     public static void setDefaultValues(Context ctx, boolean force) {
-        SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+        SettingsHelper.setLogStreamDefaultValues(ctx, SHARED_PREFS_NAME, force, DEFAULTS);
     }
 
 }

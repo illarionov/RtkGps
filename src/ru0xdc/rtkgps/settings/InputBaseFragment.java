@@ -28,6 +28,17 @@ public class InputBaseFragment extends InputRoverFragment {
     protected static final String KEY_TRANSMIT_GPGGA_LAT = "transmit_gpgga_latitude";
     protected static final String KEY_TRANSMIT_GPGGA_LON = "transmit_gpgga_longitude";
 
+    private static final SettingsHelper.InputStreamDefaults DEFAULTS = new SettingsHelper.InputStreamDefaults();
+
+    static {
+        DEFAULTS
+        .setEnabled(false)
+        .setFileClientDefaults(
+            new StreamFileClientFragment.Value()
+                .setFilename("input_base.rtcm3")
+            );
+    }
+
     public InputBaseFragment() {
         super();
     }
@@ -102,7 +113,7 @@ public class InputBaseFragment extends InputRoverFragment {
     public static void setDefaultValues(Context ctx, boolean force) {
         final SharedPreferences prefs;
 
-        SettingsHelper.setInputStreamDefaultValues(ctx, SHARED_PREFS_NAME, force);
+        SettingsHelper.setInputStreamDefaultValues(ctx, SHARED_PREFS_NAME, force, DEFAULTS);
 
         prefs = ctx.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
 

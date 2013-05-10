@@ -5,14 +5,12 @@
         android:key="stream_tcp_client_host"
         android:title="@string/tcp_client_host_title"
         android:inputType="textUri"
-        android:defaultValue=""
         />
     
     <EditTextPreference
         android:key="stream_tcp_client_port"
         android:title="@string/tcp_client_port_title"
         android:inputType="number"
-        android:defaultValue="1020"
         />
     
 

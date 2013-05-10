@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 
@@ -23,6 +22,32 @@ public class StreamTcpClientFragment extends PreferenceFragment {
     private final PreferenceChangeListener mPreferenceChangeListener;
 
     private String mSharedPrefsName;
+
+    public static final class Value {
+        private String host;
+        private int port;
+
+        public static final String DEFAULT_HOST = "localhost";
+        public static final int DEFULT_PORT = 1020;
+
+        public Value() {
+            host = DEFAULT_HOST;
+            port = DEFULT_PORT;
+        }
+
+        public Value setHost(@Nonnull String host) {
+            if (host == null) throw new NullPointerException();
+            this.host = host;
+            return this;
+        }
+
+        public Value setPort(int port) {
+            if (port <= 0 || port > 65535) throw new IllegalArgumentException();
+            this.port = port;
+            return this;
+        }
+    }
+
 
     public StreamTcpClientFragment() {
         super();
@@ -60,9 +85,14 @@ public class StreamTcpClientFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.stream_tcp_client_settings);
     }
 
-    public static void setDefaultValues(Context ctx, String sharedPrefsName, boolean force) {
-        PreferenceManager.setDefaultValues(ctx, sharedPrefsName,
-                Context.MODE_PRIVATE, R.xml.stream_tcp_client_settings, force);
+    public static void setDefaultValue(Context ctx, String sharedPrefsName, Value value) {
+        final SharedPreferences prefs;
+        prefs = ctx.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE);
+
+        prefs.edit()
+            .putString(KEY_HOST, value.host)
+            .putString(KEY_PORT, String.valueOf(value.port))
+            .apply();
     }
 
     @Override
