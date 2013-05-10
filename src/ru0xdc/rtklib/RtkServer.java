@@ -40,8 +40,6 @@ public class RtkServer {
     public boolean start() {
         final boolean started;
 
-        // started = _start();
-
         started = _rtksvrstart(
                 mSettings.getServerCycleMs(),
                 mSettings.getBufferSize(),
@@ -128,8 +126,6 @@ public class RtkServer {
         _destroy();
         super.finalize();
     }
-
-    private native boolean _start();
 
     private native void _stop();
 

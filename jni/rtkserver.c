@@ -70,82 +70,6 @@ static void RtkServer__destroy(JNIEnv* env, jobject thiz)
    (*env)->SetLongField(env, thiz, m_object_field, 0L);
 }
 
-static jboolean RtkServer__start(JNIEnv* env, jclass thiz)
-{
-   struct native_ctx_t *nctx;
-
-   /* Input stream types */
-   int strs[MAXSTRRTK] = {
-      STR_NTRIPCLI, STR_NONE, STR_NONE,
-      STR_NONE, STR_NONE,
-      STR_NONE, STR_NONE, STR_NONE,
-   };
-
-   /* input stream paths */
-   char *paths[8] = {"osm:osm@gps.0xdc.ru:2101/gag27-rtcm:", "", "",
-      "", "", "", "", ""};
-
-   /* input stream formats (STRFMT_???) */
-   int format[3] = {STRFMT_RTCM3, STRFMT_RTCM3, STRFMT_RTCM3};
-
-   /* input stream start commands */
-   char *cmds[3] = {NULL, NULL, NULL};
-
-   /* receiver options */
-   char *rcvopts[3] = {"", "", ""};
-
-   /* rtk processing options */
-   prcopt_t prcopt;
-
-   /* solution options */
-   solopt_t solopt[3];
-
-   /* nmea position */
-   double nmeapos[3] = {0.0, };
-
-   prcopt = prcopt_default;
-   prcopt.mode = PMODE_PPP_STATIC;
-
-   bzero(&solopt[0], sizeof(solopt_t));
-   bzero(&solopt[1], sizeof(solopt_t));
-   solopt[1] = solopt_default;
-   solopt[2] = solopt_default;
-
-   LOGV("RtkServer__start()");
-
-   nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
-   if (nctx == NULL) {
-      LOGV("nctx is null");
-      return JNI_FALSE;
-   }
-
-
-
-   if (!rtksvrstart(
-	    &nctx->rtksvr,
-	    /* SvrCycle ms */ 10,
-	    /* SvrBuffSize */ 32768,
-	    /* stream types */ strs,
-	    /* paths */ paths,
-	    /* input stream format */ format,
-	    /* NavSelect */ 0,
-	    /* input stream start commands */ cmds,
-	    /* receiver options */ rcvopts,
-	    /* nmea request cycle ms */ 1000,
-	    /* nmea request type */ 1,
-	    /* transmitted nmea position  */ nmeapos,
-	    /* rtk processing options */&prcopt,
-	    /* solution options */ solopt,
-	    /* monitor stream */ &nctx->monistr
-	    )) {
-      traceclose();
-      return JNI_FALSE;
-   }
-
-   return JNI_TRUE;
-}
-
-
 static jboolean RtkServer__rtksvrstart(JNIEnv* env, jclass thiz,
       jint j_cycle,
       jint j_buffsize,
@@ -677,7 +601,6 @@ static void RtkServer__get_rtk_status(JNIEnv* env, jclass thiz, jobject j_rtk_co
 static JNINativeMethod nativeMethods[] = {
    {"_create", "()V", (void*)RtkServer__create},
    {"_destroy", "()V", (void*)RtkServer__destroy},
-   {"_start", "()Z", (void*)RtkServer__start},
    {"_rtksvrstart", "("
 	 "I"
 	 "I"
