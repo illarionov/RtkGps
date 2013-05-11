@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <Preference
+        android:key="stream_bluetooth_system_settings"
+        android:title="@string/bluetooth_system_settings_title"
+        android:summary="@string/bluetooth_system_settings_summary"
+        android:persistent="false">
+        <intent
+            android:action="android.settings.BLUETOOTH_SETTINGS" />
+    </Preference>
+    
+    <ListPreference
+        android:key="stream_bluetooth_address"
+        android:title="@string/bluetooth_device_address_title"
+        android:defaultValue=""
+        />    
+
+</PreferenceScreen>

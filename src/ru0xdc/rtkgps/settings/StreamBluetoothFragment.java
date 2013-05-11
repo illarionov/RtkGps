@@ -1,55 +1,52 @@
 package ru0xdc.rtkgps.settings;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtkgps.MainActivity;
 import ru0xdc.rtkgps.R;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
+import android.text.TextUtils;
 import android.util.Log;
 
-
-public class StreamTcpClientFragment extends PreferenceFragment {
+public class StreamBluetoothFragment extends PreferenceFragment {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
-    private static final String KEY_HOST = "stream_tcp_client_host";
-    private static final String KEY_PORT = "stream_tcp_client_port";
+    private static final String KEY_DEVICE_ADDRESS = "stream_bluetooth_address";
+    private static final String KEY_DEVICE_NAME = "stream_bluetooth_name";
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
     private String mSharedPrefsName;
 
     public static final class Value {
-        private String host;
-        private int port;
 
-        public static final String DEFAULT_HOST = "localhost";
-        public static final int DEFULT_PORT = 1020;
+        public static final String ADDRESS_DEVICE_IS_NOT_SELECTED = "";
+
+        private String address;
+        private String name;
 
         public Value() {
-            host = DEFAULT_HOST;
-            port = DEFULT_PORT;
+            address = ADDRESS_DEVICE_IS_NOT_SELECTED;
+            name = ADDRESS_DEVICE_IS_NOT_SELECTED;
         }
 
-        public Value setHost(@Nonnull String host) {
-            if (host == null) throw new NullPointerException();
-            this.host = host;
-            return this;
-        }
-
-        public Value setPort(int port) {
-            if (port <= 0 || port > 65535) throw new IllegalArgumentException();
-            this.port = port;
+        public Value setAddress(@Nonnull String address) {
+            if (address == null) throw new NullPointerException();
+            this.address = address;
+            this.name = address;
             return this;
         }
     }
 
-
-    public StreamTcpClientFragment() {
+    public StreamBluetoothFragment() {
         super();
         mPreferenceChangeListener = new PreferenceChangeListener();
         mSharedPrefsName = StreamNtripClientFragment.class.getSimpleName();
@@ -76,16 +73,16 @@ public class StreamTcpClientFragment extends PreferenceFragment {
 
     protected void initPreferenceScreen() {
         if (DBG) Log.v(mSharedPrefsName, "initPreferenceScreen()");
-        addPreferencesFromResource(R.xml.stream_tcp_client_settings);
+        addPreferencesFromResource(R.xml.stream_bluetooth_settings);
     }
 
     public static void setDefaultValue(Context ctx, String sharedPrefsName, Value value) {
         final SharedPreferences prefs;
         prefs = ctx.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE);
-
-        prefs.edit()
-            .putString(KEY_HOST, value.host)
-            .putString(KEY_PORT, String.valueOf(value.port))
+        prefs
+            .edit()
+            .putString(KEY_DEVICE_NAME, value.name)
+            .putString(KEY_DEVICE_ADDRESS, value.address)
             .apply();
     }
 
@@ -105,13 +102,11 @@ public class StreamTcpClientFragment extends PreferenceFragment {
     }
 
     void reloadSummaries() {
-        EditTextPreference etp;
+        ListPreference pref;
 
-        etp = (EditTextPreference) findPreference(KEY_HOST);
-        etp.setSummary(etp.getText());
+        pref = (ListPreference) findPreference(KEY_DEVICE_ADDRESS);
+        pref.setSummary(getSummary(getResources(), pref.getEntry()));
 
-        etp = (EditTextPreference) findPreference(KEY_PORT);
-        etp.setSummary(etp.getText());
     }
 
     private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -123,19 +118,35 @@ public class StreamTcpClientFragment extends PreferenceFragment {
     };
 
     @Nonnull
-    public static String readPath(SharedPreferences prefs) {
-        return StreamNtripClientFragment.encodeNtripTcpPath(
-                null,
-                null,
-                prefs.getString(KEY_HOST, ""),
-                prefs.getString(KEY_PORT, ""),
-                null,
-                null
-                );
+    public static String bluetoothLocalSocketName(@Nonnull String address) {
+        return "bluetooth_" + address.replaceAll("\\W", "_");
     }
 
-    public static String readSummary(SharedPreferences prefs) {
-        return "tcp:" + readPath(prefs);
+    @Nonnull
+    public static String readPath(Context context, SharedPreferences prefs) {
+        String path;
+        String address;
+
+        address = prefs.getString(KEY_DEVICE_ADDRESS, null);
+        if (address == null)  throw new IllegalStateException("setDefaultValues() must be called");
+
+        path = MainActivity.getLocalSocketPath(context, bluetoothLocalSocketName(address)).getAbsolutePath();
+
+        if (DBG) Log.v("StreamFileClientFragment", "bluetooth socket path: " + path);
+
+        return path;
+    }
+
+    private static String getSummary(Resources r, @Nullable CharSequence deviceName) {
+        if (TextUtils.isEmpty(deviceName)) {
+            deviceName = r.getString(R.string.bluetooth_device_not_selected);
+        }
+        return "Bluetooth: " + deviceName;
+    }
+
+    public static String readSummary(Resources r, SharedPreferences prefs) {
+        String name=prefs.getString(KEY_DEVICE_NAME, "");
+        return getSummary(r, name);
     }
 
 

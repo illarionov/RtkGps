@@ -66,12 +66,6 @@ public class StreamFileClientFragment extends PreferenceFragment {
         initPreferenceScreen();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getActivity().setTitle(R.string.file_dialog_title);
-    }
-
     protected void initPreferenceScreen() {
         if (DBG) Log.v(mSharedPrefsName, "initPreferenceScreen()");
         addPreferencesFromResource(R.xml.stream_file_settings);

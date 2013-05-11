@@ -120,7 +120,7 @@ public class LogRoverFragment extends PreferenceFragment {
         typePref.setSummary(getString(typePref.getValueT().getNameResId()));
 
         settingsPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
-        settingsPref.setSummary(SettingsHelper.readLogStreamSumary(getPreferenceManager().getSharedPreferences()));
+        settingsPref.setSummary(SettingsHelper.readLogStreamSumary(getResources(), getPreferenceManager().getSharedPreferences()));
 
 
     }

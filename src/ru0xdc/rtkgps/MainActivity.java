@@ -228,6 +228,12 @@ public class MainActivity extends Activity implements ActionBar.OnNavigationList
         return new File(Environment.getExternalStorageDirectory(), "RtkGps/");
     }
 
+    @Nonnull
+    public static File getLocalSocketPath(Context ctx, String socketName) {
+        return ctx.getFileStreamPath(socketName);
+    }
+
+
     static {
         System.loadLibrary("rtkgps");
     }

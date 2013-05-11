@@ -13,6 +13,7 @@ import ru0xdc.rtklib.constants.StreamFormat;
 import ru0xdc.rtklib.constants.StreamType;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 
 public class SettingsHelper {
 
@@ -24,6 +25,7 @@ public class SettingsHelper {
         protected StreamFileClientFragment.Value fileClientDefaults;
         protected StreamNtripClientFragment.Value ntripClientDefaults;
         protected StreamTcpClientFragment.Value tcpClientDefaults;
+        protected StreamBluetoothFragment.Value bluetoothDefaults;
 
         public StreamDefaultsBase() {
             enable = true;
@@ -31,6 +33,7 @@ public class SettingsHelper {
             fileClientDefaults = new StreamFileClientFragment.Value();
             ntripClientDefaults = new StreamNtripClientFragment.Value();
             tcpClientDefaults = new StreamTcpClientFragment.Value();
+            bluetoothDefaults = new StreamBluetoothFragment.Value();
         }
 
         public StreamDefaultsBase setEnabled(boolean enabled) {
@@ -173,6 +176,7 @@ public class SettingsHelper {
             StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
             StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
             StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.tcpClientDefaults);
+            StreamBluetoothFragment.setDefaultValue(ctx, sharedPrefsName, defaults.bluetoothDefaults);
         }
     }
 
@@ -194,6 +198,7 @@ public class SettingsHelper {
             StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
             StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
             StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName,  defaults.tcpClientDefaults);
+            StreamBluetoothFragment.setDefaultValue(ctx, sharedPrefsName, defaults.bluetoothDefaults);
         }
     }
 
@@ -241,7 +246,7 @@ public class SettingsHelper {
         .setReceiverOption(prefs.getString(InputRoverFragment.KEY_RECEIVER_OPTION, ""))
         ;
 
-        stream.setPath(readStreamPath(type, prefs));
+        stream.setPath(readStreamPath(ctx, type, prefs));
 
         return stream;
     }
@@ -270,7 +275,7 @@ public class SettingsHelper {
         .setSolutionFormat(SolutionFormat.valueOf(prefs.getString(OutputSolution1Fragment.KEY_FORMAT,SolutionFormat.NMEA.name())))
         ;
 
-        stream.setPath(readStreamPath(type, prefs));
+        stream.setPath(readStreamPath(ctx, type, prefs));
 
         return stream;
     }
@@ -294,13 +299,13 @@ public class SettingsHelper {
         type = StreamType.valueOf(prefs.getString(LogRoverFragment.KEY_TYPE, null));
         stream.setType(type);
 
-        stream.setPath(readStreamPath(type, prefs));
+        stream.setPath(readStreamPath(ctx, type, prefs));
 
         return stream;
     }
 
     @Nonnull
-    static String readStreamPath(StreamType type, SharedPreferences prefs) {
+    static String readStreamPath(Context context, StreamType type, SharedPreferences prefs) {
         String path;
 
         switch(type) {
@@ -313,6 +318,12 @@ public class SettingsHelper {
         case TCPCLI:
             path = StreamTcpClientFragment.readPath(prefs);
             break;
+        case BLUETOOTH:
+            path = StreamBluetoothFragment.readPath(context, prefs);
+            break;
+        case USB:
+            path = StreamUsbFragment.readPath(context, prefs);
+            break;
         case NONE:
             path="";
             break;
@@ -323,28 +334,28 @@ public class SettingsHelper {
     }
 
     @Nonnull
-    static String readInputStreamSumary(SharedPreferences prefs) {
+    static String readInputStreamSumary(Resources resources, SharedPreferences prefs) {
         StreamType type;
         type = StreamType.valueOf(prefs.getString(InputRoverFragment.KEY_TYPE, StreamType.NONE.name()));
-        return readStreamSummary(type, prefs);
+        return readStreamSummary(resources,type, prefs);
     }
 
     @Nonnull
-    static String readOutputStreamSumary(SharedPreferences prefs) {
+    static String readOutputStreamSumary(Resources resources, SharedPreferences prefs) {
         StreamType type;
         type = StreamType.valueOf(prefs.getString(OutputSolution1Fragment.KEY_TYPE, StreamType.NONE.name()));
-        return readStreamSummary(type, prefs);
+        return readStreamSummary(resources, type, prefs);
     }
 
     @Nonnull
-    static String readLogStreamSumary(SharedPreferences prefs) {
+    static String readLogStreamSumary(Resources resources, SharedPreferences prefs) {
         StreamType type;
         type = StreamType.valueOf(prefs.getString(LogRoverFragment.KEY_TYPE, StreamType.NONE.name()));
-        return readStreamSummary(type, prefs);
+        return readStreamSummary(resources, type, prefs);
     }
 
     @Nonnull
-    static String readStreamSummary(StreamType type, SharedPreferences prefs) {
+    static String readStreamSummary(Resources resources, StreamType type, SharedPreferences prefs) {
         String summary;
         switch(type) {
         case FILE:
@@ -355,6 +366,12 @@ public class SettingsHelper {
             break;
         case TCPCLI:
             summary = StreamTcpClientFragment.readSummary(prefs);
+            break;
+        case BLUETOOTH:
+            summary = StreamBluetoothFragment.readSummary(resources, prefs);
+            break;
+        case USB:
+            summary = StreamUsbFragment.readSummary(resources, prefs);
             break;
         case NONE:
             summary="";

@@ -105,12 +105,6 @@ public class StreamNtripClientFragment extends PreferenceFragment {
         initPreferenceScreen();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getActivity().setTitle(R.string.ntrip_client_dialog_title);
-    }
-
     protected void initPreferenceScreen() {
         if (DBG) Log.v(mSharedPrefsName, "initPreferenceScreen()");
         addPreferencesFromResource(R.xml.stream_ntrip_client_settings);

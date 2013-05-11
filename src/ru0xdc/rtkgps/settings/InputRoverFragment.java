@@ -34,12 +34,14 @@ public class InputRoverFragment extends PreferenceFragment {
     protected static final String KEY_RECEIVER_OPTION = "receiver_option";
 
     static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
+        StreamType.BLUETOOTH,
+        StreamType.USB,
         StreamType.TCPCLI,
         StreamType.NTRIPCLI,
         StreamType.FILE
     };
 
-    protected static final StreamType DEFAULT_STREAM_TYPE = StreamType.NTRIPCLI;
+    protected static final StreamType DEFAULT_STREAM_TYPE = StreamType.BLUETOOTH;
 
     protected static final StreamFormat INPUT_STREAM_FORMATS[] = new StreamFormat[] {
         StreamFormat.RTCM2,
@@ -164,7 +166,7 @@ public class InputRoverFragment extends PreferenceFragment {
         startupCommandsPref.setSummary(startupCommandsPref.getText());
         shutdownCommandsPref.setSummary(shutdownCommandsPref.getText());
         receiverOptionPref.setSummary(receiverOptionPref.getText());
-        settingsButtonPref.setSummary(SettingsHelper.readInputStreamSumary(getPreferenceManager().getSharedPreferences()));
+        settingsButtonPref.setSummary(SettingsHelper.readInputStreamSumary(getResources(), getPreferenceManager().getSharedPreferences()));
     }
 
     private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {

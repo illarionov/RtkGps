@@ -145,7 +145,7 @@ public class OutputSolution1Fragment extends PreferenceFragment {
         formatPref.setSummary(getString(formatPref.getValueT().getNameResId()));
 
         settingsPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
-        settingsPref.setSummary(SettingsHelper.readOutputStreamSumary(getPreferenceManager().getSharedPreferences()));
+        settingsPref.setSummary(SettingsHelper.readOutputStreamSumary(getResources(), getPreferenceManager().getSharedPreferences()));
 
     }
 

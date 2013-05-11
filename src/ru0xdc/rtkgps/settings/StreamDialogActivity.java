@@ -25,6 +25,7 @@ public class StreamDialogActivity extends Activity {
         String fragmentType;
         final Bundle fragmentArgs;
         final Fragment fragment;
+        final int title;
 
         setContentView(R.layout.activity_stream_settings_dialog);
 
@@ -43,16 +44,28 @@ public class StreamDialogActivity extends Activity {
         switch (StreamType.valueOf(fragmentType)) {
         case NTRIPCLI:
             fragment = new StreamNtripClientFragment();
+            title = R.string.ntrip_client_dialog_title;
             break;
         case TCPCLI:
             fragment = new StreamTcpClientFragment();
+            title = R.string.tcp_client_dialog_title;
             break;
         case FILE:
             fragment = new StreamFileClientFragment();
+            title = R.string.file_dialog_title;
+            break;
+        case BLUETOOTH:
+            fragment = new StreamBluetoothFragment();
+            title = R.string.bluetooth_dialog_title;
+            break;
+        case USB:
+            fragment = new StreamUsbFragment();
+            title = R.string.usb_dialog_title;
             break;
         case TCPSVR:
             // TODO
             fragment = new StreamNtripClientFragment();
+            title = R.string.ntrip_client_dialog_title;
             break;
         default:
             throw new IllegalArgumentException("wrong ARG_FRAGMENT_ARGUMENTS");
@@ -63,6 +76,7 @@ public class StreamDialogActivity extends Activity {
         getFragmentManager().beginTransaction()
         .replace(R.id.fragment_container, fragment).commit();
 
+        setTitle(title);
     }
 
     public void closeButtonClicked(View view) {

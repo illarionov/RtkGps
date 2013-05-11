@@ -139,6 +139,9 @@
     <string name="str_ntripcli">NTRIP client</string>
     <string name="str_ftp">FTP</string>
     <string name="str_http">HTTP</string>
+    <string name="str_unixsvr">Unix domain socket server</string>
+    <string name="str_bluetooth">Bluetooth</string>
+    <string name="str_usb">USB</string>
 
     <!-- IONOOPT_XXX Ionosphere option -->
     <string name="ionoopt_off">Off</string>
@@ -423,6 +426,7 @@
     <string name="log_stream_settings_base_tab_title">Log Base</string>
     <string name="log_stream_settings_correction_tab_title">Log Correction</string>
     
+    <!-- NTRIP client stream preferences -->
     <string name="ntrip_client_dialog_title">NTRIP client settings</string>
     <string name="ntrip_client_host_title">Host</string>
     <string name="ntrip_client_port_title">Port</string>
@@ -431,10 +435,21 @@
     <string name="ntrip_client_password_title">NTRIP password</string>
     <string name="file_filename_title">Filename</string>
     
+    <!-- TCP client stream preferences -->
 	<string name="tcp_client_dialog_title">TCP client settings</string>
     <string name="tcp_client_host_title">Host</string>
     <string name="tcp_client_port_title">Port</string>
     
+    <!-- File stream preferences -->
     <string name="file_dialog_title">File settings</string>
+    
+    <!-- Bluetooth stream preferences -->
+    <string name="bluetooth_dialog_title">Bluetooth receiver settings</string>
+    <string name="bluetooth_device_not_selected">device not selected</string>
+    <string name="bluetooth_device_address_title">Bluetooth device</string>
+    <string name="bluetooth_system_settings_title">Bluetooth system settings</string>
+    <string name="bluetooth_system_settings_summary">Display system Bluetooth settings screen</string>
+    
+    <string name="usb_dialog_title">USB receiver settings</string>
     
 </resources>

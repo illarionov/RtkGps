@@ -34,7 +34,16 @@ public enum StreamType implements IHasRtklibId {
     FTP(8, R.string.str_ftp),
 
     /** stream type: http */
-    HTTP(9, R.string.str_http)
+    HTTP(9, R.string.str_http),
+
+    /** stream type: unix server */
+    UNIXSVR(10, R.string.str_unixsvr),
+
+    // XXX
+    BLUETOOTH(10, R.string.str_bluetooth),
+
+    USB(10, R.string.str_usb)
+
     ;
 
     private final int mRtklibId;
