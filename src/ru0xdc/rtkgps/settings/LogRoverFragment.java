@@ -6,6 +6,7 @@ import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
 import ru0xdc.rtkgps.settings.widget.StreamTypePreference;
 import ru0xdc.rtklib.RtkServerSettings.LogStream;
+import ru0xdc.rtklib.constants.StreamType;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,9 +23,17 @@ public class LogRoverFragment extends PreferenceFragment {
 
     static final String SHARED_PREFS_NAME = "LogRover";
 
-    protected static final String KEY_ENABLE = "enable";
-    protected static final String KEY_TYPE = "type";
-    protected static final String KEY_STREAM_SETTINGS_BUTTON = "stream_settings_button";
+    static final String KEY_ENABLE = "enable";
+    static final String KEY_TYPE = "type";
+    static final String KEY_STREAM_SETTINGS_BUTTON = "stream_settings_button";
+
+    static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
+        StreamType.TCPCLI,
+        StreamType.NTRIPCLI,
+        StreamType.FILE
+    };
+
+    static final StreamType DEFAULT_STREAM_TYPE = StreamType.FILE;
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
@@ -88,8 +97,8 @@ public class LogRoverFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.log_stream_settings);
 
         typePref = (StreamTypePreference)findPreference(KEY_TYPE);
-        typePref.setValues(InputRoverFragment.INPUT_STREAM_TYPES);
-        typePref.setDefaultValue(InputRoverFragment.DEFAULT_STREAM_TYPE);
+        typePref.setValues(INPUT_STREAM_TYPES);
+        typePref.setDefaultValue(DEFAULT_STREAM_TYPE);
     }
 
     protected void streamSettingsButtonClicked() {

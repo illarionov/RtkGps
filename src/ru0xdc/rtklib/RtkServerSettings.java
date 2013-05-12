@@ -364,7 +364,7 @@ public class RtkServerSettings {
     }
 
     public RtkServerSettings setInputCorrection(InputStream correction) {
-        mInputBase.setValue(correction);
+        mInputCorrection.setValue(correction);
         return this;
     }
 

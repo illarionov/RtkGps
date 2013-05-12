@@ -1,16 +1,29 @@
 package ru0xdc.rtkgps.settings;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.MainActivity;
 import ru0xdc.rtkgps.R;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,9 +35,9 @@ public class StreamBluetoothFragment extends PreferenceFragment {
     private static final String KEY_DEVICE_ADDRESS = "stream_bluetooth_address";
     private static final String KEY_DEVICE_NAME = "stream_bluetooth_name";
 
-    private final PreferenceChangeListener mPreferenceChangeListener;
-
     private String mSharedPrefsName;
+
+    private BluetoothAdapter mBluetoothAdapter;
 
     public static final class Value {
 
@@ -48,7 +61,6 @@ public class StreamBluetoothFragment extends PreferenceFragment {
 
     public StreamBluetoothFragment() {
         super();
-        mPreferenceChangeListener = new PreferenceChangeListener();
         mSharedPrefsName = StreamNtripClientFragment.class.getSimpleName();
     }
 
@@ -57,6 +69,8 @@ public class StreamBluetoothFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         final Bundle arguments;
 
+        if (DBG) Log.v(mSharedPrefsName, "onCreate()");
+
         arguments = getArguments();
         if (arguments == null || !arguments.containsKey(StreamDialogActivity.ARG_SHARED_PREFS_NAME)) {
             throw new IllegalArgumentException("ARG_SHARED_PREFFS_NAME argument not defined");
@@ -64,16 +78,60 @@ public class StreamBluetoothFragment extends PreferenceFragment {
 
         mSharedPrefsName = arguments.getString(StreamDialogActivity.ARG_SHARED_PREFS_NAME);
 
-        if (DBG) Log.v(mSharedPrefsName, "onCreate()");
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         getPreferenceManager().setSharedPreferencesName(mSharedPrefsName);
 
         initPreferenceScreen();
+
+        if (savedInstanceState == null) {
+            askToTurnOnBluetooth();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (DBG) Log.v(mSharedPrefsName, "onResume()");
+        reloadSummaries();
+
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(mPreferenceChangeListener);
+        getActivity().registerReceiver(mBluetoothChangeListener,
+                new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+    }
+
+    @Override
+    public void onPause() {
+        if (DBG) Log.v(mSharedPrefsName, "onPause()");
+        getActivity().unregisterReceiver(mBluetoothChangeListener);
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(mPreferenceChangeListener);
+        super.onPause();
+    }
+
+    private void askToTurnOnBluetooth() {
+        if (mBluetoothAdapter.isEnabled())
+            return;
+
+        final Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivity(i);
     }
 
     protected void initPreferenceScreen() {
+        final ListPreference deviceSelectorPref;
         if (DBG) Log.v(mSharedPrefsName, "initPreferenceScreen()");
         addPreferencesFromResource(R.xml.stream_bluetooth_settings);
+
+        deviceSelectorPref = (ListPreference) findPreference(KEY_DEVICE_ADDRESS);
+        deviceSelectorPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                String name = mBluetoothAdapter.getRemoteDevice(newValue.toString()).getName();
+                if (name == null) name = newValue.toString();
+                preference.getEditor().putString(KEY_DEVICE_NAME, name).commit();
+                return true;
+            }
+        });
+
     }
 
     public static void setDefaultValue(Context ctx, String sharedPrefsName, Value value) {
@@ -86,30 +144,66 @@ public class StreamBluetoothFragment extends PreferenceFragment {
             .apply();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (DBG) Log.v(mSharedPrefsName, "onResume()");
-        reloadSummaries();
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(mPreferenceChangeListener);
-    }
-
-    @Override
-    public void onPause() {
-        if (DBG) Log.v(mSharedPrefsName, "onPause()");
-        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(mPreferenceChangeListener);
-        super.onPause();
+    private static class BluetoothDeviceComparator implements Comparator<BluetoothDevice> {
+        @Override
+        public int compare(BluetoothDevice arg0, BluetoothDevice arg1) {
+            String name0, name1;
+            name0 = arg0.getName();
+            name1 = arg1.getName();
+            if (name0 == null) name0="";
+            if (name1 == null) name1="";
+            return name0.compareToIgnoreCase(name1);
+        }
     }
 
     void reloadSummaries() {
-        ListPreference pref;
+        ListPreference deviceSelectorPref;
+        Set<BluetoothDevice> pairedDevicesSet;
 
-        pref = (ListPreference) findPreference(KEY_DEVICE_ADDRESS);
-        pref.setSummary(getSummary(getResources(), pref.getEntry()));
+        deviceSelectorPref = (ListPreference) findPreference(KEY_DEVICE_ADDRESS);
 
+        if (!mBluetoothAdapter.isEnabled()) {
+            pairedDevicesSet = null;
+        }else {
+            pairedDevicesSet = mBluetoothAdapter.getBondedDevices();
+        }
+
+        if (pairedDevicesSet == null) {
+            deviceSelectorPref.setEnabled(false);
+            deviceSelectorPref.setSummary(R.string.bluetooth_disabled_summary);
+            return;
+        }
+
+
+        final List<BluetoothDevice> pairedDevices;
+        final String[] entries;
+        final String[] values;
+
+        pairedDevices = new ArrayList<BluetoothDevice>(pairedDevicesSet);
+        Collections.sort(pairedDevices, new BluetoothDeviceComparator());
+
+        entries = new String[pairedDevices.size()];
+        values = new String[pairedDevices.size()];
+
+        for (int i=0; i<entries.length; ++i) {
+            final BluetoothDevice dev = pairedDevices.get(i);
+            entries[i] = dev.getName();
+            values[i] = dev.getAddress();
+        }
+
+        deviceSelectorPref.setEnabled(true);
+        deviceSelectorPref.setEntries(entries);
+        deviceSelectorPref.setEntryValues(values);
+
+        final CharSequence entry = deviceSelectorPref.getEntry();
+        if (entry == null) {
+            deviceSelectorPref.setSummary(R.string.bluetooth_device_not_selected);
+        }else {
+            deviceSelectorPref.setSummary(entry);
+        }
     }
 
-    private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private SharedPreferences.OnSharedPreferenceChangeListener mPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(
                 SharedPreferences sharedPreferences, String key) {
@@ -117,20 +211,27 @@ public class StreamBluetoothFragment extends PreferenceFragment {
         }
     };
 
+    private final BroadcastReceiver mBluetoothChangeListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            reloadSummaries();
+        }
+    };
+
     @Nonnull
-    public static String bluetoothLocalSocketName(@Nonnull String address) {
-        return "bluetooth_" + address.replaceAll("\\W", "_");
+    public static String bluetoothLocalSocketName(@Nonnull String address, String stream) {
+        return "bt_" + stream; // + "_" + address.replaceAll("\\W", "_");
     }
 
     @Nonnull
-    public static String readPath(Context context, SharedPreferences prefs) {
+    public static String readPath(Context context, SharedPreferences prefs, String stream) {
         String path;
         String address;
 
         address = prefs.getString(KEY_DEVICE_ADDRESS, null);
         if (address == null)  throw new IllegalStateException("setDefaultValues() must be called");
 
-        path = MainActivity.getLocalSocketPath(context, bluetoothLocalSocketName(address)).getAbsolutePath();
+        path = MainActivity.getLocalSocketPath(context, bluetoothLocalSocketName(address, stream)).getAbsolutePath();
 
         if (DBG) Log.v("StreamFileClientFragment", "bluetooth socket path: " + path);
 

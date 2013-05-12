@@ -1,5 +1,8 @@
 package ru0xdc.rtkgps.settings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.annotation.Nonnull;
 
 import ru0xdc.rtkgps.BuildConfig;
@@ -9,6 +12,7 @@ import ru0xdc.rtkgps.settings.widget.StreamTypePreference;
 import ru0xdc.rtklib.RtkServerSettings.InputStream;
 import ru0xdc.rtklib.constants.StreamFormat;
 import ru0xdc.rtklib.constants.StreamType;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,16 +28,16 @@ public class InputRoverFragment extends PreferenceFragment {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
-    static final String SHARED_PREFS_NAME = "InputRover";
-    protected static final String KEY_ENABLE = "enable";
-    protected static final String KEY_TYPE = "type";
-    protected static final String KEY_FORMAT = "format";
-    protected static final String KEY_STREAM_SETTINGS_BUTTON = "stream_settings_button";
-    protected static final String KEY_COMMANDS_AT_STARTUP = "commands_at_startup";
-    protected static final String KEY_COMMANDS_AT_SHUTDOWN = "commands_at_shutdown";
-    protected static final String KEY_RECEIVER_OPTION = "receiver_option";
+    private static final String SHARED_PREFS_NAME = "InputRover";
+    static final String KEY_ENABLE = "enable";
+    static final String KEY_TYPE = "type";
+    static final String KEY_FORMAT = "format";
+    static final String KEY_STREAM_SETTINGS_BUTTON = "stream_settings_button";
+    static final String KEY_COMMANDS_AT_STARTUP = "commands_at_startup";
+    static final String KEY_COMMANDS_AT_SHUTDOWN = "commands_at_shutdown";
+    static final String KEY_RECEIVER_OPTION = "receiver_option";
 
-    static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
+    private static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
         StreamType.BLUETOOTH,
         StreamType.USB,
         StreamType.TCPCLI,
@@ -41,7 +45,7 @@ public class InputRoverFragment extends PreferenceFragment {
         StreamType.FILE
     };
 
-    protected static final StreamType DEFAULT_STREAM_TYPE = StreamType.BLUETOOTH;
+    static final StreamType DEFAULT_STREAM_TYPE = StreamType.BLUETOOTH;
 
     protected static final StreamFormat INPUT_STREAM_FORMATS[] = new StreamFormat[] {
         StreamFormat.RTCM2,
@@ -77,7 +81,6 @@ public class InputRoverFragment extends PreferenceFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
 
         getPreferenceManager().setSharedPreferencesName(getSharedPreferenceName());
@@ -112,20 +115,33 @@ public class InputRoverFragment extends PreferenceFragment {
     }
 
     protected void initPreferenceScreen() {
-        final StreamTypePreference typePref;
+
         final StreamFormatPreference formatPref;
 
         if (DBG) Log.v(getSharedPreferenceName(), "initPreferenceScreen()");
 
         addPreferencesFromResource(R.xml.input_stream_settings);
 
-        typePref = (StreamTypePreference)findPreference(KEY_TYPE);
-        typePref.setValues(INPUT_STREAM_TYPES);
-        typePref.setDefaultValue(DEFAULT_STREAM_TYPE);
+        initStreamTypePref();
 
         formatPref = (StreamFormatPreference)findPreference(KEY_FORMAT);
         formatPref.setValues(INPUT_STREAM_FORMATS);
         formatPref.setDefaultValue(DEFAULT_STREAM_FORMAT);
+    }
+
+    protected void initStreamTypePref() {
+        final StreamTypePreference typePref;
+        ArrayList<StreamType> types;
+
+        types = new ArrayList<StreamType>(Arrays.asList(INPUT_STREAM_TYPES));
+
+        if (BluetoothAdapter.getDefaultAdapter() == null) {
+            types.remove(StreamType.BLUETOOTH);
+        }
+
+        typePref = (StreamTypePreference)findPreference(KEY_TYPE);
+        typePref.setValues(types.toArray(new StreamType[types.size()]));
+        typePref.setDefaultValue(DEFAULT_STREAM_TYPE);
     }
 
     protected void streamSettingsButtonClicked() {

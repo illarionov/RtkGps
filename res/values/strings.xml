@@ -446,6 +446,8 @@
     <!-- Bluetooth stream preferences -->
     <string name="bluetooth_dialog_title">Bluetooth receiver settings</string>
     <string name="bluetooth_device_not_selected">device not selected</string>
+    <string name="bluetooth_not_supported">Bluetooth is not supported on this hardware</string>
+    <string name="bluetooth_disabled_summary">Turn on Bluetooth and select the receiver</string>
     <string name="bluetooth_device_address_title">Bluetooth device</string>
     <string name="bluetooth_system_settings_title">Bluetooth system settings</string>
     <string name="bluetooth_system_settings_summary">Display system Bluetooth settings screen</string>

@@ -246,7 +246,7 @@ public class SettingsHelper {
         .setReceiverOption(prefs.getString(InputRoverFragment.KEY_RECEIVER_OPTION, ""))
         ;
 
-        stream.setPath(readStreamPath(ctx, type, prefs));
+        stream.setPath(readStreamPath(ctx, type, prefs, sharedPrefsName));
 
         return stream;
     }
@@ -275,7 +275,7 @@ public class SettingsHelper {
         .setSolutionFormat(SolutionFormat.valueOf(prefs.getString(OutputSolution1Fragment.KEY_FORMAT,SolutionFormat.NMEA.name())))
         ;
 
-        stream.setPath(readStreamPath(ctx, type, prefs));
+        stream.setPath(readStreamPath(ctx, type, prefs, sharedPrefsName));
 
         return stream;
     }
@@ -299,13 +299,13 @@ public class SettingsHelper {
         type = StreamType.valueOf(prefs.getString(LogRoverFragment.KEY_TYPE, null));
         stream.setType(type);
 
-        stream.setPath(readStreamPath(ctx, type, prefs));
+        stream.setPath(readStreamPath(ctx, type, prefs, sharedPrefsName));
 
         return stream;
     }
 
     @Nonnull
-    static String readStreamPath(Context context, StreamType type, SharedPreferences prefs) {
+    static String readStreamPath(Context context, StreamType type, SharedPreferences prefs, String stream) {
         String path;
 
         switch(type) {
@@ -319,7 +319,7 @@ public class SettingsHelper {
             path = StreamTcpClientFragment.readPath(prefs);
             break;
         case BLUETOOTH:
-            path = StreamBluetoothFragment.readPath(context, prefs);
+            path = StreamBluetoothFragment.readPath(context, prefs, stream);
             break;
         case USB:
             path = StreamUsbFragment.readPath(context, prefs);

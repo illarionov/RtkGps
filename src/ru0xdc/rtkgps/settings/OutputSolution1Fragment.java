@@ -34,6 +34,14 @@ public class OutputSolution1Fragment extends PreferenceFragment {
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
+    private final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
+        StreamType.TCPCLI,
+        StreamType.NTRIPCLI,
+        StreamType.FILE
+    };
+
+    static final StreamType DEFAULT_STREAM_TYPE = StreamType.FILE;
+
     private static final SolutionFormat SOLUTION_FORMATS[] = new SolutionFormat[] {
         SolutionFormat.LLH,
         SolutionFormat.XYZ,
@@ -105,8 +113,8 @@ public class OutputSolution1Fragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.output_stream_settings);
 
         typePref = (StreamTypePreference)findPreference(KEY_TYPE);
-        typePref.setValues(InputRoverFragment.INPUT_STREAM_TYPES);
-        typePref.setDefaultValue(InputRoverFragment.DEFAULT_STREAM_TYPE);
+        typePref.setValues(INPUT_STREAM_TYPES);
+        typePref.setDefaultValue(DEFAULT_STREAM_TYPE);
 
         formatPref = (SolutionFormatPreference)findPreference(KEY_FORMAT);
         formatPref.setValues(SOLUTION_FORMATS);

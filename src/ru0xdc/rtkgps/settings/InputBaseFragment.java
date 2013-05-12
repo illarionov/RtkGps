@@ -59,10 +59,8 @@ public class InputBaseFragment extends InputRoverFragment {
 
         findPreference(KEY_ENABLE).setTitle(R.string.input_streams_settings_enable_base_title);
 
-
+        initStreamTypePref();
         typePref = (StreamTypePreference)findPreference(KEY_TYPE);
-        typePref.setValues(INPUT_STREAM_TYPES);
-        typePref.setDefaultValue(DEFAULT_STREAM_TYPE);
         typePref.setTitle(R.string.input_streams_settings_base_tab_title);
 
         formatPref = (StreamFormatPreference)findPreference(KEY_FORMAT);
