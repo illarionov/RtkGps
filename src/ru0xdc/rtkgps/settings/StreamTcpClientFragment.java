@@ -4,6 +4,8 @@ import javax.annotation.Nonnull;
 
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
+import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
+import ru0xdc.rtklib.constants.StreamType;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,7 +25,7 @@ public class StreamTcpClientFragment extends PreferenceFragment {
 
     private String mSharedPrefsName;
 
-    public static final class Value {
+    public static final class Value implements TransportSettings, Cloneable {
         private String host;
         private int port;
 
@@ -46,8 +48,38 @@ public class StreamTcpClientFragment extends PreferenceFragment {
             this.port = port;
             return this;
         }
-    }
 
+        @Override
+        public StreamType getType() {
+            return StreamType.TCPCLI;
+        }
+
+        @Override
+        public String getPath() {
+            return SettingsHelper.encodeNtripTcpPath(
+                    null,
+                    null,
+                    host,
+                    String.valueOf(port),
+                    null,
+                    null
+                    );
+        }
+
+        @Override
+        protected Value clone() {
+            try {
+                return (Value)super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        @Override
+        public Value copy() {
+            return clone();
+        }
+    }
 
     public StreamTcpClientFragment() {
         super();
@@ -122,20 +154,15 @@ public class StreamTcpClientFragment extends PreferenceFragment {
         }
     };
 
-    @Nonnull
-    public static String readPath(SharedPreferences prefs) {
-        return StreamNtripClientFragment.encodeNtripTcpPath(
-                null,
-                null,
-                prefs.getString(KEY_HOST, ""),
-                prefs.getString(KEY_PORT, ""),
-                null,
-                null
-                );
+    public static Value readSettings(SharedPreferences prefs) {
+        return new Value()
+            .setHost(prefs.getString(KEY_HOST, ""))
+            .setPort(Integer.valueOf(prefs.getString(KEY_PORT, "0")))
+            ;
     }
 
     public static String readSummary(SharedPreferences prefs) {
-        return "tcp:" + readPath(prefs);
+        return "tcp:" + readSettings(prefs).getPath();
     }
 
 

@@ -12,6 +12,8 @@ import javax.annotation.Nullable;
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.MainActivity;
 import ru0xdc.rtkgps.R;
+import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
+import ru0xdc.rtklib.constants.StreamType;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -39,23 +41,68 @@ public class StreamBluetoothFragment extends PreferenceFragment {
 
     private BluetoothAdapter mBluetoothAdapter;
 
-    public static final class Value {
+    public static final class Value implements TransportSettings {
 
         public static final String ADDRESS_DEVICE_IS_NOT_SELECTED = "";
 
         private String address;
         private String name;
+        private String mPath;
 
         public Value() {
             address = ADDRESS_DEVICE_IS_NOT_SELECTED;
             name = ADDRESS_DEVICE_IS_NOT_SELECTED;
         }
 
+        Value(String address, String name) {
+            this.address = address;
+            this.name = name;
+        }
+
+        @Nonnull
+        public static String bluetoothLocalSocketName(@Nonnull String address, String stream) {
+            return "bt_" + stream; // + "_" + address.replaceAll("\\W", "_");
+        }
+
         public Value setAddress(@Nonnull String address) {
             if (address == null) throw new NullPointerException();
             this.address = address;
             this.name = address;
+            this.mPath = null;
             return this;
+        }
+
+        @Override
+        public StreamType getType() {
+            return StreamType.BLUETOOTH;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getPath() {
+            if (mPath == null) throw new IllegalStateException("Path not initialized. Call updatePath()");
+            return mPath;
+        }
+
+        public void updatePath(Context context, String sharedPrefsName) {
+            mPath = MainActivity.getLocalSocketPath(context,
+                    bluetoothLocalSocketName(address, sharedPrefsName)).getAbsolutePath();
+        }
+
+        @Override
+        public Value copy() {
+            Value v = new Value();
+            v.address = address;
+            v.name = name;
+            v.mPath = mPath;
+            return v;
         }
     }
 
@@ -218,24 +265,18 @@ public class StreamBluetoothFragment extends PreferenceFragment {
         }
     };
 
-    @Nonnull
-    public static String bluetoothLocalSocketName(@Nonnull String address, String stream) {
-        return "bt_" + stream; // + "_" + address.replaceAll("\\W", "_");
-    }
 
     @Nonnull
-    public static String readPath(Context context, SharedPreferences prefs, String stream) {
-        String path;
+    public static Value readSettings(Context context, SharedPreferences prefs, String sharedPrefsName) {
         String address;
 
         address = prefs.getString(KEY_DEVICE_ADDRESS, null);
         if (address == null)  throw new IllegalStateException("setDefaultValues() must be called");
 
-        path = MainActivity.getLocalSocketPath(context, bluetoothLocalSocketName(address, stream)).getAbsolutePath();
+        final Value v = new Value(address, prefs.getString(KEY_DEVICE_NAME, ""));
+        v.updatePath(context, sharedPrefsName);
 
-        if (DBG) Log.v("StreamFileClientFragment", "bluetooth socket path: " + path);
-
-        return path;
+        return v;
     }
 
     private static String getSummary(Resources r, @Nullable CharSequence deviceName) {

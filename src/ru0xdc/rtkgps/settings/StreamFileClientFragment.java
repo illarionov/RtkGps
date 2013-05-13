@@ -7,6 +7,8 @@ import javax.annotation.Nonnull;
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.MainActivity;
 import ru0xdc.rtkgps.R;
+import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
+import ru0xdc.rtklib.constants.StreamType;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -25,7 +27,7 @@ public class StreamFileClientFragment extends PreferenceFragment {
     private String mSharedPrefsName;
 
 
-    public static final class Value {
+    public static final class Value implements TransportSettings {
         private String filename;
 
         public static final String DEFAULT_FILENAME = "stream.log";
@@ -38,6 +40,21 @@ public class StreamFileClientFragment extends PreferenceFragment {
             if (filename == null) throw new NullPointerException();
             this.filename = filename;
             return this;
+        }
+
+        @Override
+        public StreamType getType() {
+            return StreamType.FILE;
+        }
+
+        @Override
+        public String getPath() {
+            return (new File(MainActivity.getFileStorageDirectory(), filename)).getAbsolutePath();
+        }
+
+        @Override
+        public Value copy() {
+            return new Value().setFilename(filename);
         }
     }
 
@@ -112,24 +129,19 @@ public class StreamFileClientFragment extends PreferenceFragment {
     };
 
     @Nonnull
-    public static String readPath(SharedPreferences prefs) {
-        String path;
-        String filename;
+    public static Value readSettings(SharedPreferences prefs) {
+        final Value v = new Value();
+        final String filename;
 
         filename = prefs.getString(KEY_FILENAME, null);
         if (filename == null)  throw new IllegalStateException("setDefaultValues() must be called");
 
-        if (filename.length() == 0) filename = Value.DEFAULT_FILENAME;
-
-        path =  (new File(MainActivity.getFileStorageDirectory(), filename)).getAbsolutePath();
-
-        if (DBG) Log.v("StreamFileClientFragment", "file path: " + path);
-
-        return path;
+        if (filename.length() != 0) v.setFilename(filename);
+        return v;
     }
 
     public static String readSummary(SharedPreferences prefs) {
-        return "file://" + readPath(prefs);
+        return "file://" + readSettings(prefs).filename;
     }
 
 

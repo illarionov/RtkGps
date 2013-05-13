@@ -1,12 +1,16 @@
 package ru0xdc.rtkgps;
 
 import ru0xdc.rtkgps.settings.SettingsHelper;
+import ru0xdc.rtkgps.settings.StreamBluetoothFragment;
+import ru0xdc.rtkgps.settings.StreamBluetoothFragment.Value;
 import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.RtkServer;
 import ru0xdc.rtklib.RtkServerObservationStatus;
 import ru0xdc.rtklib.RtkServerSettings;
+import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import ru0xdc.rtklib.Solution;
+import ru0xdc.rtklib.constants.StreamType;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -35,6 +39,8 @@ public class RtkNaviService extends Service {
     private final RtkServer mRtkServer = new RtkServer();
 
     private PowerManager.WakeLock mCpuLock;
+
+    private BluetoothToLocalSocket mBtRover, mBtBase;
 
     @Override
     public void onCreate() {
@@ -112,6 +118,8 @@ public class RtkNaviService extends Service {
             return;
         }
 
+        startBluetoothPipes();
+
         mCpuLock.acquire();
 
         Notification notification = createForegroundNotification();
@@ -129,6 +137,7 @@ public class RtkNaviService extends Service {
         if (mCpuLock.isHeld()) mCpuLock.release();
 
         if (isServiceStarted()) {
+            stopBluetoothPipes();
             mRtkServer.stop();
             // Tell the user we stopped.
             Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT)
@@ -157,5 +166,37 @@ public class RtkNaviService extends Service {
                 getText(R.string.local_service_label), text, contentIntent);
 
         return notification;
+    }
+
+    private void startBluetoothPipes() {
+        final TransportSettings roverSettngs, baseSettings;
+
+        RtkServerSettings settings = mRtkServer.getServerSettings();
+
+        roverSettngs = settings.getInputRover().getTransportSettings();
+
+        if (roverSettngs.getType() == StreamType.BLUETOOTH) {
+            StreamBluetoothFragment.Value btSettings = (Value)roverSettngs;
+            mBtRover = new BluetoothToLocalSocket(btSettings.getAddress(), btSettings.getPath());
+            mBtRover.start();
+        }else {
+            mBtRover = null;
+        }
+
+        baseSettings = settings.getInputBase().getTransportSettings();
+        if (baseSettings.getType() == StreamType.BLUETOOTH) {
+            StreamBluetoothFragment.Value btSettings = (Value)roverSettngs;
+            mBtBase = new BluetoothToLocalSocket(btSettings.getAddress(), btSettings.getPath());
+            mBtBase.start();
+        }else {
+            mBtBase = null;
+        }
+    }
+
+    private void stopBluetoothPipes() {
+        if (mBtRover != null) mBtRover.stop();
+        if (mBtBase != null) mBtBase.stop();
+        mBtRover = null;
+        mBtBase = null;
     }
 }

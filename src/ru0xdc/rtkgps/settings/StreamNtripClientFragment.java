@@ -3,13 +3,13 @@ import javax.annotation.Nonnull;
 
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
+import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
+import ru0xdc.rtklib.constants.StreamType;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
-import android.text.TextUtils;
 import android.util.Log;
 
 
@@ -27,12 +27,12 @@ public class StreamNtripClientFragment extends PreferenceFragment {
 
     private String mSharedPrefsName;
 
-    public static final class Value {
-        private String host;
+    public static final class Value implements TransportSettings, Cloneable {
+        private @Nonnull String host;
         private int port;
-        private String mountpoint;
-        private String user;
-        private String password;
+        private @Nonnull String mountpoint;
+        private @Nonnull String user;
+        private @Nonnull String password;
 
         public static final String DEFAULT_HOST = "gps.0xdc.ru";
         public static final int DEFULT_PORT = 2101;
@@ -76,6 +76,40 @@ public class StreamNtripClientFragment extends PreferenceFragment {
             if (password == null) throw new NullPointerException();
             this.password = password;
             return this;
+        }
+
+        @Override
+        public StreamType getType() {
+            return StreamType.NTRIPCLI;
+        }
+
+        @Override
+        public String getPath() {
+            return SettingsHelper.encodeNtripTcpPath(user, password, host,
+                    String.valueOf(port), mountpoint, null);
+        }
+
+        public String getSummary() {
+            return SettingsHelper.encodeNtripTcpPath(user,
+                    "".equals(password) ? null : "xxx",
+                    host,
+                    String.valueOf(port),
+                    mountpoint,
+                    null);
+        }
+
+        @Override
+        protected Value clone() {
+            try {
+                return (Value) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        @Override
+        public Value copy() {
+            return clone();
         }
 
     }
@@ -165,65 +199,19 @@ public class StreamNtripClientFragment extends PreferenceFragment {
         }
     };
 
-    /**
-     *
-     * @return [user[:passwd]@]addr[:port][/mntpnt[:str]])
-     */
-    @Nonnull
-    static String encodeNtripTcpPath(String user, String passwd, String host, String port, String mountpoint, String str) {
-        StringBuilder path;
-        path = new StringBuilder();
 
-        final boolean emptyUser, emptyPasswd;
-
-        emptyUser = TextUtils.isEmpty(user);
-        emptyPasswd = TextUtils.isEmpty(passwd);
-
-        if (!emptyUser) {
-            path.append(Uri.encode(user));
-        }
-
-        if (!emptyPasswd) {
-            if (!emptyUser) path.append(':');
-            path.append(Uri.encode(passwd));
-        }
-
-        if (!emptyUser || !emptyPasswd) {
-            path.append('@');
-        }
-
-        if (TextUtils.isEmpty(host)) host = "localhost";
-
-        path.append(host);
-        if (!TextUtils.isEmpty(port)) {
-            path.append(':').append(port);
-        }
-
-        path.append('/');
-
-        if (!TextUtils.isEmpty(mountpoint)) path.append(mountpoint);
-
-        if (!TextUtils.isEmpty(str)) {
-            path.append(':').append(str);
-        }
-
-        return path.toString();
-    }
-
-    @Nonnull
-    public static String readPath(SharedPreferences prefs) {
-        return encodeNtripTcpPath(
-                prefs.getString(KEY_USER, ""),
-                prefs.getString(KEY_PASSWORD, ""),
-                prefs.getString(KEY_HOST, ""),
-                prefs.getString(KEY_PORT, ""),
-                prefs.getString(KEY_MOUNTPOINT, ""),
-                null
-                );
+    public static Value readSettings(SharedPreferences prefs) {
+        return new Value()
+            .setUser(prefs.getString(KEY_USER, ""))
+            .setPassword(prefs.getString(KEY_PASSWORD, ""))
+            .setHost(prefs.getString(KEY_HOST, ""))
+            .setPort(Integer.valueOf(prefs.getString(KEY_PORT, "0")))
+            .setMountpoint(prefs.getString(KEY_MOUNTPOINT, ""))
+            ;
     }
 
     public static String readSummary(SharedPreferences prefs) {
-        return "ntrip://" + readPath(prefs);
+        return "ntrip://" + readSettings(prefs).getPath();
     }
 
 }

@@ -141,6 +141,7 @@ public class BluetoothToLocalSocket {
             try {
                 rcvd =  mInputStream.read(buf, 0, buf.length);
                 if (rcvd >= 0) {
+                    // TODO: report error to rtksvr?
                     mBluetoothThread.write(buf, 0, rcvd);
                 }
             }catch (IOException e) {

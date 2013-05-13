@@ -7,8 +7,6 @@ import javax.annotation.Nonnull;
 import ru0xdc.rtkgps.MainActivity;
 
 
-
-
 public class RtkServer {
 
     /* mObject is used by native code, do not remove or rename */
@@ -111,6 +109,10 @@ public class RtkServer {
     public void setServerSettings(RtkServerSettings settings) {
         if (mStatus != RtkServerStreamStatus.STATE_CLOSE) throw new IllegalStateException();
         mSettings.setValues(settings);
+    }
+
+    public final RtkServerSettings getServerSettings() {
+        return mSettings;
     }
 
     private RtkServerObservationStatus getObservationStatus(int receiver, RtkServerObservationStatus status) {

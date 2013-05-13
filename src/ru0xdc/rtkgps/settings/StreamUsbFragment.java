@@ -4,6 +4,8 @@ import javax.annotation.Nonnull;
 
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.MainActivity;
+import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
+import ru0xdc.rtklib.constants.StreamType;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -16,6 +18,30 @@ public class StreamUsbFragment extends PreferenceFragment {
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
     private String mSharedPrefsName;
+
+    public static final class Value implements TransportSettings {
+
+        private String path;
+
+        public Value(Context context) {
+            path = MainActivity.getLocalSocketPath(context, usbLocalSocketName("receiver")).getAbsolutePath();
+        }
+
+        @Override
+        public StreamType getType() {
+            return StreamType.USB;
+        }
+
+        @Override
+        public String getPath() {
+            return path;
+        }
+
+        @Override
+        public Value copy() {
+            return this;
+        }
+    }
 
     public StreamUsbFragment() {
         super();
@@ -67,14 +93,8 @@ public class StreamUsbFragment extends PreferenceFragment {
     }
 
     @Nonnull
-    public static String readPath(Context context, SharedPreferences prefs) {
-        String path;
-
-        path = MainActivity.getLocalSocketPath(context, usbLocalSocketName("receiver")).getAbsolutePath();
-
-        if (DBG) Log.v("StreamFileClientFragment", "USB socket path: " + path);
-
-        return path;
+    public static Value readSettings(Context context, SharedPreferences prefs) {
+        return new Value(context);
     }
 
     public static String readSummary(Resources r, SharedPreferences prefs) {

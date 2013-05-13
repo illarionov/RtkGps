@@ -1,12 +1,14 @@
 package ru0xdc.rtkgps.settings;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import ru0xdc.rtklib.ProcessingOptions;
 import ru0xdc.rtklib.RtkServerSettings;
 import ru0xdc.rtklib.RtkServerSettings.InputStream;
 import ru0xdc.rtklib.RtkServerSettings.LogStream;
 import ru0xdc.rtklib.RtkServerSettings.OutputStream;
+import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
 import ru0xdc.rtklib.SolutionOptions;
 import ru0xdc.rtklib.constants.SolutionFormat;
 import ru0xdc.rtklib.constants.StreamFormat;
@@ -14,6 +16,8 @@ import ru0xdc.rtklib.constants.StreamType;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.text.TextUtils;
 
 public class SettingsHelper {
 
@@ -234,19 +238,18 @@ public class SettingsHelper {
         if (!prefs.contains(InputRoverFragment.KEY_TYPE)) throw new IllegalStateException();
 
         if (!prefs.getBoolean(InputRoverFragment.KEY_ENABLE, false)) {
-            stream.setType(StreamType.NONE);
+            stream.setTransportSettings(RtkServerSettings.TRANSPORT_DUMMY);
             return stream;
         }
 
         type = StreamType.valueOf(prefs.getString(InputRoverFragment.KEY_TYPE, null));
         stream
-        .setType(type)
         .setFormat(StreamFormat.valueOf(prefs.getString(InputRoverFragment.KEY_FORMAT, StreamFormat.RTCM3.name())))
         .setCommandsAtStartup(prefs.getString(InputRoverFragment.KEY_COMMANDS_AT_STARTUP, ""))
         .setReceiverOption(prefs.getString(InputRoverFragment.KEY_RECEIVER_OPTION, ""))
         ;
 
-        stream.setPath(readStreamPath(ctx, type, prefs, sharedPrefsName));
+        stream.setTransportSettings(readTransportSettings(ctx, type, prefs, sharedPrefsName));
 
         return stream;
     }
@@ -265,17 +268,15 @@ public class SettingsHelper {
         if (!prefs.contains(OutputSolution1Fragment.KEY_TYPE)) throw new IllegalStateException();
 
         if (!prefs.getBoolean(OutputSolution1Fragment.KEY_ENABLE, false)) {
-            stream.setType(StreamType.NONE);
+            stream.setTransportSettings(RtkServerSettings.TRANSPORT_DUMMY);
             return stream;
         }
 
         type = StreamType.valueOf(prefs.getString(OutputSolution1Fragment.KEY_TYPE, null));
         stream
-        .setType(type)
         .setSolutionFormat(SolutionFormat.valueOf(prefs.getString(OutputSolution1Fragment.KEY_FORMAT,SolutionFormat.NMEA.name())))
+        .setTransportSettings(readTransportSettings(ctx, type, prefs, sharedPrefsName))
         ;
-
-        stream.setPath(readStreamPath(ctx, type, prefs, sharedPrefsName));
 
         return stream;
     }
@@ -292,45 +293,43 @@ public class SettingsHelper {
         if (!prefs.contains(LogRoverFragment.KEY_TYPE)) throw new IllegalStateException();
 
         if (!prefs.getBoolean(LogRoverFragment.KEY_ENABLE, false)) {
-            stream.setType(StreamType.NONE);
+            stream.setTransportSettings(RtkServerSettings.TRANSPORT_DUMMY);
             return stream;
         }
 
         type = StreamType.valueOf(prefs.getString(LogRoverFragment.KEY_TYPE, null));
-        stream.setType(type);
-
-        stream.setPath(readStreamPath(ctx, type, prefs, sharedPrefsName));
+        stream.setTransportSettings(readTransportSettings(ctx, type, prefs, sharedPrefsName));
 
         return stream;
     }
 
     @Nonnull
-    static String readStreamPath(Context context, StreamType type, SharedPreferences prefs, String stream) {
-        String path;
+    static TransportSettings readTransportSettings(Context context, StreamType type, SharedPreferences prefs, String stream) {
+        TransportSettings settings;
 
         switch(type) {
         case FILE:
-            path = StreamFileClientFragment.readPath(prefs);
+            settings = StreamFileClientFragment.readSettings(prefs);
             break;
         case NTRIPCLI:
-            path = StreamNtripClientFragment.readPath(prefs);
+            settings = StreamNtripClientFragment.readSettings(prefs);
             break;
         case TCPCLI:
-            path = StreamTcpClientFragment.readPath(prefs);
+            settings = StreamTcpClientFragment.readSettings(prefs);
             break;
         case BLUETOOTH:
-            path = StreamBluetoothFragment.readPath(context, prefs, stream);
+            settings = StreamBluetoothFragment.readSettings(context, prefs, stream);
             break;
         case USB:
-            path = StreamUsbFragment.readPath(context, prefs);
+            settings = StreamUsbFragment.readSettings(context, prefs);
             break;
         case NONE:
-            path="";
+            settings = RtkServerSettings.TRANSPORT_DUMMY;
             break;
         default:
             throw new IllegalArgumentException();
         }
-        return path;
+        return settings;
     }
 
     @Nonnull
@@ -381,5 +380,57 @@ public class SettingsHelper {
         }
         return summary;
     }
+
+    /**
+    *
+    * @return [user[:passwd]@]addr[:port][/mntpnt[:str]])
+    */
+   @Nonnull
+   static String encodeNtripTcpPath(
+           @Nullable String user,
+           @Nullable String passwd,
+           @Nullable String host,
+           @Nullable String port,
+           @Nullable String mountpoint,
+           @Nullable String str) {
+       StringBuilder path;
+       path = new StringBuilder();
+
+       final boolean emptyUser, emptyPasswd;
+
+       emptyUser = TextUtils.isEmpty(user);
+       emptyPasswd = TextUtils.isEmpty(passwd);
+
+       if (!emptyUser) {
+           path.append(Uri.encode(user));
+       }
+
+       if (!emptyPasswd) {
+           if (!emptyUser) path.append(':');
+           path.append(Uri.encode(passwd));
+       }
+
+       if (!emptyUser || !emptyPasswd) {
+           path.append('@');
+       }
+
+       if (TextUtils.isEmpty(host)) host = "localhost";
+
+       path.append(host);
+       if (!TextUtils.isEmpty(port)) {
+           path.append(':').append(port);
+       }
+
+       path.append('/');
+
+       if (!TextUtils.isEmpty(mountpoint)) path.append(mountpoint);
+
+       if (!TextUtils.isEmpty(str)) {
+           path.append(':').append(str);
+       }
+
+       return path.toString();
+   }
+
 
 }

@@ -15,9 +15,7 @@ public class RtkServerSettings {
 
     public static class InputStream {
 
-        private StreamType mType;
-
-        private String mPath;
+        private TransportSettings mTransport;
 
         private StreamFormat mFormat;
 
@@ -32,18 +30,12 @@ public class RtkServerSettings {
         private final Position3d mTransmittedPos;
 
         public InputStream() {
-            mType = StreamType.NONE;
-            mPath = "";
+            mTransport = TRANSPORT_DUMMY;
             mFormat = StreamFormat.RINEX;
             mCommandsAtStartup = "";
             mReceiverOption = "";
             mNmeaRequestType = 0;
             mTransmittedPos = new Position3d();
-        }
-
-        public InputStream(StreamType type, @Nonnull String path, StreamFormat format) {
-            this();
-            setType(type).setPath(path).setFormat(format);
         }
 
         public InputStream(@Nonnull InputStream src) {
@@ -52,8 +44,7 @@ public class RtkServerSettings {
         }
 
         public void setValue(@Nonnull InputStream src) {
-            mType = src.mType;
-            mPath = src.mPath;
+            mTransport = src.mTransport.copy();
             mFormat = src.mFormat;
             mCommandsAtStartup = src.mCommandsAtStartup;
             mReceiverOption = src.mReceiverOption;
@@ -61,9 +52,12 @@ public class RtkServerSettings {
             mTransmittedPos.setValues(src.mTransmittedPos);
         }
 
-        public InputStream setType(StreamType type) {
-            mType = type;
-            return this;
+        public StreamType getType() {
+            return mTransport.getType();
+        }
+
+        public StreamFormat getFormat() {
+            return mFormat;
         }
 
         public InputStream setFormat(StreamFormat format) {
@@ -71,16 +65,34 @@ public class RtkServerSettings {
             return this;
         }
 
-        public InputStream setPath(@Nonnull String path) {
-            if (path == null) throw new NullPointerException();
-            mPath = path;
+        @Nonnull
+        public String getPath() {
+            return mTransport.getPath();
+        }
+
+        public InputStream setTransportSettings(TransportSettings transport) {
+            mTransport = transport.copy();
             return this;
+        }
+
+        public TransportSettings getTransportSettings() {
+            return mTransport.copy();
+        }
+
+        @Nonnull
+        public String getCommandsAtStartup() {
+            return mCommandsAtStartup;
         }
 
         public InputStream setCommandsAtStartup(@Nonnull String cmds) {
             if (cmds == null) throw new NullPointerException();
             mCommandsAtStartup = TextUtils.isEmpty(cmds) ? "" : cmds;
             return this;
+        }
+
+        @Nonnull
+        public String getReceiverOption() {
+            return mReceiverOption;
         }
 
         public InputStream setReceiverOption(@Nonnull String option) {
@@ -112,33 +124,37 @@ public class RtkServerSettings {
     }
 
     public static class OutputStream {
-        private StreamType mType;
 
-        private String mPath;
+        private TransportSettings mTransport;
 
         private SolutionOptions mOptions;
 
         public OutputStream() {
-            mType = StreamType.NONE;
-            mPath = "";
+            mTransport = TRANSPORT_DUMMY;
             mOptions = new SolutionOptions();
         }
 
         public void setValue(OutputStream src) {
-            mType = src.mType;
-            mPath = src.mPath;
+            mTransport = src.mTransport.copy();
             mOptions.setValues(src.mOptions);
         }
 
-        public OutputStream setType(StreamType type) {
-            mType = type;
+        public OutputStream setTransportSettings(TransportSettings transport) {
+            mTransport = transport.copy();
             return this;
         }
 
-        public OutputStream setPath(@Nonnull String path) {
-            if (path == null) throw new NullPointerException();
-            mPath = path;
-            return this;
+        public TransportSettings getTransportSettings() {
+            return mTransport.copy();
+        }
+
+        public StreamType getType() {
+            return mTransport.getType();
+        }
+
+        @Nonnull
+        public String getPath() {
+            return mTransport.getPath();
         }
 
         public OutputStream setSolutionOptions(SolutionOptions opts) {
@@ -156,30 +172,63 @@ public class RtkServerSettings {
 
     public static class LogStream {
 
-        private StreamType mType;
-
-        private String mPath;
+        private TransportSettings mTransport;
 
         public LogStream() {
-            mType = StreamType.NONE;
-            mPath = "";
+            mTransport = TRANSPORT_DUMMY;
         }
 
         public void setValue(LogStream src) {
-            mType = src.mType;
-            mPath = src.mPath;
+            mTransport = src.mTransport.copy();
         }
 
-        public LogStream setType(StreamType type) {
-            mType = type;
+        public LogStream setTransportSettings(TransportSettings transport) {
+            mTransport = transport.copy();
             return this;
         }
 
-        public LogStream setPath(@Nonnull String path) {
-            mPath = path;
-            return this;
+        public TransportSettings getTransportSettings() {
+            return mTransport.copy();
         }
+
+        public StreamType getType() {
+            return mTransport.getType();
+        }
+
+        @Nonnull
+        public String getPath() {
+            return mTransport.getPath();
+        }
+
     }
+
+    public abstract interface TransportSettings {
+
+        public StreamType getType();
+
+        public String getPath();
+
+        public TransportSettings copy();
+    }
+
+    public final static TransportSettings TRANSPORT_DUMMY = new TransportSettings() {
+        @Override
+        public StreamType getType() {
+            return StreamType.NONE;
+        }
+
+        @Override
+        public String getPath() {
+            return "";
+        }
+
+        @Override
+        public TransportSettings copy() {
+            return this;
+        }
+
+    };
+
 
     private final static int DEFAULT_SERVER_CYCLE_MS = 10;
 
@@ -261,14 +310,14 @@ public class RtkServerSettings {
 
     int[] getStreamTypes() {
         final int[] types = new int[8];
-        types[0] = mInputRover.mType.getRtklibId();
-        types[1] = mInputBase.mType.getRtklibId();
-        types[2] = mInputCorrection.mType.getRtklibId();
-        types[3] = mOutputSolution1.mType.getRtklibId();
-        types[4] = mOutputSolution2.mType.getRtklibId();
-        types[5] = mLogRover.mType.getRtklibId();
-        types[6] = mLogBase.mType.getRtklibId();
-        types[7] = mLogCorrection.mType.getRtklibId();
+        types[0] = mInputRover.getType().getRtklibId();
+        types[1] = mInputBase.getType().getRtklibId();
+        types[2] = mInputCorrection.getType().getRtklibId();
+        types[3] = mOutputSolution1.getType().getRtklibId();
+        types[4] = mOutputSolution2.getType().getRtklibId();
+        types[5] = mLogRover.getType().getRtklibId();
+        types[6] = mLogBase.getType().getRtklibId();
+        types[7] = mLogCorrection.getType().getRtklibId();
 
         return types;
     }
@@ -276,14 +325,14 @@ public class RtkServerSettings {
     @Nonnull
     String[] getStreamPaths() {
         final String[] paths = new String[8];
-        paths[0] = mInputRover.mPath;
-        paths[1] = mInputBase.mPath;
-        paths[2] = mInputCorrection.mPath;
-        paths[3] = mOutputSolution1.mPath;
-        paths[4] = mOutputSolution2.mPath;
-        paths[5] = mLogRover.mPath;
-        paths[6] = mLogBase.mPath;
-        paths[7] = mLogCorrection.mPath;
+        paths[0] = mInputRover.getPath();
+        paths[1] = mInputBase.getPath();
+        paths[2] = mInputCorrection.getPath();
+        paths[3] = mOutputSolution1.getPath();
+        paths[4] = mOutputSolution2.getPath();
+        paths[5] = mLogRover.getPath();
+        paths[6] = mLogBase.getPath();
+        paths[7] = mLogCorrection.getPath();
 
         for (int i=0; i<8; ++i) assertNotNull(paths[i]);
 
@@ -353,9 +402,17 @@ public class RtkServerSettings {
         return mInputBase.mTransmittedPos;
     }
 
+    public final InputStream getInputRover() {
+        return mInputRover;
+    }
+
     public RtkServerSettings setInputRover(InputStream rover) {
         mInputRover.setValue(rover);
         return this;
+    }
+
+    public final InputStream getInputBase() {
+        return mInputBase;
     }
 
     public RtkServerSettings setInputBase(InputStream base) {
@@ -363,9 +420,17 @@ public class RtkServerSettings {
         return this;
     }
 
+    public final InputStream getInputCorrection() {
+        return mInputCorrection;
+    }
+
     public RtkServerSettings setInputCorrection(InputStream correction) {
         mInputCorrection.setValue(correction);
         return this;
+    }
+
+    public final OutputStream getOutputSolution1() {
+        return mOutputSolution1;
     }
 
     public RtkServerSettings setOutputSolution1(OutputStream solution1) {
@@ -373,9 +438,17 @@ public class RtkServerSettings {
         return this;
     }
 
+    public final OutputStream getOutputSolution2() {
+        return mOutputSolution2;
+    }
+
     public RtkServerSettings setOutputSolution2(OutputStream solution2) {
         mOutputSolution2.setValue(solution2);
         return this;
+    }
+
+    public final LogStream getLogRover() {
+        return mLogRover;
     }
 
     public RtkServerSettings setLogRover(LogStream rover) {
@@ -383,9 +456,17 @@ public class RtkServerSettings {
         return this;
     }
 
+    public final LogStream getLogBase() {
+        return mLogBase;
+    }
+
     public RtkServerSettings setLogBase(LogStream base) {
         mLogBase.setValue(base);
         return this;
+    }
+
+    public final LogStream getLogCorrection() {
+        return mLogCorrection;
     }
 
     public RtkServerSettings setLogCorrection(LogStream correction) {
