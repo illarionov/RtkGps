@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.net.LocalSocketAddress.Namespace;
+import android.os.ConditionVariable;
 import android.util.Log;
 
 public class BluetoothToLocalSocket {
@@ -23,20 +24,25 @@ public class BluetoothToLocalSocket {
     public static final int STATE_IDLE = 0;
     public static final int STATE_CONNECTING = 1;
     public static final int STATE_CONNECTED = 2;
+    public static final int STATE_WAITING = 3;
     public static final int STATE_RECONNECTING = 4;
 
     //  Standard UUID for the Serial Port Profile
     private static final java.util.UUID UUID_SPP = java.util.UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     final LocalSocketServiceThread mLocalSocketThread;
+
     final BluetoothServiceThread mBluetoothThread;
+
+    final ConditionVariable mIsBluetoothReadyCondvar;
 
     public static final int RECONNECT_TIMEOUT_MS = 2000;
 
     public BluetoothToLocalSocket(@Nonnull String bluetoothAddress,
             @Nonnull String localSocketPath) {
-        mLocalSocketThread = new LocalSocketServiceThread(localSocketPath);
+        mLocalSocketThread = new LocalSocketServiceThread(localSocketPath, localSocketPath+"_"+bluetoothAddress);
         mBluetoothThread = new BluetoothServiceThread(bluetoothAddress);
+        mIsBluetoothReadyCondvar = new ConditionVariable(false);
     }
 
     public void start() {
@@ -47,41 +53,82 @@ public class BluetoothToLocalSocket {
     public void stop() {
         mBluetoothThread.cancel();
         mLocalSocketThread.cancel();
+        mIsBluetoothReadyCondvar.open();
     }
 
     private class LocalSocketServiceThread extends Thread {
 
         private final LocalSocketAddress mSocketPath;
+        private final LocalSocketAddress mBindName;
 
-        private int mConnectionState;
+        private volatile int mConnectionState;
         private volatile boolean cancelRequested;
         private LocalSocket mSocket;
         private InputStream mInputStream;
         private OutputStream mOutputStream;
 
-        public LocalSocketServiceThread(String socketPath) {
-            mSocketPath = new  LocalSocketAddress(socketPath, Namespace.FILESYSTEM);
+        public LocalSocketServiceThread(String socketPath, String bindName) {
+            mSocketPath = new LocalSocketAddress(socketPath, Namespace.FILESYSTEM);
+            mBindName = new LocalSocketAddress(bindName, Namespace.FILESYSTEM);
 
-            mSocket = new LocalSocket();
             mInputStream = sDummyInputStream;
             mOutputStream = sDummyOutputStream;
 
         }
 
         public void cancel() {
-            LocalSocket s;
+            if (DBG) Log.v(TAG, "Local cancel()");
             synchronized(this) {
                 cancelRequested = true;
-                s = mSocket;
+                disconnect();
                 notifyAll();
             }
-            if (s != null) {
-                try {
-                    s.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "close() of connect socket failed", e);
-                }
+        }
+
+        public synchronized void disconnect() {
+
+            if (DBG) Log.v(TAG, "Local disconnect() connected: " + (mConnectionState == STATE_CONNECTED));
+
+            if (mConnectionState != STATE_CONNECTED) {
+                return;
             }
+
+            if (mSocket == null)
+                return;
+
+            try {
+                mSocket.shutdownInput();
+            }catch(IOException e) {
+                Log.e(TAG, "Local shutdownInput() of mSocket failed", e);
+            }
+
+            try {
+                mSocket.shutdownOutput();
+            }catch(IOException e) {
+                Log.e(TAG, "Local shutdownOutput() of mSocket failed", e);
+            }
+
+            try {
+                mInputStream.close();
+            }catch(IOException e) {
+                Log.e(TAG, "Local close() of mInputStream failed", e);
+            }
+
+            try {
+                mOutputStream.close();
+            }catch(IOException e) {
+                Log.e(TAG, "Local close() of mOutputStream failed", e);
+            }
+
+            try {
+                mSocket.close();
+            }catch(IOException e) {
+                Log.e(TAG, "Local close() of mSocket failed", e);
+            }
+
+            mInputStream = sDummyInputStream;
+            mOutputStream = sDummyOutputStream;
+
         }
 
         /**
@@ -92,35 +139,47 @@ public class BluetoothToLocalSocket {
             OutputStream os;
             synchronized(this) {
                 if (mConnectionState != STATE_CONNECTED) {
-                    Log.e(TAG, "write() error: not connected");
+                    Log.e(TAG, "Local write() error: not connected");
                     return;
                 }
                 os = mOutputStream;
             }
+            //if (DBG) Log.v(TAG, "Local socket write " + count + " bytes");
             os.write(buffer, offset, count);
         }
 
 
-        private void setState(int state) {
+        private synchronized void setState(int state) {
             int oldState = mConnectionState;
             mConnectionState = state;
-            if (DBG) Log.d(TAG, "setState() " + oldState + " -> " + state);
+            if (DBG) Log.v(TAG, "Local setState() " + oldState + " -> " + state);
         }
 
         private boolean connectLoop() {
-            LocalSocket s;
-            synchronized(this) {
-                s = mSocket;
+            LocalSocket s = new LocalSocket();
+            try {
+                s.bind(mBindName);
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
 
             while(!cancelRequested) {
                 try {
                     s.connect(mSocketPath);
+                    synchronized(this) {
+                        mSocket = s;
+                        mInputStream = s.getInputStream();
+                        mOutputStream = s.getOutputStream();
+                        // s.setSoTimeout(n)
+                    }
                     return true;
                 }catch (IOException e) {
                     synchronized(this) {
                         if (cancelRequested) {
                             return false;
+                        }
+                        if (!mIsBluetoothReadyCondvar.block(1)) {
+                            return true;
                         }
                         setState(STATE_RECONNECTING);
                         try {
@@ -139,31 +198,38 @@ public class BluetoothToLocalSocket {
             final byte buf[] = new byte[4096];
 
             try {
-                rcvd =  mInputStream.read(buf, 0, buf.length);
-                if (rcvd >= 0) {
-                    // TODO: report error to rtksvr?
-                    mBluetoothThread.write(buf, 0, rcvd);
+                while (!cancelRequested) {
+                    rcvd =  mInputStream.read(buf, 0, buf.length);
+                    if (rcvd >= 0) {
+                        // TODO: report error to rtksvr?
+                        mBluetoothThread.write(buf, 0, rcvd);
+                    }
+                    if (rcvd < 0) {
+                        if (DBG) Log.v(TAG, "Local: EOF reached");
+                        return !cancelRequested;
+                    }
                 }
+                return false;
             }catch (IOException e) {
                 synchronized(this) {
-                    try {
-                        mSocket.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                    mInputStream = sDummyInputStream;
-                    mOutputStream = sDummyOutputStream;
-                    return cancelRequested;
+                    disconnect();
+                    return !cancelRequested;
                 }
             }
+        }
 
-            return false;
+        private void waitBluetooth() {
+            if (DBG) Log.v(TAG, "waitBluetooth()");
+            mIsBluetoothReadyCondvar.block();
         }
 
         @Override
         public void run() {
             Log.i(TAG, "BEGIN BluetoothToLocalSocket-Socket");
             setName("BluetoothToLocalSocket-LocalSocket");
+
+            setState(STATE_WAITING);
+            waitBluetooth();
 
             setState(STATE_CONNECTING);
 
@@ -176,6 +242,9 @@ public class BluetoothToLocalSocket {
 
                 if (!transferDataLoop())
                     return;
+
+                setState(STATE_WAITING);
+                waitBluetooth();
 
                 setState(STATE_RECONNECTING);
             }
@@ -204,11 +273,17 @@ public class BluetoothToLocalSocket {
             mBtDevice = mBtAdapter.getRemoteDevice(bluetoothAddress);
         }
 
-        private void setState(int state) {
+        private synchronized void setState(int state) {
             int oldState = mConnectionState;
             mConnectionState = state;
-            if (DBG) Log.d(TAG, "setState() " + oldState + " -> " + state);
+            if (DBG) Log.d(TAG, "BT setState() " + oldState + " -> " + state);
 
+            if (mConnectionState == STATE_CONNECTED)
+                mIsBluetoothReadyCondvar.open();
+            else {
+                mIsBluetoothReadyCondvar.close();
+                //mLocalSocketThread.disconnect();
+            }
         }
 
         public void cancel() {
@@ -240,6 +315,7 @@ public class BluetoothToLocalSocket {
                 }
                 os = mOutputStream;
             }
+            //if (DBG) Log.v(TAG, "BT socket write " + count + " bytes");
             os.write(buffer, offset, count);
         }
 
@@ -273,7 +349,6 @@ public class BluetoothToLocalSocket {
 
         private boolean connectLoop() {
 
-
             while(!cancelRequested) {
                 try {
                     connect();
@@ -300,15 +375,20 @@ public class BluetoothToLocalSocket {
             final byte buf[] = new byte[4096];
 
             try {
-                rcvd =  mInputStream.read(buf, 0, buf.length);
-                if (rcvd >= 0) {
-                    try {
-                        mLocalSocketThread.write(buf, 0, rcvd);
-                    }catch (IOException e) {
-                        // TODO
-                        e.printStackTrace();
+                while(!cancelRequested) {
+                    rcvd =  mInputStream.read(buf, 0, buf.length);
+                    if (rcvd >= 0) {
+                        try {
+                            mLocalSocketThread.write(buf, 0, rcvd);
+                        }catch (IOException e) {
+                            // TODO
+                            e.printStackTrace();
+                        }
                     }
+                    if (rcvd < 0)
+                        throw new IOException("EOF");
                 }
+                return false;
             }catch (IOException e) {
                 synchronized(this) {
                     try {
@@ -318,11 +398,9 @@ public class BluetoothToLocalSocket {
                     }
                     mInputStream = sDummyInputStream;
                     mOutputStream = sDummyOutputStream;
-                    return cancelRequested;
+                    return !cancelRequested;
                 }
             }
-
-            return false;
         }
 
         @Override
