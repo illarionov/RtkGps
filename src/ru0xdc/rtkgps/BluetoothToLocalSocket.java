@@ -282,7 +282,7 @@ public class BluetoothToLocalSocket {
                 mIsBluetoothReadyCondvar.open();
             else {
                 mIsBluetoothReadyCondvar.close();
-                //mLocalSocketThread.disconnect();
+                mLocalSocketThread.disconnect();
             }
         }
 
@@ -291,15 +291,19 @@ public class BluetoothToLocalSocket {
             synchronized(this) {
                 cancelRequested = true;
                 s = mSocket;
+
+                if (s != null) {
+                    try {
+                        if (DBG) Log.v(TAG, "BT close");
+                        s.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "close() of connect socket failed", e);
+                    }
+                }
+
                 notifyAll();
             }
-            if (s != null) {
-                try {
-                    s.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "close() of connect socket failed", e);
-                }
-            }
+
         }
 
         /**

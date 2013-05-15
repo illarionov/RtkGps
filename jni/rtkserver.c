@@ -272,6 +272,7 @@ static jboolean get_path_in_storage_dir(JNIEnv* env, char *filename, size_t bufs
 
    j_str2buf(env, j_path, filename, bufsize);
 
+   return JNI_TRUE;
 }
 
 static jboolean open_trace_file(JNIEnv* env, int trace_level, gtime_t timestamp)
