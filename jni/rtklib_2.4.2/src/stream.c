@@ -868,10 +868,11 @@ static int recv_nb(socket_t sock, unsigned char *buff, int n)
 {
     struct timeval tv={0};
     fd_set rs;
+    int nr;
     
     FD_ZERO(&rs); FD_SET(sock,&rs);
     if (!select(sock+1,&rs,NULL,NULL,&tv)) return 0;
-    return recv(sock,(char *)buff,n,0);
+    return (nr=recv(sock,(char *)buff,n,0))?nr:-1;
 }
 /* non-block send ------------------------------------------------------------*/
 static int send_nb(socket_t sock, unsigned char *buff, int n)
@@ -1861,7 +1862,7 @@ static void updateunixsvr(unixsvr_t *unixsvr, char *msg)
     }
     for (i=0;i<MAXCLI;i++) {
         if (!unixsvr->cli[i].state) continue;
-        strcpy(saddr,unixsvr->cli[i].saddr);
+        memcpy(saddr,unixsvr->cli[i].saddr, sizeof(unixsvr->cli[i].saddr));
         n++;
     }
     if (n==0) {
@@ -1898,9 +1899,9 @@ static int accunixsock(unixsvr_t *unixsvr, char *msg)
     unixsvr->cli[i].sock=sock;
     if (!setsock(unixsvr->cli[i].sock,msg)) return 0;
     memcpy(&unixsvr->cli[i].addr,&addr,sizeof(addr));
-    strcpy(unixsvr->cli[i].saddr,addr.sun_path);
+    memcpy(unixsvr->cli[i].saddr,addr.sun_path, sizeof(addr.sun_path));
     sprintf(msg,"%s",unixsvr->cli[i].saddr);
-    tracet(2,"accsock: connected sock=%d addr=%s\n",unixsvr->cli[i].sock,unixsvr->cli[i].saddr);
+    tracet(2,"accunixsock: connected sock=%d addr=%s\n",unixsvr->cli[i].sock,unixsvr->cli[i].saddr);
     unixsvr->cli[i].state=2;
     unixsvr->cli[i].tact=tickget();
     return 1;
