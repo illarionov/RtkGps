@@ -185,7 +185,7 @@ public class RtkNaviService extends Service {
 
         baseSettings = settings.getInputBase().getTransportSettings();
         if (baseSettings.getType() == StreamType.BLUETOOTH) {
-            StreamBluetoothFragment.Value btSettings = (Value)roverSettngs;
+            StreamBluetoothFragment.Value btSettings = (Value)baseSettings;
             mBtBase = new BluetoothToLocalSocket(btSettings.getAddress(), btSettings.getPath());
             mBtBase.start();
         }else {
