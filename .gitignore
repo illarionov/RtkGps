@@ -1,21 +1,23 @@
 *~
 *.swp
 
-bin
-trash
-gen
-local.properties
+/bin
+/trash
+/gen
+/local.properties
 
-.apt_generated/
-.lint4jprefs
-lint.xml
-proguard/
-projectSet.psf
+/.apt_generated/
+/.lint4jprefs
+/lint.xml
+/proguard/
+/projectSet.psf
 
-obj/
-libs/armeabi-v7a/
-libs/armeabi/
-libs/x86/
-libs/android-support-v4.jar
+/obj/
+/libs/armeabi-v7a/
+/libs/armeabi/
+/libs/x86/
+
+/.gradle
+/build
 
 

@@ -1,0 +1,47 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.4'
+    }
+}
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile files('libs/android-support-v13.jar', 'libs/x86/librtkgps.so')
+    compile 'com.google.code.findbugs:jsr305:2.0.1'
+    compile 'com.jakewharton:butterknife:1.3.2'
+}
+
+android {
+    compileSdkVersion 17
+    buildToolsVersion "17"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 17
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+
+        instrumentTest.setRoot('tests')
+    }
+}
+
+tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
+   pkgTask.jniDir new File(projectDir, 'libs')
+}
+
