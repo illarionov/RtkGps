@@ -108,7 +108,7 @@ public class StreamBluetoothFragment extends PreferenceFragment {
 
     public StreamBluetoothFragment() {
         super();
-        mSharedPrefsName = StreamNtripClientFragment.class.getSimpleName();
+        mSharedPrefsName = StreamBluetoothFragment.class.getSimpleName();
     }
 
     @Override
@@ -264,7 +264,6 @@ public class StreamBluetoothFragment extends PreferenceFragment {
             reloadSummaries();
         }
     };
-
 
     @Nonnull
     public static Value readSettings(Context context, SharedPreferences prefs, String sharedPrefsName) {

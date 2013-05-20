@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--  Prolific -->
+    <usb-device vendor-id="1659" product-id="8963"  /> <!-- 0x067b 0x2303 PL2303 Serial  -->
+    <usb-device vendor-id="1659" product-id="4660"  /> <!-- 0x067b 0x1234 DCU-11 Phone Cable -->
+    <usb-device vendor-id="21362" product-id="8963" /> <!-- 0x5372 0x2303 Prolific2 PL2303 -->
+
+    <!--  Generic comunnication device with Abstract Control Model subclass -->
+    <usb-device class="2" subclass="0" protocol="0" />
+</resources>

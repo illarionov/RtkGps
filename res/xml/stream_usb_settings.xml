@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <ListPreference
+        android:key="stream_usb_baudrate"
+        android:title="@string/usb_device_baudrate_title"
+        android:entries="@array/usb_device_baudrate_entries"
+        android:entryValues="@array/usb_device_baudrate_entries"
+        android:defaultValue="38400"
+        />
+
+</PreferenceScreen>

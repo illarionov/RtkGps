@@ -321,7 +321,7 @@ public class SettingsHelper {
             settings = StreamBluetoothFragment.readSettings(context, prefs, stream);
             break;
         case USB:
-            settings = StreamUsbFragment.readSettings(context, prefs);
+            settings = StreamUsbFragment.readSettings(context, prefs, stream);
             break;
         case NONE:
             settings = RtkServerSettings.TRANSPORT_DUMMY;

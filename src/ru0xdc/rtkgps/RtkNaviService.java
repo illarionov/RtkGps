@@ -3,6 +3,7 @@ package ru0xdc.rtkgps;
 import ru0xdc.rtkgps.settings.SettingsHelper;
 import ru0xdc.rtkgps.settings.StreamBluetoothFragment;
 import ru0xdc.rtkgps.settings.StreamBluetoothFragment.Value;
+import ru0xdc.rtkgps.settings.StreamUsbFragment;
 import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.RtkServer;
 import ru0xdc.rtklib.RtkServerObservationStatus;
@@ -40,7 +41,12 @@ public class RtkNaviService extends Service {
 
     private PowerManager.WakeLock mCpuLock;
 
-    private BluetoothToLocalSocket mBtRover, mBtBase;
+    private BluetoothToRtklib mBtRover, mBtBase;
+    private UsbToRtklib mUsbReceiver;
+
+    static {
+        System.loadLibrary("rtkgps");
+    }
 
     @Override
     public void onCreate() {
@@ -53,9 +59,15 @@ public class RtkNaviService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        final String action = intent.getAction();
-        if (action.equals(ACTION_START)) processStart();
-        else if(action.equals(ACTION_STOP)) processStop();
+        if (intent == null) {
+            Log.v(TAG, "RtkNaviService restarted");
+            processStart();
+        }else {
+            final String action = intent.getAction();
+            if (action.equals(ACTION_START)) processStart();
+            else if(action.equals(ACTION_STOP)) processStop();
+            else Log.e(TAG, "onStartCommand(): unknown action " + action);
+        }
         return  START_STICKY;
     }
 
@@ -119,6 +131,7 @@ public class RtkNaviService extends Service {
         }
 
         startBluetoothPipes();
+        startUsb();
 
         mCpuLock.acquire();
 
@@ -138,6 +151,7 @@ public class RtkNaviService extends Service {
 
         if (isServiceStarted()) {
             stopBluetoothPipes();
+            stopUsb();
             mRtkServer.stop();
             // Tell the user we stopped.
             Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT)
@@ -177,7 +191,7 @@ public class RtkNaviService extends Service {
 
         if (roverSettngs.getType() == StreamType.BLUETOOTH) {
             StreamBluetoothFragment.Value btSettings = (Value)roverSettngs;
-            mBtRover = new BluetoothToLocalSocket(btSettings.getAddress(), btSettings.getPath());
+            mBtRover = new BluetoothToRtklib(btSettings.getAddress(), btSettings.getPath());
             mBtRover.start();
         }else {
             mBtRover = null;
@@ -186,7 +200,7 @@ public class RtkNaviService extends Service {
         baseSettings = settings.getInputBase().getTransportSettings();
         if (baseSettings.getType() == StreamType.BLUETOOTH) {
             StreamBluetoothFragment.Value btSettings = (Value)baseSettings;
-            mBtBase = new BluetoothToLocalSocket(btSettings.getAddress(), btSettings.getPath());
+            mBtBase = new BluetoothToRtklib(btSettings.getAddress(), btSettings.getPath());
             mBtBase.start();
         }else {
             mBtBase = null;
@@ -198,5 +212,40 @@ public class RtkNaviService extends Service {
         if (mBtBase != null) mBtBase.stop();
         mBtRover = null;
         mBtBase = null;
+    }
+
+    private void startUsb() {
+        RtkServerSettings settings = mRtkServer.getServerSettings();
+
+        {
+            final TransportSettings roverSettngs;
+            roverSettngs = settings.getInputRover().getTransportSettings();
+            if (roverSettngs.getType() == StreamType.USB) {
+                StreamUsbFragment.Value usbSettings = (ru0xdc.rtkgps.settings.StreamUsbFragment.Value)roverSettngs;
+                mUsbReceiver = new UsbToRtklib(this, usbSettings.getPath());
+                mUsbReceiver.setBaudRate(usbSettings.getBaudrate());
+                mUsbReceiver.start();
+                return;
+            }
+        }
+
+        {
+            final TransportSettings baseSettngs;
+            baseSettngs = settings.getInputBase().getTransportSettings();
+            if (baseSettngs.getType() == StreamType.USB) {
+                StreamUsbFragment.Value usbSettings = (ru0xdc.rtkgps.settings.StreamUsbFragment.Value)baseSettngs;
+                mUsbReceiver = new UsbToRtklib(this, usbSettings.getPath());
+                mUsbReceiver.setBaudRate(usbSettings.getBaudrate());
+                mUsbReceiver.start();
+                return;
+            }
+        }
+    }
+
+    private void stopUsb() {
+        if (mUsbReceiver != null) {
+            mUsbReceiver.stop();
+            mUsbReceiver = null;
+        }
     }
 }

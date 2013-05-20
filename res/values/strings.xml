@@ -453,5 +453,23 @@
     <string name="bluetooth_system_settings_summary">Display system Bluetooth settings screen</string>
     
     <string name="usb_dialog_title">USB receiver settings</string>
+    <string name="usb_device_baudrate_title">Baudrate</string>
+	<string-array name="usb_device_baudrate_entries">
+			<item>300</item>
+            <item>1200</item>
+            <item>1800</item>
+            <item>2400</item>
+            <item>3600</item>
+            <item>4800</item>
+            <item>7200</item>
+            <item>9600</item>
+            <item>14400</item>
+            <item>19200</item>
+            <item>28800</item>
+            <item>38400</item>
+            <item>57600</item>
+            <item>115200</item>
+            <item>230400</item>
+    </string-array>
     
 </resources>

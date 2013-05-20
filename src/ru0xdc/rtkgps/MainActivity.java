@@ -14,9 +14,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -59,7 +61,9 @@ public class MainActivity extends Activity implements ActionBar.OnNavigationList
         if (savedInstanceState == null) {
             SettingsHelper.setDefaultValues(this, false);
             startRtkService();
+            proxyIfUsbAttached(getIntent());
         }
+
     }
 
     @Override
@@ -69,6 +73,25 @@ public class MainActivity extends Activity implements ActionBar.OnNavigationList
             final Intent intent = new Intent(this, RtkNaviService.class);
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        proxyIfUsbAttached(intent);
+    }
+
+    private void proxyIfUsbAttached(Intent intent) {
+
+        if (intent == null) return;
+
+        if (!UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(intent.getAction())) return;
+
+        if (DBG) Log.v(TAG, "usb device attached");
+
+        final Intent proxyIntent = new Intent(UsbToRtklib.ACTION_USB_DEVICE_ATTACHED);
+        proxyIntent.putExtras(intent.getExtras());
+        sendBroadcast(proxyIntent);
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
