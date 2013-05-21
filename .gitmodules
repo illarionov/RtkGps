@@ -1,0 +1,3 @@
+[submodule "jni/RTKLIB"]
+	path = jni/RTKLIB
+	url = git@github.com:littlesavage/RTKLIB.git
