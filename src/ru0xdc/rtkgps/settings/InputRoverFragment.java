@@ -53,6 +53,7 @@ public class InputRoverFragment extends PreferenceFragment {
         StreamFormat.OEM3,
         StreamFormat.OEM4,
         StreamFormat.UBX,
+        StreamFormat.SIRF,
         StreamFormat.SS2,
         StreamFormat.CRES,
         StreamFormat.STQ,
