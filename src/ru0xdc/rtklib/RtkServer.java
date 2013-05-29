@@ -121,6 +121,20 @@ public class RtkServer {
         return status;
     }
 
+    public void sendStartupCommands(int stream) {
+        switch (stream) {
+        case RECEIVER_ROVER:
+            _writeCommands(mSettings.getInputRover().getCommandsAtStartup(), null, null);
+            break;
+        case RECEIVER_BASE:
+            _writeCommands(null,mSettings.getInputBase().getCommandsAtStartup(),  null);
+            break;
+        case RECEIVER_EPHEM:
+            _writeCommands(null,null,mSettings.getInputCorrection().getCommandsAtStartup());
+            break;
+        }
+    }
+
     @Nonnull
     // getPathInStorageDirectory() is used by native code, do not remove or rename
     public static String getPathInStorageDirectory(@Nonnull String filename) {
@@ -147,6 +161,8 @@ public class RtkServer {
     private native void _getRtkStatus(RtkControlResult dst);
 
     private native void _readSolutionBuffer(Solution.SolutionBuffer dst);
+
+    private native void _writeCommands(String roverCmd, String baseCmd, String correctionsCmd);
 
     /**
      * Start rtk server thread

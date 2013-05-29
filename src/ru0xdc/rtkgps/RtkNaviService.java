@@ -18,6 +18,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
@@ -182,6 +183,87 @@ public class RtkNaviService extends Service {
         return notification;
     }
 
+    private class BluetoothCallbacks implements BluetoothToRtklib.Callbacks {
+
+        private int mStreamId;
+        private final Handler mHandler;
+
+        public BluetoothCallbacks(int streamId) {
+            mStreamId = streamId;
+            mHandler = new Handler();
+        }
+
+        @Override
+        public void onConnected() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(RtkNaviService.this, R.string.bluetooth_connected,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            mRtkServer.sendStartupCommands(mStreamId);
+        }
+
+        @Override
+        public void onStopped() {
+        }
+
+        @Override
+        public void onConnectionLost() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(RtkNaviService.this, R.string.bluetooth_connection_lost,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+    }
+
+    private class UsbCallbacks implements UsbToRtklib.Callbacks {
+
+        private int mStreamId;
+        private final Handler mHandler;
+
+        public UsbCallbacks(int streamId) {
+            mStreamId = streamId;
+            mHandler = new Handler();
+        }
+
+        @Override
+        public void onConnected() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(RtkNaviService.this, R.string.usb_connected,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            mRtkServer.sendStartupCommands(mStreamId);
+        }
+
+        @Override
+        public void onStopped() {
+        }
+
+        @Override
+        public void onConnectionLost() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(RtkNaviService.this, R.string.usb_connection_lost,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+    }
+
+
     private void startBluetoothPipes() {
         final TransportSettings roverSettngs, baseSettings;
 
@@ -192,6 +274,7 @@ public class RtkNaviService extends Service {
         if (roverSettngs.getType() == StreamType.BLUETOOTH) {
             StreamBluetoothFragment.Value btSettings = (Value)roverSettngs;
             mBtRover = new BluetoothToRtklib(btSettings.getAddress(), btSettings.getPath());
+            mBtRover.setCallbacks(new BluetoothCallbacks(RtkServer.RECEIVER_ROVER));
             mBtRover.start();
         }else {
             mBtRover = null;
@@ -201,6 +284,7 @@ public class RtkNaviService extends Service {
         if (baseSettings.getType() == StreamType.BLUETOOTH) {
             StreamBluetoothFragment.Value btSettings = (Value)baseSettings;
             mBtBase = new BluetoothToRtklib(btSettings.getAddress(), btSettings.getPath());
+            mBtBase.setCallbacks(new BluetoothCallbacks(RtkServer.RECEIVER_BASE));
             mBtBase.start();
         }else {
             mBtBase = null;
@@ -224,6 +308,7 @@ public class RtkNaviService extends Service {
                 StreamUsbFragment.Value usbSettings = (ru0xdc.rtkgps.settings.StreamUsbFragment.Value)roverSettngs;
                 mUsbReceiver = new UsbToRtklib(this, usbSettings.getPath());
                 mUsbReceiver.setBaudRate(usbSettings.getBaudrate());
+                mUsbReceiver.setCallbacks(new UsbCallbacks(RtkServer.RECEIVER_ROVER));
                 mUsbReceiver.start();
                 return;
             }
@@ -236,6 +321,7 @@ public class RtkNaviService extends Service {
                 StreamUsbFragment.Value usbSettings = (ru0xdc.rtkgps.settings.StreamUsbFragment.Value)baseSettngs;
                 mUsbReceiver = new UsbToRtklib(this, usbSettings.getPath());
                 mUsbReceiver.setBaudRate(usbSettings.getBaudrate());
+                mUsbReceiver.setCallbacks(new UsbCallbacks(RtkServer.RECEIVER_BASE));
                 mUsbReceiver.start();
                 return;
             }

@@ -402,74 +402,82 @@ public class RtkServerSettings {
         return mInputBase.mTransmittedPos;
     }
 
+    @Nonnull
     public final InputStream getInputRover() {
         return mInputRover;
     }
 
-    public RtkServerSettings setInputRover(InputStream rover) {
+    public RtkServerSettings setInputRover(@Nonnull InputStream rover) {
         mInputRover.setValue(rover);
         return this;
     }
 
+    @Nonnull
     public final InputStream getInputBase() {
         return mInputBase;
     }
 
-    public RtkServerSettings setInputBase(InputStream base) {
+    public RtkServerSettings setInputBase(@Nonnull InputStream base) {
         mInputBase.setValue(base);
         return this;
     }
 
+    @Nonnull
     public final InputStream getInputCorrection() {
         return mInputCorrection;
     }
 
-    public RtkServerSettings setInputCorrection(InputStream correction) {
+    public RtkServerSettings setInputCorrection(@Nonnull InputStream correction) {
         mInputCorrection.setValue(correction);
         return this;
     }
 
+    @Nonnull
     public final OutputStream getOutputSolution1() {
         return mOutputSolution1;
     }
 
-    public RtkServerSettings setOutputSolution1(OutputStream solution1) {
+    public RtkServerSettings setOutputSolution1(@Nonnull OutputStream solution1) {
         mOutputSolution1.setValue(solution1);
         return this;
     }
 
+    @Nonnull
     public final OutputStream getOutputSolution2() {
         return mOutputSolution2;
     }
 
-    public RtkServerSettings setOutputSolution2(OutputStream solution2) {
+    public RtkServerSettings setOutputSolution2(@Nonnull OutputStream solution2) {
         mOutputSolution2.setValue(solution2);
         return this;
     }
 
+    @Nonnull
     public final LogStream getLogRover() {
         return mLogRover;
     }
 
-    public RtkServerSettings setLogRover(LogStream rover) {
+    public RtkServerSettings setLogRover(@Nonnull LogStream rover) {
         mLogRover.setValue(rover);
         return this;
     }
 
+    @Nonnull
     public final LogStream getLogBase() {
         return mLogBase;
     }
 
-    public RtkServerSettings setLogBase(LogStream base) {
+    public RtkServerSettings setLogBase(@Nonnull LogStream base) {
         mLogBase.setValue(base);
         return this;
     }
 
+    @Nonnull
     public final LogStream getLogCorrection() {
         return mLogCorrection;
     }
 
-    public RtkServerSettings setLogCorrection(LogStream correction) {
+    public RtkServerSettings setLogCorrection(@Nonnull LogStream correction) {
         mLogCorrection.setValue(correction);
         return this;
     }

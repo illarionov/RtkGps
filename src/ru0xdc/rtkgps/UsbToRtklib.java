@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import ru0xdc.rtkgps.usb.UsbAcmController;
 import ru0xdc.rtkgps.usb.UsbPl2303Controller;
@@ -40,15 +41,37 @@ public class UsbToRtklib {
     final LocalSocketThread mLocalSocketThread;
     final UsbReceiver mUsbReceiver;
 
+    private Callbacks mCallbacks;
 
     public static final int RECONNECT_TIMEOUT_MS = 2000;
+
+    private static final Callbacks sDummyCallbacks = new Callbacks() {
+        @Override
+        public void onConnected() {}
+        @Override
+        public void onStopped() {}
+        @Override
+        public void onConnectionLost() {}
+    };
+
+
+    public interface Callbacks {
+
+        public void onConnected();
+
+        public void onStopped();
+
+        public void onConnectionLost();
+
+    }
+
 
     public UsbToRtklib(Context serviceContext, @Nonnull String localSocketPath) {
         mLocalSocketThread = new LocalSocketThread(localSocketPath);
         mLocalSocketThread.setBindpoint(localSocketPath);
 
         mUsbReceiver = new UsbReceiver(serviceContext);
-
+        mCallbacks = sDummyCallbacks;
     }
 
     public void start() {
@@ -67,6 +90,12 @@ public class UsbToRtklib {
 
     public int getBaudRate() {
         return mUsbReceiver.getBaudRate();
+    }
+
+    public void setCallbacks(Callbacks callbacks) {
+        if (callbacks == null) throw new IllegalStateException();
+        if (mLocalSocketThread.isAlive()) throw new IllegalStateException();
+        mCallbacks = callbacks;
     }
 
 
@@ -92,7 +121,6 @@ public class UsbToRtklib {
             if (count <= 0) return true;
 
             try {
-
                 mUsbReceiver.write(buffer, 0, count);
             }catch(IOException e) {
                 e.printStackTrace();
@@ -295,7 +323,7 @@ public class UsbToRtklib {
                 serialControllerSet = new ConditionVariable(false);
             }
 
-            public synchronized void setController(UsbSerialController controller) {
+            public synchronized void setController(@Nullable UsbSerialController controller) {
                 if (mUsbController != null) {
                     serialControllerSet.close();
                     mUsbController.detach();
@@ -304,6 +332,7 @@ public class UsbToRtklib {
                 if (controller != null) serialControllerSet.open();
             }
 
+            @CheckForNull
             public synchronized UsbSerialController getController() {
                 return mUsbController;
             }
@@ -323,8 +352,10 @@ public class UsbToRtklib {
 
             public synchronized void cancel() {
                 cancelRequested = true;
+                mCallbacks.onStopped();
                 if (mUsbController != null) {
                     mUsbController.detach();
+                    mUsbController=null;
                 }
             }
 
@@ -344,13 +375,17 @@ public class UsbToRtklib {
                 os.write(buffer, offset, count);
             }
 
-            private void connect() throws UsbControllerException {
+            private synchronized void throwIfCancelRequested() throws CancelRequestedException {
+                if (cancelRequested) throw new CancelRequestedException();
+            }
+
+            private void connect() throws UsbControllerException, CancelRequestedException {
 
                 serialControllerSet.block();
 
                 synchronized(UsbReceiver.this) {
                     synchronized (this) {
-                        if (cancelRequested) return;
+                        throwIfCancelRequested();
                         if (DBG) Log.v(TAG, "attach(). baudrate: "+ mUsbController.getBaudRate());
                         mUsbController.attach();
                         mInputStream = mUsbController.getInputStream();
@@ -360,38 +395,35 @@ public class UsbToRtklib {
                 return;
             }
 
-            private boolean connectLoop() {
+            private void connectLoop() throws CancelRequestedException {
 
                 if (DBG) Log.v(TAG, "connectLoop()");
 
-                while(!cancelRequested) {
+                while(true) {
                     try {
                         connect();
-                        return true;
+                        return;
                     }catch (UsbControllerException e) {
                         synchronized(this) {
-                            if (cancelRequested) {
-                                return false;
-                            }
+                            throwIfCancelRequested();
                             setState(STATE_RECONNECTING);
                             try {
                                 wait(RECONNECT_TIMEOUT_MS);
                             } catch(InterruptedException ie) {
-                                return false;
+                                throwIfCancelRequested();
                             }
                         }
                     }
                 }
-                return false;
             }
 
 
-            private boolean transferDataLoop() {
+            private void transferDataLoop() throws CancelRequestedException {
                 int rcvd;
                 final byte buf[] = new byte[4096];
 
                 try {
-                    while(!cancelRequested) {
+                    while(true) {
                         rcvd =  mInputStream.read(buf, 0, buf.length);
                         if (rcvd >= 0) {
                             try {
@@ -404,37 +436,39 @@ public class UsbToRtklib {
                         if (rcvd < 0)
                             throw new IOException("EOF");
                     }
-                    return false;
                 }catch (IOException e) {
                     synchronized(this) {
-                        mUsbController.detach();
+                        if (mUsbController!=null) mUsbController.detach();
                         mInputStream = RtklibLocalSocketThread.DummyInputStream.instance;
                         mOutputStream = RtklibLocalSocketThread.DummyOutputStream.instance;
-                        return !cancelRequested;
+                        throwIfCancelRequested();
                     }
                 }
             }
 
             @Override
             public void run() {
-                Log.i(TAG, "BEGIN UsbToLocalSocket-BT");
-                setName("UsbToLocalSocket-BT");
+                Log.i(TAG, "BEGIN UsbToLocalSocket-USB");
+                setName("UsbToLocalSocket-USB");
+                try {
+                    setState(STATE_CONNECTING);
+                    while (true) {
+                        throwIfCancelRequested();
+                        connectLoop();
 
-                setState(STATE_CONNECTING);
+                        setState(STATE_CONNECTED);
+                        mCallbacks.onConnected();
+                        transferDataLoop();
 
-                while (!cancelRequested) {
-
-                    if (!connectLoop())
-                        return;
-
-                    setState(STATE_CONNECTED);
-
-                    if (!transferDataLoop())
-                        return;
-
-                    setState(STATE_RECONNECTING);
-                }
+                        setState(STATE_RECONNECTING);
+                        mCallbacks.onConnectionLost();
+                    }
+                }catch(CancelRequestedException cre) {}
             }
+        }
+
+        private class CancelRequestedException extends Exception {
+            private static final long serialVersionUID = 1L;
         }
     }
 

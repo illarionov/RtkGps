@@ -452,6 +452,12 @@
     <string name="bluetooth_system_settings_title">Bluetooth system settings</string>
     <string name="bluetooth_system_settings_summary">Display system Bluetooth settings screen</string>
     
+    <string name="bluetooth_connected">Bluetooth connected</string>
+    <string name="bluetooth_connection_lost">Bluetooth connection lost</string>
+    
+	<string name="usb_connected">USB connected</string>
+    <string name="usb_connection_lost">USB connection lost</string>
+    
     <string name="usb_dialog_title">USB receiver settings</string>
     <string name="usb_device_baudrate_title">Baudrate</string>
 	<string-array name="usb_device_baudrate_entries">

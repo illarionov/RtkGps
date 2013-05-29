@@ -27,13 +27,34 @@ public class BluetoothToRtklib {
     //  Standard UUID for the Serial Port Profile
     private static final java.util.UUID UUID_SPP = java.util.UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    public static final int RECONNECT_TIMEOUT_MS = 2000;
+
     final LocalSocketThread mLocalSocketThread;
 
     final BluetoothServiceThread mBluetoothThread;
 
     final ConditionVariable mIsBluetoothReadyCondvar;
 
-    public static final int RECONNECT_TIMEOUT_MS = 2000;
+    private Callbacks mCallbacks;
+
+    private static final Callbacks sDummyCallbacks = new Callbacks() {
+        @Override
+        public void onConnected() {}
+        @Override
+        public void onStopped() {}
+        @Override
+        public void onConnectionLost() {}
+    };
+
+    public interface Callbacks {
+
+        public void onConnected();
+
+        public void onStopped();
+
+        public void onConnectionLost();
+
+    }
 
     public BluetoothToRtklib(@Nonnull String bluetoothAddress,
             @Nonnull String localSocketPath) {
@@ -43,6 +64,7 @@ public class BluetoothToRtklib {
         mIsBluetoothReadyCondvar = new ConditionVariable(false);
 
         mLocalSocketThread.setBindpoint(localSocketPath+"_"+bluetoothAddress);
+        mCallbacks = sDummyCallbacks;
     }
 
     public void start() {
@@ -54,6 +76,12 @@ public class BluetoothToRtklib {
         mBluetoothThread.cancel();
         mLocalSocketThread.cancel();
         mIsBluetoothReadyCondvar.open();
+    }
+    
+    public void setCallbacks(Callbacks callbacks) {
+        if (callbacks == null) throw new IllegalStateException();
+        if (mBluetoothThread.isAlive()) throw new IllegalStateException();
+        mCallbacks = callbacks;
     }
 
     private final class LocalSocketThread extends RtklibLocalSocketThread {
@@ -128,16 +156,15 @@ public class BluetoothToRtklib {
 
                 if (s != null) {
                     try {
+                        mCallbacks.onStopped();
                         if (DBG) Log.v(TAG, "BT close");
                         s.close();
                     } catch (IOException e) {
                         Log.e(TAG, "close() of connect socket failed", e);
                     }
                 }
-
                 notifyAll();
             }
-
         }
 
         /**
@@ -157,6 +184,9 @@ public class BluetoothToRtklib {
             os.write(buffer, offset, count);
         }
 
+        private synchronized void throwIfCancelRequested() throws CancelRequestedException {
+                if (cancelRequested) throw new CancelRequestedException();
+        }
 
         private void connect() throws IOException {
             BluetoothSocket s;
@@ -173,47 +203,47 @@ public class BluetoothToRtklib {
                     mOutputStream = s.getOutputStream();
                 }
             }catch (IOException e) {
-                Log.e(TAG, "connect() failed: " +  e.getLocalizedMessage());
-                try {
-                    s.close();
+                synchronized(this) {
+                    Log.e(TAG, "connect() failed: " +  e.getLocalizedMessage());
+                    try {
+                        s.close();
+                    }catch (IOException e2) {
+                        Log.e(TAG, "mSocket.close() failed: " + e2.getLocalizedMessage());
+                    }
+
+                    mSocket = null;
                     mInputStream = RtklibLocalSocketThread.DummyInputStream.instance;
                     mOutputStream = RtklibLocalSocketThread.DummyOutputStream.instance;
-                }catch (IOException e2) {
-                    Log.e(TAG, "mSocket.close() failed: " + e2.getLocalizedMessage());
                 }
                 throw(e);
             }
         }
 
-        private boolean connectLoop() {
-
-            while(!cancelRequested) {
+        private void connectLoop() throws CancelRequestedException {
+            while(true) {
                 try {
                     connect();
-                    return true;
+                    return;
                 }catch (IOException e) {
                     synchronized(this) {
-                        if (cancelRequested) {
-                            return false;
-                        }
-                        setState(STATE_RECONNECTING);
+                        throwIfCancelRequested();
                         try {
+                            setState(STATE_RECONNECTING);
                             wait(RECONNECT_TIMEOUT_MS);
                         } catch(InterruptedException ie) {
-                            return false;
+                            throwIfCancelRequested();
                         }
                     }
                 }
             }
-            return false;
         }
 
-        private boolean transferDataLoop() {
+        private void transferDataLoop() throws CancelRequestedException {
             int rcvd;
             final byte buf[] = new byte[4096];
 
             try {
-                while(!cancelRequested) {
+                while(true) {
                     rcvd =  mInputStream.read(buf, 0, buf.length);
                     if (rcvd >= 0) {
                         try {
@@ -226,7 +256,6 @@ public class BluetoothToRtklib {
                     if (rcvd < 0)
                         throw new IOException("EOF");
                 }
-                return false;
             }catch (IOException e) {
                 synchronized(this) {
                     try {
@@ -236,7 +265,7 @@ public class BluetoothToRtklib {
                     }
                     mInputStream = RtklibLocalSocketThread.DummyInputStream.instance;
                     mOutputStream = RtklibLocalSocketThread.DummyOutputStream.instance;
-                    return !cancelRequested;
+                    throwIfCancelRequested();
                 }
             }
         }
@@ -246,20 +275,23 @@ public class BluetoothToRtklib {
             Log.i(TAG, "BEGIN BluetoothToLocalSocket-BT");
             setName("BluetoothToLocalSocket-BT");
 
-            setState(STATE_CONNECTING);
+            try {
+                setState(STATE_CONNECTING);
+                while (true) {
+                    connectLoop();
 
-            while (!cancelRequested) {
+                    setState(STATE_CONNECTED);
+                    mCallbacks.onConnected();
+                    transferDataLoop();
 
-                if (!connectLoop())
-                    return;
+                    setState(STATE_RECONNECTING);
+                    mCallbacks.onConnectionLost();
+                }
+            }catch (CancelRequestedException cre) {}
+        }
 
-                setState(STATE_CONNECTED);
-
-                if (!transferDataLoop())
-                    return;
-
-                setState(STATE_RECONNECTING);
-            }
+        private class CancelRequestedException extends Exception {
+            private static final long serialVersionUID = 1L;
         }
     }
 
