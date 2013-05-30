@@ -56,7 +56,7 @@ public class OutputSolution1Fragment extends PreferenceFragment {
     static {
         DEFAULTS.setFileClientDefaults(
                 new StreamFileClientFragment.Value()
-                    .setFilename("solution1.pos")
+                    .setFilename("solution1_%Y%m%d%h%M%S.pos")
                 );
     }
 

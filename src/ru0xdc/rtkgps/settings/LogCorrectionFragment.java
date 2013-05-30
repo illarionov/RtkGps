@@ -17,7 +17,7 @@ public class LogCorrectionFragment extends LogRoverFragment {
             .setEnabled(false)
             .setFileClientDefaults(
                 new StreamFileClientFragment.Value()
-                    .setFilename("correction.log")
+                    .setFilename("correction_%Y%m%d%h%M%S.log")
                 );
     }
 

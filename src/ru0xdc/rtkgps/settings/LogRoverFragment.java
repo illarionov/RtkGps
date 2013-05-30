@@ -43,7 +43,7 @@ public class LogRoverFragment extends PreferenceFragment {
         DEFAULTS
             .setFileClientDefaults(
                 new StreamFileClientFragment.Value()
-                    .setFilename("rover.log")
+                    .setFilename("rover_%Y%m%d%h%M%S.log")
                 );
     }
 

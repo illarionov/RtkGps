@@ -18,7 +18,7 @@ public class LogBaseFragment extends LogRoverFragment {
             .setEnabled(false)
             .setFileClientDefaults(
                 new StreamFileClientFragment.Value()
-                    .setFilename("base.log")
+                    .setFilename("base_%Y%m%d%h%M%S.log")
                 );
     }
 
