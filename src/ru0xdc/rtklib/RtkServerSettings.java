@@ -21,6 +21,8 @@ public class RtkServerSettings {
 
         private String mCommandsAtStartup;
 
+        private String mCommandsAtShutdown;
+
         private String mReceiverOption;
 
         /** nmea request type (0:no,1:base pos,2:single sol) */
@@ -33,6 +35,7 @@ public class RtkServerSettings {
             mTransport = TRANSPORT_DUMMY;
             mFormat = StreamFormat.RINEX;
             mCommandsAtStartup = "";
+            mCommandsAtShutdown = "";
             mReceiverOption = "";
             mNmeaRequestType = 0;
             mTransmittedPos = new Position3d();
@@ -47,6 +50,7 @@ public class RtkServerSettings {
             mTransport = src.mTransport.copy();
             mFormat = src.mFormat;
             mCommandsAtStartup = src.mCommandsAtStartup;
+            mCommandsAtShutdown = src.mCommandsAtShutdown;
             mReceiverOption = src.mReceiverOption;
             mNmeaRequestType = src.mNmeaRequestType;
             mTransmittedPos.setValues(src.mTransmittedPos);
@@ -84,9 +88,20 @@ public class RtkServerSettings {
             return mCommandsAtStartup;
         }
 
-        public InputStream setCommandsAtStartup(@Nonnull String cmds) {
+        public InputStream setCommandsAtStartup(boolean send, @Nonnull String cmds) {
             if (cmds == null) throw new NullPointerException();
-            mCommandsAtStartup = TextUtils.isEmpty(cmds) ? "" : cmds;
+            mCommandsAtStartup = !send || TextUtils.isEmpty(cmds) ? "" : cmds;
+            return this;
+        }
+
+        @Nonnull
+        public String getCommandsAtShutdown() {
+            return mCommandsAtShutdown;
+        }
+
+        public InputStream setCommandsAtShutdown(boolean send, @Nonnull String cmds) {
+            if (cmds == null) throw new NullPointerException();
+            mCommandsAtShutdown = !send || TextUtils.isEmpty(cmds) ? "" : cmds;
             return this;
         }
 
@@ -349,11 +364,28 @@ public class RtkServerSettings {
 
     String[] getInputStreamCommandsAtStartup() {
         final String[] commands = new String[3];
-        commands[0] = TextUtils.isEmpty(mInputRover.mCommandsAtStartup) ? null : mInputRover.mCommandsAtStartup;
-        commands[1] = TextUtils.isEmpty(mInputBase.mCommandsAtStartup) ? null : mInputBase.mCommandsAtStartup;
-        commands[2] = TextUtils.isEmpty(mInputCorrection.mCommandsAtStartup) ? null : mInputCorrection.mCommandsAtStartup;
+        commands[0] = TextUtils.isEmpty(mInputRover.mCommandsAtStartup) ? null :
+            mInputRover.mCommandsAtStartup.replaceAll("\r?\\n", "\r\n");
+        commands[1] = TextUtils.isEmpty(mInputBase.mCommandsAtStartup) ? null :
+            mInputBase.mCommandsAtStartup.replaceAll("\r?\\n", "\r\n");
+        commands[2] = TextUtils.isEmpty(mInputCorrection.mCommandsAtStartup) ? null
+                : mInputCorrection.mCommandsAtStartup.replaceAll("\r?\\n", "\r\n");
+
         return commands;
     }
+
+    String[] getInputStreamCommandsAtShutdown() {
+        final String[] commands = new String[3];
+        commands[0] = TextUtils.isEmpty(mInputRover.mCommandsAtShutdown) ? null :
+            mInputRover.mCommandsAtShutdown.replaceAll("\r?\\n", "\r\n");
+        commands[1] = TextUtils.isEmpty(mInputBase.mCommandsAtShutdown) ? null :
+            mInputBase.mCommandsAtShutdown.replaceAll("\r?\\n", "\r\n");
+        commands[2] = TextUtils.isEmpty(mInputCorrection.mCommandsAtShutdown) ? null
+                : mInputCorrection.mCommandsAtShutdown.replaceAll("\r?\\n", "\r\n");
+
+        return commands;
+    }
+
 
     @Nonnull
     String[] getInputStreamReceiverOption() {

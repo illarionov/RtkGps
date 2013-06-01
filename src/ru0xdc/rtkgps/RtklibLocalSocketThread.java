@@ -213,6 +213,7 @@ public abstract class RtklibLocalSocketThread extends Thread {
 
     protected abstract boolean onDataReceived(byte[] buffer, int offset, int count);
 
+    protected abstract void onLocalSocketConnected();
 
     @Override
     public void run() {
@@ -230,6 +231,7 @@ public abstract class RtklibLocalSocketThread extends Thread {
                 return;
 
             setState(STATE_CONNECTED);
+            onLocalSocketConnected();
 
             if (!transferDataLoop())
                 return;

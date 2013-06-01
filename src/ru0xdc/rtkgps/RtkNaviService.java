@@ -151,9 +151,10 @@ public class RtkNaviService extends Service {
         if (mCpuLock.isHeld()) mCpuLock.release();
 
         if (isServiceStarted()) {
+            mRtkServer.stop();
+
             stopBluetoothPipes();
             stopUsb();
-            mRtkServer.stop();
             // Tell the user we stopped.
             Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT)
             .show();
@@ -203,7 +204,12 @@ public class RtkNaviService extends Service {
                 }
             });
 
-            mRtkServer.sendStartupCommands(mStreamId);
+            new Thread() {
+                @Override
+                public void run() {
+                    mRtkServer.sendStartupCommands(mStreamId);
+                }
+            }.start();
         }
 
         @Override
@@ -243,7 +249,13 @@ public class RtkNaviService extends Service {
                 }
             });
 
-            mRtkServer.sendStartupCommands(mStreamId);
+            new Thread() {
+                @Override
+                public void run() {
+                    mRtkServer.sendStartupCommands(mStreamId);
+                }
+            }.run();
+
         }
 
         @Override

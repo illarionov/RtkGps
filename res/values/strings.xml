@@ -387,14 +387,13 @@
 	<string name="streams_settings_type_title">Type</string>
     <string name="streams_settings_format_title">Format</string>
     <string name="streams_settings_button_title">Stream settings&#8230;</string>
+    <string name="streams_settings_commands_at_startup_shutdown_title">Commands at startup/shutdown&#8230;</string>
     <string name="input_streams_settings_enable_rover_title">Enable rover</string>
     <string name="input_streams_settings_enable_base_title">Enable base</string>
     <string name="input_streams_settings_enable_correction_title">Enable correction</string>
     <string name="input_streams_settings_rover_tab_title">Input Rover</string>
     <string name="input_streams_settings_base_tab_title">Input Base</string>
     <string name="input_streams_settings_correction_tab_title">Input Correction</string>
-    <string name="input_streams_settings_commands_at_startup_title">Commands at startup</string>
-    <string name="input_streams_settings_commands_at_shutdown_title">Commands at shutdown</string>
     <string name="input_streams_settings_receiver_option_title">Receiver option</string>
     <string name="input_streams_settings_transmit_gpgga_to_base_title">Transmit GPGGA to Base Station</string>
     <string name="input_streams_settings_transmit_gpgga_lat_title">Latitude</string>
@@ -455,6 +454,8 @@
     <string name="bluetooth_connected">Bluetooth connected</string>
     <string name="bluetooth_connection_lost">Bluetooth connection lost</string>
     
+    <!-- USB stream preferences -->
+    
 	<string name="usb_connected">USB connected</string>
     <string name="usb_connection_lost">USB connection lost</string>
     
@@ -478,4 +479,13 @@
             <item>230400</item>
     </string-array>
     
+	<!-- Startup/shutdown commands preference widget -->
+	<string name="startup_shutdown_commands_title">Set startup/shutdown commands</string>
+	<string name="send_commands_at_startup">Send commands at startup</string>
+	<string name="send_commands_at_shutdown">Send commands at shutdown</string>
+	<string name="commands_at_startup">Commands at startup</string>
+	<string name="commands_at_shutdown">Commands at shutdown</string>
+	<string name="load_startup_shutdown_commands">Load</string>
+	<string name="load_startup_shutdown_dialog_title">Select file</string>
+	
 </resources>

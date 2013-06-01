@@ -60,8 +60,12 @@
         
         <activity
             android:name=".settings.StreamDialogActivity"
-            android:theme="@android:style/Theme.Holo.Dialog.MinWidth"
-            />
+            android:theme="@android:style/Theme.Holo.Dialog.MinWidth" />
+        
+        <activity
+            android:name=".settings.StartupShutdownSettingsActivity"
+            android:theme="@android:style/Theme.Holo.Dialog"
+            android:title="@string/startup_shutdown_commands_title" />
         
     </application>
 

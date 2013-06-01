@@ -33,8 +33,7 @@ public class InputRoverFragment extends PreferenceFragment {
     static final String KEY_TYPE = "type";
     static final String KEY_FORMAT = "format";
     static final String KEY_STREAM_SETTINGS_BUTTON = "stream_settings_button";
-    static final String KEY_COMMANDS_AT_STARTUP = "commands_at_startup";
-    static final String KEY_COMMANDS_AT_SHUTDOWN = "commands_at_shutdown";
+    static final String KEY_COMMANDS_AT_STARTUP_SHUTDOWN_BUTTON = "commands_at_startup_shutdown_button";
     static final String KEY_RECEIVER_OPTION = "receiver_option";
 
     private static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
@@ -94,6 +93,15 @@ public class InputRoverFragment extends PreferenceFragment {
                 return true;
             }
         });
+
+        findPreference(KEY_COMMANDS_AT_STARTUP_SHUTDOWN_BUTTON).setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                commandsAtStartupShutdownButtonClicked();
+                return true;
+            }
+        });
+
     }
 
     @Override
@@ -163,6 +171,12 @@ public class InputRoverFragment extends PreferenceFragment {
         startActivity(intent);
     }
 
+    protected void commandsAtStartupShutdownButtonClicked() {
+        final Intent intent = new Intent(getActivity(), StartupShutdownSettingsActivity.class);
+        intent.putExtra(StartupShutdownSettingsActivity.ARG_SHARED_PREFS_NAME, getSharedPreferenceName());
+        startActivity(intent);
+    }
+
     protected void refresh() {
         final StreamTypePreference typePref;
         final StreamFormatPreference formatPref;
@@ -173,15 +187,11 @@ public class InputRoverFragment extends PreferenceFragment {
 
         typePref = (StreamTypePreference) findPreference(KEY_TYPE);
         formatPref = (StreamFormatPreference) findPreference(KEY_FORMAT);
-        startupCommandsPref = (EditTextPreference)findPreference(KEY_COMMANDS_AT_STARTUP);
-        shutdownCommandsPref = (EditTextPreference)findPreference(KEY_COMMANDS_AT_SHUTDOWN);
         receiverOptionPref = (EditTextPreference)findPreference(KEY_RECEIVER_OPTION);
         settingsButtonPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
 
         typePref.setSummary(getString(typePref.getValueT().getNameResId()));
         formatPref.setSummary(getString(formatPref.getValueT().getNameResId()));
-        startupCommandsPref.setSummary(startupCommandsPref.getText());
-        shutdownCommandsPref.setSummary(shutdownCommandsPref.getText());
         receiverOptionPref.setSummary(receiverOptionPref.getText());
         settingsButtonPref.setSummary(SettingsHelper.readInputStreamSumary(getResources(), getPreferenceManager().getSharedPreferences()));
     }

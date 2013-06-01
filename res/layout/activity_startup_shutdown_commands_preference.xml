@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="vertical" >
+
+            <CheckBox
+                android:id="@+id/send_commands_at_startup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/send_commands_at_startup"
+                android:onClick="onSendCommandsAtStartupClicked" />
+
+            <EditText
+                android:id="@+id/commands_at_startup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:hint="@string/commands_at_startup"
+                android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
+                android:minLines="5"
+                android:textSize="12sp"
+                android:typeface="monospace" />
+
+            <CheckBox
+                android:id="@+id/send_commands_at_shutdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/send_commands_at_shutdown"
+                android:onClick="onSendCommandsAtShutdownClicked" />
+
+            <EditText
+                android:id="@+id/commands_at_shutdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:hint="@string/commands_at_shutdown"
+                android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
+                android:minLines="5"
+                android:textSize="12sp"
+                android:typeface="monospace" />
+        </LinearLayout>
+    </ScrollView>
+
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:divider="?android:attr/dividerHorizontal"
+        android:showDividers="beginning"
+        android:dividerPadding="0dip">
+        
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onCancelButtonClicked"
+                android:text="@android:string/cancel" />
+
+            <Button
+                android:id="@+id/load_startup_shutdown_commands"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onLoadButtonClicked"
+                android:text="@string/load_startup_shutdown_commands" />
+
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onOkButtonClicked"
+                android:text="@android:string/ok" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -128,6 +128,11 @@ public class UsbToRtklib {
             }
             return true;
         }
+
+        @Override
+        protected void onLocalSocketConnected() {
+            mCallbacks.onConnected();
+        }
     }
 
 
@@ -457,7 +462,6 @@ public class UsbToRtklib {
                         connectLoop();
 
                         setState(STATE_CONNECTED);
-                        mCallbacks.onConnected();
                         transferDataLoop();
 
                         setState(STATE_RECONNECTING);

@@ -171,12 +171,10 @@ public class SettingsHelper {
             e.putBoolean(InputRoverFragment.KEY_ENABLE, defaults.enable)
             .putString(InputRoverFragment.KEY_TYPE, defaults.type.name())
             .putString(InputRoverFragment.KEY_FORMAT, defaults.format.name())
-            .putString(InputRoverFragment.KEY_COMMANDS_AT_STARTUP, defaults.commandsAtStartup)
-            .putString(InputRoverFragment.KEY_COMMANDS_AT_SHUTDOWN, defaults.commandsAtShutdown)
             .putString(InputRoverFragment.KEY_RECEIVER_OPTION, defaults.receiverOption)
-            ;
-            e.commit();
+            .commit();
 
+            StartupShutdownSettingsActivity.setDefaultValue(ctx, sharedPrefsName);
             StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
             StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
             StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.tcpClientDefaults);
@@ -245,7 +243,12 @@ public class SettingsHelper {
         type = StreamType.valueOf(prefs.getString(InputRoverFragment.KEY_TYPE, null));
         stream
         .setFormat(StreamFormat.valueOf(prefs.getString(InputRoverFragment.KEY_FORMAT, StreamFormat.RTCM3.name())))
-        .setCommandsAtStartup(prefs.getString(InputRoverFragment.KEY_COMMANDS_AT_STARTUP, ""))
+        .setCommandsAtStartup(
+                prefs.getBoolean(StartupShutdownSettingsActivity.SHARED_PREFS_KEY_SEND_COMMANDS_AT_STARTUP, false),
+                prefs.getString(StartupShutdownSettingsActivity.SHARED_PREFS_KEY_COMMANDS_AT_STARTUP, ""))
+        .setCommandsAtShutdown(
+                prefs.getBoolean(StartupShutdownSettingsActivity.SHARED_PREFS_KEY_SEND_COMMANDS_AT_SHUTDOWN, false),
+                prefs.getString(StartupShutdownSettingsActivity.SHARED_PREFS_KEY_COMMANDS_AT_SHUTDOWN, ""))
         .setReceiverOption(prefs.getString(InputRoverFragment.KEY_RECEIVER_OPTION, ""))
         ;
 

@@ -77,7 +77,7 @@ public class BluetoothToRtklib {
         mLocalSocketThread.cancel();
         mIsBluetoothReadyCondvar.open();
     }
-    
+
     public void setCallbacks(Callbacks callbacks) {
         if (callbacks == null) throw new IllegalStateException();
         if (mBluetoothThread.isAlive()) throw new IllegalStateException();
@@ -112,6 +112,11 @@ public class BluetoothToRtklib {
                 return false;
             }
             return true;
+        }
+
+        @Override
+        protected void onLocalSocketConnected() {
+            mCallbacks.onConnected();
         }
     }
 
@@ -281,7 +286,6 @@ public class BluetoothToRtklib {
                     connectLoop();
 
                     setState(STATE_CONNECTED);
-                    mCallbacks.onConnected();
                     transferDataLoop();
 
                     setState(STATE_RECONNECTING);

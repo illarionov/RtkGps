@@ -60,7 +60,7 @@ public class RtkServer {
     }
 
     public void stop() {
-        _stop();
+        _stop(mSettings.getInputStreamCommandsAtShutdown());
         mStatus = RtkServerStreamStatus.STATE_CLOSE;
     }
 
@@ -122,16 +122,20 @@ public class RtkServer {
     }
 
     public void sendStartupCommands(int stream) {
+        String cmds[] = mSettings.getInputStreamCommandsAtStartup();
         switch (stream) {
         case RECEIVER_ROVER:
-            _writeCommands(mSettings.getInputRover().getCommandsAtStartup(), null, null);
+            cmds[1] = cmds[2] = null;
             break;
         case RECEIVER_BASE:
-            _writeCommands(null,mSettings.getInputBase().getCommandsAtStartup(),  null);
+            cmds[0] = cmds[2] = null;
             break;
         case RECEIVER_EPHEM:
-            _writeCommands(null,null,mSettings.getInputCorrection().getCommandsAtStartup());
+            cmds[0] = cmds[1] = null;
             break;
+        }
+        if (cmds[0] != null || cmds[1] != null || cmds[2] != null ) {
+            _writeCommands(cmds);
         }
     }
 
@@ -148,7 +152,7 @@ public class RtkServer {
         super.finalize();
     }
 
-    private native void _stop();
+    private native void _stop(String cmds[]);
 
     private native void _create();
 
@@ -162,7 +166,7 @@ public class RtkServer {
 
     private native void _readSolutionBuffer(Solution.SolutionBuffer dst);
 
-    private native void _writeCommands(String roverCmd, String baseCmd, String correctionsCmd);
+    private native void _writeCommands(String cmds[]);
 
     /**
      * Start rtk server thread

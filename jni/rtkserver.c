@@ -226,10 +226,12 @@ rtksvrstart_end:
    return res;
 }
 
-static void RtkServer__stop(JNIEnv* env, jclass thiz)
+static void RtkServer__stop(JNIEnv* env, jclass thiz, jobjectArray j_cmds)
 {
+   unsigned i;
    struct native_ctx_t *nctx;
-   char *cmds[3]={0,};
+   const char *cmds[3]={NULL, NULL, NULL};
+   jstring cmds_jstring[3]={NULL, NULL, NULL};
 
    LOGV("RtkServer__stop()");
 
@@ -239,10 +241,29 @@ static void RtkServer__stop(JNIEnv* env, jclass thiz)
       return;
    }
 
-   rtksvrstop(&nctx->rtksvr,cmds);
+   for (i=0; i<sizeof(cmds)/sizeof(cmds[0]); ++i) {
+      cmds_jstring[i] = (*env)->GetObjectArrayElement(env, j_cmds, i);
+      if ((*env)->ExceptionOccurred(env))
+	 goto rtksvrstop_close;
+      if (cmds_jstring[i] != NULL) {
+	 cmds[i] = (*env)->GetStringUTFChars(env, cmds_jstring[i], NULL);
+	 if (cmds[i] == NULL)
+	    goto rtksvrstop_close;
+      }
+   }
+
+rtksvrstop_close:
+
+   rtksvrstop(&nctx->rtksvr,(char **)cmds);
 
    traceclose();
    rtkclosestat();
+
+   for (i=0; i<sizeof(cmds)/sizeof(cmds[0]); ++i) {
+      if (cmds[i] != NULL)
+	 (*env)->ReleaseStringUTFChars(env, cmds_jstring[i], cmds[i]);
+   }
+
 }
 
 
@@ -437,10 +458,12 @@ static void RtkServer__get_observation_status(JNIEnv* env, jclass thiz,
 }
 
 static void RtkServer__write_commands(JNIEnv* env, jclass thiz,
-        jobject j_rover, jobject j_base, jobject j_corr)
+        jobjectArray j_cmds)
 {
+   unsigned i;
    struct native_ctx_t *nctx;
-   const char *rover, *base, *corr;
+   const char *cmds[3] = {NULL, NULL, NULL};
+   jstring cmds_jstring[3] = {NULL, NULL, NULL};
 
    LOGV("RtkServer__write_start_commands() ");
 
@@ -450,32 +473,29 @@ static void RtkServer__write_commands(JNIEnv* env, jclass thiz,
       return;
    }
 
-   if (j_rover) {
-      rover = (*env)->GetStringUTFChars(env, j_rover, NULL);
-       if (rover == NULL) goto write_commands_end;
-   }else
-       rover = NULL;
-   if (j_base) {
-       base = (*env)->GetStringUTFChars(env, j_base, NULL);
-       if (base == NULL) goto write_commands_end;
-   }else
-       base = NULL;
-   if (j_corr) {
-       corr = (*env)->GetStringUTFChars(env, j_corr, NULL);
-       if (corr == NULL) goto write_commands_end;
-   }else
-       corr = NULL;
+   for (i=0; i<sizeof(cmds)/sizeof(cmds[0]); ++i) {
+      cmds_jstring[i] = (*env)->GetObjectArrayElement(env, j_cmds, i);
+      if ((*env)->ExceptionOccurred(env))
+	 goto write_commands_end;
+      if (cmds_jstring[i] != NULL) {
+	 cmds[i] = (*env)->GetStringUTFChars(env, cmds_jstring[i], NULL);
+	 if (cmds[i] == NULL)
+	    goto write_commands_end;
+      }
+   }
 
    rtksvrlock(&nctx->rtksvr);
-   if (rover) strsendcmd(&nctx->rtksvr.stream[0], rover);
-   if (base) strsendcmd(&nctx->rtksvr.stream[1], base);
-   if (corr) strsendcmd(&nctx->rtksvr.stream[2], corr);
+   if (cmds[0]) strsendcmd(&nctx->rtksvr.stream[0], cmds[0]);
+   if (cmds[1]) strsendcmd(&nctx->rtksvr.stream[1], cmds[1]);
+   if (cmds[2]) strsendcmd(&nctx->rtksvr.stream[2], cmds[2]);
    rtksvrunlock(&nctx->rtksvr);
 
 write_commands_end:
-   if (rover) (*env)->ReleaseStringUTFChars(env, j_rover, rover);
-   if (base) (*env)->ReleaseStringUTFChars(env, j_base, base);
-   if (corr) (*env)->ReleaseStringUTFChars(env, j_corr, corr);
+
+   for (i=0; i<sizeof(cmds)/sizeof(cmds[0]); ++i) {
+      if (cmds[i] != NULL)
+	 (*env)->ReleaseStringUTFChars(env, cmds_jstring[i], cmds[i]);
+   }
 
 }
 
@@ -663,16 +683,12 @@ static JNINativeMethod nativeMethods[] = {
 	 "Lru0xdc/rtklib/SolutionOptions$Native;"
 	 ")Z"
 	 , (void*)RtkServer__rtksvrstart},
-   {"_stop", "()V", (void*)RtkServer__stop},
+   {"_stop", "([Ljava/lang/String;)V", (void*)RtkServer__stop},
    {"_getStreamStatus", "(Lru0xdc/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status},
    {"_readSolutionBuffer", "(Lru0xdc/rtklib/Solution$SolutionBuffer;)V", (void*)RtkServer__read_solution_buffer},
    {"_getRtkStatus", "(Lru0xdc/rtklib/RtkControlResult;)V", (void*)RtkServer__get_rtk_status},
    {"_getObservationStatus", "(ILru0xdc/rtklib/RtkServerObservationStatus$Native;)V", (void*)RtkServer__get_observation_status},
-   {"_writeCommands", "("
-       "Ljava/lang/String;"
-       "Ljava/lang/String;"
-       "Ljava/lang/String;"
-       ")V", (void*)RtkServer__write_commands}
+   {"_writeCommands", "([Ljava/lang/String;)V", (void*)RtkServer__write_commands}
 };
 
 static int init_observation_status_fields(JNIEnv* env) {

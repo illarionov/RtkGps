@@ -20,24 +20,17 @@
         android:key="format"
         android:title="@string/streams_settings_format_title"
         android:dependency="enable" />
-        
-    <EditTextPreference
-        android:key="commands_at_startup"
-        android:title="@string/input_streams_settings_commands_at_startup_title"
+
+	<Preference
+        android:key="commands_at_startup_shutdown_button"
         android:dependency="enable"
-        android:inputType="textLongMessage"
-         />
-    
-	<EditTextPreference
-        android:key="commands_at_shutdown"
-        android:title="@string/input_streams_settings_commands_at_shutdown_title"
-        android:dependency="enable"
-        android:inputType="textLongMessage"
-         />
-	
+        android:title="@string/streams_settings_commands_at_startup_shutdown_title"
+        android:persistent="false" />
+
 	<EditTextPreference
         android:key="receiver_option"
         android:title="@string/input_streams_settings_receiver_option_title"
         android:dependency="enable" />
-
+		
+	
 </PreferenceScreen>
