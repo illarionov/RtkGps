@@ -60,11 +60,5 @@ LOCAL_SRC_FILES += \
 
 LOCAL_SRC_FILES += log.c
 
-TARGET-process-src-files-tags += $(call add-src-files-target-cflags, \
-   $(RTKLIB_PATH)/src/download.c, -DS_IREAD=S_IRUSR)
-TARGET-process-src-files-tags += $(call add-src-files-target-cflags, \
-   $(RTKLIB_PATH)/src/rtkcmn.c, -DCLOCK_MONOTONIC_RAW=CLOCK_MONOTONIC)
-
-
 include $(BUILD_STATIC_LIBRARY)
 
