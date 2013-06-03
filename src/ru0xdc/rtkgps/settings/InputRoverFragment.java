@@ -9,6 +9,7 @@ import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
 import ru0xdc.rtkgps.settings.widget.StreamFormatPreference;
 import ru0xdc.rtkgps.settings.widget.StreamTypePreference;
+import ru0xdc.rtklib.ProcessingOptions;
 import ru0xdc.rtklib.RtkServerSettings.InputStream;
 import ru0xdc.rtklib.constants.StreamFormat;
 import ru0xdc.rtklib.constants.StreamType;
@@ -34,6 +35,7 @@ public class InputRoverFragment extends PreferenceFragment {
     static final String KEY_FORMAT = "format";
     static final String KEY_STREAM_SETTINGS_BUTTON = "stream_settings_button";
     static final String KEY_COMMANDS_AT_STARTUP_SHUTDOWN_BUTTON = "commands_at_startup_shutdown_button";
+    static final String KEY_STATION_POSITION_BUTTON = "station_position_button";
     static final String KEY_RECEIVER_OPTION = "receiver_option";
 
     private static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
@@ -75,6 +77,8 @@ public class InputRoverFragment extends PreferenceFragment {
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
+    ProcessingOptions mProcessingOptions;
+
     public InputRoverFragment() {
         mPreferenceChangeListener = new PreferenceChangeListener();
     }
@@ -85,6 +89,8 @@ public class InputRoverFragment extends PreferenceFragment {
 
         getPreferenceManager().setSharedPreferencesName(getSharedPreferenceName());
         initPreferenceScreen();
+
+        mProcessingOptions = ProcessingOptions1Fragment.readPrefs(getActivity());
 
         findPreference(KEY_STREAM_SETTINGS_BUTTON).setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
@@ -102,6 +108,20 @@ public class InputRoverFragment extends PreferenceFragment {
             }
         });
 
+        final Preference stationBtn = findPreference(KEY_STATION_POSITION_BUTTON);
+        if (stationBtn != null) {
+            if (stationPositionButtonDisabledCause() == 0) {
+                stationBtn.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        stationPositionButtonClicked();
+                        return true;
+                    }
+                });
+            }else {
+                stationBtn.setEnabled(false);
+            }
+        }
     }
 
     @Override
@@ -129,7 +149,7 @@ public class InputRoverFragment extends PreferenceFragment {
 
         if (DBG) Log.v(getSharedPreferenceName(), "initPreferenceScreen()");
 
-        addPreferencesFromResource(R.xml.input_stream_settings);
+        addPreferencesFromResource(R.xml.input_stream_settings_rover);
 
         initStreamTypePref();
 
@@ -151,6 +171,14 @@ public class InputRoverFragment extends PreferenceFragment {
         typePref = (StreamTypePreference)findPreference(KEY_TYPE);
         typePref.setValues(types.toArray(new StreamType[types.size()]));
         typePref.setDefaultValue(DEFAULT_STREAM_TYPE);
+    }
+
+    protected int stationPositionButtonDisabledCause() {
+        if (mProcessingOptions.getPositioningMode().isFixed()) {
+            return 0;
+        }else {
+            return R. string.station_position_for_fixed_mode;
+        }
     }
 
     protected void streamSettingsButtonClicked() {
@@ -177,23 +205,42 @@ public class InputRoverFragment extends PreferenceFragment {
         startActivity(intent);
     }
 
+    protected void stationPositionButtonClicked() {
+        final Intent intent = new Intent(getActivity(), StationPositionActivity.class);
+        intent.putExtra(StationPositionActivity.ARG_SHARED_PREFS_NAME, getSharedPreferenceName());
+        intent.putExtra(StationPositionActivity.ARG_HIDE_USE_RTCM, true);
+        startActivity(intent);
+    }
+
     protected void refresh() {
         final StreamTypePreference typePref;
         final StreamFormatPreference formatPref;
-        final EditTextPreference startupCommandsPref, shutdownCommandsPref, receiverOptionPref;
+        final EditTextPreference receiverOptionPref;
         final Preference settingsButtonPref;
+        final Preference positionButtonpref;
+        final SharedPreferences prefs;
 
         if (DBG) Log.v(getSharedPreferenceName(), "refresh()");
 
+        prefs = getPreferenceManager().getSharedPreferences();
         typePref = (StreamTypePreference) findPreference(KEY_TYPE);
         formatPref = (StreamFormatPreference) findPreference(KEY_FORMAT);
         receiverOptionPref = (EditTextPreference)findPreference(KEY_RECEIVER_OPTION);
         settingsButtonPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
+        positionButtonpref = findPreference(KEY_STATION_POSITION_BUTTON);
 
         typePref.setSummary(getString(typePref.getValueT().getNameResId()));
         formatPref.setSummary(getString(formatPref.getValueT().getNameResId()));
         receiverOptionPref.setSummary(receiverOptionPref.getText());
-        settingsButtonPref.setSummary(SettingsHelper.readInputStreamSumary(getResources(), getPreferenceManager().getSharedPreferences()));
+        settingsButtonPref.setSummary(SettingsHelper.readInputStreamSumary(getResources(), prefs));
+        if (positionButtonpref != null) {
+            int disabledCause = stationPositionButtonDisabledCause();
+            if (disabledCause == 0) {
+                positionButtonpref.setSummary(StationPositionActivity.readSummary(getResources(), prefs));
+            }else {
+                positionButtonpref.setSummary(disabledCause);
+            }
+        }
     }
 
     private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {

@@ -74,7 +74,7 @@ public class InputCorrectionFragment extends InputRoverFragment {
 
         if (DBG) Log.v(getSharedPreferenceName(), "initPreferenceScreen()");
 
-        addPreferencesFromResource(R.xml.input_stream_settings);
+        addPreferencesFromResource(R.xml.input_stream_settings_correction);
 
         findPreference(KEY_ENABLE).setTitle(R.string.input_streams_settings_enable_correction_title);
 

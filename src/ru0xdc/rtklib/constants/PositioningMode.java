@@ -73,4 +73,9 @@ public enum PositioningMode implements IHasRtklibId {
                 || MOVEB.equals(this)
                 || FIXED.equals(this);
     }
+
+    public boolean isFixed() {
+        return FIXED.equals(this)
+                || PPP_FIXED.equals(this);
+    }
 }

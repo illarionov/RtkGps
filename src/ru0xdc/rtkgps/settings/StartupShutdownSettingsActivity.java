@@ -51,7 +51,7 @@ public class StartupShutdownSettingsActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_startup_shutdown_commands_preference);
+        setContentView(R.layout.activity_startup_shutdown_commands);
 
         final Intent intent = getIntent();
         mSharedPrefsName = intent.getStringExtra(ARG_SHARED_PREFS_NAME);

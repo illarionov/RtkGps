@@ -377,7 +377,7 @@ public class RtkCommon {
 
         public static String toString(double degree, boolean isLat) {
             double dd[] = new double[3];
-            _deg2dms(degree, dd);
+            _deg2dms(degree+Math.signum(degree)*1.0E-12, dd);
             return formatString(dd[0], dd[1], dd[2], isLat);
         }
 

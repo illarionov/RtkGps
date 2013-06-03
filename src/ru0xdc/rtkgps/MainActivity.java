@@ -25,7 +25,6 @@ import android.widget.ArrayAdapter;
 
 public class MainActivity extends Activity implements ActionBar.OnNavigationListener {
 
-    @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
     static final String TAG = MainActivity.class.getSimpleName();

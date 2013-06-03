@@ -9,6 +9,7 @@ import ru0xdc.rtkgps.settings.widget.StreamTypePreference;
 import ru0xdc.rtklib.RtkCommon;
 import ru0xdc.rtklib.RtkServerSettings.InputStream;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -87,6 +88,23 @@ public class InputBaseFragment extends InputRoverFragment {
         transmitPref.setSummary(transmitPref.getEntry());
         gpggaLatPref.setSummary(gpggaLatPref.getText());
         gpggaLonPref.setSummary(gpggaLonPref.getText());
+    }
+
+    @Override
+    protected int stationPositionButtonDisabledCause() {
+        if (mProcessingOptions.getPositioningMode().isRelative()) {
+            return 0;
+        }else {
+            return R. string.station_position_for_relative_mode;
+        }
+    }
+
+    @Override
+    protected void stationPositionButtonClicked() {
+        final Intent intent = new Intent(getActivity(), StationPositionActivity.class);
+        intent.putExtra(StationPositionActivity.ARG_SHARED_PREFS_NAME, getSharedPreferenceName());
+        intent.putExtra(StationPositionActivity.ARG_HIDE_USE_RTCM, false);
+        startActivity(intent);
     }
 
     @Nonnull

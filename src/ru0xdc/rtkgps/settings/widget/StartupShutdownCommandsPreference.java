@@ -18,7 +18,7 @@ public class StartupShutdownCommandsPreference extends DialogPreference {
         super(context, attrs, defStyle);
 
         setPersistent(false);
-        setDialogLayoutResource(R.layout.activity_startup_shutdown_commands_preference);
+        setDialogLayoutResource(R.layout.activity_startup_shutdown_commands);
     }
 
     private String getStartupCommandsKey() {

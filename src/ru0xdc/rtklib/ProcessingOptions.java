@@ -5,12 +5,14 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.constants.Constants;
 import ru0xdc.rtklib.constants.EarthTideCorrectionType;
 import ru0xdc.rtklib.constants.EphemerisOption;
 import ru0xdc.rtklib.constants.IonosphereOption;
 import ru0xdc.rtklib.constants.NavigationSystem;
 import ru0xdc.rtklib.constants.PositioningMode;
+import ru0xdc.rtklib.constants.StationPositionType;
 import ru0xdc.rtklib.constants.TroposphereOption;
 import android.util.Log;
 
@@ -541,5 +543,49 @@ public class ProcessingOptions {
     public void setRaimFdeEnabled(boolean enable) {
         mNative.posopt[4] = enable ? 1 : 0;
     }
+
+
+    /**
+     * @return Base station position type
+     */
+    public StationPositionType getBaseStationPositionType() {
+        return StationPositionType.valueOf(mNative.refpos);
+    }
+
+    /**
+     * @return ECEF base position
+     */
+    public Position3d getBaseStationPosition() {
+        return new Position3d(mNative.baseX, mNative.baseY, mNative.baseZ);
+    }
+
+    public void setBasePosition(StationPositionType type, Position3d ecefPos) {
+        mNative.refpos = type.getRtklibId();
+        mNative.baseX = ecefPos.getX();
+        mNative.baseY = ecefPos.getY();
+        mNative.baseZ = ecefPos.getZ();
+    }
+
+    /**
+     * @return Rover position type
+     */
+    public StationPositionType getRoverPositionType() {
+        return StationPositionType.valueOf(mNative.rovpos);
+    }
+
+    /**
+     * @return ECEF rover position
+     */
+    public Position3d getRoverPosition() {
+        return new Position3d(mNative.ruX, mNative.ruY, mNative.ruZ);
+    }
+
+    public void setRoverPosition(StationPositionType type, Position3d ecefPos) {
+        mNative.rovpos = type.getRtklibId();
+        mNative.ruX = ecefPos.getX();
+        mNative.ruY = ecefPos.getY();
+        mNative.ruZ = ecefPos.getZ();
+    }
+
 
 }

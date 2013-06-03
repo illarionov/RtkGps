@@ -178,6 +178,14 @@
     <string name="ephopt_ssrcom">Broadcast + SSR CoM</string>
     <string name="ephopt_lex">QZSS LEX ephemeris</string>
 
+    <!-- Station position type -->
+    <string name="stapos_in_prcopt">Specified position</string>
+    <string name="stapos_avg_of_single">Average of single position</string>
+    <string name="stapos_read_from_file">Read from file</string>
+    <string name="stapos_rinex_hdr">Rinex header</string>
+    <string name="stapos_rtcm_pos">RTCM Antenna position</string>
+
+    
     <!-- Procession options -->
     <string name="procopt_category_processing_options_1">Processing options 1</string>
     <string name="procopt_category_processing_options_2">Processing options 2</string>
@@ -388,6 +396,8 @@
     <string name="streams_settings_format_title">Format</string>
     <string name="streams_settings_button_title">Stream settings&#8230;</string>
     <string name="streams_settings_commands_at_startup_shutdown_title">Commands at startup/shutdown&#8230;</string>
+    <string name="streams_settings_base_station_position_title">Base station position</string>
+    <string name="streams_settings_rover_position_title">Rover position</string>
     <string name="input_streams_settings_enable_rover_title">Enable rover</string>
     <string name="input_streams_settings_enable_base_title">Enable base</string>
     <string name="input_streams_settings_enable_correction_title">Enable correction</string>
@@ -488,4 +498,11 @@
 	<string name="load_startup_shutdown_commands">Load</string>
 	<string name="load_startup_shutdown_dialog_title">Select file</string>
 	
+	<!-- Rover/base position -->
+	<string name="station_position_format_llh">Lat/Lon/Height (deg/m)</string>
+	<string name="station_position_format_llh_dms">Lat/Lon/Height (dms/m)</string>
+	<string name="station_position_format_ecef">X/Y/Z — ECEF</string>
+	<string name="station_position_for_fixed_mode">For fixed mode</string>
+	<string name="station_position_for_relative_mode">For relative mode</string>
+		
 </resources>

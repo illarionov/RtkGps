@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.constants.PositioningMode;
 import ru0xdc.rtklib.constants.SolutionFormat;
+import ru0xdc.rtklib.constants.StationPositionType;
 import ru0xdc.rtklib.constants.StreamFormat;
 import ru0xdc.rtklib.constants.StreamType;
 import android.text.TextUtils;
@@ -31,6 +32,12 @@ public class RtkServerSettings {
         /** transmitted nmea position (ecef) X (m) */
         private final Position3d mTransmittedPos;
 
+        /** station position type */
+        private StationPositionType mStationPosType;
+
+        /** Station positon  for fixed/relative mode */
+        private final Position3d mStationPos;
+
         public InputStream() {
             mTransport = TRANSPORT_DUMMY;
             mFormat = StreamFormat.RINEX;
@@ -39,6 +46,8 @@ public class RtkServerSettings {
             mReceiverOption = "";
             mNmeaRequestType = 0;
             mTransmittedPos = new Position3d();
+            mStationPosType = StationPositionType.RTCM_POS;
+            mStationPos = new Position3d();
         }
 
         public InputStream(@Nonnull InputStream src) {
@@ -54,6 +63,8 @@ public class RtkServerSettings {
             mReceiverOption = src.mReceiverOption;
             mNmeaRequestType = src.mNmeaRequestType;
             mTransmittedPos.setValues(src.mTransmittedPos);
+            mStationPosType = src.mStationPosType;
+            mStationPos.setValues(src.mStationPos);
         }
 
         public StreamType getType() {
@@ -134,6 +145,26 @@ public class RtkServerSettings {
 
         public Position3d getTransmittedPosition() {
             return new Position3d(mTransmittedPos);
+        }
+
+        /**
+         *
+         * @param type position type
+         * @param ecefPos
+         * @return
+         */
+        public InputStream setStationPos(StationPositionType type, Position3d ecefPos) {
+            mStationPosType = type;
+            mStationPos.setValues(ecefPos);
+            return this;
+        }
+
+        public StationPositionType getStationPosType() {
+            return mStationPosType;
+        }
+
+        public Position3d getStationPosition() {
+            return new Position3d(mStationPos);
         }
 
     }
@@ -441,6 +472,7 @@ public class RtkServerSettings {
 
     public RtkServerSettings setInputRover(@Nonnull InputStream rover) {
         mInputRover.setValue(rover);
+        mProcessingOptions.setRoverPosition(rover.mStationPosType, rover.mStationPos);
         return this;
     }
 
@@ -451,6 +483,7 @@ public class RtkServerSettings {
 
     public RtkServerSettings setInputBase(@Nonnull InputStream base) {
         mInputBase.setValue(base);
+        mProcessingOptions.setBasePosition(base.mStationPosType, base.mStationPos);
         return this;
     }
 

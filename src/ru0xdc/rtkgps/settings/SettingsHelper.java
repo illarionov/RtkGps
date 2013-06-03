@@ -69,16 +69,14 @@ public class SettingsHelper {
     static class InputStreamDefaults extends StreamDefaultsBase {
 
         private StreamFormat format;
-        private String commandsAtStartup;
-        private String commandsAtShutdown;
         private String receiverOption;
+        protected StationPositionActivity.Value positionDefaults;
 
         public InputStreamDefaults() {
             super();
             format = StreamFormat.RTCM3;
-            commandsAtStartup = "";
-            commandsAtShutdown = "";
             receiverOption = "";
+            positionDefaults = new StationPositionActivity.Value();
         }
 
         public InputStreamDefaults setFormat(StreamFormat format) {
@@ -86,6 +84,10 @@ public class SettingsHelper {
             return this;
         }
 
+        public StreamDefaultsBase setPositionDefaults(StationPositionActivity.Value defaults) {
+            this.positionDefaults = defaults;
+            return this;
+        }
     }
 
     static class OutputStreamDefaults extends StreamDefaultsBase {
@@ -150,6 +152,8 @@ public class SettingsHelper {
         .setLogCorrection(LogCorrectionFragment.readPrefs(ctx))
         ;
 
+
+
         // TODO: send NMEA to base setting
 
         return settings;
@@ -175,6 +179,7 @@ public class SettingsHelper {
             .commit();
 
             StartupShutdownSettingsActivity.setDefaultValue(ctx, sharedPrefsName);
+            StationPositionActivity.setDefaultValue(ctx, sharedPrefsName, defaults.positionDefaults);
             StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
             StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
             StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.tcpClientDefaults);
@@ -253,6 +258,9 @@ public class SettingsHelper {
         ;
 
         stream.setTransportSettings(readTransportSettings(ctx, type, prefs, sharedPrefsName));
+
+        final StationPositionActivity.Value posSettings = StationPositionActivity.readSettings(prefs);
+        stream.setStationPos(posSettings.getType(), posSettings.getPosition());
 
         return stream;
     }

@@ -64,8 +64,12 @@
         
         <activity
             android:name=".settings.StartupShutdownSettingsActivity"
-            android:theme="@android:style/Theme.Holo.Dialog"
-            android:title="@string/startup_shutdown_commands_title" />
+            android:theme="@android:style/Theme.Holo.Dialog"  />
+        
+		<activity
+            android:name=".settings.StationPositionActivity"
+            android:theme="@android:style/Theme.Holo.Dialog" />
+        
         
     </application>
 

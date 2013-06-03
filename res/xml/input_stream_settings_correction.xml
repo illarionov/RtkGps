@@ -31,6 +31,5 @@
         android:key="receiver_option"
         android:title="@string/input_streams_settings_receiver_option_title"
         android:dependency="enable" />
-		
 	
 </PreferenceScreen>
