@@ -12,7 +12,7 @@ public enum SolutionStatus implements IHasRtklibId {
 
     NONE(0, R.string.solq_none),
     FIX(1, R.string.solq_fix),
-    FLOAT(2, R.string.solq_fix),
+    FLOAT(2, R.string.solq_float),
     SBAS(3, R.string.solq_sbas),
     DGPS(4, R.string.solq_dgps),
     SINGLE(5, R.string.solq_single),

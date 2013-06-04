@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">RtkGps</string>
-    <string name="title_status">Status</string>
 	<string name="title_activity_input_stream_settings">Input stream settings</string>
 	<string name="title_activity_output_stream_settings">Output stream settings</string>
 	<string name="title_activity_log_stream_settings">Log stream settings</string>
@@ -22,7 +21,21 @@
     <string name="sky_plot_south">S</string>
     <string name="sky_plot_east">E</string>
     <string name="sky_plot_num_of_sat"># of Sat: %d</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 
+    <!-- Navigation drawer -->
+    <string name="navdraw_category_server">Server</string>
+    <string name="navdraw_category_streams">Streams</string>
+    <string name="navdraw_category_settings">Settings</string>
+    <string name="navdraw_item_server_switch">Server</string>
+    <string name="navdraw_item_status">Status</string>
+	<string name="navdraw_item_input_streams">Input streams</string>
+    <string name="navdraw_item_output_streams">Output streams</string>
+    <string name="navdraw_item_log_streams">Log streams</string>
+    <string name="navdraw_item_processing_options">Processing options</string>
+    <string name="navdraw_item_solution_options">Solution options</string>
+    
     <string-array name="rtk_server_receiver">
         <item>Rover</item>
         <item>Base</item>

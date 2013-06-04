@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/navigation_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#ff333333" >
+        
+    	<LinearLayout
+    	    android:layout_width="match_parent"
+    	    android:layout_height="wrap_content"
+    	    android:layout_marginLeft="5dp"
+    	    android:layout_marginRight="5dp"
+    	    android:orientation="vertical" >
+
+    	    <TextView
+    	        style="?android:attr/listSeparatorTextViewStyle"
+    	        android:text="@string/navdraw_category_server" />
+
+    	    <Switch
+    	        style="@style/NavigationDrawerItem"
+    	        android:id="@+id/navdraw_server_switch"
+    	        android:text="@string/navdraw_item_server_switch"
+    	        android:background="@null" />
+    	        
+    	    <TextView
+    	        style="@style/NavigationDrawerItem"
+    	        android:id="@+id/navdraw_item_status"
+    	        android:text="@string/navdraw_item_status"
+    	        android:onClick="onNavDrawevItemClicked" />
+    		
+    	    <TextView
+    	        style="?android:attr/listSeparatorTextViewStyle"
+    	        android:layout_marginTop="10dp"
+    	        android:text="@string/navdraw_category_streams" />
+    	    
+    	    <TextView
+    	        style="@style/NavigationDrawerItem"
+    	        android:id="@+id/navdraw_item_input_streams"
+    	        android:text="@string/navdraw_item_input_streams"
+    	        android:onClick="onNavDrawevItemClicked" />
+    	    
+			<TextView
+			    style="@style/NavigationDrawerItem"
+    	        android:id="@+id/navdraw_item_output_streams"
+    	        android:text="@string/navdraw_item_output_streams"
+    	        android:onClick="onNavDrawevItemClicked" />
+
+			<TextView
+			    style="@style/NavigationDrawerItem"
+    	        android:id="@+id/navdraw_item_log_streams"
+    	        android:text="@string/navdraw_item_log_streams"
+    	        android:onClick="onNavDrawevItemClicked" />
+
+			<TextView
+    	        style="?android:attr/listSeparatorTextViewStyle"
+    	        android:layout_marginTop="10dp"
+    	        android:text="@string/navdraw_category_settings" />
+			
+			<TextView
+			    style="@style/NavigationDrawerItem"
+    	        android:id="@+id/navdraw_item_processing_options"
+    	        android:text="@string/navdraw_item_processing_options"
+    	        android:onClick="onNavDrawevItemClicked" />
+						
+			<TextView
+			    style="@style/NavigationDrawerItem"
+    	        android:id="@+id/navdraw_item_solution_options"
+    	        android:text="@string/navdraw_item_solution_options"
+    	        android:onClick="onNavDrawevItemClicked" />
+							    
+    	</LinearLayout>
+</ScrollView>

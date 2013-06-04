@@ -69,7 +69,7 @@ public class RtkNaviService extends Service {
             else if(action.equals(ACTION_STOP)) processStop();
             else Log.e(TAG, "onStartCommand(): unknown action " + action);
         }
-        return  START_STICKY;
+        return START_STICKY;
     }
 
 
