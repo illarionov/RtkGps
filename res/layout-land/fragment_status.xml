@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/ru0xdc.rtkgps"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="1dp"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    tools:ignore="SmallSp" >
+
+	<ru0xdc.rtkgps.view.StreamIndicatorsView
+	    android:id="@+id/streamIndicatorsView"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignParentTop="true"
+	    android:layout_marginRight="3dp"
+	    android:layout_marginTop="2dp" />
+    
+	<ru0xdc.rtkgps.view.GTimeView
+	    android:id="@+id/gtimeView"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="10dp"
+	    android:layout_marginRight="10dp"
+	    android:ellipsize="end"
+	    android:maxLines="1"
+	    custom:time_format="gps_tow" />
+
+	<ru0xdc.rtkgps.view.SolutionView
+	    android:id="@+id/solutionView"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@id/gtimeView"
+	    android:layout_gravity="left"
+	    android:layout_marginLeft="5dp"
+	    android:layout_marginRight="5dp"
+	    android:layout_marginTop="10dp"
+	    android:minWidth="255dp" />
+	
+	<TextView
+	    android:id="@+id/streamStatus"
+	    android:layout_width="0dp"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@id/solutionView"
+	    android:layout_marginBottom="5dp"
+	    android:layout_marginLeft="3dp"
+	    android:layout_marginRight="5dp"
+	    android:layout_marginTop="5dp"
+	    android:layout_toLeftOf="@+id/status_main_view"
+	    android:minEms="10"
+	    android:minLines="3"
+	    android:textColor="@android:color/darker_gray"
+	    android:textIsSelectable="true"
+	    android:textSize="10sp" />
+	
+	<LinearLayout
+	    android:id="@id/status_main_view"
+	    android:layout_width="0dp"
+	    android:layout_height="match_parent"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignParentTop="true"
+	    android:layout_toRightOf="@id/solutionView"
+	    android:orientation="vertical" >
+
+		<include
+	    	layout="@layout/include_status_view_widget" />
+	</LinearLayout>
+
+</RelativeLayout>

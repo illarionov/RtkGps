@@ -31,8 +31,7 @@
         	    	android:layout_width="0dp"
         	    	android:layout_height="wrap_content"
         	    	android:gravity="center"
-        	    	android:layout_weight="1"
-        	    	android:text="None" />
+        	    	android:layout_weight="1" />
         	
         		<view class="ru0xdc.rtkgps.view.SolutionView$SolutionIndicatorView"
         	    	android:id="@+id/solution_indicator_view"

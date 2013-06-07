@@ -90,6 +90,11 @@ public class RtkNaviService extends Service {
         return mRtkServer.getRoverObservationStatus(status);
     }
 
+    public final RtkServerObservationStatus getBaseObservationStatus(
+            RtkServerObservationStatus status) {
+        return mRtkServer.getBaseObservationStatus(status);
+    }
+
     public RtkControlResult getRtkStatus(RtkControlResult dst) {
         return mRtkServer.getRtkStatus(dst);
     }

@@ -10,9 +10,6 @@
     <string name="menu_stop_service">Stop service</string>
     <string name="menu_select_solution_format">Select solution format</string>
     <string name="menu_select_gtime_format">Select time format</string>
-    <string name="menu_input_stream_settings">Configure Input streams</string>
-    <string name="menu_output_stream_settings">Configure Output streams</string>
-    <string name="menu_log_stream_settings">Configure Log streams</string>
     <string name="local_service_started">Local service started</string>
     <string name="local_service_stopped">Local service stopped</string>
     <string name="local_service_label">RtkGps</string>
@@ -201,12 +198,7 @@
     
     <!-- Procession options -->
     <string name="procopt_category_processing_options_1">Processing options 1</string>
-    <string name="procopt_category_processing_options_2">Processing options 2</string>
     <string name="procopt_category_solution_options">Solution options</string>
-    <string name="procopt_category_statistics">Statistics</string>
-    <string name="procopt_category_positions">Positions</string>
-    <string name="procopt_category_files">Files</string>
-    <string name="procopt_category_misc">Misc</string>
 
     <!-- Positionong mode -->
     <string name="procopt_positioning_mode_title">Positioning mode</string>
@@ -391,18 +383,6 @@
         <item>4</item>
         <item>5</item>
     </string-array>
-
-    <!-- Settings headers -->
-    <string name="settings_header_input_rover">Input Rover</string>
-    <string name="settings_header_input_base">Input Base</string>
-    <string name="settings_header_input_correction">Input Correction</string>
-    
-    <string name="settings_header_output_solution1">Output Solution 1</string>
-    <string name="settings_header_output_solution2">Output Solution 2</string>
-    
-    <string name="settings_header_log_rover">Log Stream Rover</string>
-    <string name="settings_header_log_base">Log Stream Base</string>
-    <string name="settings_header_log_correction">Log Stream Correction</string>
     
     <!-- Input streams settings -->
 	<string name="streams_settings_type_title">Type</string>
@@ -468,7 +448,6 @@
     <!-- Bluetooth stream preferences -->
     <string name="bluetooth_dialog_title">Bluetooth receiver settings</string>
     <string name="bluetooth_device_not_selected">device not selected</string>
-    <string name="bluetooth_not_supported">Bluetooth is not supported on this hardware</string>
     <string name="bluetooth_disabled_summary">Turn on Bluetooth and select the receiver</string>
     <string name="bluetooth_device_address_title">Bluetooth device</string>
     <string name="bluetooth_system_settings_title">Bluetooth system settings</string>
@@ -503,7 +482,6 @@
     </string-array>
     
 	<!-- Startup/shutdown commands preference widget -->
-	<string name="startup_shutdown_commands_title">Set startup/shutdown commands</string>
 	<string name="send_commands_at_startup">Send commands at startup</string>
 	<string name="send_commands_at_shutdown">Send commands at shutdown</string>
 	<string name="commands_at_startup">Commands at startup</string>
@@ -517,5 +495,19 @@
 	<string name="station_position_format_ecef">X/Y/Z — ECEF</string>
 	<string name="station_position_for_fixed_mode">For fixed mode</string>
 	<string name="station_position_for_relative_mode">For relative mode</string>
-		
+	
+	<!-- StatusView -->
+	<string name="status_view_snr">SNR Rover/Base</string>
+	<string name="status_view_snr_l1">SNR Rover/Base L1</string>
+	<string name="status_view_snr_l2">SNR Rover/Base L2</string>
+	<string name="status_view_snr_l5">SNR Rover/Base L5</string>
+	<string name="status_view_skyplot_rover_l1">Skyplot Rover L1</string>
+	<string name="status_view_skyplot_rover_l2">Skyplot Rover L2</string>
+	<string name="status_view_skyplot_rover_l5">Skyplot Rover L5</string>	
+	<string name="status_view_skyplot_base_l1">Skyplot Base L1</string>
+	<string name="status_view_skyplot_base_l2">Skyplot Base L2</string>
+	<string name="status_view_skyplot_base_l5">Skyplot Base L5</string>
+	<string name="status_view_baseline">Baseline</string>
+	
+	
 </resources>

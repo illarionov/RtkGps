@@ -26,7 +26,7 @@ public class RtkServerObservationStatus {
         public SatStatus() {
         }
 
-        SatStatus(int satNumber, double az, double el,
+        public SatStatus(int satNumber, double az, double el,
                 int freq1Snr, int freq2Snr, int freq3Snr, boolean valid) {
             this();
             setValues(satNumber, az, el, freq1Snr, freq2Snr, freq3Snr, valid);

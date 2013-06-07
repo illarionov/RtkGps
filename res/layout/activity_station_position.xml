@@ -40,8 +40,7 @@
                     android:layout_marginBottom="3dp"
                     android:layout_marginRight="2dp"
                     android:gravity="end"
-                    android:minEms="3"
-                    android:text="Lat:" />
+                    android:minEms="3" />
 
                 <EditText
                     android:id="@+id/coord1"
@@ -66,8 +65,7 @@
                     android:layout_marginBottom="3dp"
                     android:layout_marginRight="2dp"
                     android:gravity="end"
-                    android:minEms="3"
-                    android:text="Lon:" />
+                    android:minEms="3" />
 
                 <EditText
                     android:id="@+id/coord2"
@@ -88,8 +86,7 @@
                     android:layout_marginBottom="3dp"
                     android:layout_marginRight="2dp"
                     android:gravity="end"
-                    android:minEms="3"
-                    android:text="Height:" />
+                    android:minEms="3" />
 
                 <EditText
                     android:id="@+id/coord3"

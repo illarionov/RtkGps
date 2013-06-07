@@ -37,12 +37,12 @@ public class GpsSkyView extends View {
     private static final int GRID_TEXT_SIZE = 16;
 
     static int SNR_COLORS[] = new int[] {
-        Color.GREEN,
-        Color.rgb(0, 0xaa, 0xff),
-        Color.rgb(0xff, 0, 0xff),
-        Color.BLUE,
-        Color.RED,
-        Color.GRAY
+        Color.argb(0, 0, 0xff, 0),
+        Color.argb(0, 0, 0xaa, 0xff),
+        Color.argb(0, 0xff, 0, 0xff),
+        Color.argb(0, 0, 0, 0xff),
+        Color.argb(0, 0xff, 0, 0),
+        Color.argb(0, 0xa0, 0xa0, 0xa0)
     };
 
     private String mBand;
@@ -100,6 +100,7 @@ public class GpsSkyView extends View {
         mDopsFormatter = new DecimalFormat("0.0");
 
         setFocusable(true);
+
     }
 
     public void setStats(RtkServerObservationStatus status) {
@@ -251,6 +252,14 @@ public class GpsSkyView extends View {
         // Keep the view squared
         int w = MeasureSpec.getSize(widthMeasureSpec);
         int h = MeasureSpec.getSize(heightMeasureSpec);
+
+        if (w != 0) {
+            w = w - getPaddingLeft() - getPaddingRight();
+        }
+        if (h != 0) {
+            h = h - getPaddingTop() - getPaddingBottom();
+        }
+
         int d = w == 0 ? h : h == 0 ? w : w < h ? w : h;
         setMeasuredDimension(d, d);
     }

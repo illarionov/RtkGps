@@ -1,6 +1,5 @@
 package ru0xdc.rtkgps.view;
 
-import static junit.framework.Assert.assertTrue;
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
 import ru0xdc.rtklib.RtkServerObservationStatus;
@@ -33,7 +32,7 @@ public class SnrView extends View {
 
     public static final int BAND_L5 = 5;
 
-    private final static int COLOR_BAR = Color.WHITE;
+    private final static int COLOR_BAR = Color.argb(0x80, 0xff, 0xff, 0xff);
 
     private final static int MIN_SNR = 10;
 
@@ -43,6 +42,18 @@ public class SnrView extends View {
 
     private static final int GRID_TEXT_COLOR = Color.GRAY;
 
+    private static final SatStatus TEST_SAT_STATUS[] = new SatStatus[] {
+        new SatStatus(10, 0, 0, 10, 10, 10, false),
+        new SatStatus(15, 0, 0, 15, 15, 15, true),
+        new SatStatus(20, 0, 0, 20, 20, 20, true),
+        new SatStatus(25, 0, 0, 25, 25, 25, true),
+        new SatStatus(30, 0, 0, 30, 30, 30, true),
+        new SatStatus(35, 0, 0, 35, 35, 35, true),
+        new SatStatus(40, 0, 0, 40, 40, 40, true),
+        new SatStatus(45, 0, 0, 45, 45, 45, true),
+
+
+    };
 
     private final RtkServerObservationStatus mStatus;
 
@@ -176,9 +187,14 @@ public class SnrView extends View {
         final float paddingLeft;
         float interBarWidth;
         final int numSatellites;
-        final SatStatus satStatus;
+        SatStatus satStatus;
 
-        numSatellites = mStatus.getNumSatellites();
+        if (isInEditMode()) {
+            numSatellites = TEST_SAT_STATUS.length;
+        }else {
+            numSatellites = mStatus.getNumSatellites();
+        }
+
         if (numSatellites == 0) return;
 
         gridRect = getGridRect();
@@ -225,13 +241,17 @@ public class SnrView extends View {
 
             x1 = barBox.left + interBarWidth/2.0f;
             x2 = barBox.right - interBarWidth/2.0f;
-            assertTrue(x2>=x1);
+            // assertTrue(x2>=x1);
 
-            mStatus.getSatStatus(i, satStatus);
+            if (isInEditMode()) {
+                satStatus = TEST_SAT_STATUS[i];
+            }else {
+                mStatus.getSatStatus(i, satStatus);
+            }
 
             // Text
             canvas.drawText(
-                    satStatus.getSatId(),
+                    !isInEditMode() ? satStatus.getSatId() : "S" + satStatus.getSatNumber(),
                     barBox.left + barBoxWidth/2.0f,
                     gridRect.bottom + mGridTextPaint.getTextSize(),
                     mGridTextPaint

@@ -24,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,44 +32,57 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import butterknife.InjectView;
 import butterknife.Views;
 
 public class StatusFragment extends Fragment {
 
-    @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
     static final String TAG = StatusFragment.class.getSimpleName();
-
-    private Timer mStreamStatusUpdateTimer;
-    private RtkServerStreamStatus mStreamStatus;
-    private RtkServerObservationStatus mRoverObservationStatus;
-    private RtkControlResult mRtkStatus;
-
-    @InjectView(R.id.Sky) GpsSkyView mSkyView;
-    @InjectView(R.id.Snr) SnrView mSnrView;
-    @InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
-    @InjectView(R.id.gtimeView) GTimeView mGTimeView;
-    @InjectView(R.id.solutionView) SolutionView mSolutionView;
-    @InjectView(R.id.streamStatus) TextView mStreamStatusView;
 
     public static final String PREF_TIME_FORMAT = "StatusFragment.PREF_TIME_FORMAT";
 
     public static final String PREF_SOLUTION_FORMAT = "StatusFragment.PREF_SOLUTION_FORMAT";
 
+    private static final String KEY_CURRENT_STATUS_VIEW = "StatusFragment.currentStatusView";
+
+    private Timer mStreamStatusUpdateTimer;
+    private RtkServerStreamStatus mStreamStatus;
+    private final RtkServerObservationStatus mRoverObservationStatus, mBaseObservationStatus;
+    private RtkControlResult mRtkStatus;
+
+    @InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
+    @InjectView(R.id.gtimeView) GTimeView mGTimeView;
+    @InjectView(R.id.solutionView) SolutionView mSolutionView;
+    @InjectView(R.id.streamStatus) TextView mStreamStatusView;
+
+    @InjectView(R.id.status_view_spinner) Spinner mStatusViewSpinner;
+    @InjectView(R.id.status_view_container) ViewGroup mStatusViewContainer;
+    @InjectView(R.id.Sky) GpsSkyView mSkyView;
+    @InjectView(R.id.Snr1) SnrView mSnr1View;
+    @InjectView(R.id.Snr2) SnrView mSnr2View;
+
+    private ArrayAdapter<StatusView> mStatusViewSpinnerAdapter;
+
+    private StatusView mCurrentStatusView;
+
     public StatusFragment() {
         mStreamStatus = new RtkServerStreamStatus();
         mRoverObservationStatus = new RtkServerObservationStatus();
+        mBaseObservationStatus = new RtkServerObservationStatus();
         mRtkStatus = new RtkControlResult();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        // Create a new TextView and set its text to the fragment's section
-        // number argument value.
+
         View v = inflater.inflate(R.layout.fragment_status, container, false);
         Views.inject(this, v);
 
@@ -102,6 +116,51 @@ public class StatusFragment extends Fragment {
             }
         });
 
+        mStatusViewSpinnerAdapter = new ArrayAdapter<StatusView>(getActivity(),
+                R.layout.select_solution_view_item) {
+
+            @Override
+            public View getDropDownView(int position, View convertView,
+                    ViewGroup parent) {
+                final View v = super.getDropDownView(position, convertView, parent);
+                ((TextView)v).setText(getItem(position).mTitleId);
+                return v;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                final View v = super.getView(position, convertView, parent);
+                ((TextView)v).setText(getItem(position).mTitleId);
+                return v;
+            }
+        };
+        mStatusViewSpinnerAdapter.addAll(StatusView.values());
+        mStatusViewSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mStatusViewSpinner.setAdapter(mStatusViewSpinnerAdapter);
+
+        mStatusViewSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                    int position, long id) {
+                if (DBG) Log.v(TAG, "onItemSelected() " + position);
+                StatusView newView = mStatusViewSpinnerAdapter.getItem(position);
+                if (mCurrentStatusView != newView) {
+                    setStatusView(newView);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
+
+        if (savedInstanceState == null) {
+            setStatusView(StatusView.SNR);
+        }else {
+            mCurrentStatusView = StatusView.valueOf(savedInstanceState.getString(KEY_CURRENT_STATUS_VIEW));
+        }
     }
 
     @Override
@@ -137,6 +196,13 @@ public class StatusFragment extends Fragment {
         prefs.registerOnSharedPreferenceChangeListener(mPrefsChangedListener);
     }
 
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_CURRENT_STATUS_VIEW, mCurrentStatusView.name());
+    }
+
     @Override
     public void onPause() {
         final SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -170,6 +236,70 @@ public class StatusFragment extends Fragment {
         }
 
         return true;
+    }
+
+    private void setStatusView(StatusView statusView) {
+        mCurrentStatusView = statusView;
+
+        switch (statusView) {
+        //case BASELINE:
+        case SKYPLOT_BASE_L1:
+        case SKYPLOT_BASE_L2:
+        case SKYPLOT_BASE_L5:
+        case SKYPLOT_ROVER_L1:
+        case SKYPLOT_ROVER_L2:
+        case SKYPLOT_ROVER_L5:
+            mSkyView.setVisibility(View.VISIBLE);
+            mSnr1View.setVisibility(View.GONE);
+            mSnr2View.setVisibility(View.GONE);
+            break;
+        case SNR:
+        case SNR_L1:
+        case SNR_L2:
+        case SNR_L5:
+            mSkyView.setVisibility(View.GONE);
+            mSnr1View.setVisibility(View.VISIBLE);
+            mSnr2View.setVisibility(View.VISIBLE);
+            break;
+        default:
+            throw new IllegalStateException();
+
+        }
+
+        switch (statusView) {
+        // case BASELINE:
+            //break;
+        case SKYPLOT_BASE_L1:
+        case SKYPLOT_ROVER_L1:
+            mSkyView.setFreqBand(GpsSkyView.BAND_L1);
+            break;
+        case SKYPLOT_BASE_L2:
+        case SKYPLOT_ROVER_L2:
+            mSkyView.setFreqBand(GpsSkyView.BAND_L2);
+            break;
+        case SKYPLOT_BASE_L5:
+        case SKYPLOT_ROVER_L5:
+            mSkyView.setFreqBand(GpsSkyView.BAND_L5);
+            break;
+        case SNR:
+            mSnr1View.setFreqBand(SnrView.BAND_ANY);
+            mSnr2View.setFreqBand(SnrView.BAND_ANY);
+            break;
+        case SNR_L1:
+            mSnr1View.setFreqBand(SnrView.BAND_L1);
+            mSnr2View.setFreqBand(SnrView.BAND_L1);
+            break;
+        case SNR_L2:
+            mSnr1View.setFreqBand(SnrView.BAND_L2);
+            mSnr2View.setFreqBand(SnrView.BAND_L2);
+            break;
+        case SNR_L5:
+            mSnr1View.setFreqBand(SnrView.BAND_L5);
+            mSnr2View.setFreqBand(SnrView.BAND_L5);
+            break;
+        default:
+            break;
+        }
     }
 
     private final OnSharedPreferenceChangeListener mPrefsChangedListener = new OnSharedPreferenceChangeListener() {
@@ -214,17 +344,41 @@ public class StatusFragment extends Fragment {
         }else {
             rtks.getStreamStatus(mStreamStatus);
             rtks.getRoverObservationStatus(mRoverObservationStatus);
+            rtks.getBaseObservationStatus(mBaseObservationStatus);
             rtks.getRtkStatus(mRtkStatus);
             serverStatus = rtks.getServerStatus();
         }
 
         assertNotNull(mStreamStatus.mMsg);
         mStreamStatusView.setText(mStreamStatus.mMsg);
-        mSkyView.setStats(mRoverObservationStatus);
-        mSnrView.setStats(mRoverObservationStatus);
+
         mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
         mSolutionView.setStats(mRtkStatus);
         mGTimeView.setTime(mRoverObservationStatus.getTime());
+
+        switch (mCurrentStatusView) {
+        //case BASELINE:
+        case SKYPLOT_BASE_L1:
+        case SKYPLOT_BASE_L2:
+        case SKYPLOT_BASE_L5:
+            mSkyView.setStats(mBaseObservationStatus);
+            break;
+        case SKYPLOT_ROVER_L1:
+        case SKYPLOT_ROVER_L2:
+        case SKYPLOT_ROVER_L5:
+            mSkyView.setStats(mRoverObservationStatus);
+            break;
+        case SNR:
+        case SNR_L1:
+        case SNR_L2:
+        case SNR_L5:
+            mSnr1View.setStats(mRoverObservationStatus);
+            mSnr2View.setStats(mBaseObservationStatus);
+            break;
+        default:
+            throw new IllegalStateException();
+        }
+
     }
 
     void updateGTimeFormat(SharedPreferences prefs) {
@@ -250,6 +404,39 @@ public class StatusFragment extends Fragment {
             cce.printStackTrace();
         }catch(IllegalArgumentException iae) {
             iae.printStackTrace();
+        }
+    }
+
+    public static enum StatusView {
+
+        SNR(R.string.status_view_snr),
+
+        SNR_L1(R.string.status_view_snr_l1),
+
+        SNR_L2(R.string.status_view_snr_l2),
+
+        SNR_L5(R.string.status_view_snr_l5),
+
+        SKYPLOT_ROVER_L1(R.string.status_view_skyplot_rover_l1),
+
+        SKYPLOT_ROVER_L2(R.string.status_view_skyplot_rover_l2),
+
+        SKYPLOT_ROVER_L5(R.string.status_view_skyplot_rover_l5),
+
+        SKYPLOT_BASE_L1(R.string.status_view_skyplot_base_l1),
+
+        SKYPLOT_BASE_L2(R.string.status_view_skyplot_base_l2),
+
+        SKYPLOT_BASE_L5(R.string.status_view_skyplot_base_l5),
+
+        //BASELINE(R.string.status_view_baseline)
+
+        ;
+
+        final int mTitleId;
+
+        private StatusView(int titleId) {
+            mTitleId = titleId;
         }
     }
 

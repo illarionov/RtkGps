@@ -127,8 +127,15 @@ public class SolutionView extends TableLayout {
         mCoordEcefFormatter = new DecimalFormat("0.000",
                 DecimalFormatSymbols.getInstance(Locale.US));
 
-        updateCoordinatesHeader();
-        clearCoordinates();
+        if (isInEditMode()) {
+            mSolutionFormat = Format.WGS84;
+            updateCoordinatesHeader();
+            setStats(new RtkControlResult());
+        }else {
+            updateCoordinatesHeader();
+            clearCoordinates();
+            setStats(new RtkControlResult());
+        }
     }
 
     public void setStats(RtkControlResult status) {
@@ -165,21 +172,28 @@ public class SolutionView extends TableLayout {
             String strLat, strLon, strHeight;
             RtkCommon.Matrix3x3 cov;
 
-            if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
-                break;
-            }
-
-            roverPos = RtkCommon.ecef2pos(roverEcefPos);
-            cov = sol.getQrMatrix();
-            Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
-            if (mSolutionFormat == Format.WGS84) {
-                strLat = Deg2Dms.toString(Math.toDegrees(roverPos.getLat()), true);
-                strLon = Deg2Dms.toString(Math.toDegrees(roverPos.getLon()), false);
+            if (isInEditMode()) {
+                strLat = "-34.56785678°";
+                strLon = "123.45454545°";
+                strHeight = "45.324m el.";
+                Qe = new double[9];
             }else {
-                strLat = String.format(Locale.US, "%11.8f°", Math.toDegrees(roverPos.getLat()));
-                strLon = String.format(Locale.US, "%11.8f°", Math.toDegrees(roverPos.getLon()));
+                if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
+                    break;
+                }
+
+                roverPos = RtkCommon.ecef2pos(roverEcefPos);
+                cov = sol.getQrMatrix();
+                Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
+                if (mSolutionFormat == Format.WGS84) {
+                    strLat = Deg2Dms.toString(Math.toDegrees(roverPos.getLat()), true);
+                    strLon = Deg2Dms.toString(Math.toDegrees(roverPos.getLon()), false);
+                }else {
+                    strLat = String.format(Locale.US, "%11.8f°", Math.toDegrees(roverPos.getLat()));
+                    strLon = String.format(Locale.US, "%11.8f°", Math.toDegrees(roverPos.getLon()));
+                }
+                strHeight = String.format(Locale.US, "%.3fm el.", roverPos.getHeight());
             }
-            strHeight = String.format(Locale.US, "%.3fm el.", roverPos.getHeight());
 
             mTextViewCoord1Value.setText(strLat);
             mTextViewCoord2Value.setText(strLon);
@@ -284,13 +298,11 @@ public class SolutionView extends TableLayout {
 
     private void updateCoordinatesHeader() {
         final String headers[];
-
         if (isInEditMode()) {
-            headers = new String[] {"Lat:", "Lon:", "height:"};
+            headers = new String[] {"Lat:", "Lon:", "Height:"};
         }else {
             headers = getResources().getStringArray(mSolutionFormat.mHeadersArrayId);
         }
-
         mTextViewCoord1Name.setText(headers[0]);
         mTextViewCoord2Name.setText(headers[1]);
         mTextViewCoord3Name.setText(headers[2]);

@@ -253,7 +253,7 @@ public class StationPositionActivity extends Activity {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                final View v = super.getDropDownView(position, convertView, parent);
+                final View v = super.getView(position, convertView, parent);
                 ((TextView)v).setText(getItem(position).mTitleId);
                 return v;
             }
