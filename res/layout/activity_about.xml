@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/textView2"
+        style="@android:style/TextAppearance.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="false"
+        android:layout_centerVertical="false"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="80dp"
+        android:text="@string/app_name" />
+
+    <TextView
+        android:id="@+id/version_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_below="@+id/textView2"
+        android:layout_marginTop="20dp"
+        android:text="@string/app_version_label" />
+
+    <TextView
+        android:id="@+id/version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/version_label"
+        android:layout_alignBottom="@+id/version_label"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/version_label" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/version_label"
+        android:layout_below="@+id/version_label"
+        android:layout_marginTop="5dp"
+        android:autoLink="web"
+        android:gravity="center_vertical"
+        android:minHeight="48dp"
+        android:text="@string/app_url" />
+
+    <Button
+        android:id="@+id/legacyInfoButton"
+        style="android:buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/version_label"
+        android:layout_below="@+id/version_label"
+        android:layout_marginTop="60dp"
+        android:onClick="onLegacyInfoButtonClicked"
+        android:text="@string/app_legacy_info_label" />
+
+</RelativeLayout>

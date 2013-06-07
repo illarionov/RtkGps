@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ru0xdc.rtkgps"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0 alpha1" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -42,15 +42,6 @@
         </activity>
 
         <activity android:name=".settings.SettingsActivity" />
-        <service 
-            android:name=".RtkNaviService"
-            android:exported="false"
-             >
-			<intent-filter>
-			    <action android:name="ru0xdc.rtkgps.RtkNaviService.START" />
-                <action android:name="ru0xdc.rtkgps.RtkNaviService.STOP" />
-			</intent-filter>	
-		</service>
 
         <activity
             android:name=".settings.StreamSettingsActivity"
@@ -70,7 +61,19 @@
             android:name=".settings.StationPositionActivity"
             android:theme="@android:style/Theme.Holo.Dialog" />
         
+		<activity android:name=".AboutActivity"
+		    android:label="@string/about_activity_label"
+		     />
         
+		<service 
+            android:name=".RtkNaviService"
+            android:exported="false" >
+			<intent-filter>
+			    <action android:name="ru0xdc.rtkgps.RtkNaviService.START" />
+                <action android:name="ru0xdc.rtkgps.RtkNaviService.STOP" />
+			</intent-filter>	
+		</service>
+		
     </application>
 
 </manifest>

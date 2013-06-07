@@ -179,6 +179,9 @@ public class MainActivity extends Activity {
         case R.id.menu_settings:
             mDrawerLayout.openDrawer(mNavDrawer);
             break;
+        case R.id.menu_about:
+            startActivity(new Intent(this, AboutActivity.class));
+            break;
         default:
             return super.onOptionsItemSelected(item);
         }
