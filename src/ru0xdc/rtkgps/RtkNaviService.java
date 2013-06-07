@@ -45,10 +45,6 @@ public class RtkNaviService extends Service {
     private BluetoothToRtklib mBtRover, mBtBase;
     private UsbToRtklib mUsbReceiver;
 
-    static {
-        System.loadLibrary("rtkgps");
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();

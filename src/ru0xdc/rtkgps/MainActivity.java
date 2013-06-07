@@ -366,9 +366,4 @@ public class MainActivity extends Activity {
     public static File getLocalSocketPath(Context ctx, String socketName) {
         return ctx.getFileStreamPath(socketName);
     }
-
-
-    static {
-        System.loadLibrary("rtkgps");
-    }
 }

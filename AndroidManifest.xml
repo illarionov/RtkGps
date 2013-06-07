@@ -24,6 +24,7 @@
         android:icon="@drawable/ic_launcher"
         android:installLocation="auto"
         android:label="@string/app_name"
+        android:name="RtkGps"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
