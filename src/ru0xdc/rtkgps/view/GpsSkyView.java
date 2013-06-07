@@ -37,12 +37,12 @@ public class GpsSkyView extends View {
     private static final int GRID_TEXT_SIZE = 16;
 
     static int SNR_COLORS[] = new int[] {
-        Color.argb(0, 0, 0xff, 0),
-        Color.argb(0, 0, 0xaa, 0xff),
-        Color.argb(0, 0xff, 0, 0xff),
-        Color.argb(0, 0, 0, 0xff),
-        Color.argb(0, 0xff, 0, 0),
-        Color.argb(0, 0xa0, 0xa0, 0xa0)
+        Color.argb(0xff, 0, 0xff, 0),
+        Color.argb(0xff, 0, 0xaa, 0xff),
+        Color.argb(0xff, 0xff, 0, 0xff),
+        Color.argb(0xff, 0, 0, 0xff),
+        Color.argb(0xff, 0xff, 0, 0),
+        Color.argb(0xff, 0xa0, 0xa0, 0xa0)
     };
 
     private String mBand;

@@ -1,17 +1,21 @@
 package ru0xdc.rtklib;
 
+import proguard.annotation.Keep;
+
 public class GTime {
 
     /**
      * time (s) expressed by standard time_t
      */
     // Used in native code
+    @Keep
     private long time;
 
     /**
      * fraction of second under 1 s
      */
     // Used in native code
+    @Keep
     private double sec;
 
     public GTime() {
@@ -27,6 +31,8 @@ public class GTime {
         dst.setGTime(time, sec);
     }
 
+    // Used in native code
+    @Keep
     void setGTime(long time, double sec) {
         this.time = time;
         this.sec = sec;

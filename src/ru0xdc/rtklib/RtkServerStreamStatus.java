@@ -1,5 +1,6 @@
 package ru0xdc.rtklib;
 
+import proguard.annotation.Keep;
 import android.annotation.SuppressLint;
 
 public class RtkServerStreamStatus {
@@ -69,6 +70,7 @@ public class RtkServerStreamStatus {
     }
 
     // Used in native code
+    @Keep
     void setStatus(int inputStreamRoverStatus,
             int inputStreamBaseStationStatus,
             int inputStreamCorrectionStatus,

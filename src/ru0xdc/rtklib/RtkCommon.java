@@ -5,6 +5,8 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
+import proguard.annotation.Keep;
+
 
 public class RtkCommon {
 
@@ -334,6 +336,7 @@ public class RtkCommon {
         }
 
         // Used in native code
+        @Keep
         void setDops(double gdop, double pdop, double hdop, double vdop) {
             mDops[0] = gdop;
             mDops[1] = pdop;

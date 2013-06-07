@@ -1,5 +1,6 @@
 package ru0xdc.rtklib;
 
+import proguard.annotation.Keep;
 import ru0xdc.rtklib.RtkCommon.Position3d;
 
 public class RtkControlResult {
@@ -8,6 +9,7 @@ public class RtkControlResult {
      * RTK solution
      */
     // Used in native code
+    @Keep
     private final Solution sol;
 
     /**
@@ -50,6 +52,8 @@ public class RtkControlResult {
         mRb = new double[6];
     }
 
+    //Used in native code
+    @Keep
     void setStatus1(double rb0, double rb1, double rb2,
             double rb3, double rb4, double rb5,
             int nx, int na, double tt, int nfix,

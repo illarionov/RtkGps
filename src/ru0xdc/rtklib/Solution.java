@@ -3,6 +3,7 @@ package ru0xdc.rtklib;
 import java.util.Arrays;
 import java.util.Locale;
 
+import proguard.annotation.Keep;
 import ru0xdc.rtklib.RtkCommon.Matrix3x3;
 import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.constants.Constants;
@@ -137,6 +138,8 @@ public class Solution {
         return mRr;
     }
 
+    // Used in native code
+    @Keep
     void setSolution(
             long time_time, double time_sec,
             int type,
@@ -224,6 +227,8 @@ public class Solution {
             return mBuffer[mNSol-1];
         }
 
+        // Used in native code
+        @Keep
         void setSolution(
                 int idx,
                 long time_time, double time_sec,

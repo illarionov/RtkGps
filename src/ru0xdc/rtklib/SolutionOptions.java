@@ -3,6 +3,7 @@ package ru0xdc.rtklib;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
+import proguard.annotation.Keep;
 import ru0xdc.rtklib.constants.GeoidModel;
 import ru0xdc.rtklib.constants.SolutionFormat;
 import ru0xdc.rtklib.constants.TimeSystem;
@@ -17,6 +18,7 @@ public class SolutionOptions {
     private final Native mNative;
 
 
+    @Keep
     static class Native {
 
         /** solution format (SOLF_??? {@link SolutionFormat}) */

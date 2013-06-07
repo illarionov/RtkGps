@@ -4,12 +4,14 @@ import java.io.File;
 
 import javax.annotation.Nonnull;
 
+import proguard.annotation.Keep;
 import ru0xdc.rtkgps.MainActivity;
 
 
 public class RtkServer {
 
     /* mObject is used by native code, do not remove or rename */
+    @Keep
     private long mObject;
 
     public final static int RECEIVER_ROVER = 0;
