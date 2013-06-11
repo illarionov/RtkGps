@@ -7,10 +7,13 @@ import javax.annotation.Nonnull;
 
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
+import ru0xdc.rtkgps.settings.StationPositionActivity.Value;
 import ru0xdc.rtkgps.settings.widget.StreamFormatPreference;
 import ru0xdc.rtkgps.settings.widget.StreamTypePreference;
 import ru0xdc.rtklib.ProcessingOptions;
+import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.RtkServerSettings.InputStream;
+import ru0xdc.rtklib.constants.StationPositionType;
 import ru0xdc.rtklib.constants.StreamFormat;
 import ru0xdc.rtklib.constants.StreamType;
 import android.bluetooth.BluetoothAdapter;
@@ -73,6 +76,8 @@ public class InputRoverFragment extends PreferenceFragment {
                 new StreamFileClientFragment.Value()
                     .setFilename("input_rover.rtcm3")
                 );
+        DEFAULTS.setPositionDefaults(new Value(StationPositionType.POS_IN_PRCOPT,
+                new Position3d()));
     }
 
     private final PreferenceChangeListener mPreferenceChangeListener;

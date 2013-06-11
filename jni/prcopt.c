@@ -95,12 +95,14 @@ static struct {
 static int init_prcopt_fields_methods(JNIEnv* env, jclass clazz);
 static int init_snrmask_fields_methods(JNIEnv* env, jclass clazz);
 jboolean SnrMask_load(JNIEnv* env, jobject j_snrmask, const snrmask_t *snrmask);
+void SnrMask_save(JNIEnv* env, jobject j_snrmask, snrmask_t *dst);
 
 void processing_options2prcopt_t(JNIEnv* env, jobject thiz, prcopt_t *dst)
 {
    int string_size;
    jstring jstr;
    jobject jarr;
+   jobject jsnrmask;
    jclass clazz;
 
    clazz = (*env)->FindClass(env, PROCESSING_OPTIONS_CLASS);
@@ -203,6 +205,9 @@ void processing_options2prcopt_t(JNIEnv* env, jobject thiz, prcopt_t *dst)
    j_str2buf(env, jstr, dst->rnxopt[1], sizeof(dst->rnxopt[1]));
    jarr = GET_FIELD2(posopt, Object)
    (*env)->GetIntArrayRegion(env, jarr, 0, sizeof(dst->posopt)/sizeof(dst->posopt[0]), dst->posopt);
+
+   jsnrmask = GET_FIELD2(snrmask, Object);
+   SnrMask_save(env, jsnrmask, &dst->snrmask);
 
 #undef GET_FIELD
 #undef GET_FIELD2
@@ -343,6 +348,24 @@ jboolean SnrMask_load(JNIEnv* env, jobject j_snrmask, const snrmask_t *snrmask)
    (*env)->SetDoubleArrayRegion(env, j_arr_l5, 0, sizeof(snrmask->mask[2])/sizeof(snrmask->mask[2][0]), snrmask->mask[2]);
 
    return JNI_TRUE;
+}
+
+void SnrMask_save(JNIEnv* env, jobject j_snrmask, snrmask_t *dst)
+{
+   jarray j_arr_l1, j_arr_l2, j_arr_l5;
+   if (dst == NULL)
+      return;
+
+   dst->ena[0] = (*env)->GetBooleanField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.enableRover);
+   dst->ena[1] = (*env)->GetBooleanField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.enableBase);
+
+   j_arr_l1 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL1);
+   j_arr_l2 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL2);
+   j_arr_l5 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL5);
+   (*env)->GetDoubleArrayRegion(env, j_arr_l1, 0, sizeof(dst->mask[0])/sizeof(dst->mask[0][0]), dst->mask[0]);
+   (*env)->GetDoubleArrayRegion(env, j_arr_l2, 0, sizeof(dst->mask[1])/sizeof(dst->mask[1][0]), dst->mask[1]);
+   (*env)->GetDoubleArrayRegion(env, j_arr_l5, 0, sizeof(dst->mask[2])/sizeof(dst->mask[2][0]), dst->mask[2]);
+
 }
 
 
