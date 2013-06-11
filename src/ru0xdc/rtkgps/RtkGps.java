@@ -1,6 +1,5 @@
 package ru0xdc.rtkgps;
 
-import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
@@ -21,7 +20,7 @@ public class RtkGps extends Application {
             StrictMode.enableDefaults();
         }
         super.onCreate();
-        ACRA.init(this);
+        //ACRA.init(this);
 
         System.loadLibrary("rtkgps");
 

@@ -9,7 +9,6 @@ import ru0xdc.rtkgps.settings.SettingsActivity;
 import ru0xdc.rtkgps.settings.SettingsHelper;
 import ru0xdc.rtkgps.settings.SolutionOutputSettingsFragment;
 import ru0xdc.rtkgps.settings.StreamSettingsActivity;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
@@ -63,9 +62,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         // Set up the action bar to show a dropdown list.
-        final ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        //final ActionBar actionBar = getActionBar();
+        //actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setHomeButtonEnabled(true);
 
         Views.inject(this);
 
@@ -223,19 +222,10 @@ public class MainActivity extends Activity {
     }
 
     private void selectDrawerItem(int itemId) {
-        Fragment fragment;
-
         switch (itemId) {
         case R.id.navdraw_item_status:
-            mDrawerLayout.closeDrawer(mNavDrawer);
-            if (mNavDraverSelectedItem != R.id.navdraw_item_status) {
-                fragment = new StatusFragment();
-                getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .commit();
-                setNavDrawerItemChecked(itemId);
-            }
+        case R.id.navdraw_item_map:
+            setNavDrawerItemFragment(itemId);
             break;
         case R.id.navdraw_item_input_streams:
             showInputStreamSettings();
@@ -253,6 +243,32 @@ public class MainActivity extends Activity {
         default:
             throw new IllegalStateException();
         }
+    }
+
+    private void setNavDrawerItemFragment(int itemId) {
+        Fragment fragment;
+        mDrawerLayout.closeDrawer(mNavDrawer);
+
+        if (mNavDraverSelectedItem == itemId) {
+            return;
+        }
+
+        switch (itemId) {
+        case R.id.navdraw_item_status:
+            fragment = new StatusFragment();
+            break;
+        case R.id.navdraw_item_map:
+            fragment = new MapFragment();
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+
+        getFragmentManager()
+        .beginTransaction()
+        .replace(R.id.container, fragment)
+        .commit();
+        setNavDrawerItemChecked(itemId);
     }
 
     private void setNavDrawerItemChecked(int itemId) {

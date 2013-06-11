@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="1dp"
+    android:layout_marginTop="?android:attr/actionBarSize"
     android:orientation="vertical"
     tools:context=".MainActivity"
     tools:ignore="SmallSp" >
