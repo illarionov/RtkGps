@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="1dp"
     android:orientation="vertical"
+    android:layout_marginTop="?android:attr/actionBarSize"
     tools:context=".MainActivity"
     tools:ignore="SmallSp" >
 
