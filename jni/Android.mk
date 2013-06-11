@@ -20,3 +20,5 @@ LOCAL_STATIC_LIBRARIES := rtklib
 
 include $(BUILD_SHARED_LIBRARY)
 
+$(call import-module,simonlynen_android_libs/lapack/jni)
+

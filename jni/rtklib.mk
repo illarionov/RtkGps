@@ -5,6 +5,9 @@ RTKLIB_CFLAGS := -DENAGLO -DENAGAL -DENAQZS -DENACMP -DNFREQ=3 -DTRACE
 
 LOCAL_MODULE    := rtklib
 
+RTKLIB_CFLAGS += -DLAPACK
+LOCAL_STATIC_LIBRARIES += clapack blas f2c
+
 LOCAL_CFLAGS += -fvisibility=hidden
 LOCAL_CFLAGS += $(RTKLIB_CFLAGS)
 LOCAL_EXPORT_CFLAGS := $(RTKLIB_CFLAGS)
@@ -59,6 +62,9 @@ LOCAL_SRC_FILES += \
         $(RTKLIB_PATH)/src/rcv/ublox.c
 
 LOCAL_SRC_FILES += log.c
+
+TARGET-process-src-files-tags += $(call add-src-files-target-cflags, \
+       $(RTKLIB_PATH)/src/rtkcmn.c, -Ddgemm_=f2c_dgemm)
 
 include $(BUILD_STATIC_LIBRARY)
 
