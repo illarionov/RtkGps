@@ -84,6 +84,11 @@
 			</intent-filter>	
 		</service>
 		
+		<meta-data
+		    android:name="BING_KEY"
+		    android:value=" Anw2XC78AChKH-ji_aSpKg0hdF1XzkOnBCCOSwOwVnrVr8elrdvfNupIfeB_aKbb " />
+		    
+		
     </application>
 
 </manifest>

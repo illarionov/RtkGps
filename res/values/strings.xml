@@ -5,7 +5,7 @@
     <string name="app_url">http://github.com/illarionov/RtkGps</string>
     <string name="app_version_label">Version</string>
     <string name="app_legacy_info_label">Legacy info</string>
-    <string name="about_licenses">Open Source Licenses</string>
+    <string name="about_licenses">Legacy info</string>
     <string name="about_activity_label">About</string>
     <string name="crash_toast_text">Ooooops! I crashed, but a report has been sent to my developer to help fix the issue!</string>
 	<string name="title_activity_input_stream_settings">Input stream settings</string>
@@ -17,6 +17,10 @@
     <string name="menu_select_solution_format">Select solution format</string>
     <string name="menu_select_gtime_format">Select time format</string>
     <string name="menu_about">About</string>
+    <string name="menu_map_mode">Map mode</string>
+    <string name="menu_map_mode_osm">OpenStreetMap</string>
+    <string name="menu_map_mode_bing_aerial">Bing Aerial</string>
+    <string name="menu_map_mode_bing_road">Bing Road</string>
     <string name="local_service_started">Local service started</string>
     <string name="local_service_stopped">Local service stopped</string>
     <string name="local_service_label">RtkGps</string>

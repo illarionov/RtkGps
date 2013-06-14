@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_map_mode"
+        android:showAsAction="never"
+		android:title="@string/menu_map_mode"
+		android:orderInCategory="150" >
+		<item
+		    android:title="@string/menu_map_mode">
+		    <menu>
+		        <group
+		            android:title="@string/menu_map_mode"
+		    		android:checkableBehavior="single">
+        			<item
+            			android:id="@+id/menu_map_mode_osm"
+            			android:title="@string/menu_map_mode_osm" />
+					<item
+            			android:id="@+id/menu_map_mode_bing_road"
+            			android:title="@string/menu_map_mode_bing_road" />
+					<item
+            			android:id="@+id/menu_map_mode_bing_aerial"
+            			android:title="@string/menu_map_mode_bing_aerial" />
+				</group>
+        	</menu>
+        </item>            
+    </item>
+	
+
+</menu>
