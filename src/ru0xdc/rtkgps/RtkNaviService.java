@@ -107,6 +107,10 @@ public class RtkNaviService extends Service {
         return mRtkServer.getLastSolution();
     }
 
+    public Solution[] readSolutionBuffer() {
+        return mRtkServer.readSolutionBuffer();
+    }
+
     /**
      * Class used for the client Binder. Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
