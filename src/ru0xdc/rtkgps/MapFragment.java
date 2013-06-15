@@ -10,13 +10,18 @@ import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.bing.BingMapTileSource;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.PathOverlay;
 
 import ru0xdc.rtkgps.view.StreamIndicatorsView;
+import ru0xdc.rtklib.RtkCommon;
+import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.RtkServerStreamStatus;
+import ru0xdc.rtklib.Solution;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,6 +52,7 @@ public class MapFragment extends Fragment {
     private ResourceProxy mResourceProxy;
 
     private BingMapTileSource mBingRoadTileSource, mBingAerialTileSource;
+    private PathOverlay mPathOverlay;
 
     @InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
     @InjectView(R.id.map_container) ViewGroup mMapViewContainer;
@@ -90,6 +96,9 @@ public class MapFragment extends Fragment {
         mMapView.setMultiTouchControls(true);
         mMapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
+        mPathOverlay = new PathOverlay(Color.GRAY, inflater.getContext());
+        mMapView.getOverlays().add(mPathOverlay);
+
         mMapViewContainer.addView(mMapView, 0);
 
         return v;
@@ -129,8 +138,6 @@ public class MapFragment extends Fragment {
         inflater.inflate(R.menu.fragment_map, menu);
     }
 
-
-
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
@@ -159,15 +166,16 @@ public class MapFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        mPathOverlay.clearPath();
         mStreamStatusUpdateTimer.cancel();
         mStreamStatusUpdateTimer = null;
-
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         mMapView = null;
+        mPathOverlay = null;
         Views.reset(this);
     }
 
@@ -212,6 +220,7 @@ public class MapFragment extends Fragment {
         }else {
             rtks.getStreamStatus(mStreamStatus);
             serverStatus = rtks.getServerStatus();
+            appendSolutions(rtks.readSolutionBuffer());
         }
 
         assertNotNull(mStreamStatus.mMsg);
@@ -277,6 +286,14 @@ public class MapFragment extends Fragment {
             }
         }else {
             return provider.name();
+        }
+    }
+
+    private void appendSolutions(Solution solutions[]) {
+        for (Solution s: solutions) {
+            final Position3d pos = RtkCommon.ecef2pos(s.getPosition());
+            mPathOverlay.addPoint((int)(Math.toDegrees(pos.getLat())*1e6),
+                    (int)(Math.toDegrees(pos.getLon())*1e6));
         }
     }
 
