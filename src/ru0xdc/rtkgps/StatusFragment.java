@@ -2,8 +2,7 @@ package ru0xdc.rtkgps;
 
 import static junit.framework.Assert.assertNotNull;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import javax.annotation.Nonnull;
 
 import ru0xdc.rtkgps.view.GTimeView;
 import ru0xdc.rtkgps.view.GpsSkyView;
@@ -12,9 +11,10 @@ import ru0xdc.rtkgps.view.SolutionView;
 import ru0xdc.rtkgps.view.SolutionView.Format;
 import ru0xdc.rtkgps.view.StreamIndicatorsView;
 import ru0xdc.rtklib.RtkControlResult;
+import ru0xdc.rtklib.RtkServer;
 import ru0xdc.rtklib.RtkServerObservationStatus;
 import ru0xdc.rtklib.RtkServerStreamStatus;
-import android.app.Activity;
+import ru0xdc.rtklib.Solution;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -52,11 +52,6 @@ public class StatusFragment extends Fragment {
 
     private static final String KEY_CURRENT_STATUS_VIEW = "StatusFragment.currentStatusView";
 
-    private Timer mStreamStatusUpdateTimer;
-    private RtkServerStreamStatus mStreamStatus;
-    private final RtkServerObservationStatus mRoverObservationStatus, mBaseObservationStatus;
-    private RtkControlResult mRtkStatus;
-
     @InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
     @InjectView(R.id.gtimeView) GTimeView mGTimeView;
     @InjectView(R.id.solutionView) SolutionView mSolutionView;
@@ -73,10 +68,6 @@ public class StatusFragment extends Fragment {
     private StatusView mCurrentStatusView;
 
     public StatusFragment() {
-        mStreamStatus = new RtkServerStreamStatus();
-        mRoverObservationStatus = new RtkServerObservationStatus();
-        mBaseObservationStatus = new RtkServerObservationStatus();
-        mRtkStatus = new RtkControlResult();
     }
 
     @Override
@@ -170,28 +161,6 @@ public class StatusFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        mStreamStatusUpdateTimer = new Timer();
-        mStreamStatusUpdateTimer.scheduleAtFixedRate(
-                new TimerTask() {
-                    Runnable updateStatusRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            StatusFragment.this.updateStatus();
-                        }
-                    };
-                    @Override
-                    public void run() {
-                        Activity a = getActivity();
-                        if (a == null) return;
-                        a.runOnUiThread(updateStatusRunnable);
-                    }
-                }, 200, 250);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -200,8 +169,8 @@ public class StatusFragment extends Fragment {
         updateSolutionFormat(prefs);
 
         prefs.registerOnSharedPreferenceChangeListener(mPrefsChangedListener);
+        RtkNaviService.Manager.getInstance(getActivity()).registerListener(mNaviServiceListener);
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -211,16 +180,10 @@ public class StatusFragment extends Fragment {
 
     @Override
     public void onPause() {
+        super.onPause();
         final SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
         prefs.unregisterOnSharedPreferenceChangeListener(mPrefsChangedListener);
-
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        mStreamStatusUpdateTimer.cancel();
-        super.onStop();
+        RtkNaviService.Manager.getInstance(getActivity()).unregisterListener(mNaviServiceListener);
     }
 
     @Override
@@ -333,60 +296,6 @@ public class StatusFragment extends Fragment {
                 "Select Time Format Dialog");
     }
 
-    void updateStatus() {
-        MainActivity ma;
-        RtkNaviService rtks;
-        int serverStatus;
-
-        ma = (MainActivity)getActivity();
-
-        if (ma == null) return;
-
-        rtks = ma.getRtkService();
-        if (rtks == null) {
-            serverStatus = RtkServerStreamStatus.STATE_CLOSE;
-            // mRoverObservationStatus.clear();
-            mStreamStatus.clear();
-        }else {
-            rtks.getStreamStatus(mStreamStatus);
-            rtks.getRoverObservationStatus(mRoverObservationStatus);
-            rtks.getBaseObservationStatus(mBaseObservationStatus);
-            rtks.getRtkStatus(mRtkStatus);
-            serverStatus = rtks.getServerStatus();
-        }
-
-        assertNotNull(mStreamStatus.mMsg);
-        mStreamStatusView.setText(mStreamStatus.mMsg);
-
-        mStreamIndicatorsView.setStats(mStreamStatus, serverStatus);
-        mSolutionView.setStats(mRtkStatus);
-        mGTimeView.setTime(mRoverObservationStatus.getTime());
-
-        switch (mCurrentStatusView) {
-        //case BASELINE:
-        case SKYPLOT_BASE_L1:
-        case SKYPLOT_BASE_L2:
-        case SKYPLOT_BASE_L5:
-            mSkyView.setStats(mBaseObservationStatus);
-            break;
-        case SKYPLOT_ROVER_L1:
-        case SKYPLOT_ROVER_L2:
-        case SKYPLOT_ROVER_L5:
-            mSkyView.setStats(mRoverObservationStatus);
-            break;
-        case SNR:
-        case SNR_L1:
-        case SNR_L2:
-        case SNR_L5:
-            mSnr1View.setStats(mRoverObservationStatus);
-            mSnr2View.setStats(mBaseObservationStatus);
-            break;
-        default:
-            throw new IllegalStateException();
-        }
-
-    }
-
     void updateGTimeFormat(SharedPreferences prefs) {
         try {
             String timeFormat = prefs.getString(PREF_TIME_FORMAT, null);
@@ -412,6 +321,63 @@ public class StatusFragment extends Fragment {
             iae.printStackTrace();
         }
     }
+
+    private RtkNaviService.Manager.Listener mNaviServiceListener = new RtkNaviService.Manager.Listener() {
+
+        @Override
+        public void onRtkStreamStatusChanged(RtkServerStreamStatus status) {
+            assertNotNull(status.mMsg);
+            mStreamStatusView.setText(status.mMsg);
+            mStreamIndicatorsView.setStats(status, 0);
+        }
+
+        @Override
+        public void onRtkStatusChanged(RtkControlResult status) {
+            mSolutionView.setStats(status);
+        }
+
+        @Override
+        public void onObservationStatusChanged(RtkServerObservationStatus status) {
+            if( status.getNumSatellites() > 0) {
+                mGTimeView.setTime(status.getTime());
+            }
+
+            switch (mCurrentStatusView) {
+            //case BASELINE:
+            case SKYPLOT_BASE_L1:
+            case SKYPLOT_BASE_L2:
+            case SKYPLOT_BASE_L5:
+                if (status.getReceiver() == RtkServer.RECEIVER_BASE) {
+                    mSkyView.setStats(status);
+                }
+                break;
+            case SKYPLOT_ROVER_L1:
+            case SKYPLOT_ROVER_L2:
+            case SKYPLOT_ROVER_L5:
+                if (status.getReceiver() == RtkServer.RECEIVER_ROVER) {
+                    mSkyView.setStats(status);
+                }
+                break;
+            case SNR:
+            case SNR_L1:
+            case SNR_L2:
+            case SNR_L5:
+                if (status.getReceiver() == RtkServer.RECEIVER_ROVER) {
+                    mSnr1View.setStats(status);
+                }else {
+                    mSnr2View.setStats(status);
+                }
+                break;
+            default:
+                throw new IllegalStateException();
+            }
+        }
+
+        @Override
+        public void onSolutionReceived(@Nonnull Solution[] solutions) {
+        }
+
+    };
 
     public static enum StatusView {
 

@@ -1,5 +1,13 @@
 package ru0xdc.rtkgps;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import ru0xdc.rtkgps.settings.SettingsHelper;
 import ru0xdc.rtkgps.settings.StreamBluetoothFragment;
 import ru0xdc.rtkgps.settings.StreamBluetoothFragment.Value;
@@ -20,6 +28,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -33,6 +42,8 @@ public class RtkNaviService extends Service {
     public static final String ACTION_START = "ru0xdc.rtkgps.RtkNaviService.START";
     public static final String ACTION_STOP = "ru0xdc.rtkgps.RtkNaviService.STOP";
 
+    private Timer mStatusUpdateTimer;
+
     private int NOTIFICATION = R.string.local_service_started;
 
     // Binder given to clients
@@ -45,12 +56,18 @@ public class RtkNaviService extends Service {
     private BluetoothToRtklib mBtRover, mBtBase;
     private UsbToRtklib mUsbReceiver;
 
+    private Manager mStatusManager;
+
+    private int mNumBoundClients;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mCpuLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+
+        mStatusManager = Manager.getInstance(this);
 
     }
 
@@ -62,7 +79,10 @@ public class RtkNaviService extends Service {
         }else {
             final String action = intent.getAction();
             if (action.equals(ACTION_START)) processStart();
-            else if(action.equals(ACTION_STOP)) processStop();
+            else if(action.equals(ACTION_STOP)) {
+                stop();
+                stopSelf();
+            }
             else Log.e(TAG, "onStartCommand(): unknown action " + action);
         }
         return START_STICKY;
@@ -71,10 +91,27 @@ public class RtkNaviService extends Service {
 
     @Override
     public IBinder onBind(Intent arg0) {
-        // TODO Auto-generated method stub
+        mNumBoundClients += 1;
+        if (DBG) Log.v(TAG, "onBind() boundClients: " +  mNumBoundClients);
+        startStatusUpdateTimer();
         return mBinder;
     }
 
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+        mNumBoundClients += 1;
+        if (DBG) Log.v(TAG, "onRebind() boundClients: " +  mNumBoundClients);
+        startStatusUpdateTimer();
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        mNumBoundClients -= 1;
+        if (DBG) Log.v(TAG, "onUnbind() boundClients: " +  mNumBoundClients);
+        if (mNumBoundClients == 0) stopStatusUpdateTimer();
+        return true;
+    }
 
     public final RtkServerStreamStatus getStreamStatus(
             RtkServerStreamStatus status) {
@@ -105,6 +142,10 @@ public class RtkNaviService extends Service {
 
     public final Solution getLastSolution() {
         return mRtkServer.getLastSolution();
+    }
+
+    public Solution[] readSolutionBuffer() {
+        return mRtkServer.readSolutionBuffer();
     }
 
     /**
@@ -141,12 +182,6 @@ public class RtkNaviService extends Service {
         startForeground(NOTIFICATION, notification);
     }
 
-
-    private void processStop() {
-        stop();
-        stopSelf();
-    }
-
     private void stop() {
         stopForeground(true);
         if (mCpuLock.isHeld()) mCpuLock.release();
@@ -164,7 +199,55 @@ public class RtkNaviService extends Service {
 
     @Override
     public void onDestroy() {
+        stopStatusUpdateTimer();
         stop();
+    }
+
+    private void stopStatusUpdateTimer() {
+        if (mStatusUpdateTimer != null) {
+            mStatusUpdateTimer.cancel();
+            mStatusUpdateTimer = null;
+        }
+    }
+
+    private void startStatusUpdateTimer() {
+        if (mStatusUpdateTimer != null) return;
+
+        mStatusUpdateTimer = new Timer();
+        mStatusUpdateTimer.scheduleAtFixedRate(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        dispatchServerStatus();
+                    }
+                }
+                , 200, 250);
+    }
+
+    private void dispatchServerStatus() {
+        final RtkServerStreamStatus stream;
+        final RtkControlResult rtk;
+        final RtkServerObservationStatus base, rover;
+
+        stream = getStreamStatus(null);
+        rtk = getRtkStatus(null);
+
+
+        Solution solutions[] = readSolutionBuffer();
+
+        if (stream.getInputBaseStatus() != RtkServerStreamStatus.STATE_CLOSE) {
+            base = getBaseObservationStatus(null);
+            mStatusManager.dispatchObsStatus(base);
+        }
+
+        if (stream.getInputRoverStatus()!= RtkServerStreamStatus.STATE_CLOSE) {
+            rover = getRoverObservationStatus(null);
+            mStatusManager.dispatchObsStatus(rover);
+        }
+
+        mStatusManager.dispatchStreamStatus(stream);
+        mStatusManager.dispatchRtkStatus(rtk);
+        mStatusManager.dispatchSolutionBuffer(solutions);
     }
 
     @SuppressWarnings("deprecation")
@@ -347,4 +430,125 @@ public class RtkNaviService extends Service {
             mUsbReceiver = null;
         }
     }
+
+    public static class Manager {
+
+        public static interface Listener {
+            void onRtkStreamStatusChanged(RtkServerStreamStatus status);
+
+            void onRtkStatusChanged(RtkControlResult status);
+
+            void onObservationStatusChanged(RtkServerObservationStatus status);
+
+            void onSolutionReceived(@Nonnull Solution solutions[]);
+        }
+
+        private static final int MSG_DISPATCH_STREAM_STATUS = 1;
+        private static final int MSG_DISPATCH_RTK_STATUS = 2;
+        private static final int MSG_DISPATCH_OBS_STATUS = 3;
+        private static final int MSG_DISPATCH_SOLUTION = 4;
+
+        private Handler mHandler;
+
+        private static Manager sInstance;
+
+        private final ArrayList<WeakReference<Listener>> mListeners =
+                new ArrayList<WeakReference<Listener>>();
+
+        private Manager(Context context) {
+            mHandler = new Handler(context.getMainLooper(), mHandlerCallback);
+        }
+
+        public static Manager getInstance(Context context) {
+            if (sInstance == null) {
+                Context appCtx = context.getApplicationContext();
+                sInstance = new Manager(appCtx);
+            }
+            return sInstance;
+        }
+
+        public void registerListener(Listener listener) {
+            synchronized(mListeners) {
+                mListeners.add(new WeakReference<Listener>(listener));
+            }
+        }
+
+        public void unregisterListener(@Nullable Listener mListener) {
+            synchronized(mListeners) {
+                for (int i=mListeners.size()-1; i >= 0; i--) {
+                    final Listener l = mListeners.get(i).get();
+                    if (l == mListener || l == null) {
+                        mListeners.remove(i);
+                    }
+                }
+            }
+        }
+
+        void dispatchStreamStatus(RtkServerStreamStatus status) {
+            RtkServerStreamStatus copy = new RtkServerStreamStatus();
+            status.copyTo(copy);
+            mHandler.obtainMessage(MSG_DISPATCH_STREAM_STATUS, copy).sendToTarget();
+        }
+
+        void dispatchRtkStatus(RtkControlResult status) {
+            // XXX
+            mHandler.obtainMessage(MSG_DISPATCH_RTK_STATUS, status).sendToTarget();
+        }
+
+        void dispatchObsStatus(RtkServerObservationStatus status) {
+            RtkServerObservationStatus copy = new RtkServerObservationStatus();
+            status.copyTo(copy);
+            mHandler.obtainMessage(MSG_DISPATCH_OBS_STATUS, copy).sendToTarget();
+        }
+
+        void dispatchSolutionBuffer(Solution solutions[]) {
+            mHandler.obtainMessage(MSG_DISPATCH_SOLUTION, solutions).sendToTarget();
+        }
+
+        private Handler.Callback mHandlerCallback = new Handler.Callback() {
+
+            @Override
+            public boolean handleMessage(Message msg) {
+
+                final Listener listeners[];
+
+                synchronized(mListeners) {
+                    listeners = new Listener[mListeners.size()];
+                    for(int i=0; i<listeners.length; i++) {
+                        listeners[i]  = mListeners.get(i).get();
+                    }
+                }
+
+                switch (msg.what) {
+                case MSG_DISPATCH_STREAM_STATUS:
+                    for (Listener l: listeners) {
+                        if (l == null) continue;
+                        l.onRtkStreamStatusChanged((RtkServerStreamStatus) msg.obj);
+                    }
+                    return true;
+                case MSG_DISPATCH_RTK_STATUS:
+                    for (Listener l: listeners) {
+                        if (l == null) continue;
+                        l.onRtkStatusChanged((RtkControlResult)msg.obj);
+                    }
+                    return true;
+                case MSG_DISPATCH_OBS_STATUS:
+                    for (Listener l: listeners) {
+                        if (l == null) continue;
+                        l.onObservationStatusChanged((RtkServerObservationStatus)msg.obj);
+                    }
+                    return true;
+                case MSG_DISPATCH_SOLUTION:
+                    for (Listener l: listeners) {
+                        if (l == null) continue;
+                        l.onSolutionReceived((Solution[])msg.obj);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        };
+
+    }
+
 }
