@@ -97,9 +97,20 @@ public class RtkServer {
         return mStatus;
     }
 
+    /**
+     * XXX
+     */
     public Solution getLastSolution() {
         _readSolutionBuffer(mSolutionBuffer);
         return mSolutionBuffer.getLastSolution();
+    }
+
+    /**
+     * XXX
+     */
+    public Solution[] readSolutionBuffer() {
+        _readSolutionBuffer(mSolutionBuffer);
+        return mSolutionBuffer.get();
     }
 
     public RtkControlResult getRtkStatus(RtkControlResult dst) {
@@ -118,7 +129,11 @@ public class RtkServer {
     }
 
     private RtkServerObservationStatus getObservationStatus(int receiver, RtkServerObservationStatus status) {
-        if (status == null) status = new RtkServerObservationStatus(receiver);
+        if (status == null) {
+            status = new RtkServerObservationStatus(receiver);
+        }else {
+            status.setReceiver(receiver);
+        }
         _getObservationStatus(receiver, status.getNative());
         return status;
     }

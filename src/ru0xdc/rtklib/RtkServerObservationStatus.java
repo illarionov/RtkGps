@@ -187,6 +187,7 @@ public class RtkServerObservationStatus {
 
     public void copyTo(RtkServerObservationStatus dst) {
         if (dst == null) throw new IllegalArgumentException();
+        dst.receiver = receiver;
         dst.mNative.ns = mNative.ns;
         mNative.time.copyTo(dst.mNative.time);
         System.arraycopy(mNative.sat, 0, dst.mNative.sat, 0, mNative.ns);
@@ -256,6 +257,10 @@ public class RtkServerObservationStatus {
      */
     public int getReceiver() {
         return receiver;
+    }
+
+    void setReceiver(int receiver) {
+        this.receiver = receiver;
     }
 
     /**
