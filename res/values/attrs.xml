@@ -23,6 +23,7 @@
            <enum name="baseline_enu" value="3"/>
            <enum name="baseline_pyl" value="4"/>
        </attr>
+       <attr name="textColor" format="color" />
 	</declare-styleable>
 
 	<declare-styleable name="StreamSettings">

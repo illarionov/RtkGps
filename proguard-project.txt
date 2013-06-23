@@ -22,6 +22,8 @@
 -dontobfuscate
 
 -dontwarn butterknife.Views$InjectViewProcessor
+-dontwarn org.osmdroid.google.**
+-dontwarn org.osmdroid.contributor.GpxToPHPUploader*
 -keep class **$$ViewInjector { *; } 
 
 -keepclasseswithmembers class * {

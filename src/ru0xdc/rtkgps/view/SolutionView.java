@@ -1,18 +1,5 @@
 package ru0xdc.rtkgps.view;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.Locale;
-
-import ru0xdc.rtkgps.BuildConfig;
-import ru0xdc.rtkgps.R;
-import ru0xdc.rtklib.RtkCommon;
-import ru0xdc.rtklib.RtkCommon.Deg2Dms;
-import ru0xdc.rtklib.RtkCommon.Position3d;
-import ru0xdc.rtklib.RtkControlResult;
-import ru0xdc.rtklib.Solution;
-import ru0xdc.rtklib.constants.SolutionStatus;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -22,6 +9,20 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtkgps.R;
+import ru0xdc.rtklib.RtkCommon;
+import ru0xdc.rtklib.RtkCommon.Deg2Dms;
+import ru0xdc.rtklib.RtkCommon.Position3d;
+import ru0xdc.rtklib.RtkControlResult;
+import ru0xdc.rtklib.Solution;
+import ru0xdc.rtklib.constants.SolutionStatus;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class SolutionView extends TableLayout {
 
@@ -97,6 +98,7 @@ public class SolutionView extends TableLayout {
 
     public SolutionView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        final Integer textColor;
 
         // process style attributes
         TypedArray a = context.obtainStyledAttributes(
@@ -106,6 +108,13 @@ public class SolutionView extends TableLayout {
             final int formatVal = a.getInt(R.styleable.SolutionView_format,
                     DEFAULT_SOLUTION_FORMAT.mStyledAttributeValue
                     );
+            if (a.hasValue(R.styleable.SolutionView_textColor)) {
+                textColor = a.getColor(R.styleable.SolutionView_textColor,
+                        0);
+            }else {
+                textColor = null;
+            }
+
             mSolutionFormat = Format.valueOfStyledAttr(formatVal);
         }finally {
             a.recycle();
@@ -126,6 +135,19 @@ public class SolutionView extends TableLayout {
 
         mCoordEcefFormatter = new DecimalFormat("0.000",
                 DecimalFormatSymbols.getInstance(Locale.US));
+
+        if (textColor != null) {
+            ((TextView)findViewById(R.id.solution_title)).setTextColor(textColor);
+            mTextViewSolutionStatus.setTextColor(textColor);
+            mTextViewCoord1Name.setTextColor(textColor);
+            mTextViewCoord1Value.setTextColor(textColor);
+            mTextViewCoord2Name.setTextColor(textColor);
+            mTextViewCoord2Value.setTextColor(textColor);
+            mTextViewCoord3Name.setTextColor(textColor);
+            mTextViewCoord3Value.setTextColor(textColor);
+            mTextViewCovariance.setTextColor(textColor);
+            mTextViewAge.setTextColor(textColor);
+        }
 
         if (isInEditMode()) {
             mSolutionFormat = Format.WGS84;

@@ -2,18 +2,39 @@ package ru0xdc.rtkgps;
 
 import static junit.framework.Assert.assertNotNull;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import android.app.Activity;
+import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.location.Location;
+import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
+import butterknife.InjectView;
+import butterknife.Views;
 
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.bing.BingMapTileSource;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import ru0xdc.rtkgps.view.GTimeView;
+import ru0xdc.rtkgps.view.SolutionView;
 import ru0xdc.rtkgps.view.StreamIndicatorsView;
 import ru0xdc.rtklib.RtkCommon;
 import ru0xdc.rtklib.RtkCommon.Position3d;
@@ -21,24 +42,12 @@ import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import ru0xdc.rtklib.Solution;
 import ru0xdc.rtklib.constants.SolutionStatus;
-import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.location.Location;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import butterknife.InjectView;
-import butterknife.Views;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MapFragment extends Fragment {
 
-    @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
     static final String TAG = MapFragment.class.getSimpleName();
 
@@ -59,11 +68,16 @@ public class MapFragment extends Fragment {
     private BingMapTileSource mBingRoadTileSource, mBingAerialTileSource;
     private SolutionPathOverlay mPathOverlay;
     private MyLocationNewOverlay mMyLocationOverlay;
+    private CompassOverlay mCompassOverlay;
+    private ScaleBarOverlay mScaleBarOverlay;
 
     private RtkControlResult mRtkStatus;
 
     @InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
     @InjectView(R.id.map_container) ViewGroup mMapViewContainer;
+    @InjectView(R.id.gtimeView) GTimeView mGTimeView;
+    @InjectView(R.id.solutionView) SolutionView mSolutionView;
+
     private MapView mMapView;
 
 
@@ -94,11 +108,24 @@ public class MapFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        final Context context;
+        final DisplayMetrics dm;
 
         View v = inflater.inflate(R.layout.fragment_map, container, false);
         Views.inject(this, v);
 
-        mResourceProxy = new ResourceProxyImpl(inflater.getContext().getApplicationContext());
+        context = inflater.getContext();
+        dm = context.getResources().getDisplayMetrics();
+
+        final int actionBarHeight;
+        TypedValue tv = new TypedValue();
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
+        }else {
+            actionBarHeight = 48;
+        }
+
         mMapView = new MapView(inflater.getContext(), 256, mResourceProxy);
         mMapView.setUseSafeCanvas(true);
         mMapView.setBuiltInZoomControls(true);
@@ -106,12 +133,21 @@ public class MapFragment extends Fragment {
         mMapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         mPathOverlay = new SolutionPathOverlay(mResourceProxy);
-        mMyLocationOverlay = new MyLocationNewOverlay(getActivity(), mMyLocationProvider,
-                mMapView);
-        mMyLocationOverlay.enableFollowLocation();
-        mMapView.getOverlays().add(mPathOverlay);
-        mMapView.getOverlays().add(mMyLocationOverlay);
+        mMyLocationOverlay = new MyLocationNewOverlay(context, mMyLocationProvider,
+                mMapView, mResourceProxy);
 
+        mCompassOverlay = new CompassOverlay(context, new InternalCompassOrientationProvider(context),
+                mMapView, mResourceProxy);
+        mCompassOverlay.setCompassCenter(25.0f * dm.density, actionBarHeight + 5.0f * dm.density);
+
+        mScaleBarOverlay = new ScaleBarOverlay(context);
+        mScaleBarOverlay.setCentred(true);
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels/2, actionBarHeight + 5.0f * dm.density);
+
+        mMapView.getOverlays().add(mPathOverlay);
+        mMapView.getOverlays().add(mScaleBarOverlay);
+        mMapView.getOverlays().add(mMyLocationOverlay);
+        mMapView.getOverlays().add(mCompassOverlay);
 
         mMapViewContainer.addView(mMapView, 0);
 
@@ -138,7 +174,7 @@ public class MapFragment extends Fragment {
                         if (a == null) return;
                         a.runOnUiThread(updateStatusRunnable);
                     }
-                }, 200, 250);
+                }, 200, 2500);
     }
 
     @Override
@@ -146,6 +182,7 @@ public class MapFragment extends Fragment {
         super.onPause();
         saveMapPreferences();
         mMyLocationOverlay.disableMyLocation();
+        mCompassOverlay.disableCompass();
     }
 
     @Override
@@ -177,6 +214,8 @@ public class MapFragment extends Fragment {
         super.onResume();
         loadMapPreferences();
         mMyLocationOverlay.enableMyLocation(mMyLocationProvider);
+        mMyLocationOverlay.enableFollowLocation();
+        mCompassOverlay.enableCompass(this.mCompassOverlay.getOrientationProvider());
     }
 
     @Override
@@ -193,6 +232,8 @@ public class MapFragment extends Fragment {
         mMapView = null;
         mPathOverlay = null;
         mMyLocationOverlay = null;
+        mCompassOverlay = null;
+        mScaleBarOverlay = null;
         Views.reset(this);
     }
 
@@ -239,7 +280,9 @@ public class MapFragment extends Fragment {
             rtks.getRtkStatus(mRtkStatus);
             serverStatus = rtks.getServerStatus();
             appendSolutions(rtks.readSolutionBuffer());
-            mMyLocationProvider.setStatus(mRtkStatus);
+            mMyLocationProvider.setStatus(mRtkStatus, !mMapView.isAnimating());
+            mGTimeView.setTime(mRtkStatus.getSolution().getTime());
+            mSolutionView.setStats(mRtkStatus);
         }
 
         assertNotNull(mStreamStatus.mMsg);
@@ -337,7 +380,7 @@ public class MapFragment extends Fragment {
             return mLocationKnown ? mLastLocation : null;
         }
 
-        private void setSolution(Solution s) {
+        private void setSolution(Solution s, boolean notifyConsumer) {
             if (s.getSolutionStatus() == SolutionStatus.NONE) {
                 return;
             }
@@ -351,12 +394,17 @@ public class MapFragment extends Fragment {
 
             mLocationKnown = true;
             if (mConsumer != null) {
-                mConsumer.onLocationChanged(mLastLocation, this);
+                if (notifyConsumer) {
+                    mConsumer.onLocationChanged(mLastLocation, this);
+                }else {
+                    // XXX
+                    if (DBG) Log.v(TAG, "onLocationChanged() skipped while animating");
+                }
             }
         }
 
-        public void setStatus(RtkControlResult status) {
-            setSolution(status.getSolution());
+        public void setStatus(RtkControlResult status, boolean notifyConsumer) {
+            setSolution(status.getSolution(), notifyConsumer);
         }
 
     };
