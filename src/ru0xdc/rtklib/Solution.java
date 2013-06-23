@@ -86,6 +86,12 @@ public class Solution {
         dst.mRatio = this.mRatio;
     }
 
+    public GTime getTime() {
+        GTime r = new GTime();
+        mTime.copyTo(r);
+        return r;
+    }
+
     public Matrix3x3 getQrMatrix() {
         double m[] = new double[9];
         m[0] = mQr[0];

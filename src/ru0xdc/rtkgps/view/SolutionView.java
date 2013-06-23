@@ -393,16 +393,16 @@ public class SolutionView extends TableLayout {
             x = getPaddingTop();
             y = getPaddingLeft();
 
-            mIndicatorPaint.setColor(getIndicatorColor());
+            mIndicatorPaint.setColor(getIndicatorColor(mStatus));
             canvas.drawRect(x, y, x+mIndicatorWidth,
                     y+mIndicatorHeight, mIndicatorPaint);
 
         }
 
-        protected int getIndicatorColor() {
+        public static int getIndicatorColor(SolutionStatus status) {
             int c;
 
-            switch (mStatus) {
+            switch (status) {
             case NONE:
                 c = DEFAULT_COLOR_STATE_CLOSE;
                 break;

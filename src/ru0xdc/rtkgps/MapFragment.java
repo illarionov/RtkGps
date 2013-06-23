@@ -10,18 +10,22 @@ import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.bing.BingMapTileSource;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.PathOverlay;
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer;
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import ru0xdc.rtkgps.view.StreamIndicatorsView;
 import ru0xdc.rtklib.RtkCommon;
 import ru0xdc.rtklib.RtkCommon.Position3d;
+import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import ru0xdc.rtklib.Solution;
+import ru0xdc.rtklib.constants.SolutionStatus;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +38,7 @@ import butterknife.Views;
 
 public class MapFragment extends Fragment {
 
+    @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
     static final String TAG = MapFragment.class.getSimpleName();
 
@@ -52,7 +57,10 @@ public class MapFragment extends Fragment {
     private ResourceProxy mResourceProxy;
 
     private BingMapTileSource mBingRoadTileSource, mBingAerialTileSource;
-    private PathOverlay mPathOverlay;
+    private SolutionPathOverlay mPathOverlay;
+    private MyLocationNewOverlay mMyLocationOverlay;
+
+    private RtkControlResult mRtkStatus;
 
     @InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
     @InjectView(R.id.map_container) ViewGroup mMapViewContainer;
@@ -61,6 +69,7 @@ public class MapFragment extends Fragment {
 
     public MapFragment() {
         mStreamStatus = new RtkServerStreamStatus();
+        mRtkStatus = new RtkControlResult();
 
     }
 
@@ -96,8 +105,13 @@ public class MapFragment extends Fragment {
         mMapView.setMultiTouchControls(true);
         mMapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
-        mPathOverlay = new PathOverlay(Color.GRAY, inflater.getContext());
+        mPathOverlay = new SolutionPathOverlay(mResourceProxy);
+        mMyLocationOverlay = new MyLocationNewOverlay(getActivity(), mMyLocationProvider,
+                mMapView);
+        mMyLocationOverlay.enableFollowLocation();
         mMapView.getOverlays().add(mPathOverlay);
+        mMapView.getOverlays().add(mMyLocationOverlay);
+
 
         mMapViewContainer.addView(mMapView, 0);
 
@@ -131,6 +145,7 @@ public class MapFragment extends Fragment {
     public void onPause() {
         super.onPause();
         saveMapPreferences();
+        mMyLocationOverlay.disableMyLocation();
     }
 
     @Override
@@ -161,12 +176,13 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadMapPreferences();
+        mMyLocationOverlay.enableMyLocation(mMyLocationProvider);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mPathOverlay.clearPath();
+        //mPathOverlay.clearPath();
         mStreamStatusUpdateTimer.cancel();
         mStreamStatusUpdateTimer = null;
     }
@@ -176,6 +192,7 @@ public class MapFragment extends Fragment {
         super.onDestroyView();
         mMapView = null;
         mPathOverlay = null;
+        mMyLocationOverlay = null;
         Views.reset(this);
     }
 
@@ -219,8 +236,10 @@ public class MapFragment extends Fragment {
             mStreamStatus.clear();
         }else {
             rtks.getStreamStatus(mStreamStatus);
+            rtks.getRtkStatus(mRtkStatus);
             serverStatus = rtks.getServerStatus();
             appendSolutions(rtks.readSolutionBuffer());
+            mMyLocationProvider.setStatus(mRtkStatus);
         }
 
         assertNotNull(mStreamStatus.mMsg);
@@ -290,11 +309,56 @@ public class MapFragment extends Fragment {
     }
 
     private void appendSolutions(Solution solutions[]) {
-        for (Solution s: solutions) {
-            final Position3d pos = RtkCommon.ecef2pos(s.getPosition());
-            mPathOverlay.addPoint((int)(Math.toDegrees(pos.getLat())*1e6),
-                    (int)(Math.toDegrees(pos.getLon())*1e6));
-        }
+        mPathOverlay.addSolutions(solutions);
     }
+
+    MyLocationProvider mMyLocationProvider = new MyLocationProvider();
+
+    static class MyLocationProvider implements IMyLocationProvider {
+
+        private Location mLastLocation = new Location("");
+        private boolean mLocationKnown = false;
+        private IMyLocationConsumer mConsumer;
+
+        @Override
+        public boolean startLocationProvider(
+                IMyLocationConsumer myLocationConsumer) {
+            mConsumer = myLocationConsumer;
+            return true;
+        }
+
+        @Override
+        public void stopLocationProvider() {
+            mConsumer = null;
+        }
+
+        @Override
+        public Location getLastKnownLocation() {
+            return mLocationKnown ? mLastLocation : null;
+        }
+
+        private void setSolution(Solution s) {
+            if (s.getSolutionStatus() == SolutionStatus.NONE) {
+                return;
+            }
+
+            final Position3d pos = RtkCommon.ecef2pos(s.getPosition());
+
+            mLastLocation.setTime(s.getTime().getUtcTimeMillis());
+            mLastLocation.setLatitude(Math.toDegrees(pos.getLat()));
+            mLastLocation.setLongitude(Math.toDegrees(pos.getLon()));
+            mLastLocation.setAltitude(pos.getHeight());
+
+            mLocationKnown = true;
+            if (mConsumer != null) {
+                mConsumer.onLocationChanged(mLastLocation, this);
+            }
+        }
+
+        public void setStatus(RtkControlResult status) {
+            setSolution(status.getSolution());
+        }
+
+    };
 
 }

@@ -103,10 +103,6 @@ public class RtkNaviService extends Service {
         return mRtkServer.getStatus();
     }
 
-    public final Solution getLastSolution() {
-        return mRtkServer.getLastSolution();
-    }
-
     public Solution[] readSolutionBuffer() {
         return mRtkServer.readSolutionBuffer();
     }

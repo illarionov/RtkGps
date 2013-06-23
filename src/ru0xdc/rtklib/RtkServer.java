@@ -100,14 +100,6 @@ public class RtkServer {
     /**
      * XXX
      */
-    public Solution getLastSolution() {
-        _readSolutionBuffer(mSolutionBuffer);
-        return mSolutionBuffer.getLastSolution();
-    }
-
-    /**
-     * XXX
-     */
     public Solution[] readSolutionBuffer() {
         _readSolutionBuffer(mSolutionBuffer);
         return mSolutionBuffer.get();
