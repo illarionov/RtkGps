@@ -1,5 +1,7 @@
 package ru0xdc.rtkgps;
 
+import microsoft.mappoint.TileSystem;
+
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
@@ -7,6 +9,7 @@ import org.osmdroid.views.overlay.SafeDrawOverlay;
 import org.osmdroid.views.safecanvas.ISafeCanvas;
 import org.osmdroid.views.safecanvas.SafePaint;
 import org.osmdroid.views.safecanvas.SafeTranslatedPath;
+import org.osmdroid.views.util.constants.MapViewConstants;
 
 import ru0xdc.rtkgps.view.SolutionView;
 import ru0xdc.rtklib.RtkCommon;
@@ -28,17 +31,12 @@ import android.graphics.Rect;
 public class SolutionPathOverlay extends SafeDrawOverlay {
 
     private static final int DEFAULT_SIZE = 1000;
-
-
     private static final int PATH_COLOR = Color.GRAY;
 
 
-	private final int[] mLat;
-	private final int[] mLon;
+    private final int[] mProjectedX;
+    private final int[] mProjectedY;
 	private final SolutionStatus[] mPointSolutionStatus;
-
-	private final int[] mProjectedX;
-	private final int[] mProjectedY;
 
 	private int mBufHead;
 	private int mBufSize;
@@ -62,8 +60,6 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
 	    this.mPaint = new SafePaint();
 	    this.mPointPaint = new SafePaint();
 	    this.mPath = new SafeTranslatedPath();
-		this.mLat = new int[size];
-		this.mLon = new int[size];
 		this.mProjectedX = new int[size];
 		this.mProjectedY = new int[size];
 		this.mPointSolutionStatus = new SolutionStatus[size];
@@ -88,7 +84,7 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
 	}
 
 	private int getSize() {
-	    return mLat.length;
+	    return mProjectedX.length;
 	}
 
 	@SuppressWarnings("unused")
@@ -101,15 +97,26 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
 	}
 
 	public boolean addSolution(final Solution solution) {
+	    final Position3d pos;
+	    final double lat, lon;
+	    final int tail;
+
 	    if (solution.getSolutionStatus() == SolutionStatus.NONE) {
 	        return false;
 	    }
 
-	    final Position3d pos = RtkCommon.ecef2pos(solution.getPosition());
-	    final int tail = (this.mBufHead + this.mBufSize) % getSize();
-	    mLat[tail] = (int)Math.round(1.0e6 * Math.toDegrees(pos.getLat()));
-	    mLon[tail] = (int)Math.round(1.0e6 * Math.toDegrees(pos.getLon()));
+	    pos = RtkCommon.ecef2pos(solution.getPosition());
+	    lat = Math.toDegrees(pos.getLat());
+	    lon = Math.toDegrees(pos.getLon());
+	    tail = (this.mBufHead + this.mBufSize) % getSize();
 	    mPointSolutionStatus[tail] = solution.getSolutionStatus();
+
+	    // Performs the first computationally heavy part of the projection.
+	    final Point projected = TileSystem.LatLongToPixelXY(lat,
+	            lon, MapViewConstants.MAXIMUM_ZOOMLEVEL, null);
+        mProjectedX[tail] = projected.x;
+        mProjectedY[tail] = projected.y;
+
 	    if (isBufFull()) {
 	        mBufHead = (mBufHead + 1) % getSize();
 	    }else {
@@ -120,23 +127,7 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
 	}
 
 	public void addSolutions(final Solution[] solutions) {
-	    for (Solution s: solutions) {
-	        addSolution(s);
-	    }
-	}
-
-    /**
-     *  precompute new points to the intermediate projection.
-     * @param prj
-     */
-	private void precomputePoints(final Projection prj) {
-        final Point dst = new Point();
-        for (int i = 0; i < mBufSize; ++i) {
-            final int bufIdx =(mBufHead + i) % getSize();
-            prj.toMapPixelsProjected(mLat[bufIdx], mLon[bufIdx], dst);
-            mProjectedX[bufIdx] = dst.x;
-            mProjectedY[bufIdx] = dst.y;
-        }
+	    for (Solution s: solutions) addSolution(s);
 	}
 
 	private void rewindPointsCache() {
@@ -188,8 +179,6 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
         }
 
         pj = osmv.getProjection();
-
-        precomputePoints(pj);
 
         // clipping rectangle in the intermediate projection, to avoid performing projection.
         clipBounds = pj.fromPixelsToProjected(pj.getScreenRect());
