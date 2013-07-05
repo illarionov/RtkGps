@@ -1,14 +1,5 @@
 package ru0xdc.rtkgps;
 
-import java.io.File;
-
-import javax.annotation.Nonnull;
-
-import ru0xdc.rtkgps.settings.ProcessingOptions1Fragment;
-import ru0xdc.rtkgps.settings.SettingsActivity;
-import ru0xdc.rtkgps.settings.SettingsHelper;
-import ru0xdc.rtkgps.settings.SolutionOutputSettingsFragment;
-import ru0xdc.rtkgps.settings.StreamSettingsActivity;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
@@ -30,8 +21,18 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
+
 import butterknife.InjectView;
 import butterknife.Views;
+import ru0xdc.rtkgps.settings.ProcessingOptions1Fragment;
+import ru0xdc.rtkgps.settings.SettingsActivity;
+import ru0xdc.rtkgps.settings.SettingsHelper;
+import ru0xdc.rtkgps.settings.SolutionOutputSettingsFragment;
+import ru0xdc.rtkgps.settings.StreamSettingsActivity;
+
+import java.io.File;
+
+import javax.annotation.Nonnull;
 
 public class MainActivity extends Activity {
 
@@ -69,6 +70,7 @@ public class MainActivity extends Activity {
             SettingsHelper.setDefaultValues(this, false);
             proxyIfUsbAttached(getIntent());
             selectDrawerItem(R.id.navdraw_item_status);
+            mDrawerLayout.openDrawer(mNavDrawer);
         }
 
         mNavDrawerServerSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
