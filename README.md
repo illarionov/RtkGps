@@ -37,17 +37,9 @@ RTKLIB rtknavi port on android.
 
 ![qr][qr]
 
-[RtkGps-1.0alpha1.apk][apk]
-    
-
-
-
-### Screenshots
-
-<img src="http://gps.0xdc.ru/rtkgps/device-2013-06-08-033807.png" alt="screen1" style="width: 200px;"/>
-<img src="http://gps.0xdc.ru/rtkgps/device-2013-06-08-034055.png" alt="screen1" style="width: 400px;"/>
+[Google play][googleplay]
 
 
 [rtklib]: http://www.rtklib.com/ 
-[apk]: http://gps.0xdc.ru/rtkgps/RtkGps-1.0alpha1.apk
-[qr]: http://gps.0xdc.ru/rtkgps/qr2.png
+[googleplay]: https://play.google.com/store/apps/details?id=ru0xdc.rtkgps
+[qr]: http://gps.0xdc.ru/rtkgps/qr_googleplay.png
