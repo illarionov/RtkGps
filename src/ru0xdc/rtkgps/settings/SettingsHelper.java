@@ -1,7 +1,10 @@
 package ru0xdc.rtkgps.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.net.Uri;
+import android.text.TextUtils;
 
 import ru0xdc.rtklib.ProcessingOptions;
 import ru0xdc.rtklib.RtkServerSettings;
@@ -13,11 +16,9 @@ import ru0xdc.rtklib.SolutionOptions;
 import ru0xdc.rtklib.constants.SolutionFormat;
 import ru0xdc.rtklib.constants.StreamFormat;
 import ru0xdc.rtklib.constants.StreamType;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.net.Uri;
-import android.text.TextUtils;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class SettingsHelper {
 
@@ -30,6 +31,7 @@ public class SettingsHelper {
         protected StreamNtripClientFragment.Value ntripClientDefaults;
         protected StreamTcpClientFragment.Value tcpClientDefaults;
         protected StreamBluetoothFragment.Value bluetoothDefaults;
+        protected StreamUsbFragment.Value usbDefaults;
 
         public StreamDefaultsBase() {
             enable = true;
@@ -38,6 +40,7 @@ public class SettingsHelper {
             ntripClientDefaults = new StreamNtripClientFragment.Value();
             tcpClientDefaults = new StreamTcpClientFragment.Value();
             bluetoothDefaults = new StreamBluetoothFragment.Value();
+            usbDefaults = new StreamUsbFragment.Value();
         }
 
         public StreamDefaultsBase setEnabled(boolean enabled) {
@@ -184,6 +187,7 @@ public class SettingsHelper {
             StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
             StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.tcpClientDefaults);
             StreamBluetoothFragment.setDefaultValue(ctx, sharedPrefsName, defaults.bluetoothDefaults);
+            StreamUsbFragment.setDefaultValue(ctx, sharedPrefsName, defaults.usbDefaults);
         }
     }
 
@@ -205,7 +209,6 @@ public class SettingsHelper {
             StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
             StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
             StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName,  defaults.tcpClientDefaults);
-            StreamBluetoothFragment.setDefaultValue(ctx, sharedPrefsName, defaults.bluetoothDefaults);
         }
     }
 

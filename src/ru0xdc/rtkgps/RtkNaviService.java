@@ -1,5 +1,17 @@
 package ru0xdc.rtkgps;
 
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.PowerManager;
+import android.util.Log;
+import android.widget.Toast;
+
 import ru0xdc.rtkgps.settings.SettingsHelper;
 import ru0xdc.rtkgps.settings.StreamBluetoothFragment;
 import ru0xdc.rtkgps.settings.StreamBluetoothFragment.Value;
@@ -12,17 +24,6 @@ import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
 import ru0xdc.rtklib.RtkServerStreamStatus;
 import ru0xdc.rtklib.Solution;
 import ru0xdc.rtklib.constants.StreamType;
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.PowerManager;
-import android.util.Log;
-import android.widget.Toast;
 
 public class RtkNaviService extends Service {
 
@@ -320,7 +321,7 @@ public class RtkNaviService extends Service {
             if (roverSettngs.getType() == StreamType.USB) {
                 StreamUsbFragment.Value usbSettings = (ru0xdc.rtkgps.settings.StreamUsbFragment.Value)roverSettngs;
                 mUsbReceiver = new UsbToRtklib(this, usbSettings.getPath());
-                mUsbReceiver.setBaudRate(usbSettings.getBaudrate());
+                mUsbReceiver.setSerialLineConfiguration(usbSettings.getSerialLineConfiguration());
                 mUsbReceiver.setCallbacks(new UsbCallbacks(RtkServer.RECEIVER_ROVER));
                 mUsbReceiver.start();
                 return;
@@ -333,7 +334,7 @@ public class RtkNaviService extends Service {
             if (baseSettngs.getType() == StreamType.USB) {
                 StreamUsbFragment.Value usbSettings = (ru0xdc.rtkgps.settings.StreamUsbFragment.Value)baseSettngs;
                 mUsbReceiver = new UsbToRtklib(this, usbSettings.getPath());
-                mUsbReceiver.setBaudRate(usbSettings.getBaudrate());
+                mUsbReceiver.setSerialLineConfiguration(usbSettings.getSerialLineConfiguration());
                 mUsbReceiver.setCallbacks(new UsbCallbacks(RtkServer.RECEIVER_BASE));
                 mUsbReceiver.start();
                 return;
