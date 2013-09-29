@@ -14,7 +14,6 @@ LOCAL_EXPORT_CFLAGS := $(RTKLIB_CFLAGS)
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(RTKLIB_PATH)/src
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/$(RTKLIB_PATH)/src
 
-LOCAL_LDLIBS += -llog
 LOCAL_EXPORT_LDLIBS += -llog
 
 LOCAL_SRC_FILES := \
@@ -50,8 +49,8 @@ LOCAL_SRC_FILES := \
 
 LOCAL_SRC_FILES += \
         $(RTKLIB_PATH)/src/rcv/binex.c \
-	$(RTKLIB_PATH)/src/rcv/crescent.c \
-	$(RTKLIB_PATH)/src/rcv/gw10.c \
+        $(RTKLIB_PATH)/src/rcv/crescent.c \
+        $(RTKLIB_PATH)/src/rcv/gw10.c \
         $(RTKLIB_PATH)/src/rcv/javad.c \
         $(RTKLIB_PATH)/src/rcv/novatel.c \
         $(RTKLIB_PATH)/src/rcv/nvs.c \
