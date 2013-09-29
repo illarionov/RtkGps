@@ -1,10 +1,5 @@
 package ru0xdc.rtkgps.usb;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
-
-import ru0xdc.rtkgps.BuildConfig;
 import android.annotation.TargetApi;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
@@ -12,6 +7,11 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
+
+import ru0xdc.rtkgps.BuildConfig;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 @TargetApi(12)
 public class UsbPl2303Controller extends UsbSerialController {
@@ -22,21 +22,12 @@ public class UsbPl2303Controller extends UsbSerialController {
 
 	private static final int PL2303_INIT_TIMEOUT_MS = 2000;
 
-	private static final int[] PL2303_BAUD_RATES= new int[] {
-		75, 150, 300, 600, 1200,
-		1800, 2400, 3600, 4800, 7200,
-		9600, 14400, 19200, 28800, 38400,
-		57600, 115200, 230400, 460800, 614400,
-		921600, 1228800, 2457600, 3000000, 6000000, 12000000
-	};
-
-
 	private UsbDeviceConnection mUsbConnection;
 	private android.hardware.usb.UsbInterface mUsbInterfaces[];
 	private UsbEndpoint mInterruptEndpoint = null;
 	private UsbEndpoint mBulkInEndpoint = null;
 	private UsbEndpoint mBulkOutEndpoint = null;
-	private int mBaudrate;
+	private final SerialLineConfiguration mSerialLineConfiguration;
 	private boolean isPl2303Hx;
 
 	private UsbSerialInputStream inputStream = null;
@@ -92,7 +83,8 @@ public class UsbPl2303Controller extends UsbSerialController {
 
 		isPl2303Hx = (usbDevice.getDeviceClass() != 0x02)
 				&& (mBulkOutEndpoint.getMaxPacketSize() == 0x40);
-		mBaudrate = DEFAULT_BAUDRATE;
+
+		mSerialLineConfiguration = new SerialLineConfiguration();
 	}
 
 	public static boolean probe(UsbDevice d) {
@@ -158,10 +150,18 @@ public class UsbPl2303Controller extends UsbSerialController {
 			detach();
 			throw new UsbControllerException("pl2303Init() failed");
 		}
-		if (!pl2303SetLineCoding()) {
-			detach();
-			throw new UsbControllerException("pl2303SetLineCoding() failed");
+
+		boolean confValid;
+		final SerialLineConfiguration conf = new SerialLineConfiguration(mSerialLineConfiguration);
+		confValid = pl2303GetLineCoding(conf);
+		if (confValid) {
+		    Log.i(TAG, "Serial line configuration: " + conf.toString());
 		}
+
+		if (!pl2303SetLineCoding()) {
+		    Log.d(TAG, "pl2303SetLineCoding() failed");
+		}
+
 		inputStream = new UsbSerialInputStream(mUsbConnection, mBulkInEndpoint);
 		outputStream = new UsbSerialOutputStream(mUsbConnection, mBulkOutEndpoint);
 
@@ -206,19 +206,19 @@ public class UsbPl2303Controller extends UsbSerialController {
 		return outputStream;
 	}
 
-	@Override
-    public synchronized int getBaudRate() {
-		return mBaudrate;
-	}
+    @Override
+    public SerialLineConfiguration getSerialLineConfiguration() {
+        return new SerialLineConfiguration(mSerialLineConfiguration);
+    }
 
-	@Override
-    public synchronized void setBaudRate(int baudrate) {
-		if (this.mBaudrate == baudrate) return;
-		this.mBaudrate = baudrate;
-		if (isAttached()) {
-			pl2303SetLineCoding(baudrate);
-		}
-	}
+    @Override
+    public void setSerialLineConfiguration(final SerialLineConfiguration config) {
+        if (mSerialLineConfiguration.equals(config)) return;
+        mSerialLineConfiguration.set(config);
+        if (isAttached()) {
+            pl2303SetLineCoding();
+        }
+    }
 
 	private boolean pl2303Reset() {
 		return mUsbConnection.controlTransfer(
@@ -262,60 +262,15 @@ public class UsbPl2303Controller extends UsbSerialController {
 	}
 
 	private boolean pl2303SetLineCoding() {
-		return pl2303SetLineCoding(this.mBaudrate);
-	}
+		final byte req[];
 
-	private boolean pl2303SetLineCoding(int baudrate) {
-		return pl2303SetLineCoding(baudrate, 8, 'N', 1);
-	}
+		Log.d(TAG, "SetLineCoding " + mSerialLineConfiguration.toString());
 
-	private boolean pl2303SetLineCoding(int baudrate, int dataBits, char parity, int stopBits) {
-		int idx;
-		byte req[] = new byte[7];
-
-		/*  dwDTERate */
-		idx = Arrays.binarySearch(PL2303_BAUD_RATES, baudrate);
-		if (idx < 0) {
-			baudrate = PL2303_BAUD_RATES[-idx == PL2303_BAUD_RATES.length ? -idx-1 : -idx];
-		}
-		req[0] = (byte)(baudrate & 0xff);
-		req[1] = (byte)((baudrate >>> 8) & 0xff);
-		req[2] = (byte)((baudrate >>> 16) & 0xff);
-		req[3] = (byte)((baudrate >>> 24) & 0xff);
-
-		/* bCharFormat */
-		if (stopBits != 1 && (stopBits != 2)) throw new IllegalArgumentException("Wrong stop bits");
-		req[4] = stopBits == 1 ? (byte)0 : (byte)2;
-
-		/* bParityType */
-		switch (parity) {
-		case 'N': req[5] = 0; break; /* None */
-		case 'O': req[5] = 1; break; /* Odd */
-		case 'E': req[5] = 2; break; /* Even */
-		case 'M': req[5] = 3; break; /* Mark */
-		case 'S': req[5] = 4; break; /* Space */
-		default: throw new IllegalArgumentException("Wrong parity");
-		}
-
-		/* bDataBits */
-		switch (dataBits) {
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-			req[6] = (byte)dataBits;
-			break;
-		default: throw new IllegalArgumentException("Wrong data bits");
-		}
-
-		Log.d(TAG, "SetLineCoding rate=" + baudrate + " " +
-				Integer.toString(dataBits) +
-				Character.toString(parity) +
-				stopBits);
+		req = UsbAcmController.packSetLineCodingRequest(mSerialLineConfiguration);
 
 		if (mUsbConnection.controlTransfer(
-				0x21,
-				0x20, /* SET_LINE_CODING */
+				0x21 | UsbConstants.USB_DIR_OUT,
+				UsbAcmController.PSTN_SET_LINE_CODING,
 				0,
 				0, /* bulk data interface number */
 				req,
@@ -331,6 +286,31 @@ public class UsbPl2303Controller extends UsbSerialController {
 			return false;
 
 		return true;
+	}
+
+	private boolean pl2303GetLineCoding(SerialLineConfiguration dst) {
+	    final byte response[];
+
+	    response = new byte[7];
+	    if (mUsbConnection.controlTransfer(
+	            0x21 | UsbConstants.USB_DIR_IN,
+	            UsbAcmController.PSTN_GET_LINE_CODING,
+	            0,
+	            0, /* bulk data interface number */
+	            response,
+	            response.length,
+	            1000
+	            ) < 7)
+	        return false;
+
+	    try {
+	        dst.set(UsbAcmController.unpackLineCodingResponse(response));
+	    }catch (IllegalArgumentException iae) {
+	        iae.printStackTrace();
+	        return false;
+	    }
+
+	    return true;
 	}
 
 }

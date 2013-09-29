@@ -1,12 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    
+
     <ListPreference
         android:key="stream_usb_baudrate"
         android:title="@string/usb_device_baudrate_title"
         android:entries="@array/usb_device_baudrate_entries"
         android:entryValues="@array/usb_device_baudrate_entries"
-        android:defaultValue="38400"
-        />
+        android:defaultValue="38400" />
+
+    <ListPreference
+        android:key="stream_usb_data_bits"
+        android:title="@string/usb_device_data_bits_title"
+        android:entries="@array/usb_device_data_bits_entries"
+        android:entryValues="@array/usb_device_data_bits_entries"
+        android:defaultValue="8" />
+
+    <ListPreference
+        android:key="stream_usb_parity"
+        android:title="@string/usb_device_parity_title"
+        android:entries="@array/usb_device_parity_entries"
+        android:entryValues="@array/usb_device_parity_values"
+        android:defaultValue="N" />
+
+    <ListPreference
+	android:key="stream_usb_stop_bits"
+        android:title="@string/usb_device_stop_bits_title"
+        android:entries="@array/usb_device_stop_bits_entries"
+        android:entryValues="@array/usb_device_stop_bits_entries"
+        android:defaultValue="1" />
 
 </PreferenceScreen>

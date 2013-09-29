@@ -1,15 +1,5 @@
 package ru0xdc.rtkgps.usb;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import ru0xdc.rtkgps.BuildConfig;
-import ru0xdc.rtkgps.R;
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.res.Resources;
@@ -21,14 +11,24 @@ import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbRequest;
 import android.util.Log;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtkgps.R;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+
 @TargetApi(12)
 public abstract class UsbSerialController {
 
 	// Debugging
 	private static final String TAG = UsbSerialController.class.getSimpleName();
     private static final boolean D = BuildConfig.DEBUG & true;
-
-    public static final int DEFAULT_BAUDRATE = 4800;
 
     protected UsbManager mUsbManager;
 	protected UsbDevice mUsbDevice;
@@ -42,8 +42,16 @@ public abstract class UsbSerialController {
 	public abstract void attach() throws UsbControllerException;
 	public abstract void detach();
 
-	public abstract void setBaudRate(int baudRate);
-	public abstract int getBaudRate();
+	/**
+	 * Set serial line configuration
+	 */
+	public abstract void setSerialLineConfiguration(final SerialLineConfiguration config);
+
+	/**
+	 * @return serial line configuration
+	 */
+	public abstract SerialLineConfiguration getSerialLineConfiguration();
+
 
 	public abstract InputStream getInputStream();
 	public abstract OutputStream getOutputStream();

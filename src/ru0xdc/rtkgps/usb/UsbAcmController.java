@@ -1,15 +1,18 @@
 package ru0xdc.rtkgps.usb;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import ru0xdc.rtkgps.BuildConfig;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
+
+import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtkgps.usb.SerialLineConfiguration.Parity;
+import ru0xdc.rtkgps.usb.SerialLineConfiguration.StopBits;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /* USB CDC ACM (Communication Device Class Abstract Control Model) */
 public class UsbAcmController extends UsbSerialController {
@@ -18,13 +21,16 @@ public class UsbAcmController extends UsbSerialController {
     private static final String TAG = UsbAcmController.class.getSimpleName();
     private static final boolean D = BuildConfig.DEBUG & true;
 
+    public static final int PSTN_SET_LINE_CODING = 0x20;
+    public static final int PSTN_GET_LINE_CODING = 0x21;
+
     private UsbDeviceConnection mUsbConnection;
 
     private UsbSerialInputStream inputStream = null;
     private UsbSerialOutputStream outputStream = null;
     private UsbSerialInterruptListener interruptListener = null;
 
-    private int mBaudrate;
+    private final SerialLineConfiguration mSerialLineConfiguration;
 
     private final AcmConfig mAcmConfig;
 
@@ -169,7 +175,7 @@ public class UsbAcmController extends UsbSerialController {
         super(usbmanager, usbDevice);
 
         mAcmConfig = new AcmConfig(usbDevice);
-        mBaudrate = DEFAULT_BAUDRATE;
+        mSerialLineConfiguration = new SerialLineConfiguration();
     }
 
     public static boolean probe(UsbDevice d) {
@@ -227,9 +233,16 @@ public class UsbAcmController extends UsbSerialController {
             throw new UsbControllerException("claimInterface(mDataInterface) failed");
         }
 
-        if (setLineCoding() == false) {
+        boolean confValid;
+        final SerialLineConfiguration conf = new SerialLineConfiguration(mSerialLineConfiguration);
+        confValid = acmGetLineCoding(conf);
+        if (confValid) {
+            Log.i(TAG, "Serial line configuration: " + conf.toString());
+        }
+        if (!acmSetLineCoding()) {
             Log.d(TAG, "setLineCoding() failed");
         }
+
 
         inputStream = new UsbSerialInputStream(mUsbConnection, mAcmConfig.mBulkInEndpoint);
         outputStream = new UsbSerialOutputStream(mUsbConnection, mAcmConfig.mBulkOutEndpoint);
@@ -269,30 +282,29 @@ public class UsbAcmController extends UsbSerialController {
     }
 
     @Override
-    public synchronized int getBaudRate() {
-        return mBaudrate;
+    public SerialLineConfiguration getSerialLineConfiguration() {
+        return new SerialLineConfiguration(mSerialLineConfiguration);
     }
 
     @Override
-    public synchronized void setBaudRate(int baudrate) {
-        if (this.mBaudrate == baudrate) return;
-        this.mBaudrate = baudrate;
+    public void setSerialLineConfiguration(final SerialLineConfiguration config) {
+        if (mSerialLineConfiguration.equals(config)) return;
+        mSerialLineConfiguration.set(config);
         if (isAttached()) {
-            setLineCoding(baudrate);
+            acmSetLineCoding();
         }
     }
 
-    private boolean setLineCoding() {
-        return setLineCoding(this.mBaudrate);
-    }
 
-    private boolean setLineCoding(int baudrate) {
-        return setLineCoding(baudrate, 8, 'N', 1);
-    }
-
-    private boolean setLineCoding(int baudrate, int dataBits, char parity, int stopBits) {
+    /**
+     * Packs serial line configuration into an USB CDC PSTN SetLineCoding request
+     * @param conf serial line configuration
+     * @return the USB CDC PSTN SetLineCoding request
+     */
+    protected static byte[] packSetLineCodingRequest(final SerialLineConfiguration conf) {
         byte req[] = new byte[7];
 
+        final int baudrate = conf.getBaudrate();
         /*  dwDTERate */
         req[0] = (byte)(baudrate & 0xff);
         req[1] = (byte)((baudrate >>> 8) & 0xff);
@@ -300,35 +312,48 @@ public class UsbAcmController extends UsbSerialController {
         req[3] = (byte)((baudrate >>> 24) & 0xff);
 
         /* bCharFormat */
-        if (stopBits != 1 && (stopBits != 2)) throw new IllegalArgumentException("Wrong stop bits");
-        req[4] = stopBits == 1 ? (byte)0 : (byte)2;
+        req[4] = conf.getStopBits().getPstnCode();
 
         /* bParityType */
-        switch (parity) {
-        case 'N': req[5] = 0; break; /* None */
-        case 'O': req[5] = 1; break; /* Odd */
-        case 'E': req[5] = 2; break; /* Even */
-        case 'M': req[5] = 3; break; /* Mark */
-        case 'S': req[5] = 4; break; /* Space */
-        default: throw new IllegalArgumentException("Wrong parity");
-        }
+        req[5] = conf.getParity().getPstnCode();
 
         /* bDataBits */
-        switch (dataBits) {
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 16:
-            req[6] = (byte)dataBits;
-            break;
-        default: throw new IllegalArgumentException("Wrong data bits");
+        req[6] = (byte)conf.getDataBits();
+
+        return req;
+    }
+
+    protected static SerialLineConfiguration unpackLineCodingResponse(byte[] response) throws IllegalArgumentException {
+        final SerialLineConfiguration conf;
+
+        conf = new SerialLineConfiguration();
+        if (response.length < 7) throw new IllegalArgumentException();
+
+        final int baudrate =  0xffffffff & ((response[0] & 0xff)
+                | ((response[1] << 8) & 0xff00)
+                | ((response[2] << 16) & 0xff0000)
+                | ((response[3] << 24) & 0xff000000));
+        conf.setBaudrate(baudrate);
+
+        conf.setStopBits(StopBits.valueOfPstnCode(response[4]));
+        conf.setParity(Parity.valueOfPstnCode(response[5]));
+        if (response[6] == 0) {
+            // XXX: pl2303 on first attach
+            conf.setDataBits(8);
+        }else {
+            conf.setDataBits(response[6]);
         }
 
-        Log.d(TAG, "SetLineCoding rate=" + baudrate + " " +
-                Integer.toString(dataBits) +
-                Character.toString(parity) +
-                stopBits);
+
+        return conf;
+    }
+
+    private boolean acmSetLineCoding() {
+        final byte req[];
+
+        Log.d(TAG, "SetLineCoding " + mSerialLineConfiguration.toString());
+
+        req = packSetLineCodingRequest(mSerialLineConfiguration);
 
         if (mUsbConnection.controlTransfer(
                 0x21,
@@ -343,4 +368,30 @@ public class UsbAcmController extends UsbSerialController {
 
         return true;
     }
+
+    private boolean acmGetLineCoding(SerialLineConfiguration dst) {
+        final byte response[];
+
+        response = new byte[7];
+        if (mUsbConnection.controlTransfer(
+                0x21 | UsbConstants.USB_DIR_IN,
+                UsbAcmController.PSTN_GET_LINE_CODING,
+                0,
+                0, /* bulk data interface number */
+                response,
+                response.length,
+                1000
+                ) < 7)
+            return false;
+
+        try {
+            dst.set(UsbAcmController.unpackLineCodingResponse(response));
+        }catch (IllegalArgumentException iae) {
+            iae.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
 }

@@ -1,18 +1,5 @@
 package ru0xdc.rtkgps;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import ru0xdc.rtkgps.usb.UsbAcmController;
-import ru0xdc.rtkgps.usb.UsbPl2303Controller;
-import ru0xdc.rtkgps.usb.UsbSerialController;
-import ru0xdc.rtkgps.usb.UsbSerialController.UsbControllerException;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,6 +9,21 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.ConditionVariable;
 import android.util.Log;
+
+import ru0xdc.rtkgps.usb.SerialLineConfiguration;
+import ru0xdc.rtkgps.usb.UsbAcmController;
+import ru0xdc.rtkgps.usb.UsbPl2303Controller;
+import ru0xdc.rtkgps.usb.UsbSerialController;
+import ru0xdc.rtkgps.usb.UsbSerialController.UsbControllerException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class UsbToRtklib {
@@ -84,12 +86,12 @@ public class UsbToRtklib {
         mLocalSocketThread.cancel();
     }
 
-    public void setBaudRate(int baudrate) {
-        mUsbReceiver.setBaudRate(baudrate);
+    public void setSerialLineConfiguration(SerialLineConfiguration conf) {
+        mUsbReceiver.setSerialLineConfiguration(conf);
     }
 
-    public int getBaudRate() {
-        return mUsbReceiver.getBaudRate();
+    public SerialLineConfiguration getSeriallineConfiguration() {
+        return mUsbReceiver.getSerialLineConfiguration();
     }
 
     public void setCallbacks(Callbacks callbacks) {
@@ -140,7 +142,7 @@ public class UsbToRtklib {
 
         static final String ACTION_USB_PERMISSION = "ru0xdc.rtkgps.usb.UsbReceiver.USB_PERMISSION";
 
-        private int mBaudrate = UsbSerialController.DEFAULT_BAUDRATE;
+        private final SerialLineConfiguration mSerialLineConfiguration;
 
         private Context mContext;
 
@@ -155,6 +157,7 @@ public class UsbToRtklib {
             this.mContext = pContext;
             this.mUsbManager = (UsbManager) pContext.getSystemService(Context.USB_SERVICE);
             mIsUsbDeviceReadyCondvar = new ConditionVariable(false);
+            mSerialLineConfiguration = new SerialLineConfiguration();
 
             if (mUsbManager == null) throw new IllegalStateException("USB not available");
         }
@@ -178,12 +181,12 @@ public class UsbToRtklib {
             }
         }
 
-        public synchronized void setBaudRate(int baudrate) {
-            this.mBaudrate = baudrate;
+        public synchronized void setSerialLineConfiguration(SerialLineConfiguration conf) {
+            this.mSerialLineConfiguration.set(conf);
         }
 
-        public synchronized int getBaudRate() {
-            return this.mBaudrate;
+        public synchronized SerialLineConfiguration getSerialLineConfiguration() {
+            return new SerialLineConfiguration(mSerialLineConfiguration);
         }
 
 
@@ -274,7 +277,7 @@ public class UsbToRtklib {
             controller = probeDevice(device);
             if (controller == null) return;
 
-            controller.setBaudRate(mBaudrate);
+            controller.setSerialLineConfiguration(mSerialLineConfiguration);
 
             mServiceThread.setController(controller);
 
@@ -391,7 +394,7 @@ public class UsbToRtklib {
                 synchronized(UsbReceiver.this) {
                     synchronized (this) {
                         throwIfCancelRequested();
-                        if (DBG) Log.v(TAG, "attach(). baudrate: "+ mUsbController.getBaudRate());
+                        if (DBG) Log.v(TAG, "attach(). conf: "+ mUsbController.getSerialLineConfiguration().toString());
                         mUsbController.attach();
                         mInputStream = mUsbController.getInputStream();
                         mOutputStream = mUsbController.getOutputStream();

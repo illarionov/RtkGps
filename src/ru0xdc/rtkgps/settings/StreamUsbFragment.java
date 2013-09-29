@@ -1,13 +1,5 @@
 package ru0xdc.rtkgps.settings;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-
-import ru0xdc.rtkgps.BuildConfig;
-import ru0xdc.rtkgps.MainActivity;
-import ru0xdc.rtkgps.R;
-import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
-import ru0xdc.rtklib.constants.StreamType;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -16,11 +8,25 @@ import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtkgps.MainActivity;
+import ru0xdc.rtkgps.R;
+import ru0xdc.rtkgps.usb.SerialLineConfiguration;
+import ru0xdc.rtkgps.usb.SerialLineConfiguration.Parity;
+import ru0xdc.rtkgps.usb.SerialLineConfiguration.StopBits;
+import ru0xdc.rtklib.RtkServerSettings.TransportSettings;
+import ru0xdc.rtklib.constants.StreamType;
+
+import javax.annotation.Nonnull;
+
 public class StreamUsbFragment extends PreferenceFragment {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
     private static final String KEY_DEVICE_BAUDRATE = "stream_usb_baudrate";
+    private static final String KEY_DATA_BITS = "stream_usb_data_bits";
+    private static final String KEY_PARITY = "stream_usb_parity";
+    private static final String KEY_STOP_BITS = "stream_usb_stop_bits";
 
 
     private String mSharedPrefsName;
@@ -28,15 +34,13 @@ public class StreamUsbFragment extends PreferenceFragment {
 
     public static final class Value implements TransportSettings {
 
-        public static final int DEFAULT_BAUDRATE = 38400;
-
         private String mPath;
 
-        private int mBaudrate;
+        private SerialLineConfiguration mSerialLineConfiguration;
 
         public Value() {
             mPath = null;
-            mBaudrate = DEFAULT_BAUDRATE;
+            mSerialLineConfiguration = new SerialLineConfiguration();
         }
 
         @Override
@@ -61,23 +65,19 @@ public class StreamUsbFragment extends PreferenceFragment {
             return "usb_" + stream; // + "_" + address.replaceAll("\\W", "_");
         }
 
-        public Value setBaudrate(@Nonnegative int baudrate) {
-            if (baudrate == 0) {
-                mBaudrate = DEFAULT_BAUDRATE;
-            }else {
-                mBaudrate = baudrate;
-            }
+        public Value setSerialLineConfiguration(SerialLineConfiguration conf) {
+            mSerialLineConfiguration.set(conf);
             return this;
         }
 
-        public int getBaudrate() {
-            return mBaudrate;
+        public SerialLineConfiguration getSerialLineConfiguration() {
+            return new SerialLineConfiguration(mSerialLineConfiguration);
         }
 
         @Override
         public Value copy() {
             Value v = new Value();
-            v.mBaudrate = mBaudrate;
+            v.mSerialLineConfiguration.set(mSerialLineConfiguration);
             v.mPath = mPath;
             return v;
         }
@@ -132,33 +132,66 @@ public class StreamUsbFragment extends PreferenceFragment {
 
     public static void setDefaultValue(Context ctx, String sharedPrefsName, Value value) {
         final SharedPreferences prefs;
+        final SerialLineConfiguration conf = value.getSerialLineConfiguration();
         prefs = ctx.getSharedPreferences(sharedPrefsName, Context.MODE_PRIVATE);
         prefs
             .edit()
-            .putString(KEY_DEVICE_BAUDRATE, String.valueOf(value.getBaudrate()))
+            .putString(KEY_DEVICE_BAUDRATE, String.valueOf(conf.getBaudrate()))
+            .putString(KEY_DATA_BITS, String.valueOf(conf.getDataBits()))
+            .putString(KEY_PARITY, String.valueOf(conf.getParity().getCharVal()))
+            .putString(KEY_STOP_BITS, conf.getStopBits().getStringVal())
             .apply();
     }
 
-    @Nonnull
-    public static Value readSettings(Context context, SharedPreferences prefs, String sharedPrefsName) {
-        String baudrate = prefs.getString(KEY_DEVICE_BAUDRATE,
-                String.valueOf(Value.DEFAULT_BAUDRATE));
+    private static SerialLineConfiguration readSerialLineConfiguration(SharedPreferences prefs) {
+        final SerialLineConfiguration conf;
+        final String baudrate, dataBits, parity, stopBits;
 
-        final Value v = new Value().setBaudrate(Integer.valueOf(baudrate));
+        conf = new SerialLineConfiguration();
+
+        baudrate = prefs.getString(KEY_DEVICE_BAUDRATE, null);
+        dataBits = prefs.getString(KEY_DATA_BITS, null);
+        parity = prefs.getString(KEY_PARITY, null);
+        stopBits = prefs.getString(KEY_STOP_BITS, null);
+
+        if (baudrate != null) conf.setBaudrate(Integer.valueOf(baudrate));
+        if (dataBits != null) conf.setDataBits(Integer.valueOf(dataBits));
+        if (parity != null) conf.setParity(Parity.valueOfChar(parity.charAt(0)));
+        if (stopBits != null) conf.setStopBits(StopBits.valueOfString(stopBits));
+
+        return conf;
+    }
+
+    @Nonnull
+    public static Value readSettings(Context context,
+            SharedPreferences prefs, String sharedPrefsName) {
+        final Value v;
+        final SerialLineConfiguration conf;
+
+        conf = readSerialLineConfiguration(prefs);
+
+        v = new Value();
+        v.setSerialLineConfiguration(conf);
         v.updatePath(context, sharedPrefsName);
+
         return v;
     }
 
     void reloadSummaries() {
-        ListPreference baudratePref;
-
-        baudratePref = (ListPreference) findPreference(KEY_DEVICE_BAUDRATE);
-        baudratePref.setSummary(baudratePref.getEntry());
+        for (String lpKey: new String[]{
+                KEY_DEVICE_BAUDRATE,
+                KEY_DATA_BITS,
+                KEY_PARITY,
+                KEY_STOP_BITS}) {
+            final ListPreference lpref = (ListPreference)findPreference(lpKey);
+            lpref.setSummary(lpref.getEntry());
+        }
     }
 
     public static String readSummary(Resources r, SharedPreferences prefs) {
-        return "Any USB device, baudrate: " + prefs.getString(KEY_DEVICE_BAUDRATE,
-                String.valueOf(Value.DEFAULT_BAUDRATE));
+        final SerialLineConfiguration conf;
+        conf = readSerialLineConfiguration(prefs);
+        return "Any USB device, " + conf.toString();
     }
 
     private SharedPreferences.OnSharedPreferenceChangeListener mPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {

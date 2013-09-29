@@ -492,6 +492,33 @@
             <item>115200</item>
             <item>230400</item>
     </string-array>
+	<string name="usb_device_data_bits_title">Data bits</string>
+	<string-array name="usb_device_data_bits_entries">
+	    <item>5</item>
+	    <item>6</item>
+	    <item>7</item>
+	    <item>8</item>
+	</string-array>
+	<string name="usb_device_parity_title">Parity</string>
+	<string-array name="usb_device_parity_entries">
+	    <item>None</item>
+	    <item>Odd</item>
+	    <item>Even</item>
+	    <item>Mark</item>
+	    <item>Space</item>
+	</string-array>
+	<string-array name="usb_device_parity_values">
+	    <item>N</item>
+	    <item>O</item>
+	    <item>E</item>
+	    <item>M</item>
+	    <item>S</item>
+	</string-array>
+	<string name="usb_device_stop_bits_title">Stop bits</string>
+	<string-array name="usb_device_stop_bits_entries">
+	    <item>1</item>
+	    <item>2</item>
+	</string-array>
     
 	<!-- Startup/shutdown commands preference widget -->
 	<string name="send_commands_at_startup">Send commands at startup</string>
