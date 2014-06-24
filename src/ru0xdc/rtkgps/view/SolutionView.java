@@ -1,6 +1,7 @@
 package ru0xdc.rtkgps.view;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import ru0xdc.rtkgps.BuildConfig;
 import ru0xdc.rtkgps.R;
+import ru0xdc.rtkgps.settings.SolutionOutputSettingsFragment;
 import ru0xdc.rtklib.RtkCommon;
 import ru0xdc.rtklib.RtkCommon.Deg2Dms;
 import ru0xdc.rtklib.RtkCommon.Position3d;
@@ -83,6 +85,8 @@ public class SolutionView extends TableLayout {
 
     private Format mSolutionFormat;
 
+    private boolean mBoolIsGeodetic = false;
+
     private final NumberFormat mCoordEcefFormatter;
 
     private final TextView mTextViewSolutionStatus;
@@ -92,6 +96,7 @@ public class SolutionView extends TableLayout {
     private final TextView mTextViewCoord1Name, mTextViewCoord1Value;
     private final TextView mTextViewCoord2Name, mTextViewCoord2Value;
     private final TextView mTextViewCoord3Name, mTextViewCoord3Value;
+    private final TextView mTextViewCoord4Name, mTextViewCoord4Value;
 
     private final TextView mTextViewCovariance;
     private final TextView mTextViewAge;
@@ -130,6 +135,8 @@ public class SolutionView extends TableLayout {
         mTextViewCoord2Value = (TextView)findViewById(R.id.coord2_value);
         mTextViewCoord3Name = (TextView)findViewById(R.id.coord3_name);
         mTextViewCoord3Value = (TextView)findViewById(R.id.coord3_value);
+        mTextViewCoord4Name = (TextView)findViewById(R.id.coord4_name);
+        mTextViewCoord4Value = (TextView)findViewById(R.id.coord4_value);
         mTextViewCovariance = (TextView)findViewById(R.id.covariance_text);
         mTextViewAge = (TextView)findViewById(R.id.age_text);
 
@@ -145,6 +152,8 @@ public class SolutionView extends TableLayout {
             mTextViewCoord2Value.setTextColor(textColor);
             mTextViewCoord3Name.setTextColor(textColor);
             mTextViewCoord3Value.setTextColor(textColor);
+            mTextViewCoord4Name.setTextColor(textColor);
+            mTextViewCoord4Value.setTextColor(textColor);
             mTextViewCovariance.setTextColor(textColor);
             mTextViewAge.setTextColor(textColor);
         }
@@ -191,7 +200,7 @@ public class SolutionView extends TableLayout {
         switch (mSolutionFormat) {
         case WGS84:
         case WGS84_FLOAT:
-            String strLat, strLon, strHeight;
+            String strLat, strLon, strHeight,strAltitude="";
             RtkCommon.Matrix3x3 cov;
 
             if (isInEditMode()) {
@@ -214,12 +223,37 @@ public class SolutionView extends TableLayout {
                     strLat = String.format(Locale.US, "%11.8f°", Math.toDegrees(roverPos.getLat()));
                     strLon = String.format(Locale.US, "%11.8f°", Math.toDegrees(roverPos.getLon()));
                 }
+
+                double dGeoidHeight = 0.0;
+                // Gets if solution height is geodetic or ellipsoidal
+                SharedPreferences prefs= this.getContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
+                String strHeightPref = prefs.getString(SolutionOutputSettingsFragment.KEY_HEIGHT, "Ellipsoidal");
+                if (strHeightPref.equals("Ellipsoidal"))
+                {
+                    dGeoidHeight = 0.0;
+                    mBoolIsGeodetic = false;
+                    mTextViewCoord4Name.setText("");
+                }else
+                {
+                    mBoolIsGeodetic = true;
+                    mTextViewCoord4Name.setText("Altitude:");
+                    dGeoidHeight = RtkCommon.geoidh(roverPos.getLat(),roverPos.getLon());
+                }
+                strAltitude = String.format(Locale.US, "%.3fm el.", roverPos.getHeight()-dGeoidHeight);
                 strHeight = String.format(Locale.US, "%.3fm el.", roverPos.getHeight());
+
             }
 
             mTextViewCoord1Value.setText(strLat);
             mTextViewCoord2Value.setText(strLon);
             mTextViewCoord3Value.setText(strHeight);
+            if (mBoolIsGeodetic)
+            {
+                mTextViewCoord4Value.setText(strAltitude);
+            }else
+            {
+                mTextViewCoord4Value.setText("");
+            }
             mTextViewCovariance.setText(String.format(
                     Locale.US,
                     "N:%6.3f\nE:%6.3f\nU:%6.3f m",
@@ -321,13 +355,14 @@ public class SolutionView extends TableLayout {
     private void updateCoordinatesHeader() {
         final String headers[];
         if (isInEditMode()) {
-            headers = new String[] {"Lat:", "Lon:", "Height:"};
+            headers = new String[] {"Lat:", "Lon:", "Height:", "Altitude:"};
         }else {
             headers = getResources().getStringArray(mSolutionFormat.mHeadersArrayId);
         }
         mTextViewCoord1Name.setText(headers[0]);
         mTextViewCoord2Name.setText(headers[1]);
         mTextViewCoord3Name.setText(headers[2]);
+        //mTextViewCoord4Name.setText(headers[3]);
     }
 
     public static class SolutionIndicatorView extends View {

@@ -1,10 +1,5 @@
 package ru0xdc.rtkgps.settings;
 
-import ru0xdc.rtkgps.BuildConfig;
-import ru0xdc.rtkgps.R;
-import ru0xdc.rtklib.SolutionOptions;
-import ru0xdc.rtklib.constants.GeoidModel;
-import ru0xdc.rtklib.constants.TimeSystem;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,24 +13,30 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.text.TextUtils;
 
+import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtkgps.R;
+import ru0xdc.rtklib.SolutionOptions;
+import ru0xdc.rtklib.constants.GeoidModel;
+import ru0xdc.rtklib.constants.TimeSystem;
+
 public class SolutionOutputSettingsFragment extends PreferenceFragment {
 
     @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
     static final String TAG = SolutionOutputSettingsFragment.class.getSimpleName();
 
-    static final String SHARED_PREFS_NAME = "SolutionOutputSettings";
+    public static final String SHARED_PREFS_NAME = "SolutionOutputSettings";
 
-    static final String KEY_OUTPUT_HEADER = "output_header";
-    static final String KEY_TIME_FORMAT = "time_format";
-    static final String KEY_LAT_LON_FORMAT = "lat_lon_format";
-    static final String KEY_FIELD_SEPARATOR = "field_separator";
-    static final String KEY_HEIGHT = "height";
-    static final String KEY_GEOID_MODEL = "geoid_model";
-    static final String KEY_NMEA_INTERVAL_RMC_GGA = "nmea_interval_rmc_gga";
-    static final String KEY_NMEA_INTERVAL_GSA_GSV = "nmea_interval_gsa_gsv";
-    static final String KEY_OUTPUT_SOLUTION_STATUS = "output_solution_status";
-    static final String KEY_DEBUG_TRACE ="debug_trace";
+    public static final String KEY_OUTPUT_HEADER = "output_header";
+    public static final String KEY_TIME_FORMAT = "time_format";
+    public static final String KEY_LAT_LON_FORMAT = "lat_lon_format";
+    public static final String KEY_FIELD_SEPARATOR = "field_separator";
+    public static final String KEY_HEIGHT = "height";
+    public static final String KEY_GEOID_MODEL = "geoid_model";
+    public static final String KEY_NMEA_INTERVAL_RMC_GGA = "nmea_interval_rmc_gga";
+    public static final String KEY_NMEA_INTERVAL_GSA_GSV = "nmea_interval_gsa_gsv";
+    public static final String KEY_OUTPUT_SOLUTION_STATUS = "output_solution_status";
+    public static final String KEY_DEBUG_TRACE ="debug_trace";
 
     private CheckBoxPreference mOutputHeaderPref;
     private ListPreference mTimeFormatPref;
