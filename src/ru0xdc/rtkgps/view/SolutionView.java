@@ -32,7 +32,6 @@ public class SolutionView extends TableLayout {
     private static final boolean DBG = BuildConfig.DEBUG & true;
     static final String TAG = SolutionView.class.getSimpleName();
 
-
     public enum Format {
         WGS84(0,
                 R.string.solution_view_format_wgs84,
@@ -204,15 +203,14 @@ public class SolutionView extends TableLayout {
             RtkCommon.Matrix3x3 cov;
 
             if (isInEditMode()) {
-                strLat = "-34.56785678Â°";
-                strLon = "123.45454545Â°";
+                strLat = "-34.56785678¡";
+                strLon = "123.45454545¡";
                 strHeight = "45.324m el.";
                 Qe = new double[9];
             }else {
                 if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
                     break;
                 }
-
                 roverPos = RtkCommon.ecef2pos(roverEcefPos);
                 cov = sol.getQrMatrix();
                 Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
@@ -220,8 +218,8 @@ public class SolutionView extends TableLayout {
                     strLat = Deg2Dms.toString(Math.toDegrees(roverPos.getLat()), true);
                     strLon = Deg2Dms.toString(Math.toDegrees(roverPos.getLon()), false);
                 }else {
-                    strLat = String.format(Locale.US, "%11.8fÂ°", Math.toDegrees(roverPos.getLat()));
-                    strLon = String.format(Locale.US, "%11.8fÂ°", Math.toDegrees(roverPos.getLon()));
+                    strLat = String.format(Locale.US, "%11.8f¡", Math.toDegrees(roverPos.getLat()));
+                    strLon = String.format(Locale.US, "%11.8f¡", Math.toDegrees(roverPos.getLon()));
                 }
 
                 double dGeoidHeight = 0.0;
@@ -312,8 +310,8 @@ public class SolutionView extends TableLayout {
                 yaw = Math.atan2(enu.getLat(), enu.getLon());
                 if (yaw < 0.0) yaw += 2.0 * Math.PI;
 
-                v1 = String.format(Locale.US, "%.3f Â°", Math.toDegrees(pitch));
-                v2 = String.format(Locale.US, "%.3f Â°", Math.toDegrees(yaw));
+                v1 = String.format(Locale.US, "%.3f ¡", Math.toDegrees(pitch));
+                v2 = String.format(Locale.US, "%.3f ¡", Math.toDegrees(yaw));
                 v3 = String.format(Locale.US, "%.3f m", baselineLen);
             }
 
