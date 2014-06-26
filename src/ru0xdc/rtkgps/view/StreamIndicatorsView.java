@@ -1,7 +1,5 @@
 package ru0xdc.rtkgps.view;
 
-import ru0xdc.rtkgps.BuildConfig;
-import ru0xdc.rtklib.RtkServerStreamStatus;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,6 +7,9 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import ru0xdc.rtkgps.BuildConfig;
+import ru0xdc.rtklib.RtkServerStreamStatus;
 
 public class StreamIndicatorsView extends View {
 
@@ -28,7 +29,7 @@ public class StreamIndicatorsView extends View {
 
     private final static int DEFAULT_INDICATOR_SPACING = 2;
 
-    private final static String ARROW = "→";
+    private final static String ARROW = "⇝";
 
     @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;

@@ -68,4 +68,9 @@
 	    android:entryValues="@array/solopt_debug_trace_entry_values"
 	    />
 
+	<CheckBoxPreference
+		android:key="output_mocklocation"
+		android:title="@string/solopt_output_mocklocation_title"
+		android:summary="@string/solopt_output_mocklocation_summary"
+        />
 </PreferenceScreen>

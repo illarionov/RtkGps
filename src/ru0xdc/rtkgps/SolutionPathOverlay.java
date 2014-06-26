@@ -1,5 +1,10 @@
 package ru0xdc.rtkgps;
 
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.Rect;
+
 import microsoft.mappoint.TileSystem;
 
 import org.osmdroid.ResourceProxy;
@@ -16,10 +21,6 @@ import ru0xdc.rtklib.RtkCommon;
 import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.Solution;
 import ru0xdc.rtklib.constants.SolutionStatus;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
 
 /**
  *

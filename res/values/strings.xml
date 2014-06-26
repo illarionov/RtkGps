@@ -314,6 +314,10 @@
     <!-- Output header -->
     <string name="solopt_output_header_title">Output header</string>
     <string name="solopt_output_header_summary">Set whether the header is output or not</string>
+    
+    <!-- Output mocklocation -->
+    <string name="solopt_output_mocklocation_title">Output GPS mock locations</string>
+    <string name="solopt_output_mocklocation_summary">Set if solution is sent to other applications like the internal GPS</string>
 
     <!-- Time format -->
     <string name="solopt_time_format_title">Time format</string>

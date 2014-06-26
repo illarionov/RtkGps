@@ -1,21 +1,33 @@
 package ru0xdc.rtkgps;
 
+import android.annotation.SuppressLint;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 import ru0xdc.rtkgps.settings.SettingsHelper;
+import ru0xdc.rtkgps.settings.SolutionOutputSettingsFragment;
 import ru0xdc.rtkgps.settings.StreamBluetoothFragment;
 import ru0xdc.rtkgps.settings.StreamBluetoothFragment.Value;
 import ru0xdc.rtkgps.settings.StreamUsbFragment;
+import ru0xdc.rtklib.RtkCommon;
+import ru0xdc.rtklib.RtkCommon.Position3d;
 import ru0xdc.rtklib.RtkControlResult;
 import ru0xdc.rtklib.RtkServer;
 import ru0xdc.rtklib.RtkServerObservationStatus;
@@ -25,7 +37,15 @@ import ru0xdc.rtklib.RtkServerStreamStatus;
 import ru0xdc.rtklib.Solution;
 import ru0xdc.rtklib.constants.StreamType;
 
-public class RtkNaviService extends Service {
+import java.lang.reflect.Method;
+
+public class RtkNaviService extends IntentService implements LocationListener
+  {
+
+    public RtkNaviService() {
+        super(RtkNaviService.class.getSimpleName());
+        // TODO Auto-generated constructor stub
+    }
 
     @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
@@ -33,7 +53,8 @@ public class RtkNaviService extends Service {
 
     public static final String ACTION_START = "ru0xdc.rtkgps.RtkNaviService.START";
     public static final String ACTION_STOP = "ru0xdc.rtkgps.RtkNaviService.STOP";
-
+    private static final String RTK_GPS_MOCK_LOCATION_SERVICE = "RtkGps mock location service";
+    private static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
     private int NOTIFICATION = R.string.local_service_started;
 
     // Binder given to clients
@@ -45,6 +66,9 @@ public class RtkNaviService extends Service {
 
     private BluetoothToRtklib mBtRover, mBtBase;
     private UsbToRtklib mUsbReceiver;
+    private boolean mBoolIsRunning = false;
+    private boolean mBoolLocationServiceIsConnected = false;
+    private boolean mBoolMockLocationsPref = false;
 
     @Override
     public void onCreate() {
@@ -66,6 +90,7 @@ public class RtkNaviService extends Service {
             else if(action.equals(ACTION_STOP)) processStop();
             else Log.e(TAG, "onStartCommand(): unknown action " + action);
         }
+        super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
@@ -140,10 +165,41 @@ public class RtkNaviService extends Service {
 
         Notification notification = createForegroundNotification();
         startForeground(NOTIFICATION, notification);
+
+        SharedPreferences prefs= this.getBaseContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
+        mBoolMockLocationsPref = prefs.getBoolean(SolutionOutputSettingsFragment.KEY_OUTPUT_MOCK_LOCATION, false);
+        if (mBoolMockLocationsPref)
+        {
+                if (Settings.Secure.getString(getContentResolver(),
+                        Settings.Secure.ALLOW_MOCK_LOCATION).equals("0") )
+                {
+                    Log.e(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock Location is not allowed");
+                }else{
+                 // Connect to Location Services
+                    LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                    try {
+                        locationManager.addTestProvider(GPS_PROVIDER, false, false,
+                                false, false, true, false, true, 0, Criteria.ACCURACY_FINE);
+                    } catch (IllegalArgumentException e) {
+                        Log.e(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock Location gps provider already exist");
+                    }
+                    locationManager.setTestProviderEnabled(GPS_PROVIDER, true);
+                    locationManager.requestLocationUpdates(GPS_PROVIDER, 0, 0, this);
+                    mBoolIsRunning = true;
+                    Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock Location service was started");
+                }
+        }
     }
 
 
     private void processStop() {
+        mBoolIsRunning = false;
+        if (mBoolMockLocationsPref)
+        {
+            LocationManager lm = (LocationManager) getSystemService(
+                    Context.LOCATION_SERVICE);
+                  lm.removeTestProvider(GPS_PROVIDER);
+        }
         stop();
         stopSelf();
     }
@@ -348,4 +404,96 @@ public class RtkNaviService extends Service {
             mUsbReceiver = null;
         }
     }
+
+    /* (non-Javadoc)
+     * @see android.app.IntentService#onHandleIntent(android.content.Intent)
+     */
+    @Override
+    protected void onHandleIntent(Intent arg0) {
+
+        while (mBoolIsRunning){
+
+            if (mBoolMockLocationsPref)
+            {
+                try {
+                    RtkControlResult result = getRtkStatus(null);
+                    Solution solution = result.getSolution();
+                    Position3d positionECEF = solution.getPosition();
+                    if (RtkCommon.norm(positionECEF.getValues()) > 0.0)
+                    {
+
+                        Position3d positionLatLon = RtkCommon.ecef2pos(positionECEF);
+                        Location currentLocation = createLocation(Math.toDegrees(positionLatLon.getLat()), Math.toDegrees(positionLatLon.getLon()),positionLatLon.getHeight(), 0.1f);
+
+                        if (mBoolLocationServiceIsConnected || true)
+                            {
+                             // provide the new location
+                             //   Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location is "+currentLocation.getLatitude()+" "+currentLocation.getLongitude());
+                                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                                locationManager.setTestProviderLocation(GPS_PROVIDER, currentLocation);
+                            }
+                        Thread.sleep(2500);
+                    }
+
+                } catch (InterruptedException e) {
+                    mBoolIsRunning = false;
+                    Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location service was interrupted");
+                }
+            }
+          }
+    }
+
+    @SuppressLint("NewApi")
+    public Location createLocation(double lat, double lng, double alt, float accuracy) {
+        // Create a new Location
+        Location newLocation = new Location(GPS_PROVIDER);
+        newLocation.setLatitude(lat);
+        newLocation.setLongitude(lng);
+        newLocation.setAccuracy(accuracy);
+        newLocation.setAltitude(alt);
+        newLocation.setTime(System.currentTimeMillis());
+
+         try{
+
+            Method m = newLocation.getClass().getMethod("setElapsedRealtimeNanos", long.class);
+            if (m != null){
+                newLocation.setElapsedRealtimeNanos(SystemClock.elapsedRealtime());
+            }
+        }
+        catch(Exception e)
+        {
+            //nothing to do unsupported before API17
+        }
+        newLocation.setSpeed(0f);
+
+        newLocation.setBearing(0f);
+        return newLocation;
+    }
+    @Override
+    public void onLocationChanged(Location arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onProviderDisabled(String arg0) {
+        mBoolLocationServiceIsConnected = false;
+        Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location provide "+GPS_PROVIDER+" was disabled");
+
+    }
+
+    @Override
+    public void onProviderEnabled(String arg0) {
+        mBoolLocationServiceIsConnected = true;
+        Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location provide "+GPS_PROVIDER+" is enabled");
+
+    }
+
+    @Override
+    public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+        // TODO Auto-generated method stub
+
+    }
+
+
 }

@@ -1,11 +1,11 @@
 package ru0xdc.rtklib;
 
+import proguard.annotation.Keep;
+
 import java.util.Arrays;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
-
-import proguard.annotation.Keep;
 
 
 public class RtkCommon {
@@ -392,7 +392,7 @@ public class RtkCommon {
         private static String formatString(double pDegree, double pMinute, double pSecond, boolean isLat) {
             return String.format(
                     Locale.US,
-                    "%02.0f° %02.0f' %07.4f″ %s",
+                    "%02.0f� %02.0f' %07.4f\" %s",
                     Math.abs(pDegree),
                     pMinute,
                     pSecond,
