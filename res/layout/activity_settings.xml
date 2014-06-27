@@ -9,13 +9,13 @@
 
     	<fragment
         	android:id="@+id/settings1Fragment"
-        	class="ru0xdc.rtkgps.settings.ProcessingOptions1Fragment"
+        	class="gpsplus.rtkgps.settings.ProcessingOptions1Fragment"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content" />
     
     	<fragment
         	android:id="@+id/solutionOutputFragment"
-        	class="ru0xdc.rtkgps.settings.SolutionOutputSettingsFragment"
+        	class="gpsplus.rtkgps.settings.SolutionOutputSettingsFragment"
         	android:layout_width="wrap_content"
         	android:layout_height="wrap_content" />
     </LinearLayout>

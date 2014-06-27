@@ -274,7 +274,7 @@ static jboolean get_path_in_storage_dir(JNIEnv* env, char *filename, size_t bufs
    jstring j_filename;
    jstring j_path;
 
-   clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServer");
+   clazz = (*env)->FindClass(env, "gpsplus/rtklib/RtkServer");
    if (clazz == NULL)
       return JNI_FALSE;
 
@@ -575,7 +575,7 @@ static int set_rtk_status(JNIEnv* env, jobject j_rtk_control_result, rtk_t *stat
 
    if (sol_field_id == NULL) {
       jobject claz = (*env)->GetObjectClass(env, j_rtk_control_result);
-      sol_field_id = (*env)->GetFieldID(env, claz, "sol", "Lru0xdc/rtklib/Solution;");
+      sol_field_id = (*env)->GetFieldID(env, claz, "sol", "Lgpsplus/rtklib/Solution;");
       if (sol_field_id == NULL) {
 	 LOGV("Solution field not found");
 	 return -1;
@@ -678,27 +678,27 @@ static JNINativeMethod nativeMethods[] = {
 	 "I"
 	 "I"
 	 "[D"
-	 "Lru0xdc/rtklib/ProcessingOptions$Native;"
-	 "Lru0xdc/rtklib/SolutionOptions$Native;"
-	 "Lru0xdc/rtklib/SolutionOptions$Native;"
+	 "Lgpsplus/rtklib/ProcessingOptions$Native;"
+	 "Lgpsplus/rtklib/SolutionOptions$Native;"
+	 "Lgpsplus/rtklib/SolutionOptions$Native;"
 	 ")Z"
 	 , (void*)RtkServer__rtksvrstart},
    {"_stop", "([Ljava/lang/String;)V", (void*)RtkServer__stop},
-   {"_getStreamStatus", "(Lru0xdc/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status},
-   {"_readSolutionBuffer", "(Lru0xdc/rtklib/Solution$SolutionBuffer;)V", (void*)RtkServer__read_solution_buffer},
-   {"_getRtkStatus", "(Lru0xdc/rtklib/RtkControlResult;)V", (void*)RtkServer__get_rtk_status},
-   {"_getObservationStatus", "(ILru0xdc/rtklib/RtkServerObservationStatus$Native;)V", (void*)RtkServer__get_observation_status},
+   {"_getStreamStatus", "(Lgpsplus/rtklib/RtkServerStreamStatus;)V", (void*)RtkServer__get_stream_status},
+   {"_readSolutionBuffer", "(Lgpsplus/rtklib/Solution$SolutionBuffer;)V", (void*)RtkServer__read_solution_buffer},
+   {"_getRtkStatus", "(Lgpsplus/rtklib/RtkControlResult;)V", (void*)RtkServer__get_rtk_status},
+   {"_getObservationStatus", "(ILgpsplus/rtklib/RtkServerObservationStatus$Native;)V", (void*)RtkServer__get_observation_status},
    {"_writeCommands", "([Ljava/lang/String;)V", (void*)RtkServer__write_commands}
 };
 
 static int init_observation_status_fields(JNIEnv* env) {
-    jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServerObservationStatus$Native");
+    jclass clazz = (*env)->FindClass(env, "gpsplus/rtklib/RtkServerObservationStatus$Native");
 
     if (clazz == NULL)
        return JNI_FALSE;
 
     obs_status_fields.ns = (*env)->GetFieldID(env, clazz, "ns", "I");
-    obs_status_fields.time = (*env)->GetFieldID(env, clazz, "time", "Lru0xdc/rtklib/GTime;");
+    obs_status_fields.time = (*env)->GetFieldID(env, clazz, "time", "Lgpsplus/rtklib/GTime;");
     obs_status_fields.sat = (*env)->GetFieldID(env, clazz, "sat", "[I");
     obs_status_fields.az = (*env)->GetFieldID(env, clazz, "az", "[D");
     obs_status_fields.el = (*env)->GetFieldID(env, clazz, "el", "[D");
@@ -716,7 +716,7 @@ static int init_observation_status_fields(JNIEnv* env) {
 	  || (obs_status_fields.freq2_snr == NULL)
 	  || (obs_status_fields.freq3_snr == NULL)
 	  || (obs_status_fields.vsat == NULL)) {
-       LOGV("ru0xdc/rtklib/RtkServerObservationStatus fields not found:%s%s%s%s%s%s%s%s%s",
+       LOGV("gpsplus/rtklib/RtkServerObservationStatus fields not found:%s%s%s%s%s%s%s%s%s",
 	     (obs_status_fields.ns == NULL ? " ns" : ""),
 	     (obs_status_fields.time == NULL ? " time" : ""),
 	     (obs_status_fields.sat == NULL ? " sat" : ""),
@@ -735,7 +735,7 @@ static int init_observation_status_fields(JNIEnv* env) {
 
 int registerRtkServerNatives(JNIEnv* env) {
     /* look up the class */
-    jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkServer");
+    jclass clazz = (*env)->FindClass(env, "gpsplus/rtklib/RtkServer");
 
     if (clazz == NULL)
        return JNI_FALSE;

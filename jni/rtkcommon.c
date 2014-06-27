@@ -128,7 +128,7 @@ static jdouble RtkCommon_norm(JNIEnv* env, jclass clazz, jdoubleArray j_a)
 
 static JNINativeMethod nativeMethods[] = {
    {"getSatId", "(I)Ljava/lang/String;", (void*)RtkCommon_get_sat_id},
-   {"dops", "([DIDLru0xdc/rtklib/RtkCommon$Dops;)V", (void*)RtkCommon_dops},
+   {"dops", "([DIDLgpsplus/rtklib/RtkCommon$Dops;)V", (void*)RtkCommon_dops},
    {"geoidh", "(DD)D", (void*)RtkCommon_geoidh},
    {"_deg2dms", "(D[D)V", (void*)RtkCommon__deg2dms},
    {"norm", "([D)D", (void*)RtkCommon_norm},
@@ -142,7 +142,7 @@ int registerRtkCommonNatives(JNIEnv* env) {
     int result = -1;
 
     /* look up the class */
-    jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkCommon");
+    jclass clazz = (*env)->FindClass(env, "gpsplus/rtklib/RtkCommon");
 
     if (clazz == NULL)
        return JNI_FALSE;

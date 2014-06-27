@@ -34,7 +34,7 @@
         	    	android:gravity="center"
         	    	android:layout_weight="1" />
         	
-        		<view class="ru0xdc.rtkgps.view.SolutionView$SolutionIndicatorView"
+        		<view class="gpsplus.rtkgps.view.SolutionView$SolutionIndicatorView"
         	    	android:id="@+id/solution_indicator_view"
         	    	android:layout_width="wrap_content"
         	    	android:layout_height="wrap_content"

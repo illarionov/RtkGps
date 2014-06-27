@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru0xdc.rtkgps"
+    package="gpsplus.rtkgps"
     android:versionCode="1"
     android:versionName="1.0 alpha3" >
 
@@ -38,7 +38,7 @@
         android:name="RtkGps"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name="gpsplus.rtkgps.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.ActionBarOverlay"
             android:launchMode="singleTop" >
@@ -59,7 +59,7 @@
         <activity
             android:name=".settings.StreamSettingsActivity"
             android:label="@string/title_activity_input_stream_settings"
-            android:parentActivityName="ru0xdc.rtkgps.MainActivity" >
+            android:parentActivityName="gpsplus.rtkgps.MainActivity" >
         </activity>
         
         <activity
@@ -74,7 +74,7 @@
             android:name=".settings.StationPositionActivity"
             android:theme="@android:style/Theme.Holo.Dialog" />
         
-		<activity android:name=".AboutActivity"
+		<activity android:name="gpsplus.rtkgps.AboutActivity"
 		    android:label="@string/about_activity_label"
 		     />
         
@@ -82,8 +82,8 @@
             android:name=".RtkNaviService"
             android:exported="false" >
 			<intent-filter>
-			    <action android:name="ru0xdc.rtkgps.RtkNaviService.START" />
-                <action android:name="ru0xdc.rtkgps.RtkNaviService.STOP" />
+			    <action android:name="gpsplus.rtkgps.RtkNaviService.START" />
+                <action android:name="gpsplus.rtkgps.RtkNaviService.STOP" />
 			</intent-filter>	
 		</service>
 		
