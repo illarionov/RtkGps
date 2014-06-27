@@ -87,11 +87,6 @@
 			</intent-filter>	
 		</service>
 		
-		<service
-            android:name=".RtkGpsMockLocationService"
-            android:exported="false">
-		</service>
-		
 		<meta-data
 		    android:name="BING_KEY"
 		    android:value=" Anw2XC78AChKH-ji_aSpKg0hdF1XzkOnBCCOSwOwVnrVr8elrdvfNupIfeB_aKbb " />
