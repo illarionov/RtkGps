@@ -33,7 +33,8 @@ RTKLIB rtknavi port on android.
 * Bluetooth or USB OTG GPS receiver supported by rtklib
 
 
-### Download
+### Download original version from Alexey Illarionov
+    for testing mine (yet) you need to compile it yourself.
 
 ![qr][qr]
 
