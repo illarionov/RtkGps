@@ -94,7 +94,7 @@
     <string name="pmode_static">Static</string>
     <string name="pmode_moveb">Moving — base</string>
     <string name="pmode_fixed">Fixed</string>
-    <string name="pmode_ppp_kinema">PPP — Kinemaric</string>
+    <string name="pmode_ppp_kinema">PPP — Kinematic</string>
     <string name="pmode_ppp_static">PPP — Static</string>
     <string name="pmode_ppp_fixed">PPP — Fixed</string>
 
