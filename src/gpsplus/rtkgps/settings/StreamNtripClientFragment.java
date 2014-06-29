@@ -1,9 +1,4 @@
 package gpsplus.rtkgps.settings;
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,8 +6,12 @@ import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.RtkServerSettings.TransportSettings;
 import gpsplus.rtklib.constants.StreamType;
+
+import javax.annotation.Nonnull;
 
 
 public class StreamNtripClientFragment extends PreferenceFragment {
@@ -36,11 +35,11 @@ public class StreamNtripClientFragment extends PreferenceFragment {
         private @Nonnull String user;
         private @Nonnull String password;
 
-        public static final String DEFAULT_HOST = "gps.0xdc.ru";
+        public static final String DEFAULT_HOST = "rt.igs.net";
         public static final int DEFULT_PORT = 2101;
-        public static final String DEFAULT_MOUNTPOUNT = "gag27-rtcm";
-        public static final String DEFAULT_USER = "osm";
-        public static final String DEFAULT_PASSWORD = "osm";
+        public static final String DEFAULT_MOUNTPOUNT = "BRST0";
+        public static final String DEFAULT_USER = "request-user";
+        public static final String DEFAULT_PASSWORD = "password";
 
         public Value() {
             host = DEFAULT_HOST;
