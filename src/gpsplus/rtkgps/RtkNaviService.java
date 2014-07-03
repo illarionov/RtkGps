@@ -186,10 +186,11 @@ public class RtkNaviService extends IntentService implements LocationListener
                     }
                     locationManager.setTestProviderEnabled(GPS_PROVIDER, true);
                     locationManager.requestLocationUpdates(GPS_PROVIDER, 0, 0, this);
-                    mBoolIsRunning = true;
+
                     Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock Location service was started");
                 }
         }
+        mBoolIsRunning = true;
     }
 
 
@@ -414,25 +415,28 @@ public class RtkNaviService extends IntentService implements LocationListener
 
         while (mBoolIsRunning){
 
-            if (mBoolMockLocationsPref)
+
             {
                 try {
-                    RtkControlResult result = getRtkStatus(null);
-                    Solution solution = result.getSolution();
-                    Position3d positionECEF = solution.getPosition();
-                    if (RtkCommon.norm(positionECEF.getValues()) > 0.0)
+                    if (mBoolMockLocationsPref)
                     {
+                        RtkControlResult result = getRtkStatus(null);
+                        Solution solution = result.getSolution();
+                        Position3d positionECEF = solution.getPosition();
+                        if (RtkCommon.norm(positionECEF.getValues()) > 0.0)
+                        {
 
-                        Position3d positionLatLon = RtkCommon.ecef2pos(positionECEF);
-                        Location currentLocation = createLocation(Math.toDegrees(positionLatLon.getLat()), Math.toDegrees(positionLatLon.getLon()),positionLatLon.getHeight(), 1f);
+                            Position3d positionLatLon = RtkCommon.ecef2pos(positionECEF);
+                            Location currentLocation = createLocation(Math.toDegrees(positionLatLon.getLat()), Math.toDegrees(positionLatLon.getLon()),positionLatLon.getHeight(), 1f);
 
-                        if (mBoolLocationServiceIsConnected || true)
-                            {
-                             // provide the new location
-                             //   Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location is "+currentLocation.getLatitude()+" "+currentLocation.getLongitude());
-                                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                                locationManager.setTestProviderLocation(GPS_PROVIDER, currentLocation);
-                            }
+                            if (mBoolLocationServiceIsConnected || true)
+                                {
+                                 // provide the new location
+                                 //   Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location is "+currentLocation.getLatitude()+" "+currentLocation.getLongitude());
+                                    LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                                    locationManager.setTestProviderLocation(GPS_PROVIDER, currentLocation);
+                                }
+                        }
                         Thread.sleep(2500);
                     }
 
