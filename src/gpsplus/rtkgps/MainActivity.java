@@ -24,6 +24,9 @@ import android.widget.Switch;
 
 import butterknife.InjectView;
 import butterknife.Views;
+
+import com.dropbox.sync.android.DbxAccountManager;
+
 import gpsplus.rtkgps.settings.ProcessingOptions1Fragment;
 import gpsplus.rtkgps.settings.SettingsActivity;
 import gpsplus.rtkgps.settings.SettingsHelper;
@@ -37,6 +40,7 @@ import javax.annotation.Nonnull;
 public class MainActivity extends Activity {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
+    public static final int REQUEST_LINK_TO_DBX = 2654;
     static final String TAG = MainActivity.class.getSimpleName();
 
     /**
@@ -44,6 +48,9 @@ public class MainActivity extends Activity {
      * current dropdown position.
      */
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
+    public static final String APP_KEY = "6ffqsgh47v9y5dc";
+    public static final String APP_SECRET = "hfmsbkv4ktyl60h";
+    private DbxAccountManager mDbxAcctMgr;
 
     RtkNaviService mRtkService;
     boolean mRtkServiceBound = false;
@@ -60,6 +67,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), APP_KEY, APP_SECRET);
+
         setContentView(R.layout.activity_main);
 
         Views.inject(this);
@@ -155,6 +165,10 @@ public class MainActivity extends Activity {
         boolean serviceActive = mNavDrawerServerSwitch.isChecked();
         menu.findItem(R.id.menu_start_service).setVisible(!serviceActive);
         menu.findItem(R.id.menu_stop_service).setVisible(serviceActive);
+        if (mDbxAcctMgr.hasLinkedAccount())
+        {
+            menu.findItem(R.id.menu_dropbox).setVisible(false);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -171,6 +185,9 @@ public class MainActivity extends Activity {
             break;
         case R.id.menu_stop_service:
             mNavDrawerServerSwitch.setChecked(false);
+            break;
+        case R.id.menu_dropbox:
+            mDbxAcctMgr.startLink(this, REQUEST_LINK_TO_DBX);
             break;
         case R.id.menu_settings:
             mDrawerLayout.openDrawer(mNavDrawer);
@@ -378,5 +395,17 @@ public class MainActivity extends Activity {
     @Nonnull
     public static File getLocalSocketPath(Context ctx, String socketName) {
         return ctx.getFileStreamPath(socketName);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_LINK_TO_DBX) {
+            if (resultCode == Activity.RESULT_OK) {
+                // ... Start using Dropbox files.
+            } else {
+                // ... Link failed or was cancelled by the user.
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

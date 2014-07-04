@@ -13,11 +13,11 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.text.TextUtils;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.SolutionOptions;
 import gpsplus.rtklib.constants.GeoidModel;
 import gpsplus.rtklib.constants.TimeSystem;
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
 
 public class SolutionOutputSettingsFragment extends PreferenceFragment {
 
@@ -50,6 +50,7 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
     private ListPreference mOutputSolutionStatusPref;
     private ListPreference mDebugTracePref;
 
+
     private SolutionOptions mSolutionOptions;
 
     @Override
@@ -75,7 +76,8 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
         final SolutionOptions opts;
         final SharedPreferences prefs;
         String v;
-
+        mSzEllipsoidal = ctx.getResources().getStringArray(R.array.solopt_height_entries)[0];
+        mSzGeodetic = ctx.getResources().getStringArray(R.array.solopt_height_entries)[1];
 
         opts = new SolutionOptions();
         prefs = ctx.getSharedPreferences(SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
@@ -119,10 +121,11 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
         try {
             v = prefs.getString(KEY_HEIGHT, null);
             if (v != null) {
-                if (!"Ellipsoidal".equals(v) && !"Geodetic".equals(v)) {
+
+                if (!mSzEllipsoidal.equals(v) && !mSzGeodetic.equals(v)) {
                     throw new IllegalArgumentException("Wrong height");
                 }
-                opts.setIsEllipsoidalHeight("Ellipsoidal".equals(v));
+                opts.setIsEllipsoidalHeight(mSzEllipsoidal.equals(v));
             }
         }catch(IllegalArgumentException iae) {
             iae.printStackTrace();
@@ -209,7 +212,7 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
         mFieldSeparatorPref.setOnPreferenceChangeListener(mOnPreferenceChangeListener);
 
         mHeightPref = (ListPreference)findPreference(KEY_HEIGHT);
-        mHeightPref.setValue(mSolutionOptions.isEllipsoidalHeight() ? "Ellipsoidal" : "Geodetic");
+        mHeightPref.setValue(mSolutionOptions.isEllipsoidalHeight() ? mSzEllipsoidal : mSzGeodetic);
         mHeightPref.setOnPreferenceChangeListener(mOnPreferenceChangeListener);
 
         mGeoidModelPref = (ListPreference)findPreference(KEY_GEOID_MODEL);
@@ -301,5 +304,7 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
             return true;
         }
     };
+    private static String mSzEllipsoidal;
+    private static String mSzGeodetic;
 
 }

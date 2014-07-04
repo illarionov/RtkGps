@@ -1,10 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,20 +9,24 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.widget.SolutionFormatPreference;
 import gpsplus.rtkgps.settings.widget.StreamTypePreference;
-import gpsplus.rtklib.SolutionOptions;
 import gpsplus.rtklib.RtkServerSettings.OutputStream;
+import gpsplus.rtklib.SolutionOptions;
 import gpsplus.rtklib.constants.SolutionFormat;
 import gpsplus.rtklib.constants.StreamFormat;
 import gpsplus.rtklib.constants.StreamType;
+
+import javax.annotation.Nonnull;
 
 
 public class OutputSolution1Fragment extends PreferenceFragment {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
-    static final String SHARED_PREFS_NAME = "OutputSolution1";
+    public static final String SHARED_PREFS_NAME = "OutputSolution1";
 
     protected static final String KEY_ENABLE = "enable";
     protected static final String KEY_TYPE = "type";

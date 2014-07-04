@@ -21,10 +21,23 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.dropbox.sync.android.DbxAccountManager;
+import com.dropbox.sync.android.DbxException;
+import com.dropbox.sync.android.DbxException.Unauthorized;
+import com.dropbox.sync.android.DbxFile;
+import com.dropbox.sync.android.DbxFileSystem;
+import com.dropbox.sync.android.DbxPath;
+import com.dropbox.sync.android.DbxPath.InvalidPathException;
+
+import gpsplus.rtkgps.settings.LogBaseFragment;
+import gpsplus.rtkgps.settings.LogRoverFragment;
+import gpsplus.rtkgps.settings.OutputSolution1Fragment;
+import gpsplus.rtkgps.settings.OutputSolution2Fragment;
 import gpsplus.rtkgps.settings.SettingsHelper;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtkgps.settings.StreamBluetoothFragment;
 import gpsplus.rtkgps.settings.StreamBluetoothFragment.Value;
+import gpsplus.rtkgps.settings.StreamFileClientFragment;
 import gpsplus.rtkgps.settings.StreamUsbFragment;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
@@ -37,7 +50,13 @@ import gpsplus.rtklib.RtkServerStreamStatus;
 import gpsplus.rtklib.Solution;
 import gpsplus.rtklib.constants.StreamType;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class RtkNaviService extends IntentService implements LocationListener
   {
@@ -70,6 +89,7 @@ public class RtkNaviService extends IntentService implements LocationListener
     private boolean mBoolLocationServiceIsConnected = false;
     private boolean mBoolMockLocationsPref = false;
     private Location mLocationPrec = null;
+    private long mLStartingTime = 0;
 
     @Override
     public void onCreate() {
@@ -154,6 +174,7 @@ public class RtkNaviService extends IntentService implements LocationListener
         settings = SettingsHelper.loadSettings(this);
         mRtkServer.setServerSettings(settings);
 
+        mLStartingTime = System.currentTimeMillis();
         if (!mRtkServer.start()) {
             Log.e(TAG, "rtkSrvStart() error");
             return;
@@ -203,7 +224,91 @@ public class RtkNaviService extends IntentService implements LocationListener
                   lm.removeTestProvider(GPS_PROVIDER);
         }
         stop();
+        syncDropbox();
         stopSelf();
+    }
+
+    private void syncDropbox()
+    {
+        DbxAccountManager mDbxAcctMgr;
+        mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), MainActivity.APP_KEY, MainActivity.APP_SECRET);
+        if (mDbxAcctMgr.hasLinkedAccount())
+        {
+            ArrayList<String> alDropboxed = new ArrayList<String>();
+            if ( mRtkServer.getServerSettings().getLogRover().getType() == StreamType.FILE)
+                {
+                SharedPreferences prefs= this.getBaseContext().getSharedPreferences(LogRoverFragment.SHARED_PREFS_NAME, 0);
+                if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false))
+                    {
+                        alDropboxed.add(mRtkServer.getServerSettings().getLogRover().getPath());
+                    }
+                }
+            if ( mRtkServer.getServerSettings().getLogBase().getType() == StreamType.FILE)
+            {
+            SharedPreferences prefs= this.getBaseContext().getSharedPreferences(LogBaseFragment.SHARED_PREFS_NAME, 0);
+            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false))
+                {
+                    alDropboxed.add(mRtkServer.getServerSettings().getLogBase().getPath());
+                }
+            }
+            if ( mRtkServer.getServerSettings().getOutputSolution1().getType() == StreamType.FILE)
+            {
+            SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputSolution1Fragment.SHARED_PREFS_NAME, 0);
+            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false))
+                {
+                    alDropboxed.add(mRtkServer.getServerSettings().getOutputSolution1().getPath());
+                }
+            }
+            if ( mRtkServer.getServerSettings().getOutputSolution2().getType() == StreamType.FILE)
+            {
+            SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputSolution2Fragment.SHARED_PREFS_NAME, 0);
+            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false))
+                {
+                    alDropboxed.add(mRtkServer.getServerSettings().getOutputSolution2().getPath());
+                }
+            }
+
+             for(int i=0;i<alDropboxed.size();i++)
+             {
+                 String szCurrentPath = alDropboxed.get(i);
+
+                            if (!szCurrentPath.contains("%Y") && !szCurrentPath.contains("%m")
+                                    && !szCurrentPath.contains("%d")
+                                    && !szCurrentPath.contains("%h")
+                                    && !szCurrentPath.contains("%M")
+                                    && !szCurrentPath.contains("%S"))
+                            {
+                                SimpleDateFormat sdtFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                                sdtFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+                                Date dt = new Date(mLStartingTime);
+                                String szDate = sdtFormat.format(dt);
+                                DbxFileSystem dbxFs;
+                                try {
+                                    dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
+                                    File f = new File(szCurrentPath);
+                                    int dotposition= f.getName().lastIndexOf(".");
+                                    String remoteFileName = f.getName().substring(0, dotposition)+"-"+szDate+"."+f.getName().substring(dotposition + 1, f.getName().length());
+                                    DbxFile remoteFile = dbxFs.create(new DbxPath(remoteFileName));
+                                    remoteFile.writeFromExistingFile(f, false);
+                                    remoteFile.close();
+                                } catch (Unauthorized e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                } catch (InvalidPathException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                } catch (DbxException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+
+                                Log.i(TAG, "Sync to dropbox: "+szCurrentPath);
+                            }
+             }
+        }
     }
 
     private void stop() {

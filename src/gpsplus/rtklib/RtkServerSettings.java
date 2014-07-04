@@ -2,8 +2,6 @@ package gpsplus.rtklib;
 
 import static junit.framework.Assert.assertNotNull;
 
-import javax.annotation.Nonnull;
-
 import android.text.TextUtils;
 
 import gpsplus.rtklib.RtkCommon.Position3d;
@@ -12,6 +10,8 @@ import gpsplus.rtklib.constants.SolutionFormat;
 import gpsplus.rtklib.constants.StationPositionType;
 import gpsplus.rtklib.constants.StreamFormat;
 import gpsplus.rtklib.constants.StreamType;
+
+import javax.annotation.Nonnull;
 
 public class RtkServerSettings {
 
@@ -256,9 +256,11 @@ public class RtkServerSettings {
         public String getPath();
 
         public TransportSettings copy();
+
     }
 
     public final static TransportSettings TRANSPORT_DUMMY = new TransportSettings() {
+
         @Override
         public StreamType getType() {
             return StreamType.NONE;

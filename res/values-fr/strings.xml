@@ -14,6 +14,7 @@
   <string name="menu_settings">Paramètres</string>
   <string name="menu_start_service">Démarrage du service</string>
   <string name="menu_stop_service">Arrêter le service</string>
+  <string name="menu_dropbox">Dropbox</string>
   <string name="menu_select_solution_format">Sélectionnez le format de la solution</string>
   <string name="menu_select_gtime_format">Sélectionnez le format de l\'heure</string>
   <string name="menu_about">À propos</string>
@@ -79,7 +80,7 @@
     <item>Lacet :</item>
     <item>Longueur :</item>
   </string-array>
-  <string name="pmode_single">Single</string>
+  <string name="pmode_single">Simple</string>
   <string name="pmode_dgps">DGPS/DGNSS</string>
   <string name="pmode_kinema">Cinématique</string>
   <string name="pmode_static">Statique</string>
@@ -145,7 +146,7 @@
   <string name="str_bluetooth">Bluetooth</string>
   <string name="str_usb">USB</string>
   <string name="ionoopt_off">Off</string>
-  <string name="ionoopt_brdc">Broadcast model</string>
+  <string name="ionoopt_brdc">Modèle radiodiffusé</string>
   <string name="ionoopt_sbas">Modèle SBAS</string>
   <string name="ionoopt_iflc">L1/L2 ou L1/L5 iono-free LC</string>
   <string name="ionoopt_est">Estimation STEC</string>
@@ -239,8 +240,8 @@
   <string name="procopt_sat_antenna_pcv_summary">Utiliser la variation du centre de phase de l\'antenne satellite</string>
   <string name="procopt_receiver_antenna_pcv_title">PCV récepteur</string>
   <string name="procopt_receiver_antenna_pcv_summary">Utiliser la variation du centre de phase de l\'antenne du récepteur</string>
-  <string name="procopt_phase_windup_correction_title">Phase windup correction</string>
-  <string name="procopt_phase_windup_correction_summary">Apply phase windup correction</string>
+  <string name="procopt_phase_windup_correction_title">Correction de l\'effet wind-up</string>
+  <string name="procopt_phase_windup_correction_summary">Appliquer la correction de phase wind-up (rotation du satellite sur sa trajectoire décalant ainsi son centre de phase)</string>
   <string name="procopt_exclude_eclipsing_sat_measurements_title">Ignorer les satellites disparaissant</string>
   <string name="procopt_exclude_eclipsing_sat_measurements_summary">Exclure les mesures provenant de satellites disparaissants</string>
   <string name="procopt_raim_fde_title">RAIM FDE</string>
@@ -328,15 +329,15 @@
   <string-array name="input_streams_settings_transmit_gpgga_entries">
     <item>OFF</item>
     <item>Latitude/Longitude</item>
-    <item>Single solution</item>
+    <item>Solution simple</item>
   </string-array>
   <string-array name="input_streams_settings_transmit_gpgga_vaues">
     <item>0</item>
     <item>1</item>
     <item>2</item>
   </string-array>
-  <string name="output_streams_settings_enable_solution1_title">Enable Solution 1</string>
-  <string name="output_streams_settings_enable_solution2_title">Enable Solution 2</string>
+  <string name="output_streams_settings_enable_solution1_title">Activez la Solution 1</string>
+  <string name="output_streams_settings_enable_solution2_title">Activez la Solution 2</string>
   <string name="output_streams_settings_solution1_tab_title">Solution 1</string>
   <string name="output_streams_settings_solution2_tab_title">Solution 2</string>
   <string name="log_streams_settings_enable_rover_title">Log mobile</string>
@@ -352,6 +353,9 @@
   <string name="ntrip_client_user_title">Utilisateur NTRIP</string>
   <string name="ntrip_client_password_title">Mot de passe NTRIP</string>
   <string name="file_filename_title">Nom de fichier</string>
+  <string name="file_filename_summary">peut contenir %Y (année) %m (mois) %d (jour) %h (heure) %M (minutes) %S (secondes) pour générer un nom dynamique</string>
+  <string name="file_syncdropbox_title">Synchronisation vers Dropbox</string>
+  <string name="file_syncdropbox_summary">A besoin d\'un nom de fichier réel (c\'est à dire: ne contenant ne pas de %Y %m...), le fichier sur Dropbox est renommé selon la date de démarrage.</string>
   <string name="tcp_client_dialog_title">Paramètres client TCP</string>
   <string name="tcp_client_host_title">Hôte</string>
   <string name="tcp_client_port_title">Port</string>
@@ -416,13 +420,13 @@
   <string name="send_commands_at_shutdown">Envoyer des commandes à l\'arrêt</string>
   <string name="commands_at_startup">Commandes au démarrage</string>
   <string name="commands_at_shutdown">Commandes à l\'arrêt</string>
-  <string name="load_startup_shutdown_commands">Load</string>
+  <string name="load_startup_shutdown_commands">Charger</string>
   <string name="load_startup_shutdown_dialog_title">Sélectionnez le fichier</string>
   <string name="station_position_format_llh">Lat/Lon/hauteur (deg/m)</string>
   <string name="station_position_format_llh_dms">Lat/Lon/hauteur (dms/m)</string>
   <string name="station_position_format_ecef">X/Y/Z — ECEF</string>
-  <string name="station_position_for_fixed_mode">For fixed mode</string>
-  <string name="station_position_for_relative_mode">For relative mode</string>
+  <string name="station_position_for_fixed_mode">Pour le mode fixe</string>
+  <string name="station_position_for_relative_mode">Pour le mode relatif</string>
   <string name="status_view_snr">SNR Mobile/Base</string>
   <string name="status_view_snr_l1">SNR Mobile/Base L1</string>
   <string name="status_view_snr_l2">SNR Mobile/Base L2</string>

@@ -1,17 +1,16 @@
 package gpsplus.rtkgps.settings;
 
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 
-import gpsplus.rtklib.SolutionOptions;
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.RtkServerSettings.OutputStream;
+import gpsplus.rtklib.SolutionOptions;
+
+import javax.annotation.Nonnull;
 
 public class OutputSolution2Fragment extends OutputSolution1Fragment {
 
-    static final String SHARED_PREFS_NAME = "OutputSolution2";
+    public static final String SHARED_PREFS_NAME = "OutputSolution2";
 
     private static final SettingsHelper.OutputStreamDefaults DEFAULTS = new SettingsHelper.OutputStreamDefaults();
 

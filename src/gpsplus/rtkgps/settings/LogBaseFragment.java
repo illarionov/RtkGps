@@ -1,17 +1,16 @@
 package gpsplus.rtkgps.settings;
 
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.RtkServerSettings.LogStream;
+
+import javax.annotation.Nonnull;
 
 
 public class LogBaseFragment extends LogRoverFragment {
 
-    static final String SHARED_PREFS_NAME = "LogBase";
+    public static final String SHARED_PREFS_NAME = "LogBase";
 
     private static final SettingsHelper.LogStreamDefaults DEFAULTS = new SettingsHelper.LogStreamDefaults();
 

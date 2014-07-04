@@ -14,6 +14,7 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_start_service">Start service</string>
     <string name="menu_stop_service">Stop service</string>
+    <string name="menu_dropbox">Dropbox</string>
     <string name="menu_select_solution_format">Select solution format</string>
     <string name="menu_select_gtime_format">Select time format</string>
     <string name="menu_about">About</string>
@@ -436,6 +437,7 @@
     <string name="output_streams_settings_enable_solution2_title">Enable Solution 2</string>
     <string name="output_streams_settings_solution1_tab_title">Solution 1</string>
     <string name="output_streams_settings_solution2_tab_title">Solution 2</string>
+
     
     <!-- Log stream settings -->
     <string name="log_streams_settings_enable_rover_title">Log rover</string>
@@ -453,6 +455,9 @@
     <string name="ntrip_client_user_title">NTRIP user</string>
     <string name="ntrip_client_password_title">NTRIP password</string>
     <string name="file_filename_title">Filename</string>
+    <string name="file_filename_summary">can included %Y (year) %m (month) %d (day) %h (hour) %M (minutes) %S (seconds) for dynamic naming</string>
+    <string name="file_syncdropbox_title">Sync to Dropbox</string>
+    <string name="file_syncdropbox_summary">Needs an absolute file names (ie: not containing %Y %m …), the file on Dropbox will be renamed according to the starting date</string>
     
     <!-- TCP client stream preferences -->
 	<string name="tcp_client_dialog_title">TCP client settings</string>

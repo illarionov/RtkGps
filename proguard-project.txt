@@ -60,3 +60,7 @@
 -keep public class org.acra.ErrorReporter {
     public void handleSilentException(java.lang.Throwable);
 }
+
+#dropbox
+-keep class com.dropbox.** {*;}
+-dontwarn com.dropbox.ledger**

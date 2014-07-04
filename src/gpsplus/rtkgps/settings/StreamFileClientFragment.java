@@ -1,12 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import java.io.File;
-
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,15 +7,24 @@ import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+import com.dropbox.sync.android.DbxAccountManager;
+
+import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.MainActivity;
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.RtkServerSettings.TransportSettings;
 import gpsplus.rtklib.constants.StreamType;
+
+import java.io.File;
+
+import javax.annotation.Nonnull;
 
 public class StreamFileClientFragment extends PreferenceFragment {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
     private static final String KEY_FILENAME = "stream_file_filename";
+    public static final String KEY_SYNCDROPBOX = "syncdropbox";
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
@@ -116,16 +118,29 @@ public class StreamFileClientFragment extends PreferenceFragment {
 
     void reloadSummaries() {
         EditTextPreference etp;
-
         etp = (EditTextPreference) findPreference(KEY_FILENAME);
-        etp.setSummary(etp.getText());
+        etp.setSummary(etp.getText()+"\n"+getResources().getString(R.string.file_filename_summary));
 
     }
 
     private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
+        private static final int REQUEST_LINK_TO_DBX = 0;
+
         @Override
         public void onSharedPreferenceChanged(
                 SharedPreferences sharedPreferences, String key) {
+            if (key.equals(KEY_SYNCDROPBOX))
+            {
+                if (sharedPreferences.getBoolean(KEY_SYNCDROPBOX, false))
+                {
+                    DbxAccountManager mDbxAcctMgr;
+                    mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), MainActivity.APP_KEY, MainActivity.APP_SECRET);
+                    if (!mDbxAcctMgr.hasLinkedAccount())
+                    {
+                        mDbxAcctMgr.startLink(getActivity(), MainActivity.REQUEST_LINK_TO_DBX);
+                    }
+                }
+            }
             reloadSummaries();
         }
     };
@@ -140,6 +155,11 @@ public class StreamFileClientFragment extends PreferenceFragment {
 
         if (filename.length() != 0) v.setFilename(filename);
         return v;
+    }
+
+    public Context getApplicationContext() {
+        // return application context
+        return this.getActivity().getApplicationContext();
     }
 
     public static String readSummary(SharedPreferences prefs) {

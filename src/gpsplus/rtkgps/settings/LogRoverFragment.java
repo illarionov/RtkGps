@@ -1,10 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,16 +9,20 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.widget.StreamTypePreference;
 import gpsplus.rtklib.RtkServerSettings.LogStream;
 import gpsplus.rtklib.constants.StreamType;
+
+import javax.annotation.Nonnull;
 
 
 public class LogRoverFragment extends PreferenceFragment {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
-    static final String SHARED_PREFS_NAME = "LogRover";
+    public static final String SHARED_PREFS_NAME = "LogRover";
 
     static final String KEY_ENABLE = "enable";
     static final String KEY_TYPE = "type";
