@@ -124,7 +124,6 @@ public class StreamFileClientFragment extends PreferenceFragment {
     }
 
     private class PreferenceChangeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
-        private static final int REQUEST_LINK_TO_DBX = 0;
 
         @Override
         public void onSharedPreferenceChanged(
