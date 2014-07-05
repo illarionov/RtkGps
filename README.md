@@ -8,6 +8,7 @@ RTKLIB rtknavi port on android.
 
 #### [rtklib][rtklib] features:
 
+* Version 2.4.2p7
 * GPS, GLONASS, Galileo, QZSS, BeiDou and SBAS Navigation systems
 * Single, DGPS/DGNSS, Kinematic, Static, Moving-Baseline, Fixed,
   PPP-Kinematic, PPP-Static and PPP-Fixed positioning modes.
@@ -24,13 +25,20 @@ RTKLIB rtknavi port on android.
 
 #### Android features:
 
-* Bluetooth and USB OTG communication
+* Bluetooth communication
+* USB OTG communication with speed/parity/stop configuration
 * SiRF IV protocol (experimental)
+* Show altitude in status view if Height/Geodetic is choosen
+* Send mock location to other applications if the checkbox is ticked in the solution option screen. (Not working yet with apps using Google Maps api)
+* Upload Log/Solution to Dropbox if Sync to Dropbox is ticked in the FileSettings screen. (the sync occurs after the stop of the server)
+* English and French interface
 
 ### Requirements
 
 * android > 4.0
 * Bluetooth or USB OTG GPS receiver supported by rtklib
+* Allow mock locations in your device developer settings (optional but required for sending mock locations)
+* A Dropbox account for uploading log/solution. (you will be asked for authorizing this app by Dropbox)
 
 ###### Download original version from Alexey Illarionov.
 [original version](https://github.com/illarionov/RtkGps)
