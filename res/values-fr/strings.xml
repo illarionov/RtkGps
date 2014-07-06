@@ -319,8 +319,8 @@
   <string name="input_streams_settings_enable_rover_title">Mobile</string>
   <string name="input_streams_settings_enable_base_title">Base</string>
   <string name="input_streams_settings_enable_correction_title">Correction</string>
-  <string name="input_streams_settings_rover_tab_title">Input Rover</string>
-  <string name="input_streams_settings_base_tab_title">Input Base</string>
+  <string name="input_streams_settings_rover_tab_title">Entrée mobile</string>
+  <string name="input_streams_settings_base_tab_title">Entrée base</string>
   <string name="input_streams_settings_correction_tab_title">Flux de Correction</string>
   <string name="input_streams_settings_receiver_option_title">Options du récepteur</string>
   <string name="input_streams_settings_transmit_gpgga_to_base_title">Transmettre la position GPGGA à la Station de Base</string>
@@ -338,8 +338,10 @@
   </string-array>
   <string name="output_streams_settings_enable_solution1_title">Activez la Solution 1</string>
   <string name="output_streams_settings_enable_solution2_title">Activez la Solution 2</string>
+  <string name="output_streams_settings_enable_gpxtrace_title">Activer la trace GPX</string>
   <string name="output_streams_settings_solution1_tab_title">Solution 1</string>
   <string name="output_streams_settings_solution2_tab_title">Solution 2</string>
+  <string name="output_streams_settings_gpxtrace_tab_title">Trace GPX</string>
   <string name="log_streams_settings_enable_rover_title">Log mobile</string>
   <string name="log_streams_settings_enable_base_title">Log base </string>
   <string name="log_streams_settings_enable_correction_title">Log correction</string>

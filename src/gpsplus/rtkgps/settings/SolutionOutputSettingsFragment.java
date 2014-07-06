@@ -288,7 +288,7 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
             }else if (mFieldSeparatorPref.equals(preference)) {
                 mSolutionOptions.setFieldSeparator(newValue.toString());
             }else if (mHeightPref.equals(preference)) {
-                mSolutionOptions.setIsEllipsoidalHeight(TextUtils.equals((CharSequence)newValue, "Ellipsoidal"));
+                mSolutionOptions.setIsEllipsoidalHeight(TextUtils.equals((CharSequence)newValue, mSzEllipsoidal));
             }else if (mGeoidModelPref.equals(preference)) {
                 mSolutionOptions.setGeoidModel(GeoidModel.valueOf(newValue.toString()));
             }else if (mNmeaIntervalRmcPref.equals(preference)) {

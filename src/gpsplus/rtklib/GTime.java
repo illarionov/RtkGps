@@ -2,6 +2,10 @@ package gpsplus.rtklib;
 
 import proguard.annotation.Keep;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 public class GTime {
 
     /**
@@ -65,6 +69,14 @@ public class GTime {
     @Override
     public String toString() {
         return "time: " + time + " sec: " + sec;
+    }
+
+    public String getUtcXMLTime() {
+        SimpleDateFormat sdtFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        sdtFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Date dt = new Date(getUtcTimeMillis());
+        String szDate = sdtFormat.format(dt);
+        return szDate;
     }
 
 }

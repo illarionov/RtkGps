@@ -435,8 +435,10 @@
     <!-- Output stream settings -->
     <string name="output_streams_settings_enable_solution1_title">Enable Solution 1</string>
     <string name="output_streams_settings_enable_solution2_title">Enable Solution 2</string>
+    <string name="output_streams_settings_enable_gpxtrace_title">Enable GPX Trace</string>
     <string name="output_streams_settings_solution1_tab_title">Solution 1</string>
     <string name="output_streams_settings_solution2_tab_title">Solution 2</string>
+    <string name="output_streams_settings_gpxtrace_tab_title">GPX Trace</string>
 
     
     <!-- Log stream settings -->

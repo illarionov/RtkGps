@@ -11,15 +11,15 @@ import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
-import gpsplus.rtklib.RtkCommon;
-import gpsplus.rtklib.RtkControlResult;
-import gpsplus.rtklib.Solution;
-import gpsplus.rtklib.RtkCommon.Deg2Dms;
-import gpsplus.rtklib.RtkCommon.Position3d;
-import gpsplus.rtklib.constants.SolutionStatus;
 import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.R;
+import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
+import gpsplus.rtklib.RtkCommon;
+import gpsplus.rtklib.RtkCommon.Deg2Dms;
+import gpsplus.rtklib.RtkCommon.Position3d;
+import gpsplus.rtklib.RtkControlResult;
+import gpsplus.rtklib.Solution;
+import gpsplus.rtklib.constants.SolutionStatus;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -224,9 +224,10 @@ public class SolutionView extends TableLayout {
 
                 double dGeoidHeight = 0.0;
                 // Gets if solution height is geodetic or ellipsoidal
+                String mSzEllipsoidal = this.getContext().getResources().getStringArray(R.array.solopt_height_entries)[0];
                 SharedPreferences prefs= this.getContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
-                String strHeightPref = prefs.getString(SolutionOutputSettingsFragment.KEY_HEIGHT, "Ellipsoidal");
-                if (strHeightPref.equals("Ellipsoidal"))
+                String strHeightPref = prefs.getString(SolutionOutputSettingsFragment.KEY_HEIGHT, mSzEllipsoidal);
+                if (strHeightPref.equals(mSzEllipsoidal))
                 {
                     dGeoidHeight = 0.0;
                     mBoolIsGeodetic = false;
@@ -234,7 +235,7 @@ public class SolutionView extends TableLayout {
                 }else
                 {
                     mBoolIsGeodetic = true;
-                    mTextViewCoord4Name.setText("Altitude:");
+                    mTextViewCoord4Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[3]); //Altitude:
                     dGeoidHeight = RtkCommon.geoidh(roverPos.getLat(),roverPos.getLon());
                 }
                 strAltitude = String.format(Locale.US, "%.3fm el.", roverPos.getHeight()-dGeoidHeight);

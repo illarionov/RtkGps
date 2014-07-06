@@ -25,6 +25,7 @@ public class StreamFileClientFragment extends PreferenceFragment {
 
     private static final String KEY_FILENAME = "stream_file_filename";
     public static final String KEY_SYNCDROPBOX = "syncdropbox";
+    public static final String KEY_ENABLE = "enable";
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 

@@ -1,6 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import gpsplus.rtkgps.R;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
@@ -12,6 +11,8 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
+
+import gpsplus.rtkgps.R;
 
 public class StreamSettingsActivity extends Activity implements
 ActionBar.TabListener {
@@ -197,6 +198,9 @@ ActionBar.TabListener {
             case 1:
                 fragment = new OutputSolution2Fragment();
                 break;
+            case 2:
+                fragment = new OutputGPXTraceFragment();
+                break;
             default:
                 throw new IllegalStateException();
             }
@@ -206,7 +210,7 @@ ActionBar.TabListener {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -217,6 +221,8 @@ ActionBar.TabListener {
                 return mResources.getString(R.string.output_streams_settings_solution1_tab_title);
             case 1:
                 return mResources.getString(R.string.output_streams_settings_solution2_tab_title);
+            case 2:
+                return mResources.getString(R.string.output_streams_settings_gpxtrace_tab_title);
             }
             return null;
         }

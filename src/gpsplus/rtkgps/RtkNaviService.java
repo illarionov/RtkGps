@@ -31,6 +31,7 @@ import com.dropbox.sync.android.DbxPath.InvalidPathException;
 
 import gpsplus.rtkgps.settings.LogBaseFragment;
 import gpsplus.rtkgps.settings.LogRoverFragment;
+import gpsplus.rtkgps.settings.OutputGPXTraceFragment;
 import gpsplus.rtkgps.settings.OutputSolution1Fragment;
 import gpsplus.rtkgps.settings.OutputSolution2Fragment;
 import gpsplus.rtkgps.settings.SettingsHelper;
@@ -90,6 +91,8 @@ public class RtkNaviService extends IntentService implements LocationListener
     private boolean mBoolMockLocationsPref = false;
     private Location mLocationPrec = null;
     private long mLStartingTime = 0;
+    private boolean mBoolGenerateGPXTrace = false;
+    private GPXTrace mGpxTrace = null;
 
     @Override
     public void onCreate() {
@@ -190,6 +193,8 @@ public class RtkNaviService extends IntentService implements LocationListener
 
         SharedPreferences prefs= this.getBaseContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
         mBoolMockLocationsPref = prefs.getBoolean(SolutionOutputSettingsFragment.KEY_OUTPUT_MOCK_LOCATION, false);
+        prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
+        mBoolGenerateGPXTrace = prefs.getBoolean(OutputGPXTraceFragment.KEY_ENABLE, false);
         if (mBoolMockLocationsPref)
         {
                 if (Settings.Secure.getString(getContentResolver(),
@@ -224,8 +229,27 @@ public class RtkNaviService extends IntentService implements LocationListener
                   lm.removeTestProvider(GPS_PROVIDER);
         }
         stop();
+        finalizeGpxTrace();
         syncDropbox();
         stopSelf();
+    }
+
+    private void finalizeGpxTrace() {
+        if (mBoolGenerateGPXTrace)
+        {
+            SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
+            if(prefs.getBoolean(OutputGPXTraceFragment.KEY_SYNCDROPBOX, false))
+                {
+                    String szFilename = prefs.getString(OutputGPXTraceFragment.KEY_FILENAME, "");
+                    if (szFilename.length()>0)
+                    {
+                        String szPath = MainActivity.getFileStorageDirectory() + File.separator + szFilename;
+                        mGpxTrace.writeFile(szPath);
+                    }
+
+                }
+        }
+
     }
 
     private void syncDropbox()
@@ -238,7 +262,8 @@ public class RtkNaviService extends IntentService implements LocationListener
             if ( mRtkServer.getServerSettings().getLogRover().getType() == StreamType.FILE)
                 {
                 SharedPreferences prefs= this.getBaseContext().getSharedPreferences(LogRoverFragment.SHARED_PREFS_NAME, 0);
-                if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false))
+                if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
+                        && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
                     {
                         alDropboxed.add(mRtkServer.getServerSettings().getLogRover().getPath());
                     }
@@ -246,7 +271,8 @@ public class RtkNaviService extends IntentService implements LocationListener
             if ( mRtkServer.getServerSettings().getLogBase().getType() == StreamType.FILE)
             {
             SharedPreferences prefs= this.getBaseContext().getSharedPreferences(LogBaseFragment.SHARED_PREFS_NAME, 0);
-            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false))
+            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
+                    && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
                 {
                     alDropboxed.add(mRtkServer.getServerSettings().getLogBase().getPath());
                 }
@@ -254,7 +280,8 @@ public class RtkNaviService extends IntentService implements LocationListener
             if ( mRtkServer.getServerSettings().getOutputSolution1().getType() == StreamType.FILE)
             {
             SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputSolution1Fragment.SHARED_PREFS_NAME, 0);
-            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false))
+            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
+                    && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
                 {
                     alDropboxed.add(mRtkServer.getServerSettings().getOutputSolution1().getPath());
                 }
@@ -262,11 +289,24 @@ public class RtkNaviService extends IntentService implements LocationListener
             if ( mRtkServer.getServerSettings().getOutputSolution2().getType() == StreamType.FILE)
             {
             SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputSolution2Fragment.SHARED_PREFS_NAME, 0);
-            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false))
+            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
+                    && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
                 {
                     alDropboxed.add(mRtkServer.getServerSettings().getOutputSolution2().getPath());
                 }
             }
+            SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
+            if((prefs.getBoolean(OutputGPXTraceFragment.KEY_SYNCDROPBOX, false))
+                    && (prefs.getBoolean(OutputGPXTraceFragment.KEY_ENABLE, false)))
+                {
+                    String szFilename = prefs.getString(OutputGPXTraceFragment.KEY_FILENAME, "");
+                    if (szFilename.length()>0)
+                    {
+                        String szPath = MainActivity.getFileStorageDirectory() + File.separator + szFilename;
+                        alDropboxed.add(szPath);
+                    }
+
+                }
 
              for(int i=0;i<alDropboxed.size();i++)
              {
@@ -523,27 +563,42 @@ public class RtkNaviService extends IntentService implements LocationListener
 
             {
                 try {
-                    if (mBoolMockLocationsPref)
+                    if (mBoolMockLocationsPref || mBoolGenerateGPXTrace)
                     {
                         RtkControlResult result = getRtkStatus(null);
                         Solution solution = result.getSolution();
                         Position3d positionECEF = solution.getPosition();
+
                         if (RtkCommon.norm(positionECEF.getValues()) > 0.0)
                         {
-
                             Position3d positionLatLon = RtkCommon.ecef2pos(positionECEF);
-                            Location currentLocation = createLocation(Math.toDegrees(positionLatLon.getLat()), Math.toDegrees(positionLatLon.getLon()),positionLatLon.getHeight(), 1f);
 
-                            if (mBoolLocationServiceIsConnected || true)
+                            if (mBoolMockLocationsPref)
+                            {
+                                Location currentLocation = createLocation(Math.toDegrees(positionLatLon.getLat()), Math.toDegrees(positionLatLon.getLon()),positionLatLon.getHeight(), 1f);
+                                if (mBoolLocationServiceIsConnected || true) // TO be corrected for Google maps API
+                                    {
+                                     // provide the new location
+                                     //   Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location is "+currentLocation.getLatitude()+" "+currentLocation.getLongitude());
+                                        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                                        locationManager.setTestProviderLocation(GPS_PROVIDER, currentLocation);
+                                    }
+                            }
+                            if (mBoolGenerateGPXTrace)
+                            {
+                                if (mGpxTrace  == null)
                                 {
-                                 // provide the new location
-                                 //   Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location is "+currentLocation.getLatitude()+" "+currentLocation.getLongitude());
-                                    LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                                    locationManager.setTestProviderLocation(GPS_PROVIDER, currentLocation);
+                                    mGpxTrace = new GPXTrace();
                                 }
+                               mGpxTrace.addPoint(Math.toDegrees(positionLatLon.getLat()),
+                                                   Math.toDegrees(positionLatLon.getLon()),
+                                                   positionLatLon.getHeight(),
+                                                   RtkCommon.geoidh(positionLatLon.getLat(), positionLatLon.getLon()),
+                                                   solution.getTime());
+                            }
                         }
-                        Thread.sleep(2500);
                     }
+                    Thread.sleep(2500);
 
                 } catch (InterruptedException e) {
                     mBoolIsRunning = false;
