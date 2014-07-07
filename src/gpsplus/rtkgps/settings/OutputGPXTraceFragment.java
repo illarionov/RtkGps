@@ -15,6 +15,7 @@ import gpsplus.rtkgps.R;
 public class OutputGPXTraceFragment extends PreferenceFragment {
 
     public static final String SHARED_PREFS_NAME = "OutputGPXTrace";
+    @SuppressWarnings("unused")
     private static final String XML = "output_gpxtrace_settings.xml";
     public static final String KEY_SYNCDROPBOX = "syncdropbox";
     public static final String KEY_ENABLE = "enable";

@@ -23,6 +23,7 @@ import javax.xml.transform.stream.StreamResult;
 
 public class GPXTrace {
 
+    @SuppressWarnings("unused")
     private class Point {
         private double lat    = 0;
         private double lon    = 0;
@@ -134,21 +135,24 @@ public class GPXTrace {
             doc.appendChild(rootElement);
             Element trkElement = doc.createElement("trk");
             Element trkSegElement = doc.createElement("trkseg");
-            for (int i=0;i<mPoints.size();i++)
-            {
-                Element trkPt = doc.createElement("trkpt");
-                     trkPt.setAttribute("lat", Double.toString(mPoints.get(i).getLat()));
-                     trkPt.setAttribute("lon", Double.toString(mPoints.get(i).getLon()));
-                Element ele = doc.createElement("ele");
+            if (mPoints != null) {
+                for (int i = 0; i < mPoints.size(); i++)
+                {
+                    Element trkPt = doc.createElement("trkpt");
+                    trkPt.setAttribute("lat", Double.toString(mPoints.get(i).getLat()));
+                    trkPt.setAttribute("lon", Double.toString(mPoints.get(i).getLon()));
+                    Element ele = doc.createElement("ele");
                     ele.setTextContent(Double.toString(mPoints.get(i).height));
-                trkPt.appendChild(ele);
-                Element time = doc.createElement("time");
+                    trkPt.appendChild(ele);
+                    Element time = doc.createElement("time");
                     time.setTextContent(mPoints.get(i).getGpstime().getUtcXMLTime());
-                 trkPt.appendChild(time);
-                 Element geoidHeight = doc.createElement("geoidheight");
-                    geoidHeight.setTextContent(Double.toString(-1*mPoints.get(i).getGeoidheight()));
-                 trkPt.appendChild(geoidHeight);
-                 trkSegElement.appendChild(trkPt);
+                    trkPt.appendChild(time);
+                    Element geoidHeight = doc.createElement("geoidheight");
+                    geoidHeight.setTextContent(Double
+                            .toString(-1 * mPoints.get(i).getGeoidheight()));
+                    trkPt.appendChild(geoidHeight);
+                    trkSegElement.appendChild(trkPt);
+                }
             }
             trkElement.appendChild(trkSegElement);
             rootElement.appendChild(trkElement);
@@ -173,6 +177,7 @@ public class GPXTrace {
         }
         byte[] buffer = getGPXTrace().getBytes();
         fop.write(buffer, 0, buffer.length);
+        fop.close();
         }
         catch(IOException ioE)
         {

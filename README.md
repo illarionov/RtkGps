@@ -31,6 +31,7 @@ RTKLIB rtknavi port on android.
 * Show altitude in status view if Height/Geodetic is choosen
 * Send mock location to other applications if the checkbox is ticked in the solution option screen. (Not working yet with apps using Google Maps api)
 * Upload Log/Solution to Dropbox if Sync to Dropbox is ticked in the FileSettings screen. (the sync occurs after the stop of the server)
+* Generate a GPX track (Output view/GPX Track tab)
 * English and French interface
 
 ### Requirements
@@ -43,7 +44,7 @@ RTKLIB rtknavi port on android.
 ###### Download original version from Alexey Illarionov.
 [original version](https://github.com/illarionov/RtkGps)
 
-### Download alpha version (1.0apha6) from Google Play.
+### Download alpha version (1.0apha7) from Google Play.
 
 ![qr](https://raw.githubusercontent.com/eltorio/RtkGps/master/qr_googleplay.png)
 

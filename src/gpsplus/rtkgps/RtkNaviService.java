@@ -235,7 +235,7 @@ public class RtkNaviService extends IntentService implements LocationListener
     }
 
     private void finalizeGpxTrace() {
-        if (mBoolGenerateGPXTrace)
+        if (mBoolGenerateGPXTrace && (mGpxTrace != null))
         {
             SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
             if(prefs.getBoolean(OutputGPXTraceFragment.KEY_SYNCDROPBOX, false))
@@ -297,7 +297,8 @@ public class RtkNaviService extends IntentService implements LocationListener
             }
             SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
             if((prefs.getBoolean(OutputGPXTraceFragment.KEY_SYNCDROPBOX, false))
-                    && (prefs.getBoolean(OutputGPXTraceFragment.KEY_ENABLE, false)))
+                    && (prefs.getBoolean(OutputGPXTraceFragment.KEY_ENABLE, false))
+                    && (mGpxTrace != null))
                 {
                     String szFilename = prefs.getString(OutputGPXTraceFragment.KEY_FILENAME, "");
                     if (szFilename.length()>0)
