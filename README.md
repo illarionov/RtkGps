@@ -1,5 +1,5 @@
-RtkGps
-======
+RtkGps+
+=======
 
 RTKLIB rtknavi port on android.
 
@@ -32,7 +32,14 @@ RTKLIB rtknavi port on android.
 * Send mock location to other applications if the checkbox is ticked in the solution option screen. (Not working yet with apps using Google Maps api)
 * Upload Log/Solution to Dropbox if Sync to Dropbox is ticked in the FileSettings screen. (the sync occurs after the stop of the server)
 * Generate a GPX track (Output view/GPX Track tab)
-* English and French interface
+
+#### Translations
+Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.net/project/gpsplusrtkgps/invite).   
+You can freely create a translator account and with it you will be able request for a new translation.  
+I already made this translations:
+* English (source language)
+* French
+
 
 ### Requirements
 
