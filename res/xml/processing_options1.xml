@@ -70,4 +70,13 @@
         android:key="raim_fde"
         android:summary="@string/procopt_raim_fde_summary"
         android:title="@string/procopt_raim_fde_title" />
+    
+    <ListPreference
+        android:key="processing_cycle"
+        android:title="@string/procopt_processing_cycle_title"
+        android:summary="@string/procopt_processing_cycle_summary"
+        android:entries="@array/procopt_processing_cycle_entries"
+        android:entryValues="@array/procopt_processing_cycle_entries"
+        android:defaultValue="10" />
+
 </PreferenceScreen>

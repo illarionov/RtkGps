@@ -1,17 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -28,9 +16,20 @@ import android.preference.PreferenceFragment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.MainActivity;
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.RtkServerSettings.TransportSettings;
 import gpsplus.rtklib.constants.StreamType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class StreamBluetoothFragment extends PreferenceFragment {
 
@@ -68,7 +67,7 @@ public class StreamBluetoothFragment extends PreferenceFragment {
 
         public Value setAddress(@Nonnull String address) {
             if (address == null) throw new NullPointerException();
-            this.address = address;
+            this.address = address.toUpperCase();
             this.name = address;
             this.mPath = null;
             return this;
@@ -80,7 +79,7 @@ public class StreamBluetoothFragment extends PreferenceFragment {
         }
 
         public String getAddress() {
-            return address;
+            return address.toUpperCase();
         }
 
         public String getName() {

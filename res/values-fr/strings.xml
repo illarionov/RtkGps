@@ -102,12 +102,12 @@
   <string name="times_jst">JST</string>
   <string name="solq_none">Aucun</string>
   <string name="solq_fix">Fixe</string>
-  <string name="solq_float">Flottant</string>
+  <string name="solq_float">Flottante</string>
   <string name="solq_sbas">SBAS</string>
   <string name="solq_dgps">DGPS/DGNSS</string>
   <string name="solq_single">Simple</string>
   <string name="solq_ppp">PPP</string>
-  <string name="solq_dr">Dead reconing</string>
+  <string name="solq_dr">Navigation à l\'estime</string>
   <string name="solf_llh">Lat/Long/Hauteur</string>
   <string name="solf_xyz">X/Y/Z — ECEF</string>
   <string name="solf_enu">E/N/U — Ligne de base</string>
@@ -173,7 +173,7 @@
   <string name="ephopt_ssrcom">Radiodiffusées + SSR CoM</string>
   <string name="ephopt_lex">Éphémérides QZSS LEX</string>
   <string name="stapos_in_prcopt">Position spécifiée</string>
-  <string name="stapos_avg_of_single">Average of single position</string>
+  <string name="stapos_avg_of_single">Moyenne de position simple</string>
   <string name="stapos_read_from_file">Lire depuis le fichier</string>
   <string name="stapos_rinex_hdr">En-tête RINEX</string>
   <string name="stapos_rtcm_pos">Position de l\'antenne RTCM</string>
@@ -229,7 +229,7 @@
   </string-array>
   <string name="procopt_rec_dynamics_title">Rec dynamics</string>
   <string name="procopt_rec_dynamics_summary">Estimate receiver velocity and acceleration</string>
-  <string name="procopt_rec_earth_tides_correction_title">Correction de marée terrestre</string>
+  <string name="procopt_rec_earth_tides_correction_title">Correction de la marée terrestre</string>
   <string name="procopt_ionosphere_correction_title">Correction de l\'ionosphère</string>
   <string name="procopt_ionosphere_correction_dialog_title">Sélectionnez la méthode de correction de l\'ionosphère</string>
   <string name="procopt_troposphere_correction_title">Correction de la troposphère</string>
@@ -246,6 +246,17 @@
   <string name="procopt_exclude_eclipsing_sat_measurements_summary">Exclure les mesures provenant de satellites disparaissants</string>
   <string name="procopt_raim_fde_title">RAIM FDE</string>
   <string name="procopt_raim_fde_summary">RAIM (Receiver autonomous integrity monitoring) active le contrôle d\'intégrité des signaux GNSS, et exclut les signaux invalides</string>
+  <string name="procopt_processing_cycle_title">Cycle de traitement (s)</string>
+  <string name="procopt_processing_cycle_summary">Régler la fréquence du cycle de traitement des positions fictives et de la trace GPX</string>
+  <string-array name="procopt_processing_cycle_entries">
+    <item>1</item>
+    <item>2</item>
+    <item>5</item>
+    <item>10</item>
+    <item>15</item>
+    <item>30</item>
+    <item>60</item>
+  </string-array>
   <string name="solopt_output_header_title">En-tête de sortie</string>
   <string name="solopt_output_header_summary">Générer l\'en-tête ou pas</string>
   <string name="solopt_output_mocklocation_title">Générer des positions GPS fictives</string>
@@ -255,8 +266,8 @@
   <string name="solopt_lat_lon_format_title">Format Latitude/Longitude</string>
   <string name="solopt_lat_lon_format_dialog_title">Format Latitude/Longitude</string>
   <string name="earth_tide_correction_off">OFF</string>
-  <string name="earth_tide_correction_solid">Solid</string>
-  <string name="earth_tide_correction_solid_otl_pole">Solid, ocean, pole</string>
+  <string name="earth_tide_correction_solid">Solide</string>
+  <string name="earth_tide_correction_solid_otl_pole">Solide, océanique, polaire</string>
   <string-array name="solopt_lat_lon_format_entries">
     <item>DDD.dddddddd : degrés</item>
     <item>DDD mm ss.sss : degrés minutes secondes</item>

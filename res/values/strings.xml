@@ -122,7 +122,7 @@
     <string name="solq_dgps">DGPS/DGNSS</string>
     <string name="solq_single">Single</string>
     <string name="solq_ppp">PPP</string>
-    <string name="solq_dr">Dead reconing</string>
+    <string name="solq_dr">Dead reckoning</string>
     
     <!-- SOLF_XXX  Solution Format -->
     <string name="solf_llh">Lat/Long/Height</string>
@@ -312,6 +312,19 @@
     <string name="procopt_raim_fde_title">RAIM FDE</string>
     <string name="procopt_raim_fde_summary">Enable RAIM failure detection and exclusion</string>
 
+    <!-- PROCESSING CYCLE -->
+    <string name="procopt_processing_cycle_title">Processing cycle (s)</string>
+	<string name="procopt_processing_cycle_summary">Set the cycle for processing mock positions and GPX trace</string>
+	<string-array name="procopt_processing_cycle_entries">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+    
     <!-- Output header -->
     <string name="solopt_output_header_title">Output header</string>
     <string name="solopt_output_header_summary">Set whether the header is output or not</string>

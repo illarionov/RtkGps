@@ -1,13 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -19,6 +11,8 @@ import android.preference.PreferenceFragment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.widget.EarthTideCorrectionPreference;
 import gpsplus.rtkgps.settings.widget.EphemerisOptionPreference;
 import gpsplus.rtkgps.settings.widget.IonosphereCorrectionPreference;
@@ -33,13 +27,18 @@ import gpsplus.rtklib.constants.NavigationSystem;
 import gpsplus.rtklib.constants.PositioningMode;
 import gpsplus.rtklib.constants.TroposphereOption;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class ProcessingOptions1Fragment extends PreferenceFragment {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
     static final String TAG = ProcessingOptions1Fragment.class.getSimpleName();
 
-    static final String SHARED_PREFS_NAME = "ProcessingOptions1";
+    public static final String SHARED_PREFS_NAME = "ProcessingOptions1";
 
     static final String KEY_POSITIONING_MODE = "positioning_mode";
     static final String KEY_NUMBER_OF_FREQUENCIES = "number_of_frequencies";
@@ -56,6 +55,7 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
     static final String KEY_PHASE_WINDUP_CORRECTION = "phase_windup_correction";
     static final String KEY_EXCLUDE_ECLIPSING = "exclude_eclipsing_sat_measurements";
     static final String KEY_RAIM_FDE = "raim_fde";
+    public static final String KEY_PROCESSING_CYCLE = "processing_cycle";
 
     // Settings 1
     private PositioningModePreference mPositioningModePref;

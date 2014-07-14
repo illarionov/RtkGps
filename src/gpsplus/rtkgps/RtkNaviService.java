@@ -34,6 +34,7 @@ import gpsplus.rtkgps.settings.LogRoverFragment;
 import gpsplus.rtkgps.settings.OutputGPXTraceFragment;
 import gpsplus.rtkgps.settings.OutputSolution1Fragment;
 import gpsplus.rtkgps.settings.OutputSolution2Fragment;
+import gpsplus.rtkgps.settings.ProcessingOptions1Fragment;
 import gpsplus.rtkgps.settings.SettingsHelper;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtkgps.settings.StreamBluetoothFragment;
@@ -93,6 +94,7 @@ public class RtkNaviService extends IntentService implements LocationListener
     private long mLStartingTime = 0;
     private boolean mBoolGenerateGPXTrace = false;
     private GPXTrace mGpxTrace = null;
+    private long  mLProcessingCycle = 5;
 
     @Override
     public void onCreate() {
@@ -195,6 +197,8 @@ public class RtkNaviService extends IntentService implements LocationListener
         mBoolMockLocationsPref = prefs.getBoolean(SolutionOutputSettingsFragment.KEY_OUTPUT_MOCK_LOCATION, false);
         prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
         mBoolGenerateGPXTrace = prefs.getBoolean(OutputGPXTraceFragment.KEY_ENABLE, false);
+        prefs = this.getBaseContext().getSharedPreferences(ProcessingOptions1Fragment.SHARED_PREFS_NAME, 0);
+        mLProcessingCycle  = Long.valueOf(prefs.getString(ProcessingOptions1Fragment.KEY_PROCESSING_CYCLE, "5"));
         if (mBoolMockLocationsPref)
         {
                 if (Settings.Secure.getString(getContentResolver(),
@@ -491,7 +495,7 @@ public class RtkNaviService extends IntentService implements LocationListener
 
         if (roverSettngs.getType() == StreamType.BLUETOOTH) {
             StreamBluetoothFragment.Value btSettings = (Value)roverSettngs;
-            mBtRover = new BluetoothToRtklib(btSettings.getAddress(), btSettings.getPath());
+            mBtRover = new BluetoothToRtklib(btSettings.getAddress().toUpperCase(), btSettings.getPath());
             mBtRover.setCallbacks(new BluetoothCallbacks(RtkServer.RECEIVER_ROVER));
             mBtRover.start();
         }else {
@@ -599,7 +603,7 @@ public class RtkNaviService extends IntentService implements LocationListener
                             }
                         }
                     }
-                    Thread.sleep(2500);
+                    Thread.sleep(mLProcessingCycle*1000);
 
                 } catch (InterruptedException e) {
                     mBoolIsRunning = false;
