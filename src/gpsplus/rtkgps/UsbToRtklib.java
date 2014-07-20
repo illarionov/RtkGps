@@ -436,6 +436,10 @@ public class UsbToRtklib {
                         if (rcvd >= 0) {
                             try {
                                 mLocalSocketThread.write(buf, 0, rcvd);
+                                if ( (rcvd > 0) && DBG ){
+                                    Log.i(TAG, "READ from inputStream :"+rcvd+" bytes");
+                                    Log.i(TAG, HexString.bytesToHex(buf,rcvd));
+                                }
                             }catch (IOException e) {
                                 // TODO
                                 e.printStackTrace();
