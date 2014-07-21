@@ -21,10 +21,17 @@ import gpsplus.rtklib.RtkControlResult;
 import gpsplus.rtklib.Solution;
 import gpsplus.rtklib.constants.SolutionStatus;
 
+import org.jscience.geography.coordinates.LatLong;
+import org.jscience.geography.coordinates.UTM;
+import org.jscience.geography.coordinates.crs.CoordinatesConverter;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import javax.measure.unit.NonSI;
+import javax.measure.unit.SI;
 
 public class SolutionView extends TableLayout {
 
@@ -40,16 +47,18 @@ public class SolutionView extends TableLayout {
         WGS84_FLOAT(1,
                 R.string.solution_view_format_wgs84_float,
                 R.array.solution_view_coordinates_wgs84),
-
-        ECEF(2,
+        UTM(2,
+                        R.string.solution_view_format_utm,
+                        R.array.solution_view_coordinates_utm),
+        ECEF(3,
                 R.string.solution_view_format_ecef,
                 R.array.solution_view_coordinates_ecef),
 
-        ENU_BASELINE(3,
+        ENU_BASELINE(4,
                 R.string.solution_view_format_enu_baseline,
                 R.array.solution_view_coordinates_baseline_enu),
 
-        PYL_BASELINE(4,
+        PYL_BASELINE(5,
                 R.string.solution_view_format_pyl_baseline,
                 R.array.solution_view_coordinates_baseline_pyl)
 
@@ -188,19 +197,71 @@ public class SolutionView extends TableLayout {
         return mSolutionFormat;
     }
 
+    private double getAltitudeCorrection(double lat, double lon)
+    {
+     // Gets if solution height is geodetic or ellipsoidal
+        double dGeoidHeight = 0.0;
+        String mSzEllipsoidal = this.getContext().getResources().getStringArray(R.array.solopt_height_entries)[0];
+        SharedPreferences prefs= this.getContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
+        String strHeightPref = prefs.getString(SolutionOutputSettingsFragment.KEY_HEIGHT, mSzEllipsoidal);
+        if (strHeightPref.equals(mSzEllipsoidal))
+        {
+            dGeoidHeight = 0.0;
+            mBoolIsGeodetic = false;
+        }else
+        {
+            mBoolIsGeodetic = true;
+            dGeoidHeight = RtkCommon.geoidh(lat,lon);
+        }
+        return dGeoidHeight;
+
+    }
     private void updateCoordinates(RtkControlResult rtk) {
         RtkCommon.Position3d roverPos;
         double Qe[];
+        double dGeoidHeight = 0.0;
         final Solution sol = rtk.getSolution();
         final Position3d roverEcefPos;
+        RtkCommon.Matrix3x3 cov;
 
         roverEcefPos = sol.getPosition();
 
         switch (mSolutionFormat) {
+        case UTM:
+            if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
+                break;
+            }
+            roverPos = RtkCommon.ecef2pos(roverEcefPos);
+            double lat = Math.toDegrees(roverPos.getLat());
+            double lon = Math.toDegrees(roverPos.getLon());
+            cov = sol.getQrMatrix();
+            Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
+            dGeoidHeight = getAltitudeCorrection(lat, lon);
+            CoordinatesConverter<LatLong, UTM> latLongToUTM = LatLong.CRS.getConverterTo(UTM.CRS);
+            LatLong latLong = LatLong.valueOf(lat, lon, NonSI.DEGREE_ANGLE);
+            UTM utm = latLongToUTM.convert(latLong);
+            mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f km", utm.eastingValue(SI.KILOMETER)));
+            mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f km", utm.northingValue(SI.KILOMETER)));
+            mTextViewCoord3Value.setText(String.format(Locale.US, "%.3f m el.", roverPos.getHeight()-dGeoidHeight));
+            mTextViewCoord4Value.setText( Integer.toString(utm.longitudeZone())+utm.latitudeZone());
+            if (mBoolIsGeodetic)
+            {
+                mTextViewCoord3Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[3]); //Altitude
+            }else{
+                mTextViewCoord3Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[2]); //Height
+            }
+            mTextViewCoord4Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_utm)[3]); //Zone:
+            mTextViewCovariance.setText(String.format(
+                    Locale.US,
+                    "N:%6.3f\nE:%6.3f\nU:%6.3f m",
+                    Math.sqrt(Qe[4] < 0 ? 0 : Qe[4]),
+                    Math.sqrt(Qe[0] < 0 ? 0 : Qe[0]),
+                    Math.sqrt(Qe[8] < 0 ? 0 : Qe[8])
+                    ));
+            break;
         case WGS84:
         case WGS84_FLOAT:
             String strLat, strLon, strHeight,strAltitude="";
-            RtkCommon.Matrix3x3 cov;
 
             if (isInEditMode()) {
                 strLat = "-34.56785678¡";
@@ -222,21 +283,15 @@ public class SolutionView extends TableLayout {
                     strLon = String.format(Locale.US, "%11.8f¡", Math.toDegrees(roverPos.getLon()));
                 }
 
-                double dGeoidHeight = 0.0;
-                // Gets if solution height is geodetic or ellipsoidal
-                String mSzEllipsoidal = this.getContext().getResources().getStringArray(R.array.solopt_height_entries)[0];
-                SharedPreferences prefs= this.getContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
-                String strHeightPref = prefs.getString(SolutionOutputSettingsFragment.KEY_HEIGHT, mSzEllipsoidal);
-                if (strHeightPref.equals(mSzEllipsoidal))
+                dGeoidHeight = getAltitudeCorrection(roverPos.getLat(), roverPos.getLon());
+
+                if (mBoolIsGeodetic)
                 {
-                    dGeoidHeight = 0.0;
-                    mBoolIsGeodetic = false;
-                    mTextViewCoord4Name.setText("");
+                    mTextViewCoord4Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[3]); //Altitude:
+
                 }else
                 {
-                    mBoolIsGeodetic = true;
-                    mTextViewCoord4Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[3]); //Altitude:
-                    dGeoidHeight = RtkCommon.geoidh(roverPos.getLat(),roverPos.getLon());
+                    mTextViewCoord4Name.setText("");
                 }
                 strAltitude = String.format(Locale.US, "%.3fm el.", roverPos.getHeight()-dGeoidHeight);
                 strHeight = String.format(Locale.US, "%.3fm el.", roverPos.getHeight());

@@ -56,6 +56,7 @@
   <string name="solution_view_age_text_format">Age: %1$.1fs\nRatio: %2$.1f\n#de sat: %3$d</string>
   <string name="solution_view_format_wgs84">Lat/Long/Hauteur</string>
   <string name="solution_view_format_wgs84_float">Lat/Lon/hauteur — décimal</string>
+  <string name="solution_view_format_utm">UTM Abs/Ord/Alt/Zone</string>
   <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
   <string name="solution_view_format_enu_baseline">E/N/U — Ligne de base</string>
   <string name="solution_view_format_pyl_baseline">Tangage/Lacet/Longueur - ligne de base</string>
@@ -64,6 +65,12 @@
     <item>Lon :</item>
     <item>Hauteur :</item>
     <item>Altitude :</item>
+  </string-array>
+  <string-array name="solution_view_coordinates_utm">
+    <item>Abscisse :</item>
+    <item>Ordonnée :</item>
+    <item>Altitude:</item>
+    <item>Zone:</item>
   </string-array>
   <string-array name="solution_view_coordinates_ecef">
     <item>X:</item>

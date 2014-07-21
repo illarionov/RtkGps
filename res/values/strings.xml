@@ -62,6 +62,7 @@
     <string name="solution_view_age_text_format">Age: %1$.1fs\nRatio: %2$.1f\n#Of sat: %3$d</string>
     <string name="solution_view_format_wgs84">Lat/Lon/Height</string>
     <string name="solution_view_format_wgs84_float">Lat/Lon/Height — Float</string>
+    <string name="solution_view_format_utm">UTM East/North/Height/Zone</string>
     <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
     <string name="solution_view_format_enu_baseline">E/N/U — Baseline</string>
     <string name="solution_view_format_pyl_baseline">Pitch/Yaw/Length — Baseline</string>
@@ -71,6 +72,12 @@
         <item>Lon:</item>
         <item>Height:</item>
         <item >Altitude:</item>
+    </string-array>
+    <string-array name="solution_view_coordinates_utm">
+        <item>Easting:</item>
+        <item>Northing:</item>
+        <item>Altitude:</item>
+        <item >Zone:</item>
     </string-array>
     <string-array name="solution_view_coordinates_ecef">
         <item>X:</item>

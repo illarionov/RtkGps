@@ -64,3 +64,5 @@
 #dropbox
 -keep class com.dropbox.** {*;}
 -dontwarn com.dropbox.ledger**
+
+#jscience
