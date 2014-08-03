@@ -12,5 +12,11 @@
 		android:title="@string/file_syncdropbox_title"
 		android:summary="@string/file_syncdropbox_summary"
         />
+    <CheckBoxPreference
+		android:key="zipbeforesync"
+		android:title="@string/file_zipbeforesync_title"
+		android:summary="@string/file_zipbeforesync_summary"
+		android:dependency="syncdropbox"
+        />
 
 </PreferenceScreen>

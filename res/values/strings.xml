@@ -480,7 +480,8 @@
     <string name="file_filename_summary">can included %Y (year) %m (month) %d (day) %h (hour) %M (minutes) %S (seconds) for dynamic naming</string>
     <string name="file_syncdropbox_title">Sync to Dropbox</string>
     <string name="file_syncdropbox_summary">Needs an absolute file names (ie: not containing %Y %m …), the file on Dropbox will be renamed according to the starting date</string>
-    
+    <string name="file_zipbeforesync_title">Zip before syncing</string>
+    <string name="file_zipbeforesync_summary">Compress this file before sending to Dropbox</string>
     <!-- TCP client stream preferences -->
 	<string name="tcp_client_dialog_title">TCP client settings</string>
     <string name="tcp_client_host_title">Host</string>

@@ -63,6 +63,38 @@ import java.util.TimeZone;
 public class RtkNaviService extends IntentService implements LocationListener
   {
 
+    private class dpFile {
+        private String localFilenameWithPath;
+        private String remoteFilename;
+
+        public dpFile(String localFilenameWithPath, String remoteFilename) {
+            super();
+            this.localFilenameWithPath = localFilenameWithPath;
+            this.remoteFilename = remoteFilename;
+        }
+        public dpFile(String filename) {
+            super();
+            this.localFilenameWithPath = filename;
+            File _file = new File(filename);
+            this.remoteFilename = _file.getName();
+        }
+
+        public String getLocalFilenameWithPath() {
+            return localFilenameWithPath;
+        }
+        @SuppressWarnings("unused")
+        public void setLocalFilenameWithPath(String localFilenameWithPath) {
+            this.localFilenameWithPath = localFilenameWithPath;
+        }
+        public String getRemoteFilename() {
+            return remoteFilename;
+        }
+        @SuppressWarnings("unused")
+        public void setRemoteFilename(String remoteFilename) {
+            this.remoteFilename = remoteFilename;
+        }
+
+    }
     public RtkNaviService() {
         super(RtkNaviService.class.getSimpleName());
         // TODO Auto-generated constructor stub
@@ -256,49 +288,81 @@ public class RtkNaviService extends IntentService implements LocationListener
 
     }
 
+    private String getZipFilename(String filename)
+    {
+        return filename+".zip";
+    }
+
+    private String insertDateTimeInDropboxFilename(String file)
+    {
+        File _file = new File(file);
+        if (!file.contains("%Y") && !file.contains("%m")
+                && !file.contains("%d")
+                && !file.contains("%h")
+                && !file.contains("%M")
+                && !file.contains("%S"))
+        {
+            SimpleDateFormat sdtFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+            sdtFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            Date dt = new Date(mLStartingTime);
+            String szDate = sdtFormat.format(dt);
+            int dotposition= _file.getName().lastIndexOf(".");
+            String remoteFileName = _file.getName().substring(0, dotposition)+"-"+szDate+"."+_file.getName().substring(dotposition + 1, _file.getName().length());
+            return remoteFileName;
+        }else{
+            return _file.getName();
+        }
+    }
+
+    private void addToDropboxIfNeeded(SharedPreferences prefs, ArrayList<dpFile> alDropboxed, String file)
+    {
+        if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
+                && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
+            {
+                if (prefs.getBoolean(StreamFileClientFragment.KEY_ZIPBEFORESYNCING, false))
+                {
+                    String[] _files = {file};
+                    String zipFileName = getZipFilename(file);
+                    ZipHelper.zip(_files, zipFileName);
+                    String fileName = insertDateTimeInDropboxFilename(zipFileName);
+                    alDropboxed.add(new dpFile(zipFileName,fileName));
+                }else{
+                    alDropboxed.add(new dpFile(file,insertDateTimeInDropboxFilename(file)));
+                }
+            }
+    }
     private void syncDropbox()
     {
         DbxAccountManager mDbxAcctMgr;
         mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), MainActivity.APP_KEY, MainActivity.APP_SECRET);
         if (mDbxAcctMgr.hasLinkedAccount())
         {
-            ArrayList<String> alDropboxed = new ArrayList<String>();
+            ArrayList<dpFile> alDropboxed = new ArrayList<dpFile>();
+            //Log rover
             if ( mRtkServer.getServerSettings().getLogRover().getType() == StreamType.FILE)
                 {
                 SharedPreferences prefs= this.getBaseContext().getSharedPreferences(LogRoverFragment.SHARED_PREFS_NAME, 0);
-                if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
-                        && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
-                    {
-                        alDropboxed.add(mRtkServer.getServerSettings().getLogRover().getPath());
-                    }
+                addToDropboxIfNeeded(prefs, alDropboxed, mRtkServer.getServerSettings().getLogRover().getPath());
                 }
+            //Log base
             if ( mRtkServer.getServerSettings().getLogBase().getType() == StreamType.FILE)
             {
-            SharedPreferences prefs= this.getBaseContext().getSharedPreferences(LogBaseFragment.SHARED_PREFS_NAME, 0);
-            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
-                    && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
-                {
-                    alDropboxed.add(mRtkServer.getServerSettings().getLogBase().getPath());
-                }
+                SharedPreferences prefs= this.getBaseContext().getSharedPreferences(LogBaseFragment.SHARED_PREFS_NAME, 0);
+                addToDropboxIfNeeded(prefs, alDropboxed, mRtkServer.getServerSettings().getLogBase().getPath());
             }
+            //Solution 1
             if ( mRtkServer.getServerSettings().getOutputSolution1().getType() == StreamType.FILE)
             {
-            SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputSolution1Fragment.SHARED_PREFS_NAME, 0);
-            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
-                    && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
-                {
-                    alDropboxed.add(mRtkServer.getServerSettings().getOutputSolution1().getPath());
-                }
+                SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputSolution1Fragment.SHARED_PREFS_NAME, 0);
+                addToDropboxIfNeeded(prefs, alDropboxed, mRtkServer.getServerSettings().getOutputSolution1().getPath());
             }
+            //Solution 2
             if ( mRtkServer.getServerSettings().getOutputSolution2().getType() == StreamType.FILE)
             {
-            SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputSolution2Fragment.SHARED_PREFS_NAME, 0);
-            if(prefs.getBoolean(StreamFileClientFragment.KEY_SYNCDROPBOX, false)
-                    && prefs.getBoolean(StreamFileClientFragment.KEY_ENABLE, false))
-                {
-                    alDropboxed.add(mRtkServer.getServerSettings().getOutputSolution2().getPath());
-                }
+                SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputSolution2Fragment.SHARED_PREFS_NAME, 0);
+                addToDropboxIfNeeded(prefs, alDropboxed, mRtkServer.getServerSettings().getOutputSolution2().getPath());
             }
+            //GPX Trace (not zippable)
             SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
             if((prefs.getBoolean(OutputGPXTraceFragment.KEY_SYNCDROPBOX, false))
                     && (prefs.getBoolean(OutputGPXTraceFragment.KEY_ENABLE, false))
@@ -308,14 +372,14 @@ public class RtkNaviService extends IntentService implements LocationListener
                     if (szFilename.length()>0)
                     {
                         String szPath = MainActivity.getFileStorageDirectory() + File.separator + szFilename;
-                        alDropboxed.add(szPath);
+                        alDropboxed.add(new dpFile(szPath,insertDateTimeInDropboxFilename(szFilename)));
                     }
 
                 }
 
              for(int i=0;i<alDropboxed.size();i++)
              {
-                 String szCurrentPath = alDropboxed.get(i);
+                 String szCurrentPath = alDropboxed.get(i).getLocalFilenameWithPath();
 
                             if (!szCurrentPath.contains("%Y") && !szCurrentPath.contains("%m")
                                     && !szCurrentPath.contains("%d")
@@ -323,16 +387,11 @@ public class RtkNaviService extends IntentService implements LocationListener
                                     && !szCurrentPath.contains("%M")
                                     && !szCurrentPath.contains("%S"))
                             {
-                                SimpleDateFormat sdtFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                                sdtFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-                                Date dt = new Date(mLStartingTime);
-                                String szDate = sdtFormat.format(dt);
                                 DbxFileSystem dbxFs;
                                 try {
                                     dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
                                     File f = new File(szCurrentPath);
-                                    int dotposition= f.getName().lastIndexOf(".");
-                                    String remoteFileName = f.getName().substring(0, dotposition)+"-"+szDate+"."+f.getName().substring(dotposition + 1, f.getName().length());
+                                    String remoteFileName = alDropboxed.get(i).getRemoteFilename();
                                     DbxFile remoteFile = dbxFs.create(new DbxPath(remoteFileName));
                                     remoteFile.writeFromExistingFile(f, false);
                                     remoteFile.close();

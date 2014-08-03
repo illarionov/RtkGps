@@ -376,6 +376,8 @@
   <string name="file_filename_summary">peut contenir %Y (année) %m (mois) %d (jour) %h (heure) %M (minutes) %S (secondes) pour générer un nom dynamique</string>
   <string name="file_syncdropbox_title">Synchronisation vers Dropbox</string>
   <string name="file_syncdropbox_summary">A besoin d\'un nom de fichier réel (c\'est à dire: ne contenant ne pas de %Y %m...), le fichier sur Dropbox est renommé selon la date de démarrage.</string>
+  <string name="file_zipbeforesync_title">Zipper avant la synchronisation</string>
+  <string name="file_zipbeforesync_summary">Compresser ce fichier avant de l\'envoyer à Dropbox</string>
   <string name="tcp_client_dialog_title">Paramètres client TCP</string>
   <string name="tcp_client_host_title">Hôte</string>
   <string name="tcp_client_port_title">Port</string>
