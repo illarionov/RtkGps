@@ -132,8 +132,9 @@ public class MapFragment extends Fragment {
         mMapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         mPathOverlay = new SolutionPathOverlay(mResourceProxy);
+
         mMyLocationOverlay = new MyLocationNewOverlay(context, mMyLocationProvider,
-                mMapView, mResourceProxy);
+                mMapView);
 
         mCompassOverlay = new CompassOverlay(context, new InternalCompassOrientationProvider(context),
                 mMapView, mResourceProxy);
