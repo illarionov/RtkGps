@@ -428,8 +428,8 @@
   </string-array>
   <string-array name="usb_device_parity_values">
     <item>N</item>
-    <item>I</item>
-    <item>P</item>
+    <item>O</item>
+    <item>E</item>
     <item>M</item>
     <item>S</item>
   </string-array>
