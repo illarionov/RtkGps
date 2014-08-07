@@ -84,3 +84,7 @@ I already made this translations:
 
 
 [rtklib]: http://www.rtklib.com/
+
+###### Binary distribution
+
+* the latest apk wich is maybe very instable can be found in bin directory, but prefer the Google Play version
