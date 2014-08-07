@@ -12,5 +12,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/google-play-services_lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JScience"/>
+	<classpathentry kind="lib" path="libs/d2xx.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

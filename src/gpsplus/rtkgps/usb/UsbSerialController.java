@@ -2,6 +2,7 @@ package gpsplus.rtkgps.usb;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.hardware.usb.UsbDevice;
@@ -11,10 +12,10 @@ import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbRequest;
 import android.util.Log;
 
-import org.xmlpull.v1.XmlPullParserException;
-
 import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.R;
+
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +33,13 @@ public abstract class UsbSerialController {
 
     protected UsbManager mUsbManager;
 	protected UsbDevice mUsbDevice;
+	protected Context parentContext = null;
 
 	public UsbSerialController(UsbManager usbManager,
-			UsbDevice usbDevice) throws UsbControllerException {
+			UsbDevice usbDevice, Context parentContext) throws UsbControllerException {
 		this.mUsbDevice = usbDevice;
 		this.mUsbManager = usbManager;
+		this.parentContext = parentContext;
 	}
 
 	public abstract void attach() throws UsbControllerException;

@@ -39,6 +39,18 @@ public class RtkCommon {
 
 
     /**
+     * open geoid model
+     * @param model
+     * @param file filename with complete path
+     */
+    public static native int opengeoid(int model, String file);
+
+    /**
+     * close geoid model
+     */
+    public static native void closegeoid();
+
+    /**
      * get geoid height from geoid model
      * @param lat geodetic position lat (rad)
      * @param lon geodetic position lon (rad)
@@ -47,6 +59,15 @@ public class RtkCommon {
     public static native double geoidh(double lat, double lon);
 
 
+    /**
+     * get geoid height from geoid external model (or mod 0 for embedded)
+     * @param lat geodetic position lat (rad)
+     * @param lon geodetic position lon (rad)
+     * @param model
+     * @param file filename with complete path
+     * @return geoid height (m) (0.0:error)
+     */
+    public static native double geoidh_from_external_model(double lat, double lon, int model, String file);
     /**
      * convert degree to degree-minute-second
      * @param deg degree
@@ -392,7 +413,7 @@ public class RtkCommon {
         private static String formatString(double pDegree, double pMinute, double pSecond, boolean isLat) {
             return String.format(
                     Locale.US,
-                    "%02.0f¡ %02.0f' %07.4f\" %s",
+                    "%02.0fÂ° %02.0f' %07.4f\" %s",
                     Math.abs(pDegree),
                     pMinute,
                     pSecond,

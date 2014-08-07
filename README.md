@@ -22,11 +22,12 @@ RTKLIB rtknavi port on android.
     u-blox: LEA-4T/5T/6T, SkyTraq: S1315F, JAVAD GRIL/GREIS, Furuno
     GW-10-II/III and NVS NV08C BINR.
 * TCP/IP, NTRIP, local log file
+* Support for multiple geoids (see explanation)
 
 #### Android features:
 
 * Bluetooth communication
-* USB OTG communication with speed/parity/stop configuration
+* USB OTG communication with speed/parity/stop configuration (ACM, PL2303 chips and alpha for FTDI chips)
 * SiRF IV protocol (experimental)
 * Show altitude in status view if Height/Geodetic is choosen
 * Send mock location to other applications if the checkbox is ticked in the solution option screen. (Not working yet with apps using Google Maps api)
@@ -35,6 +36,28 @@ RTKLIB rtknavi port on android.
 * Generate a GPX track (Output view/GPX Track tab)
 * Show UTM coordinates in solution view
 
+#### Geoids
+* you can select different geoid model in "Solution Option"/Geoid model but except for embedded model (EGM96 1°x1°)  
+  you will need to place the corresponding model in the RtkGps storage (probably /storage/sdcard0/RtkGps)  
+  the model format is RTKLIB dependent, check jni/RTKLIB/src/geoid.c  
+  the model file MUST be one of:  
+  ```
+    EGM96_M150.geoid  
+    EGM2008_M25.geoid  
+    EGM2008_M10.geoid  
+    GSI2000_M15.geoid  
+  ``` 
+  
+  for example if you want to use EGM2008 2.5"x2.5" model you need:
+  ```
+    1.  download from National Geospatial Intelligence Agency the model  
+  			  on august 2014 file can be found http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm2008/Small_Endian/Und_min2.5x2.5_egm2008_isw=82_WGS84_TideFree_SE.gz   
+    2.  extract the Und_min2.5x2.5_egm2008_isw=82_WGS84_TideFree_SE file and rename it EGM2008_M25.geoid (149Mo)   
+    3.  place this model in RtkGps storage path (where all the trace and log go), on my tools it is /storage/sdcard0/RtkGps/
+  ```
+
+  if you do not have the correct model or if model is inconsistent it will not show an error, rather than it will use the EGM96 1°x1° embedded model.
+  				
 #### Translations
 Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.net/project/gpsplusrtkgps/invite).   
 You can freely create a translator account and with it you will be able request for a new translation.  

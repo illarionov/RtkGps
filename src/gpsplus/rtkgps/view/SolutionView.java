@@ -12,6 +12,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.MainActivity;
 import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtklib.RtkCommon;
@@ -19,12 +20,14 @@ import gpsplus.rtklib.RtkCommon.Deg2Dms;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.RtkControlResult;
 import gpsplus.rtklib.Solution;
+import gpsplus.rtklib.constants.GeoidModel;
 import gpsplus.rtklib.constants.SolutionStatus;
 
 import org.jscience.geography.coordinates.LatLong;
 import org.jscience.geography.coordinates.UTM;
 import org.jscience.geography.coordinates.crs.CoordinatesConverter;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -211,6 +214,10 @@ public class SolutionView extends TableLayout {
         }else
         {
             mBoolIsGeodetic = true;
+            GeoidModel model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
+            String filename = MainActivity.getFileStorageDirectory()+ File.separator + model.name()+".geoid";
+
+            double r = RtkCommon.geoidh_from_external_model(lat, lon, model.getRtklibId(), filename);
             dGeoidHeight = RtkCommon.geoidh(lat,lon);
         }
         return dGeoidHeight;
@@ -366,8 +373,8 @@ public class SolutionView extends TableLayout {
                 yaw = Math.atan2(enu.getLat(), enu.getLon());
                 if (yaw < 0.0) yaw += 2.0 * Math.PI;
 
-                v1 = String.format(Locale.US, "%.3f �", Math.toDegrees(pitch));
-                v2 = String.format(Locale.US, "%.3f �", Math.toDegrees(yaw));
+                v1 = String.format(Locale.US, "%.3f °", Math.toDegrees(pitch));
+                v2 = String.format(Locale.US, "%.3f °", Math.toDegrees(yaw));
                 v3 = String.format(Locale.US, "%.3f m", baselineLen);
             }
 

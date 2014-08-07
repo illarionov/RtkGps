@@ -220,7 +220,7 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
         mGeoidModelPref.setEntryValues(GeoidModel.getEntryValues());
         mGeoidModelPref.setOnPreferenceChangeListener(mOnPreferenceChangeListener);
         // TODO
-        mGeoidModelPref.setEnabled(false);
+        mGeoidModelPref.setEnabled(true);
 
         mNmeaIntervalGsaPref = (EditTextPreference)findPreference(KEY_NMEA_INTERVAL_GSA_GSV);
         mNmeaIntervalGsaPref.setText(String.valueOf(mSolutionOptions.getNmeaIntervalGsv()));

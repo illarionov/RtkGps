@@ -30,6 +30,39 @@ public class HexString {
         return new String(hexChars);
     }
 
+
+    public static String bytesToAscii(byte[] data){
+        return HexString.bytesToAscii(data, data.length);
+    }
+
+    public static String bytesToAscii(byte[] data, int length) {
+        int iLength = 0;
+        if (length > data.length)
+        {
+            iLength = data.length;
+        }else{
+            iLength = length;
+        }
+        StringBuilder sb = new StringBuilder(iLength);
+        for (int i = 0; i < iLength; ++ i) {
+            char c = (char)data[i];
+            if (c < 0)
+                {
+                    //throw new IllegalArgumentException();
+                }
+            if ( (c > 31) && (c<127))
+                {
+                sb.append(c);
+                }
+            else
+               {
+               sb.append('.');
+               }
+
+        }
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
         return HexString.bytesToHex(mBytes);

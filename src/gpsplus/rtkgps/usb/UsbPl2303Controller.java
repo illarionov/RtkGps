@@ -1,6 +1,7 @@
 package gpsplus.rtkgps.usb;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -35,9 +36,9 @@ public class UsbPl2303Controller extends UsbSerialController {
 	private UsbSerialInterruptListener interruptListener = null;
 
 
-	public UsbPl2303Controller(UsbManager usbManager, UsbDevice usbDevice)
+	public UsbPl2303Controller(UsbManager usbManager, UsbDevice usbDevice, Context parentContext)
 			throws UsbControllerException {
-		super(usbManager, usbDevice);
+		super(usbManager, usbDevice, parentContext);
 
 		int endpointCount;
 

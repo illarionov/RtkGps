@@ -44,12 +44,41 @@ static void RtkCommon_dops(JNIEnv* env, jclass clazz, jdoubleArray j_azel, jint 
 	 dst[0], dst[1], dst[2], dst[3]);
 }
 
+static jint RtkCommon_opengeoid(JNIEnv* env, jclass clazz, jint model, jstring geoid_filename)
+{
+	const char *filename = (*env)->GetStringUTFChars(env, geoid_filename, 0);
+	int ret = opengeoid(model,filename);
+	(*env)->ReleaseStringUTFChars(env,geoid_filename, filename);
+	return (jint)ret;
+}
+
+static void RtkCommon_closegeoid(JNIEnv* env, jclass class)
+{
+	closegeoid();
+}
+
 static jdouble RtkCommon_geoidh(JNIEnv* env, jclass clazz, jdouble j_lat, jdouble j_lon)
 {
    double pos[2] = {j_lat, j_lon};
    return (jdouble)geoidh(pos);
 }
 
+static jdouble RtkCommon_geoidh_from_external_model(JNIEnv* env, jclass clazz, jdouble j_lat, jdouble j_lon, jint model, jstring geoid_filename)
+{
+   double pos[2] = {j_lat, j_lon};
+   const char *filename = (*env)->GetStringUTFChars(env, geoid_filename, 0);
+   if (model != GEOID_EMBEDDED)
+   {
+	   int r = opengeoid(model,filename);
+   }
+   jdouble correction = (jdouble)geoidh(pos);
+   if (model != GEOID_EMBEDDED)
+   {
+	   closegeoid();
+   }
+   (*env)->ReleaseStringUTFChars(env,geoid_filename, filename);
+   return correction;
+}
 
 static void RtkCommon__ecef2pos(JNIEnv* env, jclass clazz, jdouble x,
       jdouble y, jdouble z, jdoubleArray j_pos)
@@ -129,7 +158,10 @@ static jdouble RtkCommon_norm(JNIEnv* env, jclass clazz, jdoubleArray j_a)
 static JNINativeMethod nativeMethods[] = {
    {"getSatId", "(I)Ljava/lang/String;", (void*)RtkCommon_get_sat_id},
    {"dops", "([DIDLgpsplus/rtklib/RtkCommon$Dops;)V", (void*)RtkCommon_dops},
+   {"opengeoid", "(ILjava/lang/String;)I",(void*)RtkCommon_opengeoid},
+   {"closegeoid", "()V",(void*)RtkCommon_closegeoid},
    {"geoidh", "(DD)D", (void*)RtkCommon_geoidh},
+   {"geoidh_from_external_model","(DDILjava/lang/String;)D",(void*)RtkCommon_geoidh_from_external_model},
    {"_deg2dms", "(D[D)V", (void*)RtkCommon__deg2dms},
    {"norm", "([D)D", (void*)RtkCommon_norm},
    {"_ecef2pos", "(DDD[D)V", (void*)RtkCommon__ecef2pos},

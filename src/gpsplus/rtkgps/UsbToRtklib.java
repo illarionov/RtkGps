@@ -12,6 +12,7 @@ import android.util.Log;
 
 import gpsplus.rtkgps.usb.SerialLineConfiguration;
 import gpsplus.rtkgps.usb.UsbAcmController;
+import gpsplus.rtkgps.usb.UsbFTDIController;
 import gpsplus.rtkgps.usb.UsbPl2303Controller;
 import gpsplus.rtkgps.usb.UsbSerialController;
 import gpsplus.rtkgps.usb.UsbSerialController.UsbControllerException;
@@ -229,12 +230,17 @@ public class UsbToRtklib {
         private UsbSerialController probeDevice(UsbDevice d) {
             if (DBG) Log.d(TAG, "probeDevice() device=" + d.toString());
             try {
-                final UsbPl2303Controller c = new UsbPl2303Controller(mUsbManager, d);
+                final UsbPl2303Controller c = new UsbPl2303Controller(mUsbManager, d, this.mContext);
                 return c;
             }catch(UsbControllerException ignore) { }
 
             try {
-                final UsbAcmController c = new UsbAcmController(mUsbManager, d);
+                final UsbAcmController c = new UsbAcmController(mUsbManager, d, this.mContext);
+                return c;
+            }catch (UsbControllerException ignore) {}
+
+            try {
+                final UsbFTDIController c = new UsbFTDIController(mUsbManager, d, this.mContext);
                 return c;
             }catch (UsbControllerException ignore) {}
 
@@ -439,6 +445,7 @@ public class UsbToRtklib {
                                 if ( (rcvd > 0) && DBG ){
                                     Log.i(TAG, "READ from inputStream :"+rcvd+" bytes");
                                     Log.i(TAG, HexString.bytesToHex(buf,rcvd));
+                                    Log.i(TAG, HexString.bytesToAscii(buf,rcvd));
                                 }
                             }catch (IOException e) {
                                 // TODO

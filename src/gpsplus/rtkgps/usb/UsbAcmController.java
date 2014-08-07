@@ -1,5 +1,6 @@
 package gpsplus.rtkgps.usb;
 
+import android.content.Context;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -7,9 +8,9 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.usb.SerialLineConfiguration.Parity;
 import gpsplus.rtkgps.usb.SerialLineConfiguration.StopBits;
-import gpsplus.rtkgps.BuildConfig;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -170,9 +171,9 @@ public class UsbAcmController extends UsbSerialController {
 
     }
 
-    public UsbAcmController(UsbManager usbmanager, UsbDevice usbDevice)
+    public UsbAcmController(UsbManager usbmanager, UsbDevice usbDevice, Context parentContext)
                     throws UsbControllerException {
-        super(usbmanager, usbDevice);
+        super(usbmanager, usbDevice, parentContext);
 
         mAcmConfig = new AcmConfig(usbDevice);
         mSerialLineConfiguration = new SerialLineConfiguration();
