@@ -217,8 +217,7 @@ public class SolutionView extends TableLayout {
             GeoidModel model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
             String filename = MainActivity.getFileStorageDirectory()+ File.separator + model.name()+".geoid";
 
-            double r = RtkCommon.geoidh_from_external_model(lat, lon, model.getRtklibId(), filename);
-            dGeoidHeight = RtkCommon.geoidh(lat,lon);
+            dGeoidHeight = RtkCommon.geoidh_from_external_model(lat, lon, model.getRtklibId(), filename);
         }
         return dGeoidHeight;
 
