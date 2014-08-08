@@ -15,8 +15,8 @@
   <string name="menu_start_service">Démarrage du service</string>
   <string name="menu_stop_service">Arrêter le service</string>
   <string name="menu_dropbox">Dropbox</string>
-  <string name="menu_select_solution_format">Sélectionnez le format de la solution</string>
-  <string name="menu_select_gtime_format">Sélectionnez le format de l\'heure</string>
+  <string name="menu_select_solution_format">Format de la solution</string>
+  <string name="menu_select_gtime_format">Format de l\'heure</string>
   <string name="menu_about">À propos</string>
   <string name="menu_map_mode">Mode carte</string>
   <string name="menu_map_mode_osm">OpenStreetMap</string>
@@ -30,8 +30,8 @@
   <string name="sky_plot_south">S</string>
   <string name="sky_plot_east">E</string>
   <string name="sky_plot_num_of_sat"># de Sat: %d</string>
-  <string name="drawer_open">Open navigation drawer</string>
-  <string name="drawer_close">Close navigation drawer</string>
+  <string name="drawer_open">Ouvrir le volet de navigation</string>
+  <string name="drawer_close">Fermer le volet de navigation</string>
   <string name="navdraw_category_server">Serveur</string>
   <string name="navdraw_category_streams">Flux</string>
   <string name="navdraw_category_settings">Paramètres</string>
@@ -53,12 +53,24 @@
   <string name="gtime_format_local">Local</string>
   <string name="gtime_format_gps_tow">GPS TOW</string>
   <string name="solution_view_solution">Solution:</string>
+  <string name="solution_view_geoid">Géoïde:</string>
+  <string name="solution_view_crs">CRS:</string>
   <string name="solution_view_age_text_format">Age: %1$.1fs\nRatio: %2$.1f\n#de sat: %3$d</string>
   <string name="solution_view_format_wgs84">Lat/Long/Hauteur</string>
   <string name="solution_view_format_wgs84_float">Lat/Lon/hauteur — décimal</string>
-  <string name="solution_view_format_utm">UTM Abs/Ord/Alt/Zone</string>
+  <string name="solution_view_format_utm">UTM X/Y/Z/Zone</string>
+  <string name="solution_view_format_proj4_lambert93">RGF93 X/Y/Z</string>
+  <string name="solution_view_format_proj4_lambert93_cc43">RGF93 CC43 X/Y/Z</string>
+  <string name="solution_view_format_proj4_lambert93_cc44">RGF93 CC44 X/Y/Z</string>
+  <string name="solution_view_format_proj4_lambert93_cc45">RGF93 CC45 X/Y/Z</string>
+  <string name="solution_view_format_proj4_lambert93_cc46">RGF93 CC46 X/Y/Z</string>
+  <string name="solution_view_format_proj4_lambert93_cc47">RGF93 CC47 X/Y/Z</string>
+  <string name="solution_view_format_proj4_lambert93_cc48">RGF93 CC48 X/Y/Z</string>
+  <string name="solution_view_format_proj4_lambert93_cc49">RGF93 CC49 X/Y/Z</string>
+  <string name="solution_view_format_proj4_lambert93_cc50">RGF93 CC50 X/Y/Z</string>
+  <string name="solution_view_format_proj4_nad83">NAD83 X/Y/Z</string>
   <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
-  <string name="solution_view_format_enu_baseline">E/N/U — Ligne de base</string>
+  <string name="solution_view_format_enu_baseline">X/Y/Z — Ligne de base</string>
   <string name="solution_view_format_pyl_baseline">Tangage/Lacet/Longueur - ligne de base</string>
   <string-array name="solution_view_coordinates_wgs84">
     <item>Lat :</item>
@@ -71,6 +83,16 @@
     <item>Ordonnée :</item>
     <item>Altitude:</item>
     <item>Zone:</item>
+  </string-array>
+  <string-array name="solution_view_coordinates_proj4_lambert93">
+    <item>Abscisse:</item>
+    <item>Ordonnée:</item>
+    <item>Altitude:</item>
+  </string-array>
+  <string-array name="solution_view_coordinates_proj4_nad83">
+    <item>Abscisse:</item>
+    <item>Ordonnée:</item>
+    <item>Altitude:</item>
   </string-array>
   <string-array name="solution_view_coordinates_ecef">
     <item>X:</item>
@@ -117,7 +139,7 @@
   <string name="solq_dr">Navigation à l\'estime</string>
   <string name="solf_llh">Lat/Long/Hauteur</string>
   <string name="solf_xyz">X/Y/Z — ECEF</string>
-  <string name="solf_enu">E/N/U — Ligne de base</string>
+  <string name="solf_enu">X/Y/Z — Ligne de base</string>
   <string name="solf_nmea">NMEA 0183</string>
   <string name="solf_gsif">GSI-F1/2/3</string>
   <string name="strfmt_rtcm2">RTCM 2</string>
@@ -159,8 +181,8 @@
   <string name="ionoopt_est">Estimation STEC</string>
   <string name="ionoopt_tec">Modèle IONEX TEC</string>
   <string name="ionoopt_qzs">Modèle radiodiffusé QZSS</string>
-  <string name="ionoopt_lex">QZSS LEX ionospehre</string>
-  <string name="ionoopt_stec">SLANT TEC model</string>
+  <string name="ionoopt_lex">Ionosphère QZSS LEX</string>
+  <string name="ionoopt_stec">Modèle SLANT TEC</string>
   <string name="tropopt_off">Off</string>
   <string name="tropopt_saas">Modèle Saastamoinen</string>
   <string name="tropopt_sbas">Modèle SBAS</string>
@@ -235,7 +257,7 @@
     <item>40</item>
   </string-array>
   <string name="procopt_rec_dynamics_title">Rec dynamics</string>
-  <string name="procopt_rec_dynamics_summary">Estimate receiver velocity and acceleration</string>
+  <string name="procopt_rec_dynamics_summary">Estimation de la vitesse et de l\'accélération du récepteur</string>
   <string name="procopt_rec_earth_tides_correction_title">Correction de la marée terrestre</string>
   <string name="procopt_ionosphere_correction_title">Correction de l\'ionosphère</string>
   <string name="procopt_ionosphere_correction_dialog_title">Sélectionnez la méthode de correction de l\'ionosphère</string>

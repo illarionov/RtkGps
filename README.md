@@ -76,7 +76,7 @@ I already made this translations:
 ###### Download original version from Alexey Illarionov.
 [original version](https://github.com/illarionov/RtkGps)
 
-### Download alpha version (1.0apha12) from Google Play.
+### Download alpha version (1.0apha14) from Google Play.
 
 ![qr](https://raw.githubusercontent.com/eltorio/RtkGps/master/qr_googleplay.png)
 

@@ -59,10 +59,22 @@
 
     <!-- Solution view -->
     <string name="solution_view_solution">Solution:</string>
+    <string name="solution_view_geoid">Geoid:</string>
+    <string name="solution_view_crs">CRS:</string>
     <string name="solution_view_age_text_format">Age: %1$.1fs\nRatio: %2$.1f\n#Of sat: %3$d</string>
     <string name="solution_view_format_wgs84">Lat/Lon/Height</string>
     <string name="solution_view_format_wgs84_float">Lat/Lon/Height — Float</string>
-    <string name="solution_view_format_utm">UTM East/North/Height/Zone</string>
+    <string name="solution_view_format_utm">UTM E/N/H/Zone</string>
+    <string name="solution_view_format_proj4_lambert93">RGF93 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc43">RGF93 CC43 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc44">RGF93 CC44 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc45">RGF93 CC45 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc46">RGF93 CC46 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc47">RGF93 CC47 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc48">RGF93 CC48 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc49">RGF93 CC49 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc50">RGF93 CC50 E/N/H</string>
+    <string name="solution_view_format_proj4_nad83">NAD83 E/N/H</string>
     <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
     <string name="solution_view_format_enu_baseline">E/N/U — Baseline</string>
     <string name="solution_view_format_pyl_baseline">Pitch/Yaw/Length — Baseline</string>
@@ -78,6 +90,16 @@
         <item>Northing:</item>
         <item>Altitude:</item>
         <item >Zone:</item>
+    </string-array>
+    <string-array name="solution_view_coordinates_proj4_lambert93">
+        <item>Easting:</item>
+        <item>Northing:</item>
+        <item>Altitude:</item>
+    </string-array>
+    <string-array name="solution_view_coordinates_proj4_nad83">
+        <item>Easting:</item>
+        <item>Northing:</item>
+        <item>Altitude:</item>
     </string-array>
     <string-array name="solution_view_coordinates_ecef">
         <item>X:</item>
@@ -182,7 +204,7 @@
     <string name="ionoopt_est">Estimate STEC</string>
     <string name="ionoopt_tec">IONEX TEC model</string>
     <string name="ionoopt_qzs">QZSS broadcast model</string>
-    <string name="ionoopt_lex">QZSS LEX ionospehre</string>
+    <string name="ionoopt_lex">QZSS LEX ionosphere</string>
     <string name="ionoopt_stec">SLANT TEC model</string>
 
     <!-- TROPOPT_XXX Troposphere option -->

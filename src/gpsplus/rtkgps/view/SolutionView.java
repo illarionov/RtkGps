@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.MainActivity;
+import gpsplus.rtkgps.Proj4Converter;
 import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtklib.RtkCommon;
@@ -26,6 +27,7 @@ import gpsplus.rtklib.constants.SolutionStatus;
 import org.jscience.geography.coordinates.LatLong;
 import org.jscience.geography.coordinates.UTM;
 import org.jscience.geography.coordinates.crs.CoordinatesConverter;
+import org.osgeo.proj4j.ProjCoordinate;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -45,36 +47,88 @@ public class SolutionView extends TableLayout {
     public enum Format {
         WGS84(0,
                 R.string.solution_view_format_wgs84,
-                R.array.solution_view_coordinates_wgs84),
+                R.array.solution_view_coordinates_wgs84,
+                null),
 
         WGS84_FLOAT(1,
                 R.string.solution_view_format_wgs84_float,
-                R.array.solution_view_coordinates_wgs84),
+                R.array.solution_view_coordinates_wgs84,
+                null),
         UTM(2,
-                        R.string.solution_view_format_utm,
-                        R.array.solution_view_coordinates_utm),
-        ECEF(3,
+                R.string.solution_view_format_utm,
+                R.array.solution_view_coordinates_utm,
+                null),
+
+        PROJ4_LAMBERT93(3,
+                R.string.solution_view_format_proj4_lambert93,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93),
+
+        PROJ4_LAMBERT93_CC43(4,
+                R.string.solution_view_format_proj4_lambert93_cc43,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93_CC43),
+        PROJ4_LAMBERT93_CC44(5,
+                R.string.solution_view_format_proj4_lambert93_cc44,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93_CC44),
+        PROJ4_LAMBERT93_CC45(6,
+                R.string.solution_view_format_proj4_lambert93_cc45,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93_CC45),
+        PROJ4_LAMBERT93_CC46(7,
+                R.string.solution_view_format_proj4_lambert93_cc46,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93_CC46),
+        PROJ4_LAMBERT93_CC47(8,
+                R.string.solution_view_format_proj4_lambert93_cc47,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93_CC47),
+        PROJ4_LAMBERT93_CC48(9,
+                R.string.solution_view_format_proj4_lambert93_cc48,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93_CC48),
+        PROJ4_LAMBERT93_CC49(10,
+                R.string.solution_view_format_proj4_lambert93_cc49,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93_CC49),
+        PROJ4_LAMBERT93_CC50(11,
+                R.string.solution_view_format_proj4_lambert93_cc50,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                Proj4Converter.CRS_RGF93_CC50),
+
+       PROJ4_NAD83(12,
+                R.string.solution_view_format_proj4_nad83,
+                R.array.solution_view_coordinates_proj4_nad83,
+                Proj4Converter.CRS_NAD83),
+
+        ECEF(13,
                 R.string.solution_view_format_ecef,
-                R.array.solution_view_coordinates_ecef),
+                R.array.solution_view_coordinates_ecef,
+                null),
 
-        ENU_BASELINE(4,
+        ENU_BASELINE(14,
                 R.string.solution_view_format_enu_baseline,
-                R.array.solution_view_coordinates_baseline_enu),
+                R.array.solution_view_coordinates_baseline_enu,
+                null),
 
-        PYL_BASELINE(5,
+        PYL_BASELINE(15,
                 R.string.solution_view_format_pyl_baseline,
-                R.array.solution_view_coordinates_baseline_pyl)
+                R.array.solution_view_coordinates_baseline_pyl,
+                null)
 
         ;
 
         final int mStyledAttributeValue;
         final int mHeadersArrayId;
         final int mDescriptionId;
+        final String mEPSGCode;
 
-        private Format(int styledAttributeValue, int descriptionId, int HeadersArrayId) {
+        private Format(int styledAttributeValue, int descriptionId, int HeadersArrayId, String EPSGCode) {
             mStyledAttributeValue = styledAttributeValue;
             mHeadersArrayId = HeadersArrayId;
             mDescriptionId = descriptionId;
+            mEPSGCode = EPSGCode;
         }
 
         static Format valueOfStyledAttr(int val) {
@@ -87,6 +141,9 @@ public class SolutionView extends TableLayout {
 
         public int getDescriptionResId() {
             return mDescriptionId;
+        }
+        public String getEPSNName() {
+            return mEPSGCode;
         }
     }
 
@@ -104,6 +161,7 @@ public class SolutionView extends TableLayout {
 
     private final SolutionIndicatorView mSolutionIndicatorView;
 
+    private final TextView mTextViewCoordinateSystem, mTextViewGeoidModel;
     private final TextView mTextViewCoord1Name, mTextViewCoord1Value;
     private final TextView mTextViewCoord2Name, mTextViewCoord2Value;
     private final TextView mTextViewCoord3Name, mTextViewCoord3Value;
@@ -111,6 +169,8 @@ public class SolutionView extends TableLayout {
 
     private final TextView mTextViewCovariance;
     private final TextView mTextViewAge;
+    private Proj4Converter proj4Converter = null;
+    private GeoidModel model;
 
     public SolutionView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -140,6 +200,8 @@ public class SolutionView extends TableLayout {
 
         mTextViewSolutionStatus = (TextView)findViewById(R.id.solution_status);
         mSolutionIndicatorView = (SolutionIndicatorView)findViewById(R.id.solution_indicator_view);
+        mTextViewCoordinateSystem = (TextView)findViewById(R.id.coordinate_system);
+        mTextViewGeoidModel = (TextView)findViewById(R.id.geoid_model);
         mTextViewCoord1Name = (TextView)findViewById(R.id.coord1_name);
         mTextViewCoord1Value = (TextView)findViewById(R.id.coord1_value);
         mTextViewCoord2Name = (TextView)findViewById(R.id.coord2_name);
@@ -211,11 +273,14 @@ public class SolutionView extends TableLayout {
         {
             dGeoidHeight = 0.0;
             mBoolIsGeodetic = false;
+            model = null;
+            mTextViewGeoidModel.setText(getResources().getStringArray(R.array.solopt_height_entries)[0]);
         }else
         {
             mBoolIsGeodetic = true;
-            GeoidModel model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
+            model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
             String filename = MainActivity.getFileStorageDirectory()+ File.separator + model.name()+".geoid";
+            mTextViewGeoidModel.setText(model.name());
 
             dGeoidHeight = RtkCommon.geoidh_from_external_model(lat, lon, model.getRtklibId(), filename);
         }
@@ -231,24 +296,66 @@ public class SolutionView extends TableLayout {
         RtkCommon.Matrix3x3 cov;
 
         roverEcefPos = sol.getPosition();
+        double lat,lon;
 
         switch (mSolutionFormat) {
+            case PROJ4_LAMBERT93:
+            case PROJ4_LAMBERT93_CC43:
+            case PROJ4_LAMBERT93_CC44:
+            case PROJ4_LAMBERT93_CC45:
+            case PROJ4_LAMBERT93_CC46:
+            case PROJ4_LAMBERT93_CC47:
+            case PROJ4_LAMBERT93_CC48:
+            case PROJ4_LAMBERT93_CC49:
+            case PROJ4_LAMBERT93_CC50:
+            case PROJ4_NAD83:
+                if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
+                    break;
+                }
+                if (proj4Converter == null)
+                {
+                    proj4Converter = new Proj4Converter();
+                }
+                roverPos = RtkCommon.ecef2pos(roverEcefPos);
+                lat = Math.toDegrees(roverPos.getLat());
+                lon = Math.toDegrees(roverPos.getLon());
+                cov = sol.getQrMatrix();
+                Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
+                dGeoidHeight = getAltitudeCorrection(roverPos.getLat(), roverPos.getLon());
+                ProjCoordinate proj4Coordinate = proj4Converter.convert(mSolutionFormat.getEPSNName(), lat, lon);
+                mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f m", proj4Coordinate.x));
+                mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f m", proj4Coordinate.y));
+                mTextViewCoord3Value.setText(String.format(Locale.US, "%.3f m el.", roverPos.getHeight()-dGeoidHeight));
+                if (mBoolIsGeodetic)
+                {
+                    mTextViewCoord3Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[3]); //Altitude
+                }else{
+                    mTextViewCoord3Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[2]); //Height
+                }
+                mTextViewCovariance.setText(String.format(
+                        Locale.US,
+                        "N:%6.3f\nE:%6.3f\nU:%6.3f m",
+                        Math.sqrt(Qe[4] < 0 ? 0 : Qe[4]),
+                        Math.sqrt(Qe[0] < 0 ? 0 : Qe[0]),
+                        Math.sqrt(Qe[8] < 0 ? 0 : Qe[8])
+                        ));
+                break;
         case UTM:
             if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
                 break;
             }
             roverPos = RtkCommon.ecef2pos(roverEcefPos);
-            double lat = Math.toDegrees(roverPos.getLat());
-            double lon = Math.toDegrees(roverPos.getLon());
+            lat = Math.toDegrees(roverPos.getLat());
+            lon = Math.toDegrees(roverPos.getLon());
             cov = sol.getQrMatrix();
             Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
             dGeoidHeight = getAltitudeCorrection(roverPos.getLat(), roverPos.getLon());
             CoordinatesConverter<LatLong, UTM> latLongToUTM = LatLong.CRS.getConverterTo(UTM.CRS);
             LatLong latLong = LatLong.valueOf(lat, lon, NonSI.DEGREE_ANGLE);
             UTM utm = latLongToUTM.convert(latLong);
-            mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f km", utm.eastingValue(SI.KILOMETER)));
-            mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f km", utm.northingValue(SI.KILOMETER)));
-            mTextViewCoord3Value.setText(String.format(Locale.US, "%.3f m el.", roverPos.getHeight()-dGeoidHeight));
+            mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f m", utm.eastingValue(SI.METER)));
+            mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f m", utm.northingValue(SI.METER)));
+            mTextViewCoord3Value.setText(String.format(Locale.US, "%.6f m el.", roverPos.getHeight()-dGeoidHeight));
             mTextViewCoord4Value.setText( Integer.toString(utm.longitudeZone())+utm.latitudeZone());
             if (mBoolIsGeodetic)
             {
@@ -419,10 +526,21 @@ public class SolutionView extends TableLayout {
         }else {
             headers = getResources().getStringArray(mSolutionFormat.mHeadersArrayId);
         }
+        mTextViewCoordinateSystem.setText(getResources().getString(mSolutionFormat.getDescriptionResId()));
+        if (model != null)
+        {
+            mTextViewGeoidModel.setText(model.name());
+        }
         mTextViewCoord1Name.setText(headers[0]);
         mTextViewCoord2Name.setText(headers[1]);
         mTextViewCoord3Name.setText(headers[2]);
-        //mTextViewCoord4Name.setText(headers[3]);
+        if (headers.length == 4)
+        {
+            mTextViewCoord4Name.setText(headers[3]);
+        }else{
+            mTextViewCoord4Name.setText("");
+            mTextViewCoord4Value.setText("");
+        }
     }
 
     public static class SolutionIndicatorView extends View {

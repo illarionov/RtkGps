@@ -11,7 +11,7 @@
 		<TableRow
 	    	android:layout_width="wrap_content"
 	    	android:layout_height="wrap_content"
-	    	android:paddingBottom="16dp" >
+	    	android:paddingBottom="0dp" >
 
 			<!--  <LinearLayout
 	        	android:layout_width="wrap_content"
@@ -42,7 +42,42 @@
         	     	/>
         	<!--   </LinearLayout> -->
     	</TableRow>
-
+		<TableRow
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content" >
+			<TextView
+				android:id="@+id/coordinate_system_title"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/solution_view_crs"			
+				android:minEms="2"
+				/>
+			<TextView
+				android:id="@+id/coordinate_system"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:gravity="right"
+				android:minEms="8"
+				/>
+		</TableRow>
+		<TableRow
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content" >
+			<TextView
+				android:id="@+id/geoid_model_title"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/solution_view_geoid"
+				android:minEms="3"
+				/>
+			<TextView
+				android:id="@+id/geoid_model"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:gravity="right"
+				android:minEms="7"
+				/>
+        </TableRow>
 		<TableRow
 	    	android:layout_width="wrap_content"
 	    	android:layout_height="wrap_content" >
