@@ -1,7 +1,8 @@
 package gpsplus.rtklib.constants;
 
-import gpsplus.rtkgps.R;
 import android.content.res.Resources;
+
+import gpsplus.rtkgps.R;
 
 /** Geoid model GEOID_XXX */
 public enum GeoidModel implements IHasRtklibId {
@@ -19,8 +20,10 @@ public enum GeoidModel implements IHasRtklibId {
     EGM2008_M10(3, R.string.geoid_egm2008_m10),
 
     /**  geoid model: GSI geoid 2000 1.0x1.5" */
-    GSI2000_M15(4, R.string.geoid_gsi2000_m15)
+    GSI2000_M15(4, R.string.geoid_gsi2000_m15),
 
+    /**  geoid model: RAF09 geoid 2009 1.5x2" */
+    RAF09_M15x20(5, R.string.geoid_raf09_m15x20)
     ;
 
     private final int mRtklibId;

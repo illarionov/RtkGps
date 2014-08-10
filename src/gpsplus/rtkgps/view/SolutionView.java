@@ -171,6 +171,7 @@ public class SolutionView extends TableLayout {
     private final TextView mTextViewAge;
     private Proj4Converter proj4Converter = null;
     private GeoidModel model;
+    public RtkCommon rtkCommon;
 
     public SolutionView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -242,6 +243,15 @@ public class SolutionView extends TableLayout {
         }
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        if (rtkCommon!=null)
+        {
+            rtkCommon.closegeoid();
+        }
+        super.finalize();
+    }
+
     public void setStats(RtkControlResult status) {
         final Solution sol = status.getSolution();
         mTextViewSolutionStatus.setText(sol.getSolutionStatus().getNameResId());
@@ -281,8 +291,12 @@ public class SolutionView extends TableLayout {
             model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
             String filename = MainActivity.getFileStorageDirectory()+ File.separator + model.name()+".geoid";
             mTextViewGeoidModel.setText(model.name());
-
-            dGeoidHeight = RtkCommon.geoidh_from_external_model(lat, lon, model.getRtklibId(), filename);
+            if (rtkCommon == null)
+            {
+                rtkCommon = new RtkCommon();
+                rtkCommon.opengeoid(model.getRtklibId(), filename);
+            }
+            dGeoidHeight = rtkCommon.geoidh(lat, lon);
         }
         return dGeoidHeight;
 

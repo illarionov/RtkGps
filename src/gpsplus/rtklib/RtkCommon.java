@@ -43,12 +43,12 @@ public class RtkCommon {
      * @param model
      * @param file filename with complete path
      */
-    public static native int opengeoid(int model, String file);
+    public native int opengeoid(int model, String file);
 
     /**
      * close geoid model
      */
-    public static native void closegeoid();
+    public native void closegeoid();
 
     /**
      * get geoid height from geoid model
@@ -56,7 +56,7 @@ public class RtkCommon {
      * @param lon geodetic position lon (rad)
      * @return geoid height (m) (0.0:error)
      */
-    public static native double geoidh(double lat, double lon);
+    public native double geoidh(double lat, double lon);
 
 
     /**

@@ -50,6 +50,7 @@ import gpsplus.rtklib.RtkServerSettings;
 import gpsplus.rtklib.RtkServerSettings.TransportSettings;
 import gpsplus.rtklib.RtkServerStreamStatus;
 import gpsplus.rtklib.Solution;
+import gpsplus.rtklib.constants.GeoidModel;
 import gpsplus.rtklib.constants.StreamType;
 
 import java.io.File;
@@ -657,7 +658,7 @@ public class RtkNaviService extends IntentService implements LocationListener
                                mGpxTrace.addPoint(Math.toDegrees(positionLatLon.getLat()),
                                                    Math.toDegrees(positionLatLon.getLon()),
                                                    positionLatLon.getHeight(),
-                                                   RtkCommon.geoidh(positionLatLon.getLat(), positionLatLon.getLon()),
+                                                   RtkCommon.geoidh_from_external_model(positionLatLon.getLat(), positionLatLon.getLon(),GeoidModel.EMBEDDED.getRtklibId(),""),
                                                    solution.getTime());
                             }
                         }

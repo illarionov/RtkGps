@@ -45,10 +45,11 @@ RTKLIB rtknavi port on android.
     EGM96_M150.geoid  
     EGM2008_M25.geoid  
     EGM2008_M10.geoid  
-    GSI2000_M15.geoid  
+    GSI2000_M15.geoid
+    RAF09_M15x20.geoid  
   ``` 
   
-  for example if you want to use EGM2008 2.5"x2.5" model you need:
+  for example if you want to use EGM2008 2.5'x2.5' model you need:
   ```
     1.  download from National Geospatial Intelligence Agency the model  
   			  on august 2014 file can be found http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm2008/Small_Endian/Und_min2.5x2.5_egm2008_isw=82_WGS84_TideFree_SE.gz   
@@ -56,7 +57,15 @@ RTKLIB rtknavi port on android.
     3.  place this model in RtkGps storage path (where all the trace and log go), on my tools it is /storage/sdcard0/RtkGps/
   ```
 
-  if you do not have the correct model or if model is inconsistent it will not show an error, rather than it will use the EGM96 1°x1° embedded model.
+  for example if you want to use IGN RAF09 1.5'x2.5' model you need:
+  ```
+    1.  download from IGN wich is the french national geographical institute the model  
+  			  on august 2014 file can be found http://geodesie.ign.fr/contenu/fichiers/documentation/grilles/metropole/RAF09.mnt   
+    2.  rename it RAF09_M15x20.geoid    
+    3.  place this model in RtkGps storage path (where all the trace and log go), on my tools it is /storage/sdcard0/RtkGps/
+  ```
+   
+  if you do not have the correct model or if model is inconsistent it will not show an error, rather than it will use the EGM96 1°x1° embedded model or it use ellipsoidal height.
   				
 #### Translations
 Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.net/project/gpsplusrtkgps/invite).   
