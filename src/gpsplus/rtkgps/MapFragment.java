@@ -126,7 +126,6 @@ public class MapFragment extends Fragment {
         }
 
         mMapView = new MapView(inflater.getContext(), 256, mResourceProxy);
-        mMapView.setUseSafeCanvas(true);
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
         mMapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -142,7 +141,7 @@ public class MapFragment extends Fragment {
 
         mScaleBarOverlay = new ScaleBarOverlay(context);
         mScaleBarOverlay.setCentred(true);
-        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels/2, actionBarHeight + 5.0f * dm.density);
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels/2, (int)(actionBarHeight + 5.0f * dm.density));
 
         mMapView.getOverlays().add(mPathOverlay);
         mMapView.getOverlays().add(mScaleBarOverlay);
