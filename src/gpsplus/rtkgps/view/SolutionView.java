@@ -12,7 +12,6 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.MainActivity;
 import gpsplus.rtkgps.Proj4Converter;
 import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
@@ -29,7 +28,6 @@ import org.jscience.geography.coordinates.UTM;
 import org.jscience.geography.coordinates.crs.CoordinatesConverter;
 import org.osgeo.proj4j.ProjCoordinate;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -289,14 +287,12 @@ public class SolutionView extends TableLayout {
         {
             mBoolIsGeodetic = true;
             model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
-            String filename = MainActivity.getFileStorageDirectory()+ File.separator + model.name()+".geoid";
             mTextViewGeoidModel.setText(model.name());
             if (rtkCommon == null)
             {
                 rtkCommon = new RtkCommon();
-                rtkCommon.opengeoid(model.getRtklibId(), filename);
             }
-            dGeoidHeight = rtkCommon.geoidh(lat, lon);
+            dGeoidHeight = rtkCommon.getAltitudeCorrection(lat, lon, model.getRtklibId());
         }
         return dGeoidHeight;
 

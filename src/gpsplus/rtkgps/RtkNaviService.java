@@ -110,6 +110,7 @@ public class RtkNaviService extends IntentService implements LocationListener
     private static final String RTK_GPS_MOCK_LOCATION_SERVICE = "RtkGps mock location service";
     private static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
     private int NOTIFICATION = R.string.local_service_started;
+    private RtkCommon rtkCommon;
 
     // Binder given to clients
     private final IBinder mBinder = new RtkNaviServiceBinder();
@@ -253,6 +254,8 @@ public class RtkNaviService extends IntentService implements LocationListener
                     Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock Location service was started");
                 }
         }
+        GeoidModel model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
+        rtkCommon = new RtkCommon(model);
         mBoolIsRunning = true;
     }
 
@@ -658,7 +661,7 @@ public class RtkNaviService extends IntentService implements LocationListener
                                mGpxTrace.addPoint(Math.toDegrees(positionLatLon.getLat()),
                                                    Math.toDegrees(positionLatLon.getLon()),
                                                    positionLatLon.getHeight(),
-                                                   RtkCommon.geoidh_from_external_model(positionLatLon.getLat(), positionLatLon.getLon(),GeoidModel.EMBEDDED.getRtklibId(),""),
+                                                   rtkCommon.getAltitudeCorrection(positionLatLon.getLat(), positionLatLon.getLon()),
                                                    solution.getTime());
                             }
                         }

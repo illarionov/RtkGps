@@ -1,5 +1,6 @@
 package gpsplus.rtklib;
 
+import gpsplus.rtklib.constants.GeoidModel;
 import proguard.annotation.Keep;
 
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import javax.annotation.Nullable;
 
 public class RtkCommon {
 
+    private int modelId = 0;  //EMBEDDED
     /**
      * convert satellite number to satellite id
      * @param satNo satellite number
@@ -18,6 +20,22 @@ public class RtkCommon {
     public static native String getSatId(int satNo);
 
 
+    public RtkCommon(int modelId) {
+        super();
+        this.modelId = modelId;
+        opengeoid(modelId, GeoidModel.getGeoidFilename(modelId));
+    }
+
+    public RtkCommon() {
+        super();
+        this.modelId = 0;
+    }
+
+    public RtkCommon(GeoidModel geoidModel) {
+        super();
+        this.modelId = geoidModel.getRtklibId();
+        opengeoid(this.modelId, GeoidModel.getGeoidFilename(this.modelId));
+    }
     /**
      * compute DOP (dilution of precision)
      * @param azel  satellite azimuth/elevation angle (rad)
@@ -58,7 +76,21 @@ public class RtkCommon {
      */
     public native double geoidh(double lat, double lon);
 
-
+    public double getAltitudeCorrection(double lat, double lon)
+    {
+        return geoidh(lat,lon);
+    }
+    public double getAltitudeCorrection(double lat, double lon, int model)
+    {
+        String filename = GeoidModel.getGeoidFilename(model);
+        if (model!=this.modelId)
+        {
+            closegeoid();
+            opengeoid(model,filename);
+            this.modelId = model;
+        }
+        return getAltitudeCorrection(lat,lon);
+    }
     /**
      * get geoid height from geoid external model (or mod 0 for embedded)
      * @param lat geodetic position lat (rad)

@@ -129,7 +129,7 @@
   <string name="times_gpst">Heure GPS</string>
   <string name="times_utc">UTC</string>
   <string name="times_jst">JST</string>
-  <string name="solq_none">Aucun</string>
+  <string name="solq_none">Aucune</string>
   <string name="solq_fix">Fixe</string>
   <string name="solq_float">Flottante</string>
   <string name="solq_sbas">SBAS</string>
@@ -195,6 +195,7 @@
   <string name="geoid_egm2008_m25">EGM2008 2.5x2.5\'</string>
   <string name="geoid_egm2008_m10">EGM2008 1.0x1.0\'</string>
   <string name="geoid_gsi2000_m15">GSI geoid 2000 1.0x1.5\'</string>
+  <string name="geoid_raf09_m15x20">IGN RAF09 1.5x2.0\'</string>
   <string name="ephopt_brdc">Éphémérides radiodiffusées</string>
   <string name="ephopt_prec">Éphémérides précises</string>
   <string name="ephopt_sbas">Radiodiffusées + SBAS</string>

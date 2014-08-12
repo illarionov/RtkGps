@@ -2,7 +2,10 @@ package gpsplus.rtklib.constants;
 
 import android.content.res.Resources;
 
+import gpsplus.rtkgps.MainActivity;
 import gpsplus.rtkgps.R;
+
+import java.io.File;
 
 /** Geoid model GEOID_XXX */
 public enum GeoidModel implements IHasRtklibId {
@@ -63,5 +66,10 @@ public enum GeoidModel implements IHasRtklibId {
         final CharSequence res[] = new CharSequence[values.length];
         for (int i=0; i<values.length; ++i) res[i] = values[i].name();
         return res;
+    }
+    public static String getGeoidFilename(int rtklibId) {
+        GeoidModel geoidModel = GeoidModel.valueOf(rtklibId);
+        String filename = MainActivity.getFileStorageDirectory()+ File.separator + geoidModel.name()+".geoid";
+        return filename;
     }
 }

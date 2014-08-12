@@ -23,3 +23,13 @@
 /build
 
 
+
+.README.md.html
+
+.settings/org.eclipse.core.resources.prefs
+
+custom_rules.xml
+
+egm2008_se.geoid
+
+my-release-key.keystore
