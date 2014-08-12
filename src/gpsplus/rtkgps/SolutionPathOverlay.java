@@ -1,5 +1,6 @@
 package gpsplus.rtkgps;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -7,18 +8,17 @@ import android.graphics.Rect;
 
 import gpsplus.rtkgps.view.SolutionView;
 import gpsplus.rtklib.RtkCommon;
-import gpsplus.rtklib.Solution;
 import gpsplus.rtklib.RtkCommon.Position3d;
+import gpsplus.rtklib.Solution;
 import gpsplus.rtklib.constants.SolutionStatus;
 import microsoft.mappoint.TileSystem;
 
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.MapView.Projection;
-import org.osmdroid.views.overlay.SafeDrawOverlay;
-import org.osmdroid.views.safecanvas.ISafeCanvas;
-import org.osmdroid.views.safecanvas.SafePaint;
-import org.osmdroid.views.safecanvas.SafeTranslatedPath;
+import org.osmdroid.views.Projection;
+import org.osmdroid.views.drawing.OsmPath;
+import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.util.constants.MapViewConstants;
 
 /**
@@ -28,7 +28,7 @@ import org.osmdroid.views.util.constants.MapViewConstants;
  *
  *         This class draws a path line in given color.
  */
-public class SolutionPathOverlay extends SafeDrawOverlay {
+public class SolutionPathOverlay extends PathOverlay {
 
     private static final int DEFAULT_SIZE = 1000;
     private static final int PATH_COLOR = Color.GRAY;
@@ -41,13 +41,13 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
 	private int mBufHead;
 	private int mBufSize;
 
-	private final double mPointsCache[][];
+	private final float mPointsCache[][];
 	private final int mPointsCacheSize[];
 
-	private final SafePaint mPaint;
-	private final SafePaint mPointPaint;
+	private final Paint mPaint;
+	private final Paint mPointPaint;
 
-	private final SafeTranslatedPath mPath;
+	private final OsmPath mPath;
 
 
 	public SolutionPathOverlay(final ResourceProxy pResourceProxy) {
@@ -55,18 +55,18 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
 	}
 
 	public SolutionPathOverlay(final int size, final ResourceProxy pResourceProxy) {
-		super(pResourceProxy);
+		super(PATH_COLOR,pResourceProxy);
 
-	    this.mPaint = new SafePaint();
-	    this.mPointPaint = new SafePaint();
-	    this.mPath = new SafeTranslatedPath();
+	    this.mPaint = new Paint();
+	    this.mPointPaint = new Paint();
+	    this.mPath = new OsmPath();
 		this.mProjectedX = new int[size];
 		this.mProjectedY = new int[size];
 		this.mPointSolutionStatus = new SolutionStatus[size];
 		this.mBufHead = 0;
 		this.mBufSize = 0;
 
-		this.mPointsCache = new double[SolutionStatus.values().length][];
+		this.mPointsCache = new float[SolutionStatus.values().length][];
 		this.mPointsCacheSize = new int[this.mPointsCache.length];
 
 		this.mPaint.setColor(PATH_COLOR);
@@ -137,16 +137,16 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
 	private void appendPoint(double x, double y, SolutionStatus status) {
 	    final int ord = status.ordinal();
 	    if (mPointsCache[ord] == null) {
-	        mPointsCache[ord] = new double[getSize() * 2];
+	        mPointsCache[ord] = new float[getSize() * 2];
 	    }
 
-	    final double dst[] = mPointsCache[ord];
-	    dst[mPointsCacheSize[ord]] = x;
-	    dst[mPointsCacheSize[ord]+1] = y;
+	    final float dst[] = mPointsCache[ord];
+	    dst[mPointsCacheSize[ord]] = (float)x;
+	    dst[mPointsCacheSize[ord]+1] = (float)y;
 	    mPointsCacheSize[ord] += 2;
 	}
 
-	private void drawPoints(ISafeCanvas canvas) {
+	private void drawPoints(Canvas canvas) {
 	    for (int i = mPointsCache.length-1; i >= 0; i--) {
 	        final int count = mPointsCacheSize[i];
 	        if (count == 0) continue;
@@ -161,7 +161,7 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
 	 * Should be fine up to 10K points.
 	 */
     @Override
-    protected void drawSafe(ISafeCanvas canvas, MapView osmv, boolean shadow) {
+    protected void draw(Canvas canvas, MapView osmv, boolean shadow) {
         final Projection pj;
         final Rect clipBounds, lineBounds;
         Point screenPoint0, screenPoint1;
@@ -181,7 +181,12 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
         pj = osmv.getProjection();
 
         // clipping rectangle in the intermediate projection, to avoid performing projection.
-        clipBounds = pj.fromPixelsToProjected(pj.getScreenRect());
+        BoundingBoxE6 boundingBox = pj.getBoundingBox();
+        Point topLeft = pj.toProjectedPixels(boundingBox.getLatNorthE6(),
+                boundingBox.getLonWestE6(), null);
+        Point bottomRight = pj.toProjectedPixels(boundingBox.getLatSouthE6(),
+                boundingBox.getLonEastE6(), null);
+        clipBounds = new Rect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
 
         screenPoint0 = null;
         screenPoint1 = null;
@@ -190,7 +195,7 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
         tempPoint0 = new Point();
         tempPoint1 = new Point();
 
-        mPath.onDrawCycleStart(canvas);
+        mPath.rewind();
 
         bufIdx = (mBufHead + mBufSize - 1) % getSize();
         projectedPoint0.set(mProjectedX[bufIdx], mProjectedY[bufIdx]);
@@ -213,12 +218,12 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
             // the starting point may be not calculated, because previous segment was out of clip
             // bounds
             if (screenPoint0 == null) {
-                screenPoint0 = pj.toMapPixelsTranslated(projectedPoint0, tempPoint0);
-                mPath.moveTo((double)screenPoint0.x, (double)screenPoint0.y);
+                screenPoint0 = pj.toPixelsFromProjected(projectedPoint0, tempPoint0);
+                mPath.moveTo(screenPoint0.x, screenPoint0.y);
                 appendPoint(screenPoint0.x, screenPoint0.y, mPointSolutionStatus[bufIdx]);
             }
 
-            screenPoint1 = pj.toMapPixelsTranslated(projectedPoint1, tempPoint1);
+            screenPoint1 = pj.toPixelsFromProjected(projectedPoint1, tempPoint1);
 
             // skip this point, too close to previous point
             if (Math.abs(screenPoint1.x - screenPoint0.x) + Math.abs(screenPoint1.y - screenPoint0.y) <= 1) {
@@ -226,7 +231,7 @@ public class SolutionPathOverlay extends SafeDrawOverlay {
             }
 
             canvas.drawLine(screenPoint0.x, screenPoint0.y, screenPoint1.x, screenPoint1.y, mPaint);
-            mPath.lineTo((double)screenPoint1.x, (double)screenPoint1.y);
+            mPath.lineTo(screenPoint1.x, screenPoint1.y);
             appendPoint(screenPoint1.x, screenPoint1.y, mPointSolutionStatus[bufIdx]);
 
             // update starting point to next position
