@@ -35,6 +35,7 @@ RTKLIB rtknavi port on android.
 * Ability to zip files before uploading to Dropbox for reducing the data volume.
 * Generate a GPX track (Output view/GPX Track tab)
 * Show UTM coordinates in solution view
+* Support for french Geoportail maps (cadastral parcels, roads and satellite) - needs api license key see src/gpsplus/rtkgps/geoportail/License.java.sample 
 
 #### Geoids
 * you can select different geoid model in "Solution Option"/Geoid model but except for embedded model (EGM96 1°x1°)  

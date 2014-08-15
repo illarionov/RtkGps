@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.geoportail.License;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -120,7 +121,7 @@ public class WMTSMapTileDownloader extends MapTileModuleProviderBase {
 
     @Override
     protected String getName() {
-        return "WMS Online Tile Download Provider";
+        return "WMTS Online Tile Download Provider";
     }
 
     @Override
@@ -210,7 +211,7 @@ public class WMTSMapTileDownloader extends MapTileModuleProviderBase {
 
                 final HttpUriRequest head = new HttpGet(tileURLString);
                 //Geoportail has a mandatory user-agent
-                head.setHeader("User-Agent", "Android");
+                head.setHeader("User-Agent", License.USER_AGENT); // TODO have tileSource dependent User-Agent
                 final HttpResponse response = httpClient.execute(head);
 
                 // Check to see if we got success

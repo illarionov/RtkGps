@@ -33,3 +33,5 @@ custom_rules.xml
 egm2008_se.geoid
 
 my-release-key.keystore
+
+src/gpsplus/rtkgps/geoportail/License.java
