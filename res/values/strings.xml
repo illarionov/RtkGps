@@ -22,6 +22,9 @@
     <string name="menu_map_mode_osm">OpenStreetMap</string>
     <string name="menu_map_mode_bing_aerial">Bing Aerial</string>
     <string name="menu_map_mode_bing_road">Bing Road</string>
+    <string name="menu_map_mode_geoportail_map">Geoportail map</string>
+    <string name="menu_map_mode_geoportail_cadastral">Geoportail cadastral</string>
+    <string name="menu_map_mode_geoportail_orthoimages">Geoportail aerial</string>
     <string name="local_service_started">Local service started</string>
     <string name="local_service_stopped">Local service stopped</string>
     <string name="local_service_label">RtkGps</string>
