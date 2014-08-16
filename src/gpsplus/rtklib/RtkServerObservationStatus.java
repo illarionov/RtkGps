@@ -1,17 +1,17 @@
 package gpsplus.rtklib;
 
+import android.annotation.SuppressLint;
+
+import gpsplus.rtklib.RtkCommon.Dops;
+import gpsplus.rtklib.constants.Constants;
+
+import junit.framework.Assert;
+
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-
-import junit.framework.Assert;
-
-import android.annotation.SuppressLint;
-
-import gpsplus.rtklib.RtkCommon.Dops;
-import gpsplus.rtklib.constants.Constants;
 
 public class RtkServerObservationStatus {
 
@@ -201,6 +201,17 @@ public class RtkServerObservationStatus {
         System.arraycopy(mNative.vsat, 0, dst.mNative.vsat, 0, mNative.ns);
     }
 
+    public void addValues(int sat, double az, double el, int freq1Snr, int freq2Snr, int freq3Snr, int vsat){
+       //mNative.time.setGTime(time, sec);
+        mNative.sat[mNative.ns]=sat;
+       mNative.az[mNative.ns] = az;
+       mNative.el[mNative.ns] = el;
+       mNative.freq1Snr[mNative.ns]=freq1Snr;
+       mNative.freq2Snr[mNative.ns]=freq2Snr;
+       mNative.freq3Snr[mNative.ns]=freq3Snr;
+       mNative.vsat[mNative.ns]=vsat;
+       mNative.ns++;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -1,10 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,10 +9,14 @@ import android.preference.TwoStatePreference;
 import android.text.TextUtils;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.widget.StreamFormatPreference;
 import gpsplus.rtkgps.settings.widget.StreamTypePreference;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkServerSettings.InputStream;
+
+import javax.annotation.Nonnull;
 
 
 public class InputBaseFragment extends InputRoverFragment {
@@ -25,7 +24,7 @@ public class InputBaseFragment extends InputRoverFragment {
     private static final boolean DBG = BuildConfig.DEBUG & true;
     static final String TAG = InputBaseFragment.class.getSimpleName();
 
-    static final String SHARED_PREFS_NAME = "InputBase";
+    public static final String SHARED_PREFS_NAME = "InputBase";
 
     protected static final String KEY_TRANSMIT_GPGGA_TO_BASE = "transmit_gpgga_to_base";
     protected static final String KEY_TRANSMIT_GPGGA_LAT = "transmit_gpgga_latitude";

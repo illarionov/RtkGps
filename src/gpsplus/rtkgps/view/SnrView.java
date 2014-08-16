@@ -1,8 +1,5 @@
 package gpsplus.rtkgps.view;
 
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -16,6 +13,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.RtkServerObservationStatus;
 import gpsplus.rtklib.RtkServerObservationStatus.SatStatus;
 
@@ -253,7 +252,7 @@ public class SnrView extends View {
 
             // Text
             canvas.drawText(
-                    !isInEditMode() ? satStatus.getSatId() : "S" + satStatus.getSatNumber(),
+                    satStatus.getSatId(),
                     barBox.left + barBoxWidth/2.0f,
                     gridRect.bottom + mGridTextPaint.getTextSize(),
                     mGridTextPaint

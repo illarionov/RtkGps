@@ -354,6 +354,8 @@
     <item>4</item>
     <item>5</item>
   </string-array>
+  <string name="solopt_output_testmode_title">Activer le mode test</string>
+  <string name="solopt_output_testmode_summary">Si cette option est activée et Mobile/Base/Correction sont désactivés, RtkGps+ s\'exécute dans un mode spécial de test avec des positions venant du GPS interne. Évidemment aucun algorithme de RTKLIB ne peut fonctionner</string>
   <string name="streams_settings_type_title">Type</string>
   <string name="streams_settings_format_title">Format</string>
   <string name="streams_settings_button_title">Paramètres de flux&#8230;</string>

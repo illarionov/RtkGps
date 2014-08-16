@@ -73,4 +73,10 @@
 		android:title="@string/solopt_output_mocklocation_title"
 		android:summary="@string/solopt_output_mocklocation_summary"
         />
+	
+	<CheckBoxPreference
+		android:key="enable_testmode"
+		android:title="@string/solopt_output_testmode_title"
+		android:summary="@string/solopt_output_testmode_summary"
+        />
 </PreferenceScreen>

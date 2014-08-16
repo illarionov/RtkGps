@@ -1,13 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +11,8 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.StationPositionActivity.Value;
 import gpsplus.rtkgps.settings.widget.StreamFormatPreference;
 import gpsplus.rtkgps.settings.widget.StreamTypePreference;
@@ -29,13 +23,18 @@ import gpsplus.rtklib.constants.StationPositionType;
 import gpsplus.rtklib.constants.StreamFormat;
 import gpsplus.rtklib.constants.StreamType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.annotation.Nonnull;
+
 
 public class InputRoverFragment extends PreferenceFragment {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
-    private static final String SHARED_PREFS_NAME = "InputRover";
-    static final String KEY_ENABLE = "enable";
+    public static final String SHARED_PREFS_NAME = "InputRover";
+    public static final String KEY_ENABLE = "enable";
     static final String KEY_TYPE = "type";
     static final String KEY_FORMAT = "format";
     static final String KEY_STREAM_SETTINGS_BUTTON = "stream_settings_button";

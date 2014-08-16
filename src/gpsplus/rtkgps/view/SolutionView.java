@@ -12,11 +12,15 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.DemoModeLocation;
+import gpsplus.rtkgps.MainActivity;
 import gpsplus.rtkgps.Proj4Converter;
 import gpsplus.rtkgps.R;
+import gpsplus.rtkgps.RtkNaviService;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Deg2Dms;
+import gpsplus.rtklib.RtkCommon.Matrix3x3;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.RtkControlResult;
 import gpsplus.rtklib.Solution;
@@ -170,6 +174,7 @@ public class SolutionView extends TableLayout {
     private Proj4Converter proj4Converter = null;
     private GeoidModel model;
     public RtkCommon rtkCommon;
+    private DemoModeLocation mDemoModeLocation;
 
     public SolutionView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -230,7 +235,9 @@ public class SolutionView extends TableLayout {
             mTextViewAge.setTextColor(textColor);
         }
 
-        if (isInEditMode()) {
+        mDemoModeLocation = MainActivity.getDemoModeLocation();
+
+        if (mDemoModeLocation.isInDemoMode()) {
             mSolutionFormat = Format.WGS84;
             updateCoordinatesHeader();
             setStats(new RtkControlResult());
@@ -302,11 +309,40 @@ public class SolutionView extends TableLayout {
         double Qe[];
         double dGeoidHeight = 0.0;
         final Solution sol = rtk.getSolution();
-        final Position3d roverEcefPos;
+        Position3d roverEcefPos = new Position3d();
         RtkCommon.Matrix3x3 cov;
 
-        roverEcefPos = sol.getPosition();
-        double lat,lon;
+
+        double lat,lon,height;
+        if (mDemoModeLocation.isInDemoMode() && RtkNaviService.mbStarted) {
+            roverPos = mDemoModeLocation.getPosition();
+            if (roverPos == null){
+                return;
+            }
+            lat = roverPos.getLat();
+            lon=roverPos.getLon();
+            height=roverPos.getHeight();
+            Qe = new double[9];
+            Qe[4] = mDemoModeLocation.getNAccuracy();
+            Qe[0] = mDemoModeLocation.getEAccuracy();
+            Qe[8] = mDemoModeLocation.getVAccuracy();
+            double[] covD = {0,0,0,0,0,0,0,0,0} ;
+            cov = new Matrix3x3(covD);
+            RtkCommon.pos2ecef(lat, lon, height, roverEcefPos);
+        }else {
+            roverEcefPos = sol.getPosition();
+            if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
+                return;
+            }
+            roverPos = RtkCommon.ecef2pos(roverEcefPos);
+            cov = sol.getQrMatrix();
+            lat = roverPos.getLat();
+            lon=roverPos.getLon();
+            height=roverPos.getHeight();
+            Qe = RtkCommon.covenu(lat, lon, cov).getValues();
+        }
+        double dlat = Math.toDegrees(lat);
+        double dlon = Math.toDegrees(lon);
 
         switch (mSolutionFormat) {
             case PROJ4_LAMBERT93:
@@ -319,23 +355,16 @@ public class SolutionView extends TableLayout {
             case PROJ4_LAMBERT93_CC49:
             case PROJ4_LAMBERT93_CC50:
             case PROJ4_NAD83:
-                if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
-                    break;
-                }
                 if (proj4Converter == null)
                 {
                     proj4Converter = new Proj4Converter();
                 }
-                roverPos = RtkCommon.ecef2pos(roverEcefPos);
-                lat = Math.toDegrees(roverPos.getLat());
-                lon = Math.toDegrees(roverPos.getLon());
                 cov = sol.getQrMatrix();
-                Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
-                dGeoidHeight = getAltitudeCorrection(roverPos.getLat(), roverPos.getLon());
-                ProjCoordinate proj4Coordinate = proj4Converter.convert(mSolutionFormat.getEPSNName(), lat, lon);
+                dGeoidHeight = getAltitudeCorrection(lat, lon);
+                ProjCoordinate proj4Coordinate = proj4Converter.convert(mSolutionFormat.getEPSNName(), dlat, dlon);
                 mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f m", proj4Coordinate.x));
                 mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f m", proj4Coordinate.y));
-                mTextViewCoord3Value.setText(String.format(Locale.US, "%.3f m el.", roverPos.getHeight()-dGeoidHeight));
+                mTextViewCoord3Value.setText(String.format(Locale.US, "%.3f m el.", height-dGeoidHeight));
                 if (mBoolIsGeodetic)
                 {
                     mTextViewCoord3Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[3]); //Altitude
@@ -351,21 +380,14 @@ public class SolutionView extends TableLayout {
                         ));
                 break;
         case UTM:
-            if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
-                break;
-            }
-            roverPos = RtkCommon.ecef2pos(roverEcefPos);
-            lat = Math.toDegrees(roverPos.getLat());
-            lon = Math.toDegrees(roverPos.getLon());
-            cov = sol.getQrMatrix();
-            Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
-            dGeoidHeight = getAltitudeCorrection(roverPos.getLat(), roverPos.getLon());
+
+            dGeoidHeight = getAltitudeCorrection(lat, lon);
             CoordinatesConverter<LatLong, UTM> latLongToUTM = LatLong.CRS.getConverterTo(UTM.CRS);
             LatLong latLong = LatLong.valueOf(lat, lon, NonSI.DEGREE_ANGLE);
             UTM utm = latLongToUTM.convert(latLong);
             mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f m", utm.eastingValue(SI.METER)));
             mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f m", utm.northingValue(SI.METER)));
-            mTextViewCoord3Value.setText(String.format(Locale.US, "%.6f m el.", roverPos.getHeight()-dGeoidHeight));
+            mTextViewCoord3Value.setText(String.format(Locale.US, "%.3f m el.", height-dGeoidHeight));
             mTextViewCoord4Value.setText( Integer.toString(utm.longitudeZone())+utm.latitudeZone());
             if (mBoolIsGeodetic)
             {
@@ -386,27 +408,15 @@ public class SolutionView extends TableLayout {
         case WGS84_FLOAT:
             String strLat, strLon, strHeight,strAltitude="";
 
-            if (isInEditMode()) {
-                strLat = "-34.56785678°";
-                strLon = "123.45454545°";
-                strHeight = "45.324m el.";
-                Qe = new double[9];
-            }else {
-                if (RtkCommon.norm(roverEcefPos.getValues()) <= 0.0) {
-                    break;
-                }
-                roverPos = RtkCommon.ecef2pos(roverEcefPos);
-                cov = sol.getQrMatrix();
-                Qe = RtkCommon.covenu(roverPos.getLat(), roverPos.getLon(), cov).getValues();
                 if (mSolutionFormat == Format.WGS84) {
-                    strLat = Deg2Dms.toString(Math.toDegrees(roverPos.getLat()), true);
-                    strLon = Deg2Dms.toString(Math.toDegrees(roverPos.getLon()), false);
+                    strLat = Deg2Dms.toString(Math.toDegrees(lat), true);
+                    strLon = Deg2Dms.toString(Math.toDegrees(lon), false);
                 }else {
-                    strLat = String.format(Locale.US, "%11.8f°", Math.toDegrees(roverPos.getLat()));
-                    strLon = String.format(Locale.US, "%11.8f°", Math.toDegrees(roverPos.getLon()));
+                    strLat = String.format(Locale.US, "%11.8f°", Math.toDegrees(lat));
+                    strLon = String.format(Locale.US, "%11.8f°", Math.toDegrees(lon));
                 }
 
-                dGeoidHeight = getAltitudeCorrection(roverPos.getLat(), roverPos.getLon());
+                dGeoidHeight = getAltitudeCorrection(lat, lon);
 
                 if (mBoolIsGeodetic)
                 {
@@ -416,10 +426,8 @@ public class SolutionView extends TableLayout {
                 {
                     mTextViewCoord4Name.setText("");
                 }
-                strAltitude = String.format(Locale.US, "%.3fm el.", roverPos.getHeight()-dGeoidHeight);
-                strHeight = String.format(Locale.US, "%.3fm el.", roverPos.getHeight());
-
-            }
+                strAltitude = String.format(Locale.US, "%.3fm el.", height-dGeoidHeight);
+                strHeight = String.format(Locale.US, "%.3fm el.", height);
 
             mTextViewCoord1Value.setText(strLat);
             mTextViewCoord2Value.setText(strLon);
@@ -518,14 +526,26 @@ public class SolutionView extends TableLayout {
 
     private void updateAgeText(Solution sol) {
         String format = getResources().getString(R.string.solution_view_age_text_format);
+        if (mDemoModeLocation.isInDemoMode() && RtkNaviService.mbStarted) {
 
-        mTextViewAge.setText(String.format(
-                Locale.US,
-                format,
-                sol.getAge(),
-                sol.getRatio(),
-                sol.getNs()
-                ));
+            mTextViewAge.setText(String.format(
+                    Locale.US,
+                    format,
+                    mDemoModeLocation.getAge(),
+                    0.0,
+                    mDemoModeLocation.getNbSat()
+                    ));
+
+        }else{
+
+            mTextViewAge.setText(String.format(
+                    Locale.US,
+                    format,
+                    sol.getAge(),
+                    sol.getRatio(),
+                    sol.getNs()
+                    ));
+        }
 
     }
 

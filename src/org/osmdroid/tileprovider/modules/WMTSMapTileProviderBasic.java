@@ -6,12 +6,6 @@ import org.osmdroid.tileprovider.IMapTileProviderCallback;
 import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.MapTileProviderArray;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
-import org.osmdroid.tileprovider.modules.INetworkAvailablityCheck;
-import org.osmdroid.tileprovider.modules.MapTileFileArchiveProvider;
-import org.osmdroid.tileprovider.modules.MapTileFilesystemProvider;
-import org.osmdroid.tileprovider.modules.NetworkAvailabliltyCheck;
-import org.osmdroid.tileprovider.modules.TileWriter;
-import org.osmdroid.tileprovider.modules.WMTSMapTileDownloader;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
@@ -48,7 +42,7 @@ public class WMTSMapTileProviderBasic extends MapTileProviderArray implements IM
             final INetworkAvailablityCheck aNetworkAvailablityCheck, final ITileSource pTileSource) {
         super(pTileSource, pRegisterReceiver);
 
-        final TileWriter tileWriter = new TileWriter();
+        final WMTSTileWriter tileWriter = new WMTSTileWriter();
 
         final MapTileFilesystemProvider fileSystemProvider = new MapTileFilesystemProvider(
                 pRegisterReceiver, pTileSource);

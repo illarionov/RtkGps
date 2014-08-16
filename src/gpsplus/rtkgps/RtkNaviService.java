@@ -117,6 +117,7 @@ public class RtkNaviService extends IntentService implements LocationListener
 
     private final RtkServer mRtkServer = new RtkServer();
 
+    public static boolean mbStarted = false;
     private PowerManager.WakeLock mCpuLock;
 
     private BluetoothToRtklib mBtRover, mBtBase;
@@ -169,7 +170,12 @@ public class RtkNaviService extends IntentService implements LocationListener
 
     public final RtkServerObservationStatus getRoverObservationStatus(
             RtkServerObservationStatus status) {
-        return mRtkServer.getRoverObservationStatus(status);
+        if (MainActivity.getDemoModeLocation().isInDemoMode() && mbStarted)
+        {
+            return MainActivity.getDemoModeLocation().getObservationStatus(status);
+        }else{
+            return mRtkServer.getRoverObservationStatus(status);
+        }
     }
 
     public final RtkServerObservationStatus getBaseObservationStatus(
@@ -208,6 +214,16 @@ public class RtkNaviService extends IntentService implements LocationListener
     public void processStart() {
         final RtkServerSettings settings;
 
+        mbStarted = true;
+        try {
+            MainActivity.getDemoModeLocation().reset();
+            if (MainActivity.getDemoModeLocation().isInDemoMode())
+            {
+                MainActivity.getDemoModeLocation().startDemoMode();
+            }
+        } catch (NullPointerException e) {
+            // TODO Auto-generated catch block
+        }
         if (isServiceStarted()) return;
 
         settings = SettingsHelper.loadSettings(this);
@@ -262,6 +278,11 @@ public class RtkNaviService extends IntentService implements LocationListener
 
     private void processStop() {
         mBoolIsRunning = false;
+        mbStarted = false;
+        if (MainActivity.getDemoModeLocation().isInDemoMode())
+        {
+            MainActivity.getDemoModeLocation().stopDemoMode();
+        }
         if (mBoolMockLocationsPref)
         {
             LocationManager lm = (LocationManager) getSystemService(

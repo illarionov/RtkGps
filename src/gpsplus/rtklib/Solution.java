@@ -4,11 +4,10 @@ import gpsplus.rtklib.RtkCommon.Matrix3x3;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.constants.Constants;
 import gpsplus.rtklib.constants.SolutionStatus;
+import proguard.annotation.Keep;
 
 import java.util.Arrays;
 import java.util.Locale;
-
-import proguard.annotation.Keep;
 
 public class Solution {
 

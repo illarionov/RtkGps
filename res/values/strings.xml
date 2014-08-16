@@ -447,6 +447,8 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+    <string name="solopt_output_testmode_title">Enable test mode</string>
+    <string name="solopt_output_testmode_summary">If this is enabled and Rover/Base/Correction are off, it runs in a special test mode with positions coming from internal GPS. Obviously no algorithm from RTKLIB can work</string>
     
     <!-- Input streams settings -->
 	<string name="streams_settings_type_title">Type</string>

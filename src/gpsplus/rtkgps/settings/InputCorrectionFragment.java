@@ -1,18 +1,17 @@
 package gpsplus.rtkgps.settings;
 
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.content.Context;
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.settings.widget.StreamFormatPreference;
 import gpsplus.rtkgps.settings.widget.StreamTypePreference;
 import gpsplus.rtklib.RtkServerSettings.InputStream;
 import gpsplus.rtklib.constants.StreamFormat;
 import gpsplus.rtklib.constants.StreamType;
+
+import javax.annotation.Nonnull;
 
 
 public class InputCorrectionFragment extends InputRoverFragment {
@@ -20,7 +19,7 @@ public class InputCorrectionFragment extends InputRoverFragment {
     private static final boolean DBG = BuildConfig.DEBUG & true;
     static final String TAG = InputBaseFragment.class.getSimpleName();
 
-    static final String SHARED_PREFS_NAME = "InputCorrection";
+    public static final String SHARED_PREFS_NAME = "InputCorrection";
 
     static final StreamType CORRECTION_STREAM_TYPES[] = new StreamType[] {
         StreamType.TCPCLI,

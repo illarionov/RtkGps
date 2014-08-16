@@ -416,11 +416,18 @@ public class MapFragment extends Fragment {
         }
 
         private void setSolution(Solution s, boolean notifyConsumer) {
-            if (s.getSolutionStatus() == SolutionStatus.NONE) {
-                return;
+            Position3d pos;
+            if (MainActivity.getDemoModeLocation().isInDemoMode() && RtkNaviService.mbStarted) {
+                pos=MainActivity.getDemoModeLocation().getPosition();
+                if (pos == null)
+                    return;
+            }else{
+                if (s.getSolutionStatus() == SolutionStatus.NONE) {
+                    return;
+                }
+                pos = RtkCommon.ecef2pos(s.getPosition());
             }
 
-            final Position3d pos = RtkCommon.ecef2pos(s.getPosition());
 
             mLastLocation.setTime(s.getTime().getUtcTimeMillis());
             mLastLocation.setLatitude(Math.toDegrees(pos.getLat()));

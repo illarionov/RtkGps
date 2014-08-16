@@ -54,6 +54,7 @@ public class MainActivity extends Activity {
 
     RtkNaviService mRtkService;
     boolean mRtkServiceBound = false;
+    private static DemoModeLocation mDemoModeLocation;
 
     @InjectView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @InjectView(R.id.navigation_drawer) View mNavDrawer;
@@ -69,6 +70,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), APP_KEY, APP_SECRET);
+
+        mDemoModeLocation = new DemoModeLocation(this.getApplicationContext());
 
         setContentView(R.layout.activity_main);
 
@@ -95,6 +98,10 @@ public class MainActivity extends Activity {
                 invalidateOptionsMenu();
             }
         });
+    }
+
+    public static DemoModeLocation getDemoModeLocation(){
+        return mDemoModeLocation;
     }
 
     @Override
