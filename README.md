@@ -26,6 +26,7 @@ RTKLIB rtknavi port on android.
 
 #### Android features:
 
+* Test mode for obtaining positions from internal GPS (without any RTKLIB function)
 * Bluetooth communication
 * USB OTG communication with speed/parity/stop configuration (ACM, PL2303 chips and alpha for FTDI chips)
 * SiRF IV protocol (experimental)
