@@ -383,7 +383,7 @@ public class SolutionView extends TableLayout {
 
             dGeoidHeight = getAltitudeCorrection(lat, lon);
             CoordinatesConverter<LatLong, UTM> latLongToUTM = LatLong.CRS.getConverterTo(UTM.CRS);
-            LatLong latLong = LatLong.valueOf(lat, lon, NonSI.DEGREE_ANGLE);
+            LatLong latLong = LatLong.valueOf(dlat, dlon, NonSI.DEGREE_ANGLE);
             UTM utm = latLongToUTM.convert(latLong);
             mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f m", utm.eastingValue(SI.METER)));
             mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f m", utm.northingValue(SI.METER)));
