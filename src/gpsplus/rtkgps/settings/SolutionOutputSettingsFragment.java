@@ -39,6 +39,7 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
     public static final String KEY_DEBUG_TRACE ="debug_trace";
     public static final String KEY_OUTPUT_MOCK_LOCATION = "output_mocklocation";
     public static final String KEY_ENABLE_TEST_MODE = "enable_testmode";
+    public static final String KEY_CUSTOM_PROJ4 = "customproj4";
 
     private CheckBoxPreference mOutputHeaderPref;
     private ListPreference mTimeFormatPref;

@@ -1,0 +1,10 @@
+	US/Canada/France/New Zealand Datum Shifting Files
+	-------------------------------------------------
+
+To build, and install proj with US NAD83/NAD27 datum shifting support, it
+is necessary to place these in the proj/nad directory before configuring,
+building, and installing proj.
+
+These files should work with pretty much any version of PROJ.4, but are
+known to work with PROJ 4.3.x through PROJ 4.6.x.
+

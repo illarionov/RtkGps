@@ -6,6 +6,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
@@ -64,10 +67,20 @@ public class MainActivity extends Activity {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private int mNavDraverSelectedItem;
+    private static String mApplicationDirectory = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PackageManager m = getPackageManager();
+        String s = getPackageName();
+        try {
+            PackageInfo p = m.getPackageInfo(s, 0);
+            MainActivity.mApplicationDirectory = p.applicationInfo.dataDir;
+        } catch (NameNotFoundException e) {
+            Log.w(TAG, "Error Package name not found ", e);
+        }
 
         mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), APP_KEY, APP_SECRET);
 
@@ -414,5 +427,8 @@ public class MainActivity extends Activity {
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+    public static String getApplicationDirectory() {
+        return MainActivity.mApplicationDirectory;
     }
 }
