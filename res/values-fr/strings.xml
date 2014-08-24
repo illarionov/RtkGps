@@ -62,6 +62,7 @@
   <string name="solution_view_format_wgs84">Lat/Long/Hauteur</string>
   <string name="solution_view_format_wgs84_float">Lat/Lon/hauteur — décimal</string>
   <string name="solution_view_format_utm">UTM X/Y/Z/Zone</string>
+  <string name="solution_view_format_proj4_lambertIIextended">Lambert II étendue X/Y/Z</string>
   <string name="solution_view_format_proj4_lambert93">RGF93 X/Y/Z</string>
   <string name="solution_view_format_proj4_lambert93_cc43">RGF93 CC43 X/Y/Z</string>
   <string name="solution_view_format_proj4_lambert93_cc44">RGF93 CC44 X/Y/Z</string>
@@ -75,6 +76,7 @@
   <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
   <string name="solution_view_format_enu_baseline">X/Y/Z — Ligne de base</string>
   <string name="solution_view_format_pyl_baseline">Tangage/Lacet/Longueur - ligne de base</string>
+  <string name="solution_view_format_proj4_custom">Projection Proj4 personnalisée a/b/c</string>
   <string-array name="solution_view_coordinates_wgs84">
     <item>Lat :</item>
     <item>Lon :</item>
@@ -111,6 +113,11 @@
     <item>Tangage:</item>
     <item>Lacet :</item>
     <item>Longueur :</item>
+  </string-array>
+  <string-array name="solution_view_coordinates_proj4_custom">
+    <item>a:</item>
+    <item>b:</item>
+    <item>hauteur:</item>
   </string-array>
   <string name="pmode_single">Simple</string>
   <string name="pmode_dgps">DGPS/DGNSS</string>
@@ -354,6 +361,9 @@
     <item>4</item>
     <item>5</item>
   </string-array>
+  <string name="solopt_output_customproj4_title">Projection Proj4 définie par l\'utilisateur</string>
+  <string name="solopt_output_customproj4_summary">Réservé aux utilisateurs avancés. Doit être une chaîne correcte Proj4</string>
+  <string name="solopt_output_customproj4_default">+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs</string>
   <string name="solopt_output_testmode_title">Activer le mode test</string>
   <string name="solopt_output_testmode_summary">Si cette option est activée et Mobile/Base/Correction sont désactivés, RtkGps+ s\'exécute dans un mode spécial de test avec des positions venant du GPS interne. Évidemment aucun algorithme de RTKLIB ne peut fonctionner</string>
   <string name="streams_settings_type_title">Type</string>

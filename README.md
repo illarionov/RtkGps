@@ -38,6 +38,15 @@ RTKLIB rtknavi port on android.
 * Show UTM coordinates in solution view
 * Support for french Geoportail maps (cadastral parcels, roads and satellite) - needs api license key see src/gpsplus/rtkgps/geoportail/License.java.sample 
 
+#### Proj4
+* Due to multiple issues (error in projection and lacks of features) Proj4J was removed and C lib proj4 was added
+* All conversion are done with proj4 4.8.0
+* French projections are done with IGN certified method, Lambert II extended is computed with IGN certified grid ntf_r93.gsb
+* One custom proj4 specification string can be specified (take care of exact syntax).
+* limitation of +init=xxx to epsg nad83 and ignf (for others use full proj4 definition)
+* limitation of +nadgrids=xxx to ntf_r93.gsb , chenyx06etrs.gsb and null .
+* It is possible to add some init specs or some grids simply, if you want to add xxx.yyy proj4 file push it with adb to /data/data/gpsplus.rtkgps/libxxx.yyy.so
+
 #### Geoids
 * you can select different geoid model in "Solution Option"/Geoid model but except for embedded model (EGM96 1°x1°)  
   you will need to place the corresponding model in the RtkGps storage (probably /storage/sdcard0/RtkGps)  

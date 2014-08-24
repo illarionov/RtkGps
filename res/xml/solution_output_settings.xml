@@ -79,4 +79,9 @@
 		android:title="@string/solopt_output_testmode_title"
 		android:summary="@string/solopt_output_testmode_summary"
         />
+	<EditTextPreference
+	    android:key="customproj4" 
+	    android:title="@string/solopt_output_customproj4_title" 
+	    android:summary="@string/solopt_output_customproj4_summary" 
+	    android:defaultValue="@string/solopt_output_customproj4_default"/>
 </PreferenceScreen>

@@ -30,7 +30,8 @@ import gpsplus.rtklib.constants.SolutionStatus;
 import org.jscience.geography.coordinates.LatLong;
 import org.jscience.geography.coordinates.UTM;
 import org.jscience.geography.coordinates.crs.CoordinatesConverter;
-import org.osgeo.proj4j.ProjCoordinate;
+import org.proj4.CRSRegistry;
+import org.proj4.ProjCoordinate;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -64,59 +65,66 @@ public class SolutionView extends TableLayout {
         PROJ4_LAMBERT93(3,
                 R.string.solution_view_format_proj4_lambert93,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93),
+                CRSRegistry.IGNF_LAMB93),
 
         PROJ4_LAMBERT93_CC43(4,
                 R.string.solution_view_format_proj4_lambert93_cc43,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93_CC43),
+                CRSRegistry.IGNF_RGF93CC43),
         PROJ4_LAMBERT93_CC44(5,
                 R.string.solution_view_format_proj4_lambert93_cc44,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93_CC44),
+                CRSRegistry.IGNF_RGF93CC44),
         PROJ4_LAMBERT93_CC45(6,
                 R.string.solution_view_format_proj4_lambert93_cc45,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93_CC45),
+                CRSRegistry.IGNF_RGF93CC45),
         PROJ4_LAMBERT93_CC46(7,
                 R.string.solution_view_format_proj4_lambert93_cc46,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93_CC46),
+                CRSRegistry.IGNF_RGF93CC46),
         PROJ4_LAMBERT93_CC47(8,
                 R.string.solution_view_format_proj4_lambert93_cc47,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93_CC47),
+                CRSRegistry.IGNF_RGF93CC47),
         PROJ4_LAMBERT93_CC48(9,
                 R.string.solution_view_format_proj4_lambert93_cc48,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93_CC48),
+                CRSRegistry.IGNF_RGF93CC48),
         PROJ4_LAMBERT93_CC49(10,
                 R.string.solution_view_format_proj4_lambert93_cc49,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93_CC49),
+                CRSRegistry.IGNF_RGF93CC49),
         PROJ4_LAMBERT93_CC50(11,
                 R.string.solution_view_format_proj4_lambert93_cc50,
                 R.array.solution_view_coordinates_proj4_lambert93,
-                Proj4Converter.CRS_RGF93_CC50),
-
-       PROJ4_NAD83(12,
+                CRSRegistry.IGNF_RGF93CC50),
+        PROJ4_LAMBERTIIE(12,
+                R.string.solution_view_format_proj4_lambertIIextended,
+                R.array.solution_view_coordinates_proj4_lambert93,
+                CRSRegistry.IGNF_LAMBE),
+       PROJ4_NAD83(13,
                 R.string.solution_view_format_proj4_nad83,
                 R.array.solution_view_coordinates_proj4_nad83,
-                Proj4Converter.CRS_NAD83),
+                CRSRegistry.EPSG_4269),
 
-        ECEF(13,
+        ECEF(14,
                 R.string.solution_view_format_ecef,
                 R.array.solution_view_coordinates_ecef,
                 null),
 
-        ENU_BASELINE(14,
+        ENU_BASELINE(15,
                 R.string.solution_view_format_enu_baseline,
                 R.array.solution_view_coordinates_baseline_enu,
                 null),
 
-        PYL_BASELINE(15,
+        PYL_BASELINE(16,
                 R.string.solution_view_format_pyl_baseline,
                 R.array.solution_view_coordinates_baseline_pyl,
+                null),
+        PROJ4_CUSTOM(17,
+                R.string.solution_view_format_proj4_custom,
+                R.array.solution_view_coordinates_proj4_custom,
                 null)
 
         ;
@@ -144,7 +152,7 @@ public class SolutionView extends TableLayout {
         public int getDescriptionResId() {
             return mDescriptionId;
         }
-        public String getEPSNName() {
+        public String getProj4String() {
             return mEPSGCode;
         }
     }
@@ -354,14 +362,24 @@ public class SolutionView extends TableLayout {
             case PROJ4_LAMBERT93_CC48:
             case PROJ4_LAMBERT93_CC49:
             case PROJ4_LAMBERT93_CC50:
+            case PROJ4_LAMBERTIIE:
             case PROJ4_NAD83:
+            case PROJ4_CUSTOM:
+                ProjCoordinate proj4Coordinate;
                 if (proj4Converter == null)
                 {
                     proj4Converter = new Proj4Converter();
                 }
+                if (mSolutionFormat.getProj4String() != null) {
+                    proj4Coordinate = proj4Converter.convert(mSolutionFormat.getProj4String(), dlat, dlon);
+                }else{
+                    // if PROJ4_CUSTOM
+                    SharedPreferences prefs= this.getContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
+                    String strCustomProj4 = prefs.getString(SolutionOutputSettingsFragment.KEY_CUSTOM_PROJ4, getResources().getString(R.string.solopt_output_customproj4_default));
+                    proj4Coordinate = proj4Converter.convert(strCustomProj4, dlat, dlon);
+                }
                 cov = sol.getQrMatrix();
                 dGeoidHeight = getAltitudeCorrection(lat, lon);
-                ProjCoordinate proj4Coordinate = proj4Converter.convert(mSolutionFormat.getEPSNName(), dlat, dlon);
                 mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f m", proj4Coordinate.x));
                 mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f m", proj4Coordinate.y));
                 mTextViewCoord3Value.setText(String.format(Locale.US, "%.3f m el.", height-dGeoidHeight));
