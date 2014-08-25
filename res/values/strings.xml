@@ -162,6 +162,7 @@
     <string name="solq_single">Single</string>
     <string name="solq_ppp">PPP</string>
     <string name="solq_dr">Dead reckoning</string>
+    <string name="solq_internal">Internal</string>
     
     <!-- SOLF_XXX  Solution Format -->
     <string name="solf_llh">Lat/Long/Height</string>

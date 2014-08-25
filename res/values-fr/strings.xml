@@ -147,6 +147,7 @@
   <string name="solq_single">Simple</string>
   <string name="solq_ppp">PPP</string>
   <string name="solq_dr">Navigation à l\'estime</string>
+  <string name="solq_internal">Interne</string>
   <string name="solf_llh">Lat/Long/Hauteur</string>
   <string name="solf_xyz">X/Y/Z — ECEF</string>
   <string name="solf_enu">X/Y/Z — Ligne de base</string>

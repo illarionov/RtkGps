@@ -17,7 +17,8 @@ public enum SolutionStatus implements IHasRtklibId {
     DGPS(4, R.string.solq_dgps),
     SINGLE(5, R.string.solq_single),
     PPP(6, R.string.solq_ppp),
-    DR(7, R.string.solq_dr)
+    DR(7, R.string.solq_dr),
+    INTERNAL(8,R.string.solq_internal)
     ;
 
     private final int mRtklibId;

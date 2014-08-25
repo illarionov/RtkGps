@@ -267,8 +267,17 @@ public class SolutionView extends TableLayout {
 
     public void setStats(RtkControlResult status) {
         final Solution sol = status.getSolution();
-        mTextViewSolutionStatus.setText(sol.getSolutionStatus().getNameResId());
-        mSolutionIndicatorView.setStatus(sol.getSolutionStatus());
+        int resId = 0;
+        SolutionStatus solStatus = SolutionStatus.NONE;
+        if (mDemoModeLocation.isInDemoMode() && RtkNaviService.mbStarted) {
+            resId = SolutionStatus.INTERNAL.getNameResId();
+            solStatus = SolutionStatus.INTERNAL;
+        }else{
+            resId = sol.getSolutionStatus().getNameResId();
+            solStatus = sol.getSolutionStatus();
+        }
+        mTextViewSolutionStatus.setText(resId);
+        mSolutionIndicatorView.setStatus(solStatus);
         updateCoordinates(status);
         updateAgeText(sol);
     }
@@ -709,6 +718,9 @@ public class SolutionView extends TableLayout {
                 break;
             case DR:
                 c = Color.YELLOW;
+                break;
+            case INTERNAL:
+                c= Color.MAGENTA;
                 break;
             default:
                 c = Color.WHITE;
