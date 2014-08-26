@@ -75,8 +75,8 @@
   <string name="solution_view_format_proj4_nad83">NAD83 X/Y/Z</string>
   <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
   <string name="solution_view_format_enu_baseline">X/Y/Z — Ligne de base</string>
-  <string name="solution_view_format_pyl_baseline">Tangage/Lacet/Longueur - ligne de base</string>
-  <string name="solution_view_format_proj4_custom">Projection Proj4 personnalisée a/b/c</string>
+  <string name="solution_view_format_pyl_baseline">Tang./Lacet/Lon.-ligne de base</string>
+  <string name="solution_view_format_proj4_custom">Proj4 personnalisée a/b/c</string>
   <string-array name="solution_view_coordinates_wgs84">
     <item>Lat :</item>
     <item>Lon :</item>
