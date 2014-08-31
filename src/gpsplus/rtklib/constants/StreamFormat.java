@@ -31,20 +31,24 @@ public enum StreamFormat implements IHasRtklibId {
     NVS(10, R.string.strfmt_nvs),
     /** stream format: BINEX */
     BINEX(11, R.string.strfmt_binex),
-    /** stream format: Furuno LPY-10000 */
-    LEXR(12, R.string.strfmt_lexr),
+    /** Trimble RT17 */
+    RT17(12, R.string.strfmt_rt17),
     /** stream format: SiRF    (reserved) */
     SIRF(13, R.string.strfmt_sirf),
+    /** stream format: Furuno LPY-10000 */
+    LEXR(14, R.string.strfmt_lexr),
+    /** stream format Septentrio */
+    SEPT(15, R.string.strfmt_sept),
     /** stream format: RINEX */
-    RINEX(14, R.string.strfmt_rinex),
+    RINEX(16, R.string.strfmt_rinex),
     /** stream format: SP3 */
-    SP3(15, R.string.strfmt_sp3),
+    SP3(17, R.string.strfmt_sp3),
     /** stream format: RINEX CLK */
-    RNXCLK(16, R.string.strfmt_rnxclk),
+    RNXCLK(18, R.string.strfmt_rnxclk),
     /** stream format: SBAS messages */
-    SBAS(17, R.string.strfmt_sbas),
+    SBAS(19, R.string.strfmt_sbas),
     /** stream format: NMEA 0183 */
-    NMEA(18, R.string.strfmt_nmea)
+    NMEA(20, R.string.strfmt_nmea)
 
     ;
 

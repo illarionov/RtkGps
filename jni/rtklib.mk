@@ -5,7 +5,7 @@ RTKLIB_CFLAGS := -DENAGLO -DENAGAL -DENAQZS -DENACMP -DNFREQ=3 -DTRACE
 
 LOCAL_MODULE    := rtklib
 
-RTKLIB_CFLAGS += -DLAPACK
+RTKLIB_CFLAGS += -DLAPACK -D_HAVE_FGETLN_
 LOCAL_STATIC_LIBRARIES += clapack blas f2c
 
 LOCAL_CFLAGS += -fvisibility=hidden
@@ -58,7 +58,8 @@ LOCAL_SRC_FILES += \
         $(RTKLIB_PATH)/src/rcv/skytraq.c \
         $(RTKLIB_PATH)/src/rcv/sirf.c \
         $(RTKLIB_PATH)/src/rcv/ss2.c \
-        $(RTKLIB_PATH)/src/rcv/ublox.c
+        $(RTKLIB_PATH)/src/rcv/ublox.c \
+	$(RTKLIB_PATH)/src/rcv/rt17.c
 
 LOCAL_SRC_FILES += log.c
 

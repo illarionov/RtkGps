@@ -211,7 +211,7 @@ public class WMTSMapTileDownloader extends MapTileModuleProviderBase {
 
                 final HttpUriRequest head = new HttpGet(tileURLString);
                 //Geoportail has a mandatory user-agent
-                head.setHeader("User-Agent", License.USER_AGENT); // TODO have tileSource dependent User-Agent
+                head.setHeader("User-Agent", License.getUserAgent()); // TODO have tileSource dependent User-Agent
                 final HttpResponse response = httpClient.execute(head);
 
                 // Check to see if we got success

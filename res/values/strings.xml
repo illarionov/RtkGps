@@ -184,7 +184,9 @@
     <string name="strfmt_javad">JAVAD GRIL/GREIS</string>
     <string name="strfmt_nvs">NVS NVC08C</string>
     <string name="strfmt_binex">BINEX</string>
+    <string name="strfmt_rt17">Trimble RT17</string>
     <string name="strfmt_lexr">Furuno LPY-10000</string>
+    <string name="strfmt_sept">Septentrio</string>
     <string name="strfmt_sirf">SiRF</string>
     <string name="strfmt_rinex">RINEX</string>
     <string name="strfmt_sp3">SP3</string>

@@ -8,7 +8,7 @@ RTKLIB rtknavi port on android.
 
 #### [rtklib][rtklib] features:
 
-* Version pre 2.4.2p8 (all except uBlox improvements wich currently break the parsing)
+* Version pre 2.4.2p9
 * GPS, GLONASS, Galileo, QZSS, BeiDou and SBAS Navigation systems
 * Single, DGPS/DGNSS, Kinematic, Static, Moving-Baseline, Fixed,
   PPP-Kinematic, PPP-Static and PPP-Fixed positioning modes.
@@ -20,7 +20,7 @@ RTKLIB rtknavi port on android.
 * Proprietary protocotols: 
   NovAtel: OEM4/V/6,OEM3,OEMStar,Superstar II, Hemisphere: Eclipse,Crescent,
     u-blox: LEA-4T/5T/6T, SkyTraq: S1315F, JAVAD GRIL/GREIS, Furuno
-    GW-10-II/III and NVS NV08C BINR.
+    GW-10-II/III, NVS NV08C BINR, SiRF III/IV, and Trimble RT17.
 * TCP/IP, NTRIP, local log file
 * Support for multiple geoids (see explanation)
 
