@@ -84,6 +84,7 @@ You can freely create a translator account and with it you will be able request 
 I already made this translations:
 * English (source language)
 * French
+Yong Zhang translated to simplified chinese.
 
 
 ### Requirements
