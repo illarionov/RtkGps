@@ -15,6 +15,7 @@
     <string name="menu_start_service">Start service</string>
     <string name="menu_stop_service">Stop service</string>
     <string name="menu_dropbox">Dropbox</string>
+    <string name="menu_tools">Tools</string>
     <string name="menu_select_solution_format">Select solution format</string>
     <string name="menu_select_gtime_format">Select time format</string>
     <string name="menu_about">About</string>
@@ -621,6 +622,14 @@
 	<string name="status_view_skyplot_base_l2">Skyplot Base L2</string>
 	<string name="status_view_skyplot_base_l5">Skyplot Base L5</string>
 	<string name="status_view_baseline">Baseline</string>
+	<string name="tools_download_and_inject_igu">Download and inject IGS Ultra rapid ephemeris (500kB)</string>
+	<string name="tools_inject">Inject</string>
+	<string name="tools_get_inject">Get+Inject</string>
+	<string name="tools_download_raf09_geoid">Install IGN RAF09 Geoid (2MB)</string>
+	<string name="tools_install">Install</string>
+	<string name="tools_download_egm2008_m25_geoid">Install EGM 2008 2.5\' Geoid (135MB)</string>
+	<string name="tools_download_egm2008_m10_geoid">Install EGM 2008 1.0\' Geoid (825MB)</string>
+	<string name="tools_download_egm96_m150_geoid">Install EGM 96 15\' Geoid (2MB)</string>
 	
 	
 </resources>

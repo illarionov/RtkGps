@@ -663,6 +663,63 @@ static void RtkServer__get_rtk_status(JNIEnv* env, jclass thiz, jobject j_rtk_co
    rtksvrunlock(&nctx->rtksvr);
 }
 
+static void RtkServer__readsp3(JNIEnv* env, jclass thiz, jstring file)
+{
+   struct native_ctx_t *nctx;
+   nav_t nav={0};
+   rtksvr_t *svr;
+
+   nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
+   if (nctx == NULL) {
+	  LOGV("nctx is null");
+	  return;
+   }
+	const char *filename = (*env)->GetStringUTFChars(env, file, 0);
+	readsp3(filename,&nav,0);
+	/* test if there is some ephemeris */
+	if (nav.ne<=0) {
+	            tracet(1,"sp3 file read error: %s\n",file);
+	            return;
+	        }
+
+	//OK so update to server
+	svr = &nctx->rtksvr;
+	rtksvrlock(svr);
+    if (svr->nav.peph) free(svr->nav.peph);
+    svr->nav.ne=svr->nav.nemax=nav.ne;
+    svr->nav.peph=nav.peph;
+
+	rtksvrunlock(svr);
+	(*env)->ReleaseStringUTFChars(env,file, filename);
+}
+
+static void RtkServer__readsatant(JNIEnv* env, jclass thiz, jstring file)
+{
+   struct native_ctx_t *nctx;
+   pcvs_t pcvs={0};
+   pcv_t *pcv;
+   int i;
+   gtime_t now=timeget();
+
+   nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
+   if (nctx == NULL) {
+	  LOGV("nctx is null");
+	  return;
+   }
+	const char *filename = (*env)->GetStringUTFChars(env, file, 0);
+	rtksvrlock(&nctx->rtksvr);
+
+    if (readpcv(filename,&pcvs)) {
+        for (i=0;i<MAXSAT;i++) {
+            if (!(pcv=searchpcv(i+1,"",now,&pcvs))) continue;
+            nctx->rtksvr.nav.pcvs[i]=*pcv;
+        }
+    }
+
+	rtksvrunlock(&nctx->rtksvr);
+	(*env)->ReleaseStringUTFChars(env,file, filename);
+}
+
 static JNINativeMethod nativeMethods[] = {
    {"_create", "()V", (void*)RtkServer__create},
    {"_destroy", "()V", (void*)RtkServer__destroy},
@@ -688,7 +745,9 @@ static JNINativeMethod nativeMethods[] = {
    {"_readSolutionBuffer", "(Lgpsplus/rtklib/Solution$SolutionBuffer;)V", (void*)RtkServer__read_solution_buffer},
    {"_getRtkStatus", "(Lgpsplus/rtklib/RtkControlResult;)V", (void*)RtkServer__get_rtk_status},
    {"_getObservationStatus", "(ILgpsplus/rtklib/RtkServerObservationStatus$Native;)V", (void*)RtkServer__get_observation_status},
-   {"_writeCommands", "([Ljava/lang/String;)V", (void*)RtkServer__write_commands}
+   {"_writeCommands", "([Ljava/lang/String;)V", (void*)RtkServer__write_commands},
+   {"_readsp3","(Ljava/lang/String;)V", (void*)RtkServer__readsp3},
+   {"_readsatant","(Ljava/lang/String;)V", (void*)RtkServer__readsatant}
 };
 
 static int init_observation_status_fields(JNIEnv* env) {

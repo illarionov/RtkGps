@@ -36,7 +36,11 @@ import gpsplus.rtkgps.settings.SettingsHelper;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtkgps.settings.StreamSettingsActivity;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
@@ -80,6 +84,17 @@ public class MainActivity extends Activity {
             MainActivity.mApplicationDirectory = p.applicationInfo.dataDir;
         } catch (NameNotFoundException e) {
             Log.w(TAG, "Error Package name not found ", e);
+        }
+
+        // copy assets/data
+        try {
+            copyAssetsToApplicationDirectory();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), APP_KEY, APP_SECRET);
@@ -185,6 +200,7 @@ public class MainActivity extends Activity {
         boolean serviceActive = mNavDrawerServerSwitch.isChecked();
         menu.findItem(R.id.menu_start_service).setVisible(!serviceActive);
         menu.findItem(R.id.menu_stop_service).setVisible(serviceActive);
+        menu.findItem(R.id.menu_tools).setVisible(true);
         if (mDbxAcctMgr.hasLinkedAccount())
         {
             menu.findItem(R.id.menu_dropbox).setVisible(false);
@@ -206,6 +222,9 @@ public class MainActivity extends Activity {
         case R.id.menu_stop_service:
             mNavDrawerServerSwitch.setChecked(false);
             break;
+        case R.id.menu_tools:
+            startActivity(new Intent(this, ToolsActivity.class));
+            break;
         case R.id.menu_dropbox:
             mDbxAcctMgr.startLink(this, REQUEST_LINK_TO_DBX);
             break;
@@ -219,6 +238,41 @@ public class MainActivity extends Activity {
             return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private void copyAssetsToApplicationDirectory() throws FileNotFoundException, IOException
+    {
+        //copy assets/data to appdir/data
+        java.io.InputStream stream = null;
+        java.io.OutputStream output = null;
+
+        for(String fileName : this.getAssets().list("data"))
+        {
+            stream = this.getAssets().open("data/" + fileName);
+            String dest = this.getFilesDir()+ File.separator + "data" + File.separator + fileName;
+            File fdest = new File(dest);
+            if (fdest.exists()) continue;
+
+            File fpdestDir = new File(fdest.getParent());
+            if ( !fpdestDir.exists() ) fpdestDir.mkdirs();
+
+            output = new BufferedOutputStream(new FileOutputStream(dest));
+
+            byte data[] = new byte[1024];
+            int count;
+
+            while((count = stream.read(data)) != -1)
+            {
+                output.write(data, 0, count);
+            }
+
+            output.flush();
+            output.close();
+            stream.close();
+
+            stream = null;
+            output = null;
+        }
     }
 
     private void proxyIfUsbAttached(Intent intent) {
@@ -431,4 +485,5 @@ public class MainActivity extends Activity {
     public static String getApplicationDirectory() {
         return MainActivity.mApplicationDirectory;
     }
+
 }

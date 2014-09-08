@@ -1,12 +1,11 @@
 package gpsplus.rtklib;
 
 import gpsplus.rtkgps.MainActivity;
+import proguard.annotation.Keep;
 
 import java.io.File;
 
 import javax.annotation.Nonnull;
-
-import proguard.annotation.Keep;
 
 
 public class RtkServer {
@@ -149,6 +148,13 @@ public class RtkServer {
         }
     }
 
+    public void readSP3(String file){
+        _readsp3(file);
+    }
+
+    public void readSatAnt(String file){
+        _readsatant(file);
+    }
     @Nonnull
     // getPathInStorageDirectory() is used by native code, do not remove or rename
     public static String getPathInStorageDirectory(@Nonnull String filename) {
@@ -229,4 +235,6 @@ public class RtkServer {
             SolutionOptions.Native solopt_2
             );
 
+    private native void _readsp3(String file);
+    private native void _readsatant(String file);
 }

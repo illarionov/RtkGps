@@ -21,7 +21,12 @@
 		android:showAsAction="never"
 		android:title="@string/menu_dropbox"
 		android:orderInCategory="200" />
-		<item
+	<item
+	    android:id="@+id/menu_tools"
+	    android:showAsAction="never"
+		android:title="@string/menu_tools"
+		android:orderInCategory="200" />
+	<item
 		android:id="@+id/menu_about"
 		android:showAsAction="never"
 		android:title="@string/menu_about"

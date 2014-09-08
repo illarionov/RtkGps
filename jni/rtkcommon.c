@@ -155,6 +155,30 @@ static jdouble RtkCommon_norm(JNIEnv* env, jclass clazz, jdoubleArray j_a)
    return res;
 }
 
+/* see
+ * extern int reppath(const char *path, char *rpath, gtime_t time, const char *rov, const char *base)
+ */
+static jstring RtkCommon_reppath(JNIEnv* env, jclass clazz, jstring inPath, jlong time, jstring roverId, jstring baseId){
+	char remote[1024];
+	jstring result;
+	gtime_t now;
+
+	const char *path = (*env)->GetStringUTFChars(env, inPath, 0);
+	const char *rover = (*env)->GetStringUTFChars(env, roverId, 0);
+	const char *base = (*env)->GetStringUTFChars(env, baseId, 0);
+
+	now.sec=0.0;
+	now.time=time;
+
+	reppath(path,remote,now,rover,base);
+
+	(*env)->ReleaseStringUTFChars(env,inPath, path);
+	(*env)->ReleaseStringUTFChars(env,roverId, rover);
+	(*env)->ReleaseStringUTFChars(env,baseId, base);
+	result = (*env)->NewStringUTF(env,remote);
+	return result;
+}
+
 static JNINativeMethod nativeMethods[] = {
    {"getSatId", "(I)Ljava/lang/String;", (void*)RtkCommon_get_sat_id},
    {"dops", "([DIDLgpsplus/rtklib/RtkCommon$Dops;)V", (void*)RtkCommon_dops},
@@ -168,6 +192,7 @@ static JNINativeMethod nativeMethods[] = {
    {"_ecef2enu", "(DD[D[D)V", (void*)RtkCommon__ecef2enu},
    {"_pos2ecef", "(DDD[D)V", (void*)RtkCommon__pos2ecef},
    {"_covenu", "(DD[D[D)V", (void*)RtkCommon__covenu},
+   {"_reppath", "(Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;",(void*)RtkCommon_reppath}
 };
 
 int registerRtkCommonNatives(JNIEnv* env) {

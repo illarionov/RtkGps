@@ -454,4 +454,9 @@ public class RtkCommon {
         }
     }
 
+    public static String reppath(String path,long time, String rover, String base){
+        return _reppath(path, time, rover, base);
+    }
+    private static native String _reppath(String path,long time, String rover, String base);
+
 }

@@ -35,10 +35,10 @@
   <string name="sky_plot_num_of_sat">卫星数: %d</string>
   <string name="drawer_open">打开导航栏</string>
   <string name="drawer_close">关闭导航栏</string>
-  <string name="navdraw_category_server">服务器</string>
+  <string name="navdraw_category_server">服务</string>
   <string name="navdraw_category_streams">数据源</string>
   <string name="navdraw_category_settings">设置</string>
-  <string name="navdraw_item_server_switch">服务器</string>
+  <string name="navdraw_item_server_switch">服务</string>
   <string name="navdraw_item_status">状态</string>
   <string name="navdraw_item_map">地图</string>
   <string name="navdraw_item_input_streams">输入数据源</string>
@@ -57,7 +57,7 @@
   <string name="gtime_format_gps_tow">GPS TOW</string>
   <string name="solution_view_solution">解算方法:</string>
   <string name="solution_view_geoid">大地水准面：</string>
-  <string name="solution_view_crs">CRS:</string>
+  <string name="solution_view_crs">坐标系统:</string>
   <string name="solution_view_age_text_format">数据龄期: %1$.1fs\nRatio: %2$.1f\n卫星数: %3$d</string>
   <string name="solution_view_format_wgs84">纬度/经度/高</string>
   <string name="solution_view_format_wgs84_float">纬度/经度/高 — 浮动解</string>

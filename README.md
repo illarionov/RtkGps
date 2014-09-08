@@ -49,6 +49,11 @@ RTKLIB rtknavi port on android.
 
 #### Geoids
 * you can select different geoid model in "Solution Option"/Geoid model but except for embedded model (EGM96 1°x1°)  
+     
+  After receiving some emails for asking me how to install the geoid model, I added a new menu "Tools" in this menu you can automatically download and install
+  some geoid models. Take attention to the size! I think you may prefer to download this models via a Wifi connection rather than with your data plan!  
+    
+
   you will need to place the corresponding model in the RtkGps storage (probably /storage/sdcard0/RtkGps)  
   the model format is RTKLIB dependent, check jni/RTKLIB/src/geoid.c  
   the model file MUST be one of:  
@@ -58,7 +63,7 @@ RTKLIB rtknavi port on android.
     EGM2008_M10.geoid  
     GSI2000_M15.geoid
     RAF09_M15x20.geoid  
-  ``` 
+  ```
   
   for example if you want to use EGM2008 2.5'x2.5' model you need:
   ```
@@ -78,12 +83,18 @@ RTKLIB rtknavi port on android.
    
   if you do not have the correct model or if model is inconsistent it will not show an error, rather than it will use the EGM96 1°x1° embedded model or it use ellipsoidal height.
   				
+#### Precise ephemeris
+If you need precise ephemeris you have 2 ways for using them:  
+* Manualy: In the correction tab you select "File" and type SP3 , in the filename you put the filename of the file you provide in RtkGps directory (ending with .SP3)  
+* Automatically: When the server is running, hit the "Tools" menu, here you have an option to download and inject automatically the latest ultra-rapid ephemeris from IGS or simply inject them if you already have the good file.  
+  
+  
 #### Translations
 Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.net/project/gpsplusrtkgps/invite).   
 You can freely create a translator account and with it you will be able request for a new translation.  
 I already made this translations:
 * English (source language)
-* French
+* French  
 Yong Zhang translated to simplified chinese.
 
 

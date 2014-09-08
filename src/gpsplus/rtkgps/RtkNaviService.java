@@ -73,6 +73,7 @@ public class RtkNaviService extends IntentService implements LocationListener
             this.localFilenameWithPath = localFilenameWithPath;
             this.remoteFilename = remoteFilename;
         }
+        @SuppressWarnings("unused")
         public dpFile(String filename) {
             super();
             this.localFilenameWithPath = filename;
@@ -115,7 +116,7 @@ public class RtkNaviService extends IntentService implements LocationListener
     // Binder given to clients
     private final IBinder mBinder = new RtkNaviServiceBinder();
 
-    private final RtkServer mRtkServer = new RtkServer();
+    private static final RtkServer mRtkServer = new RtkServer();
 
     public static boolean mbStarted = false;
     private PowerManager.WakeLock mCpuLock;
@@ -187,6 +188,15 @@ public class RtkNaviService extends IntentService implements LocationListener
         return mRtkServer.getRtkStatus(dst);
     }
 
+    public static void loadSP3(String file) {
+        if (mRtkServer != null)
+            mRtkServer.readSP3(file);
+    }
+
+    public static void loadSatAnt(String file) {
+        if (mRtkServer != null)
+            mRtkServer.readSatAnt(file);
+    }
     public boolean isServiceStarted() {
         return mRtkServer.getStatus() != RtkServerStreamStatus.STATE_CLOSE;
     }
@@ -272,6 +282,8 @@ public class RtkNaviService extends IntentService implements LocationListener
         }
         GeoidModel model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
         rtkCommon = new RtkCommon(model);
+        //load satellite antennas
+        loadSatAnt(MainActivity.getApplicationDirectory()+File.separator+"files"+File.separator+"data"+File.separator+"igs05.atx");
         mBoolIsRunning = true;
     }
 

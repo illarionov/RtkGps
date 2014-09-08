@@ -15,6 +15,7 @@
   <string name="menu_start_service">Démarrage du service</string>
   <string name="menu_stop_service">Arrêter le service</string>
   <string name="menu_dropbox">Dropbox</string>
+  <string name="menu_tools">Outils</string>
   <string name="menu_select_solution_format">Format de la solution</string>
   <string name="menu_select_gtime_format">Format de l\'heure</string>
   <string name="menu_about">À propos</string>
@@ -501,4 +502,12 @@
   <string name="status_view_skyplot_base_l2">Radar Base L2</string>
   <string name="status_view_skyplot_base_l5">Radar Base L5</string>
   <string name="status_view_baseline">Ligne de base</string>
+  <string name="tools_download_and_inject_igu">Télécharger et injecter les éphémérides ultra-rapides IGS (500kO)</string>
+  <string name="tools_inject">Injecter</string>
+  <string name="tools_get_inject">Charger</string>
+  <string name="tools_download_raf09_geoid">Installer le géoïde IGN RAF09 (2MO)</string>
+  <string name="tools_install">Installer</string>
+  <string name="tools_download_egm2008_m25_geoid">Installer le géoïde EGM 2008 2.5\' (135MO)</string>
+  <string name="tools_download_egm2008_m10_geoid">Installer le géoïde EGM 2008 1,0\' (825MO)</string>
+  <string name="tools_download_egm96_m150_geoid">Installer le géoïde EGM 96 15\' (2MO)</string>
 </resources>

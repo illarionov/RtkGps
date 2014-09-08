@@ -4,7 +4,7 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tools_textView_raf09"
         style="@android:style/TextAppearance.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -20,8 +20,8 @@
         android:id="@+id/version_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_below="@+id/textView2"
+        android:layout_alignLeft="@+id/tools_textView_raf09"
+        android:layout_below="@+id/tools_textView_raf09"
         android:layout_marginTop="20dp"
         android:text="@string/app_version_label" />
 
