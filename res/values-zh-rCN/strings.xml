@@ -15,6 +15,7 @@
   <string name="menu_start_service">启动服务</string>
   <string name="menu_stop_service">停止服务</string>
   <string name="menu_dropbox">Dropbox</string>
+  <string name="menu_tools">工具</string>
   <string name="menu_select_solution_format">选择解算结果的格式</string>
   <string name="menu_select_gtime_format">选择时间格式</string>
   <string name="menu_about">关于</string>
@@ -501,4 +502,12 @@
   <string name="status_view_skyplot_base_l2">Skyplot 参考站L2</string>
   <string name="status_view_skyplot_base_l5">Skyplot 参考站L5</string>
   <string name="status_view_baseline">基线</string>
+  <string name="tools_download_and_inject_igu">下载并使用IGS超快速精密星历(500KB)</string>
+  <string name="tools_inject">使用</string>
+  <string name="tools_get_inject">获取并使用</string>
+  <string name="tools_download_raf09_geoid">安装 IGN RAF09 大地水准面 (2MB)</string>
+  <string name="tools_install">安装</string>
+  <string name="tools_download_egm2008_m25_geoid">安装 EGM 2008 2.5\' 大地水准面 (135MB)</string>
+  <string name="tools_download_egm2008_m10_geoid">安装 EGM 2008 1.0\' 大地水准面 (825MB)</string>
+  <string name="tools_download_egm96_m150_geoid">安装 EGM 96 15\' 大地水准面 (2MB)</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">RtkGps</string>
+    <string name="app_name">RTKGPS+</string>
     <string name="app_url">http://github.com/eltorio/RtkGps</string>
     <string name="app_version_label">Version</string>
     <string name="app_legacy_info_label">Legacy info</string>
@@ -481,6 +481,8 @@
     <string name="input_streams_settings_transmit_gpgga_to_base_title">Transmit GPGGA to Base Station</string>
     <string name="input_streams_settings_transmit_gpgga_lat_title">Latitude</string>
     <string name="input_streams_settings_transmit_gpgga_lon_title">Longitude</string> 
+    <string name="input_streams_setting_antenna_title">Antenna</string>
+    <string name="input_streams_setting_antenna_summary">Antenna official IGS name (for phase center variation)</string>
     
 	<string-array name="input_streams_settings_transmit_gpgga_entries">
         <item>OFF</item>
