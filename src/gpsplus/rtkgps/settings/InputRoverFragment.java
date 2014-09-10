@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
@@ -17,6 +18,7 @@ import gpsplus.rtkgps.settings.StationPositionActivity.Value;
 import gpsplus.rtkgps.settings.widget.StreamFormatPreference;
 import gpsplus.rtkgps.settings.widget.StreamTypePreference;
 import gpsplus.rtklib.ProcessingOptions;
+import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.RtkServerSettings.InputStream;
 import gpsplus.rtklib.constants.StationPositionType;
@@ -41,6 +43,7 @@ public class InputRoverFragment extends PreferenceFragment {
     static final String KEY_COMMANDS_AT_STARTUP_SHUTDOWN_BUTTON = "commands_at_startup_shutdown_button";
     static final String KEY_STATION_POSITION_BUTTON = "station_position_button";
     static final String KEY_RECEIVER_OPTION = "receiver_option";
+    static final String KEY_ANTENNA = "antenna";
 
     private static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
         StreamType.BLUETOOTH,
@@ -131,6 +134,9 @@ public class InputRoverFragment extends PreferenceFragment {
                 stationBtn.setEnabled(false);
             }
         }
+
+        ListPreference listPreferenceAntrennas = (ListPreference) findPreference("antenna");
+        RtkCommon.getAntListAsListPreference(listPreferenceAntrennas);
     }
 
     @Override

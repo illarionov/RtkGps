@@ -21,6 +21,12 @@
         android:title="@string/streams_settings_format_title"
         android:dependency="enable" />
 
+    <ListPreference android:key="antenna"
+            android:title="@string/input_streams_setting_antenna_title" 
+            android:summary="@string/input_streams_setting_antenna_summary"
+            android:defaultValue="" 
+            android:dependency="enable"/>
+    
 	<Preference
         android:key="commands_at_startup_shutdown_button"
         android:dependency="enable"

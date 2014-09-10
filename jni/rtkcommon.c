@@ -179,6 +179,31 @@ static jstring RtkCommon_reppath(JNIEnv* env, jclass clazz, jstring inPath, jlon
 	return result;
 }
 
+static jobjectArray RtkCommon_getantlist(JNIEnv* env, jclass thiz, jstring file)
+{
+	jobjectArray ret;
+	pcvs_t pcvs={0};
+	char *p;
+	const char *path = (*env)->GetStringUTFChars(env, file, 0);
+	int i;
+
+	if(!readpcv(path,&pcvs)) {
+		return ret;
+	}
+
+	ret = (jobjectArray)(*env)->NewObjectArray(env,pcvs.n,(*env)->FindClass(env,"java/lang/String"),(*env)->NewStringUTF(env,""));
+	for(i=0;i<pcvs.n;i++) {
+		if (pcvs.pcv[i].sat) continue;
+		if ((p=strchr(pcvs.pcv[i].type,' '))) *p='\0';
+		if (i>0&&!strcmp(pcvs.pcv[i].type,pcvs.pcv[i-1].type)) continue;
+
+		(*env)->SetObjectArrayElement(env,ret,i,(*env)->NewStringUTF(env,pcvs.pcv[i].type));
+	}
+
+	(*env)->ReleaseStringUTFChars(env,file, path);
+	return(ret);
+}
+
 static JNINativeMethod nativeMethods[] = {
    {"getSatId", "(I)Ljava/lang/String;", (void*)RtkCommon_get_sat_id},
    {"dops", "([DIDLgpsplus/rtklib/RtkCommon$Dops;)V", (void*)RtkCommon_dops},
@@ -192,7 +217,8 @@ static JNINativeMethod nativeMethods[] = {
    {"_ecef2enu", "(DD[D[D)V", (void*)RtkCommon__ecef2enu},
    {"_pos2ecef", "(DDD[D)V", (void*)RtkCommon__pos2ecef},
    {"_covenu", "(DD[D[D)V", (void*)RtkCommon__covenu},
-   {"_reppath", "(Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;",(void*)RtkCommon_reppath}
+   {"_reppath", "(Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;",(void*)RtkCommon_reppath},
+   {"_getantlist", "(Ljava/lang/String;)[Ljava/lang/String;", (void*)RtkCommon_getantlist}
 };
 
 int registerRtkCommonNatives(JNIEnv* env) {

@@ -1,8 +1,13 @@
 package gpsplus.rtklib;
 
+import android.preference.ListPreference;
+
+import gpsplus.rtkgps.MainActivity;
 import gpsplus.rtklib.constants.GeoidModel;
 import proguard.annotation.Keep;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -457,6 +462,39 @@ public class RtkCommon {
     public static String reppath(String path,long time, String rover, String base){
         return _reppath(path, time, rover, base);
     }
+
+    public static String[] getAntList(String igs08atxPath){
+        String[] rawList = _getantlist(igs08atxPath);
+        ArrayList<String> filteredList = new ArrayList<String>();
+        for(int i=0;i<rawList.length;i++){
+            if (rawList[i].length()>0) {
+                filteredList.add(rawList[i]);
+            }
+        }
+        String[] ret = filteredList.toArray(new String[filteredList.size()]);
+        Arrays.sort(ret);
+        return ret;
+    }
+
+    public static void getAntListAsListPreference(ListPreference listPreferenceAntrennas){
+        if (listPreferenceAntrennas != null) {
+            String[] antennas = RtkCommon.getAntList(MainActivity.getApplicationDirectory() + File.separator + "files" + File.separator + "data" + File.separator + "igs08.atx");
+            CharSequence entries[] = new String[antennas.length+2];
+            CharSequence entryValues[] = new String[antennas.length+2];
+            int i = 2;
+            for (String antenna : antennas) {
+                entries[i] = antenna;
+                entryValues[i] = antenna;
+                i++;
+            }
+            entries[0]=entryValues[0] = "";
+            entries[1]=entryValues[1] = "*";
+
+            listPreferenceAntrennas.setEntries(entries);
+            listPreferenceAntrennas.setEntryValues(entryValues);
+        }
+    }
     private static native String _reppath(String path,long time, String rover, String base);
+    private static native String[] _getantlist(String path);
 
 }
