@@ -479,8 +479,8 @@ public class RtkCommon {
     public static void getAntListAsListPreference(ListPreference listPreferenceAntrennas){
         if (listPreferenceAntrennas != null) {
             String[] antennas = RtkCommon.getAntList(MainActivity.getApplicationDirectory() + File.separator + "files" + File.separator + "data" + File.separator + "igs08.atx");
-            CharSequence entries[] = new String[antennas.length+2];
-            CharSequence entryValues[] = new String[antennas.length+2];
+            CharSequence entries[] = new String[antennas.length+1];         //TODO length+2 for "*" automatic antenna in RTCM Base
+            CharSequence entryValues[] = new String[antennas.length+1];     //TODO
             int i = 1;
             //int i = 2; //TODO
             for (String antenna : antennas) {
