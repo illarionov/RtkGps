@@ -1,13 +1,8 @@
 package gpsplus.rtklib;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Set;
-
-import gpsplus.rtkgps.BuildConfig;
-
 import android.util.Log;
 
+import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.constants.Constants;
 import gpsplus.rtklib.constants.EarthTideCorrectionType;
@@ -17,6 +12,10 @@ import gpsplus.rtklib.constants.NavigationSystem;
 import gpsplus.rtklib.constants.PositioningMode;
 import gpsplus.rtklib.constants.StationPositionType;
 import gpsplus.rtklib.constants.TroposphereOption;
+
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Set;
 
 
 /**
@@ -335,6 +334,21 @@ public class ProcessingOptions {
         return this;
     }
 
+    public void setAntTypeRover(String type){
+        this.mNative.anttypeRover = type;
+    }
+
+    public String getAntTypeRover(){
+        return this.mNative.anttypeRover;
+    }
+
+    public void setAntTypeBase(String type){
+        this.mNative.anttypeBase = type;
+    }
+
+    public String getAntTypeBase(){
+        return this.mNative.anttypeBase;
+    }
     /**
      * @return nf (1:L1,2:L1+L2,3:L1+L2+L5)
      */

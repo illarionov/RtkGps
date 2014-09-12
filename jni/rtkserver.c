@@ -161,7 +161,6 @@ static jboolean RtkServer__rtksvrstart(JNIEnv* env, jclass thiz,
 
    solution_options2solopt_t(env, j_solopt1, &solopt[0]);
    solution_options2solopt_t(env, j_solopt2, &solopt[1]);
-   processing_options2prcopt_t(env, j_procopt, &prcopt);
 
    nctx = (struct native_ctx_t *)(uintptr_t)(*env)->GetLongField(env, thiz, m_object_field);
    if (nctx == NULL) {
@@ -175,6 +174,10 @@ static jboolean RtkServer__rtksvrstart(JNIEnv* env, jclass thiz,
       now = timeget();
       if (solopt[0].trace > 0)
 	 open_trace_file(env, solopt[0].trace, now);
+
+      /* treat processing options only now for having trace */
+      processing_options2prcopt_t(env, j_procopt, &prcopt);
+
       if (solopt[0].sstat > 0)
 	 open_solution_status_file(env, solopt[0].sstat, now);
    }
