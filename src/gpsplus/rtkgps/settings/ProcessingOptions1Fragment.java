@@ -236,6 +236,11 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
         opts.setExcludeEclipsingSatMeasurements(prefs.getBoolean(KEY_EXCLUDE_ECLIPSING, opts.isExcludeEclipsingSatMeasurements()));
         opts.setRaimFdeEnabled(prefs.getBoolean(KEY_RAIM_FDE, opts.isRaimFdeEnabled()));
 
+        SharedPreferences roverPrefs = ctx.getSharedPreferences(InputRoverFragment.SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
+        opts.setAntTypeRover(roverPrefs.getString(InputRoverFragment.KEY_ANTENNA, ""));
+        SharedPreferences basePrefs = ctx.getSharedPreferences(InputBaseFragment.SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
+        opts.setAntTypeBase(basePrefs.getString(InputRoverFragment.KEY_ANTENNA, ""));
+
         return opts;
     }
 

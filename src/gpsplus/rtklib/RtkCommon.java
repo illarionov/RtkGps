@@ -481,14 +481,15 @@ public class RtkCommon {
             String[] antennas = RtkCommon.getAntList(MainActivity.getApplicationDirectory() + File.separator + "files" + File.separator + "data" + File.separator + "igs08.atx");
             CharSequence entries[] = new String[antennas.length+2];
             CharSequence entryValues[] = new String[antennas.length+2];
-            int i = 2;
+            int i = 1;
+            //int i = 2; //TODO
             for (String antenna : antennas) {
                 entries[i] = antenna;
                 entryValues[i] = antenna;
                 i++;
             }
             entries[0]=entryValues[0] = "";
-            entries[1]=entryValues[1] = "*";
+         //   entries[1]=entryValues[1] = "*";  //TODO
 
             listPreferenceAntrennas.setEntries(entries);
             listPreferenceAntrennas.setEntryValues(entryValues);

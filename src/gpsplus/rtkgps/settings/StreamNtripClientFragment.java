@@ -36,14 +36,14 @@ public class StreamNtripClientFragment extends PreferenceFragment {
         private @Nonnull String password;
 
         public static final String DEFAULT_HOST = "rt.igs-ip.net";
-        public static final int DEFULT_PORT = 2101;
+        public static final int DEFAULT_PORT = 2101;
         public static final String DEFAULT_MOUNTPOUNT = "BRST0";
         public static final String DEFAULT_USER = "request-user";
         public static final String DEFAULT_PASSWORD = "password";
 
         public Value() {
             host = DEFAULT_HOST;
-            port = DEFULT_PORT;
+            port = DEFAULT_PORT;
             mountpoint = DEFAULT_MOUNTPOUNT;
             user = DEFAULT_USER;
             password = DEFAULT_PASSWORD;
@@ -56,7 +56,7 @@ public class StreamNtripClientFragment extends PreferenceFragment {
         }
 
         public Value setPort(int port) {
-            if (port <= 0 || port > 65535) throw new IllegalArgumentException();
+            if (port <= 0 || port > 65535) {port=DEFAULT_PORT;}
             this.port = port;
             return this;
         }
