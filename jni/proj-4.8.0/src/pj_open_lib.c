@@ -138,20 +138,24 @@ pj_open_lib(projCtx ctx, char *name, char *mode) {
     	char *appPath = getApplicationPath();
     	(void)strcpy(fname, appPath);
     	fname[n = strlen(fname)] = DIR_CHAR;
-        (void)strcpy(fname+n, "/lib/lib");
-        n += 8;
+        (void)strcpy(fname+n, "/files/proj4/");
+        n += 13;
         (void)strcpy(fname+n, name);
 
- 		(void)strcat(fname,".so");
         sysname = fname;
     } else /* just try it bare bones */
         sysname = name;
 
-#ifdef __ANDROID__
-    __android_log_print(ANDROID_LOG_INFO,"Proj4","loading:%s",sysname);
-#endif
-    if ((fid = fopen(sysname, mode)) != NULL)
+    if ((fid = fopen(sysname, mode)) != NULL) {
         errno = 0;
+#ifdef __ANDROID__
+        __android_log_print(ANDROID_LOG_INFO,"Proj4","OK loading:%s",sysname);
+#endif
+    }else{
+#ifdef __ANDROID__
+    	__android_log_print(ANDROID_LOG_INFO,"Proj4","ERROR loading:%s",sysname);
+#endif
+    }
 
     /* If none of those work and we have a search path, try it */
     if (!fid && path_count > 0)

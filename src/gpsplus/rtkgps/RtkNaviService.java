@@ -41,6 +41,7 @@ import gpsplus.rtkgps.settings.StreamBluetoothFragment;
 import gpsplus.rtkgps.settings.StreamBluetoothFragment.Value;
 import gpsplus.rtkgps.settings.StreamFileClientFragment;
 import gpsplus.rtkgps.settings.StreamUsbFragment;
+import gpsplus.rtkgps.utils.ZipHelper;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.RtkControlResult;

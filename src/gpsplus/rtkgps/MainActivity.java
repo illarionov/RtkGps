@@ -35,6 +35,7 @@ import gpsplus.rtkgps.settings.SettingsActivity;
 import gpsplus.rtkgps.settings.SettingsHelper;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtkgps.settings.StreamSettingsActivity;
+import gpsplus.rtkgps.utils.ChangeLog;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -126,6 +127,10 @@ public class MainActivity extends Activity {
                 invalidateOptionsMenu();
             }
         });
+
+        ChangeLog cl = new ChangeLog(this);
+        if (cl.firstRun())
+            cl.getLogDialog().show();
     }
 
     public static DemoModeLocation getDemoModeLocation(){
@@ -240,16 +245,16 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    private void copyAssetsToApplicationDirectory() throws FileNotFoundException, IOException
+    private void copyAssetsDirToApplicationDirectory(String dir) throws FileNotFoundException, IOException
     {
         //copy assets/data to appdir/data
         java.io.InputStream stream = null;
         java.io.OutputStream output = null;
 
-        for(String fileName : this.getAssets().list("data"))
+        for(String fileName : this.getAssets().list(dir))
         {
-            stream = this.getAssets().open("data/" + fileName);
-            String dest = this.getFilesDir()+ File.separator + "data" + File.separator + fileName;
+            stream = this.getAssets().open(dir+File.separator + fileName);
+            String dest = this.getFilesDir()+ File.separator + dir + File.separator + fileName;
             File fdest = new File(dest);
             if (fdest.exists()) continue;
 
@@ -273,6 +278,12 @@ public class MainActivity extends Activity {
             stream = null;
             output = null;
         }
+    }
+
+    private void copyAssetsToApplicationDirectory() throws FileNotFoundException, IOException
+    {
+       copyAssetsDirToApplicationDirectory("data");
+       copyAssetsDirToApplicationDirectory("proj4");
     }
 
     private void proxyIfUsbAttached(Intent intent) {

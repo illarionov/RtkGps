@@ -16,6 +16,7 @@ import gpsplus.rtkgps.usb.UsbFTDIController;
 import gpsplus.rtkgps.usb.UsbPl2303Controller;
 import gpsplus.rtkgps.usb.UsbSerialController;
 import gpsplus.rtkgps.usb.UsbSerialController.UsbControllerException;
+import gpsplus.rtkgps.utils.HexString;
 
 import java.io.IOException;
 import java.io.InputStream;

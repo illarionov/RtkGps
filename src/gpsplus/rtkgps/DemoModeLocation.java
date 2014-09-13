@@ -21,7 +21,6 @@ import java.util.Iterator;
 
 public class DemoModeLocation implements android.location.GpsStatus.Listener, LocationListener{
 
-    @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
     static final String TAG = DemoModeLocation.class.getSimpleName();
     private static Context mParentContext = null;

@@ -6,7 +6,6 @@ import android.util.Log;
 import android.widget.ProgressBar;
 
 import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.HexString;
 import gpsplus.rtkgps.ToolsActivity.DownloaderCaller;
 
 import org.apache.http.HttpEntity;

@@ -42,10 +42,9 @@ RTKLIB rtknavi port on android.
 * Due to multiple issues (error in projection and lacks of features) Proj4J was removed and C lib proj4 was added
 * All conversion are done with proj4 4.8.0
 * French projections are done with IGN certified method, Lambert II extended is computed with IGN certified grid ntf_r93.gsb
-* One custom proj4 specification string can be specified (take care of exact syntax).
-* limitation of +init=xxx to epsg nad83 and ignf (for others use full proj4 definition)
-* limitation of +nadgrids=xxx to ntf_r93.gsb , chenyx06etrs.gsb and null .
-* It is possible to add some init specs or some grids simply, if you want to add xxx.yyy proj4 file push it with adb to /data/data/gpsplus.rtkgps/libxxx.yyy.so
+* One custom proj4 specification string can be specified (take care of exact syntax).  
+* all standard proj4 formats and grids are included, all grids from http://download.osgeo.org/proj/proj-datumgrid-1.5.zip are also included. In other words you have access to this external files: alaska, chenyx06etrs.gsb, conus, epsg,esri, esri.extra, FL, GL27, hawaii, IGNF, MD, nad27, nad83, ntf_r93.gsb, ntv1_can.dat, null, nzgd2kgrid0005.gsb, other.extra, proj_def.dat, prvi, stgeorge, strlnc, stpaul, TN, WI, WO, world
+* If you need another specific "free" or freely distributable grid or definition file, do not hesitate to drop me an email.
 
 #### Geoids
 * you can select different geoid model in "Solution Option"/Geoid model but except for embedded model (EGM96 1°x1°)  
@@ -90,12 +89,12 @@ If you need precise ephemeris you have 2 ways for using them:
   
   
 #### Translations
-Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.net/project/gpsplusrtkgps/invite).   
+Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.com/project/gpsplusrtkgps/invite).   
 You can freely create a translator account and with it you will be able request for a new translation.  
 I already made this translations:
 * English (source language)
 * French  
-Yong Zhang translated to simplified chinese.
+* Chinese (translated by Yong Zhang)
 
 
 ### Requirements
@@ -108,7 +107,7 @@ Yong Zhang translated to simplified chinese.
 ###### Download original version from Alexey Illarionov.
 [original version](https://github.com/illarionov/RtkGps)
 
-### Download alpha version (1.0apha18) from Google Play.
+### Download alpha version (1.0apha20) from Google Play.
 
 ![qr](https://raw.githubusercontent.com/eltorio/RtkGps/master/qr_googleplay.png)
 

@@ -512,4 +512,8 @@
   <string name="tools_download_egm2008_m25_geoid">Installer le géoïde EGM 2008 2.5\' (135MO)</string>
   <string name="tools_download_egm2008_m10_geoid">Installer le géoïde EGM 2008 1,0\' (825MO)</string>
   <string name="tools_download_egm96_m150_geoid">Installer le géoïde EGM 96 15\' (2MO)</string>
+  <string name="changelog_full_title">Historique des changements</string>
+  <string name="changelog_title">Nouveautés</string>
+  <string name="changelog_ok_button">OK</string>
+  <string name="changelog_show_full">plus&#8230;</string>
 </resources>

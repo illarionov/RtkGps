@@ -27,9 +27,6 @@ LOCAL_MODULE := libDropboxSync
 LOCAL_SRC_FILES := ../libs/prebuilt/$(TARGET_ARCH_ABI)/libDropboxSync.so
 include $(PREBUILT_SHARED_LIBRARY)
 
-#ATTENTION adds all prebuilt libs like 'cp -av libs/prebuilt/* libs/'
-#this is because they are not real libs and cannot be stripped
-
 #Build proj4
 include $(CLEAR_VARS)
 LOCAL_PATH := $(JNI_TOP_PATH)

@@ -633,5 +633,9 @@
 	<string name="tools_download_egm2008_m10_geoid">Install EGM 2008 1.0\' Geoid (825MB)</string>
 	<string name="tools_download_egm96_m150_geoid">Install EGM 96 15\' Geoid (2MB)</string>
 	
+	<string name="changelog_full_title">Change Log</string>
+    <string name="changelog_title">What\'s New</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">more…</string>
 	
 </resources>
