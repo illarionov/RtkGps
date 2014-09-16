@@ -6,6 +6,7 @@
     <string name="app_version_label">Version</string>
     <string name="app_legacy_info_label">Legacy info</string>
     <string name="about_licenses">Legacy info</string>
+    <string name="about_changelog">Changelog</string>
     <string name="about_activity_label">About</string>
     <string name="crash_toast_text">Ooooops! I crashed, but a report has been sent to my developer to help fix the issue!</string>
 	<string name="title_activity_input_stream_settings">Input stream settings</string>

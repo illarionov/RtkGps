@@ -7,8 +7,8 @@
         android:id="@+id/version_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tools_textView_raf09"
-        android:layout_below="@+id/tools_textView_raf09"
+        android:layout_alignLeft="@+id/tools_textView_about_name"
+        android:layout_below="@+id/tools_textView_about_name"
         android:layout_marginTop="20dp"
         android:text="@string/app_version_label" />
 
@@ -44,7 +44,7 @@
         android:text="@string/app_legacy_info_label" />
 
     <TextView
-        android:id="@+id/tools_textView_raf09"
+        android:id="@+id/tools_textView_about_name"
         style="@android:style/TextAppearance.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,5 +54,15 @@
         android:layout_marginTop="66dp"
         android:text="@string/app_name" />
 
+    <Button
+        android:id="@+id/button_changelog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/legacyInfoButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/legacyInfoButton"
+        android:layout_marginBottom="34dp"
+        android:onClick="onChangelogButtonClicked"
+        android:text="@string/about_changelog" />
 
 </RelativeLayout>

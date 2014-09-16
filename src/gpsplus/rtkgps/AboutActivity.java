@@ -12,6 +12,8 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.TextView;
 
+import gpsplus.rtkgps.utils.ChangeLog;
+
 public class AboutActivity extends Activity {
 
     @Override
@@ -32,6 +34,11 @@ public class AboutActivity extends Activity {
         final DialogFragment dialog;
         dialog = new OpenSourceLicensesDialog();
         dialog.show(getFragmentManager(), null);
+    }
+
+    public void onChangelogButtonClicked(View v) {
+        ChangeLog cl = new ChangeLog(this);
+        cl.getFullLogDialog().show();
     }
 
     public static class OpenSourceLicensesDialog extends DialogFragment {
