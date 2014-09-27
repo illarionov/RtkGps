@@ -78,6 +78,7 @@
 		android:key="enable_testmode"
 		android:title="@string/solopt_output_testmode_title"
 		android:summary="@string/solopt_output_testmode_summary"
+		android:defaultValue="true"
         />
 	<EditTextPreference
 	    android:key="customproj4" 

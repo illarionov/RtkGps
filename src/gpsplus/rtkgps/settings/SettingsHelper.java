@@ -8,11 +8,11 @@ import android.text.TextUtils;
 
 import gpsplus.rtklib.ProcessingOptions;
 import gpsplus.rtklib.RtkServerSettings;
-import gpsplus.rtklib.SolutionOptions;
 import gpsplus.rtklib.RtkServerSettings.InputStream;
 import gpsplus.rtklib.RtkServerSettings.LogStream;
 import gpsplus.rtklib.RtkServerSettings.OutputStream;
 import gpsplus.rtklib.RtkServerSettings.TransportSettings;
+import gpsplus.rtklib.SolutionOptions;
 import gpsplus.rtklib.constants.SolutionFormat;
 import gpsplus.rtklib.constants.StreamFormat;
 import gpsplus.rtklib.constants.StreamType;
@@ -34,7 +34,7 @@ public class SettingsHelper {
         protected StreamUsbFragment.Value usbDefaults;
 
         public StreamDefaultsBase() {
-            enable = true;
+            enable = false;
             type = StreamType.NTRIPCLI;
             fileClientDefaults = new StreamFileClientFragment.Value();
             ntripClientDefaults = new StreamNtripClientFragment.Value();

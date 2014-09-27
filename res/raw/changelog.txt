@@ -22,8 +22,11 @@
 $ 1.0 alpha 22
    % Build 22
   _ 2014-09-13
+    * support for different integer ambiguity resolution settings
     * support all standard external proj4 files and all files from proj-datumgrid-1.5.zip
     * changelog is automatically shown or can be displayed in about activity
+    * add startup command for uBlox M8N raw messages on its uart #1
+    * test mode is enabled by default (new installation only)
 $ 1.0 alpha 21
    % Build 21
   _ 2014-09-12

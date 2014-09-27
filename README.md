@@ -12,6 +12,7 @@ RTKLIB rtknavi port on android.
 * GPS, GLONASS, Galileo, QZSS, BeiDou and SBAS Navigation systems
 * Single, DGPS/DGNSS, Kinematic, Static, Moving-Baseline, Fixed,
   PPP-Kinematic, PPP-Static and PPP-Fixed positioning modes.
+* RTK and PPP integer ambiguities resolution (PPP AR is experimental)
 * GNSS formats: 
   RINEX 2.10,2.11,2.12 OBS/NAV/GNAV/HNAV/LNAV/QNAV, RINEX 3.00,3.01,3.02
     OBS/NAV,RINEX 3.02 CLK,RTCM ver.2.3,RTCM ver.3.1 (with amendment 1-5),

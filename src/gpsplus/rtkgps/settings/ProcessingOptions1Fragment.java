@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.text.TextUtils;
@@ -56,6 +57,10 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
     static final String KEY_EXCLUDE_ECLIPSING = "exclude_eclipsing_sat_measurements";
     static final String KEY_RAIM_FDE = "raim_fde";
     public static final String KEY_PROCESSING_CYCLE = "processing_cycle";
+    public static final String KEY_AMBIGUITY_RESOLUTION = "ambiguity_resolution";
+    public static final String KEY_MIN_FIX_RATIO ="min_fix_ratio";
+    private static final String KEY_MIN_FIX_ELEVATION = "min_fix_elevation";
+    private static final String KEY_MIN_FIX_LOCK = "min_fix_lock";
 
     // Settings 1
     private PositioningModePreference mPositioningModePref;
@@ -63,10 +68,14 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
     private MultiSelectListPreferenceWorkaround mNavigationSystem;
     private ListPreference mElevationMaskPref;
     private ListPreference mSnrMaskPref;
+    private ListPreference mAmbiguityResolutionPref;
     private EarthTideCorrectionPreference mEarthTidesCorrPref;
     private IonosphereCorrectionPreference mIonosphereCorrectionPref;
     private TroposphereCorrectionPreference mTroposphereCorrectionPref;
     private EphemerisOptionPreference mSatEphemClockPref;
+    private EditTextPreference mMinRatioFixPref;
+    private EditTextPreference mMinElevationFixPref;
+    private EditTextPreference mMinLockFixPref;
 
     private final PreferenceChangeListener mPreferenceChangeListener;
 
@@ -135,6 +144,15 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
         mSatEphemClockPref = (EphemerisOptionPreference)findPreference(KEY_SAT_EPHEM_CLOCK);
 
         mSnrMaskPref = (ListPreference)findPreference(KEY_SNR_MASK);
+
+        mAmbiguityResolutionPref = (ListPreference)findPreference(KEY_AMBIGUITY_RESOLUTION);
+
+        mMinRatioFixPref = (EditTextPreference)findPreference(KEY_MIN_FIX_RATIO);
+
+        mMinLockFixPref = (EditTextPreference)findPreference(KEY_MIN_FIX_LOCK);
+
+        mMinElevationFixPref = (EditTextPreference)findPreference(KEY_MIN_FIX_ELEVATION);
+
     }
 
     private void reloadSummaries() {
@@ -146,6 +164,18 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
 
         summary = mNumberOfFrequenciesPref.getEntry();
         mNumberOfFrequenciesPref.setSummary(summary);
+
+        summary = mAmbiguityResolutionPref.getEntry();
+        mAmbiguityResolutionPref.setSummary(summary);
+
+        summary = mMinRatioFixPref.getText();
+        mMinRatioFixPref.setSummary(summary);
+
+        summary = mMinElevationFixPref.getText();
+        mMinElevationFixPref.setSummary(summary);
+
+        summary = mMinLockFixPref.getText();
+        mMinLockFixPref.setSummary(summary);
 
         final ArrayList<String> navsys = new ArrayList<String>(10);
         final EnumSet<NavigationSystem> navsys0 = EnumSet.noneOf(NavigationSystem.class);
@@ -171,23 +201,26 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
 
     private void updateEnable() {
         PositioningMode posMode;
-        final boolean rel, ppp;
+        final boolean rel, ppp, rtk;
 
         posMode = PositioningMode.valueOf(mPositioningModePref.getValue());
 
         rel = posMode.isRelative();
-        // rtk = posMode.isRtk();
+        rtk = posMode.isRtk();
         ppp = posMode.isPpp();
-        //ar = rtk || ppp;
 
         mNumberOfFrequenciesPref.setEnabled(rel);
         findPreference(KEY_REC_DYNAMICS).setEnabled(rel);
         mEarthTidesCorrPref.setEnabled(rel || ppp);
 
-        findPreference(KEY_SAT_ANTENNA_PCV).setEnabled(ppp);
-        findPreference(KEY_RECEIVER_ANTENNA_PCV).setEnabled(ppp);
-        findPreference(KEY_PHASE_WINDUP_CORRECTION).setEnabled(ppp);
-        findPreference(KEY_EXCLUDE_ECLIPSING).setEnabled(ppp);
+        findPreference(KEY_SAT_ANTENNA_PCV).setEnabled(rel || ppp);
+        findPreference(KEY_RECEIVER_ANTENNA_PCV).setEnabled(rel || ppp);
+        findPreference(KEY_PHASE_WINDUP_CORRECTION).setEnabled(rel || ppp);
+        findPreference(KEY_EXCLUDE_ECLIPSING).setEnabled(rel || ppp);
+        findPreference(KEY_AMBIGUITY_RESOLUTION).setEnabled(rtk || ppp);
+        findPreference(KEY_MIN_FIX_ELEVATION).setEnabled(rtk || ppp);
+        findPreference(KEY_MIN_FIX_LOCK).setEnabled(rtk || ppp);
+        findPreference(KEY_MIN_FIX_RATIO).setEnabled(rtk || ppp);
     }
 
     public static ProcessingOptions readPrefs(Context ctx) {
@@ -236,6 +269,11 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
         opts.setExcludeEclipsingSatMeasurements(prefs.getBoolean(KEY_EXCLUDE_ECLIPSING, opts.isExcludeEclipsingSatMeasurements()));
         opts.setRaimFdeEnabled(prefs.getBoolean(KEY_RAIM_FDE, opts.isRaimFdeEnabled()));
 
+        opts.setModeAR(Integer.valueOf(prefs.getString(KEY_AMBIGUITY_RESOLUTION, "0")));
+        opts.setValidThresoldAR(Double.parseDouble(prefs.getString(KEY_MIN_FIX_RATIO, "3.0")));
+        opts.setMinElevationToFixAmbiguityRad(Integer.parseInt(prefs.getString(KEY_MIN_FIX_ELEVATION, "0"))*(Math.PI/180));
+        opts.setMinLockToFixAmbiguity(Integer.parseInt(prefs.getString(KEY_MIN_FIX_LOCK, "0")));
+
         SharedPreferences roverPrefs = ctx.getSharedPreferences(InputRoverFragment.SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
         opts.setAntTypeRover(roverPrefs.getString(InputRoverFragment.KEY_ANTENNA, ""));
         SharedPreferences basePrefs = ctx.getSharedPreferences(InputBaseFragment.SHARED_PREFS_NAME, Activity.MODE_PRIVATE);
@@ -280,6 +318,7 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
         .putBoolean(KEY_PHASE_WINDUP_CORRECTION, opts.isPhaseWindupCorrectionEnabled())
         .putBoolean(KEY_EXCLUDE_ECLIPSING, opts.isExcludeEclipsingSatMeasurements())
         .putBoolean(KEY_RAIM_FDE, opts.isRaimFdeEnabled())
+        .putString(KEY_AMBIGUITY_RESOLUTION, String.valueOf(opts.getModeAR()))
         .commit()
         ;
         if (DBG) {

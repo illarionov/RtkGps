@@ -350,6 +350,55 @@ public class ProcessingOptions {
         return this.mNative.anttypeBase;
     }
     /**
+     * get ambiguity resolution mode
+     * (0:off,1:continuous,2:instantaneous,3:fix and hold)
+     * @return
+     */
+    public int getModeAR(){
+        return this.mNative.modear;
+    }
+
+    /**
+     * set ambiguity resolution mode
+     * @param mode (0:off,1:continuous,2:instantaneous,3:fix and hold)
+     */
+    public void setModeAR(int mode){
+        this.mNative.modear = mode;
+    }
+    /**
+     * set the Min ratio to fix ambiguity
+     * @param thres ratio
+     */
+    public void setValidThresoldAR(double thres){
+        this.mNative.thresar_0 = thres;
+    }
+    /**
+     * get min ratio to fix ambiguity
+     * @return
+     */
+    public double getValidThresoldAR(){
+        return this.mNative.thresar_0;
+    }
+    public void setMinLockToFixAmbiguity(int minlock){
+        this.mNative.minlock = minlock;
+    }
+    public int getMinLockToFixAmbiguity(){
+        return this.mNative.minlock;
+    }
+    public void setMinElevationToFixAmbiguityRad(double minelevation){
+        this.mNative.elmaskar = minelevation;
+    }
+    public double getMinElevationToFixAmbiguityRad(){
+        return this.mNative.elmaskar;
+    }
+    public void setMinSnrToFixAmbiguity(double minsnr){
+      //  this.mNative. = minsnr;
+    }
+    public double getMinSnrToFixAmbiguity(){
+      //  return this.mNative.;
+        return 0;
+    }
+    /**
      * @return nf (1:L1,2:L1+L2,3:L1+L2+L5)
      */
     public int getNumberOfFrequencies() {

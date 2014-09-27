@@ -6,6 +6,7 @@
   <string name="app_version_label">Version</string>
   <string name="app_legacy_info_label">版权信息</string>
   <string name="about_licenses">版权信息</string>
+  <string name="about_changelog">Changelog</string>
   <string name="about_activity_label">关于</string>
   <string name="crash_toast_text">哦，崩溃了，但是已经向开发人员发送了报告来解决这个问题。</string>
   <string name="title_activity_input_stream_settings">输入数据源设置</string>
@@ -271,6 +272,28 @@
     <item>35</item>
     <item>40</item>
   </string-array>
+  <string name="procopt_ambiguity_resolution_title">Integer ambiguity resolution</string>
+  <string name="procopt_ambiguity_resolution_dialog_title">Integer ambiguity resolution</string>
+  <string-array name="procopt_ambiguity_resolution_entries">
+    <item>无</item>
+    <item>连续</item>
+    <item>瞬时</item>
+    <item>Fix and hold</item>
+    <item>PPP</item>
+    <item>PPP (ILS)</item>
+  </string-array>
+  <string-array name="procopt_ambiguity_resolution_values">
+    <item>0</item>
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+    <item>4</item>
+    <item>5</item>
+  </string-array>
+  <string name="procopt_min_ratio_to_fix_ambiguity_title">Min ratio to fix ambiguity</string>
+  <string name="procopt_min_elevation_to_fix_ambiguity_title">Min elevation to fix ambiguity</string>
+  <string name="procopt_min_lock_to_fix_ambiguity_title">Min lock to fix ambiguity</string>
+  <string name="procopt_ambiguity_resolution_sub_preference_title">Integer ambiguity resolution settings</string>
   <string name="procopt_rec_dynamics_title">Rec dynamics</string>
   <string name="procopt_rec_dynamics_summary">估计接收机速度和加速度</string>
   <string name="procopt_rec_earth_tides_correction_title">地球的潮汐改正</string>
@@ -291,7 +314,7 @@
   <string name="procopt_raim_fde_title">RAIM FDE</string>
   <string name="procopt_raim_fde_summary">启用 RAIM 故障检测与排除</string>
   <string name="procopt_processing_cycle_title">处理周期 (s)</string>
-  <string name="procopt_processing_cycle_summary">设置模拟位置和 GPX 跟踪处理的周期</string>
+  <string name="procopt_processing_cycle_summary">设置模拟位置和 GPX 轨迹信息的输出间隔</string>
   <string-array name="procopt_processing_cycle_entries">
     <item>1</item>
     <item>2</item>
@@ -303,8 +326,8 @@
   </string-array>
   <string name="solopt_output_header_title">输出header</string>
   <string name="solopt_output_header_summary">设置是否需要输出header</string>
-  <string name="solopt_output_mocklocation_title">输出 GPS 模拟位置</string>
-  <string name="solopt_output_mocklocation_summary">设置是否发送处理结果给其他程序(类似安卓位置定位服务)</string>
+  <string name="solopt_output_mocklocation_title">输出GPS模拟位置</string>
+  <string name="solopt_output_mocklocation_summary">设置是否发送模拟位置给其他程序(类似安卓位置定位服务)</string>
   <string name="solopt_time_format_title">时间格式</string>
   <string name="solopt_time_format_dialog_title">设置时间格式</string>
   <string name="solopt_lat_lon_format_title">纬度/经度格式</string>
@@ -512,4 +535,8 @@
   <string name="tools_download_egm2008_m25_geoid">安装 EGM 2008 2.5\' 大地水准面 (135MB)</string>
   <string name="tools_download_egm2008_m10_geoid">安装 EGM 2008 1.0\' 大地水准面 (825MB)</string>
   <string name="tools_download_egm96_m150_geoid">安装 EGM 96 15\' 大地水准面 (2MB)</string>
+  <string name="changelog_full_title">更新日志</string>
+  <string name="changelog_title">新功能</string>
+  <string name="changelog_ok_button">OK</string>
+  <string name="changelog_show_full">更多...</string>
 </resources>

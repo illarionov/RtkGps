@@ -23,7 +23,7 @@
 
     <ListPreference android:key="antenna"
             android:title="@string/input_streams_setting_antenna_title" 
-            android:summary="@string/input_streams_setting_antenna_summary"
+            android:dialogTitle="@string/input_streams_setting_antenna_summary"
             android:defaultValue="" 
             android:dependency="enable"/>
     

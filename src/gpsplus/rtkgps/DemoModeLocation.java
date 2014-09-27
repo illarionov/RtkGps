@@ -56,7 +56,7 @@ public class DemoModeLocation implements android.location.GpsStatus.Listener, Lo
         boolean bBaseEnabled = prefsInputBase.getBoolean(InputBaseFragment.KEY_ENABLE, true);
         boolean bRoverEnabled = prefsInputRover.getBoolean(InputRoverFragment.KEY_ENABLE, true);
         boolean bCorrectionEnabled = prefsInputCorrection.getBoolean(InputCorrectionFragment.KEY_ENABLE, true);
-        boolean bIsTestModeEnabled = prefsSolution.getBoolean(SolutionOutputSettingsFragment.KEY_ENABLE_TEST_MODE, false);
+        boolean bIsTestModeEnabled = prefsSolution.getBoolean(SolutionOutputSettingsFragment.KEY_ENABLE_TEST_MODE, true);
 
         mIsInDemoMode = !bBaseEnabled && !bRoverEnabled && !bCorrectionEnabled && bIsTestModeEnabled;
         if (mIsInDemoMode){

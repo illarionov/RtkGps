@@ -22,7 +22,11 @@
 $ 1.0 alpha 22
    % Build 22
   _ 2014-09-13
+    * support des paramètres de résolution des ambiguïtés entières
     * support de tous les fichiers proj4 externes standards et tous les fichiers de proj-datumgrid-1.5.zip
+    * les notes de version apparaissent automatiquement ou peuvent être affichées dans l'écran "à propos"
+    * ajout des commandes de démarrage pour uBlox M8N port uart #1
+    * le mode de test est activé par défaut (nouvelle installation seulement)
 $ 1.0 alpha 21
    % Build 21
   _ 2014-09-12

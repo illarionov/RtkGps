@@ -234,6 +234,7 @@ public class InputRoverFragment extends PreferenceFragment {
         final Preference settingsButtonPref;
         final Preference positionButtonpref;
         final SharedPreferences prefs;
+        final ListPreference antennaList;
 
         if (DBG) Log.v(getSharedPreferenceName(), "refresh()");
 
@@ -243,9 +244,17 @@ public class InputRoverFragment extends PreferenceFragment {
         receiverOptionPref = (EditTextPreference)findPreference(KEY_RECEIVER_OPTION);
         settingsButtonPref = findPreference(KEY_STREAM_SETTINGS_BUTTON);
         positionButtonpref = findPreference(KEY_STATION_POSITION_BUTTON);
+        antennaList = (ListPreference)findPreference(KEY_ANTENNA);
 
         typePref.setSummary(getString(typePref.getValueT().getNameResId()));
         formatPref.setSummary(getString(formatPref.getValueT().getNameResId()));
+
+        if (antennaList != null) {
+            CharSequence summary;
+            summary = antennaList.getEntry();
+            antennaList.setSummary(summary);
+        }
+
         receiverOptionPref.setSummary(receiverOptionPref.getText());
         settingsButtonPref.setSummary(SettingsHelper.readInputStreamSumary(getResources(), prefs));
         if (positionButtonpref != null) {

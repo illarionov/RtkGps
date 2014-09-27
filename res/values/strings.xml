@@ -319,7 +319,30 @@
         <item>35</item>
         <item>40</item>
     </string-array>
-
+    
+    <string name="procopt_ambiguity_resolution_title">Integer ambiguity resolution</string>
+    <string name="procopt_ambiguity_resolution_dialog_title">Integer ambiguity resolution</string>
+    <string-array name="procopt_ambiguity_resolution_entries">
+        <item>Off</item>
+        <item>Continuous</item>
+        <item>Instantaneous</item>
+        <item>Fix and hold</item>
+        <item>PPP</item>
+        <item>PPP (ILS)</item>
+    </string-array>
+    <string-array name="procopt_ambiguity_resolution_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string name="procopt_min_ratio_to_fix_ambiguity_title">Min ratio to fix ambiguity</string>
+    <string name="procopt_min_elevation_to_fix_ambiguity_title">Min elevation to fix ambiguity</string>
+    <string name="procopt_min_lock_to_fix_ambiguity_title">Min lock to fix ambiguity</string>
+    <string name="procopt_ambiguity_resolution_sub_preference_title">Integer ambiguity resolution settings</string>
+    
     <!-- Rec dynamics / Earth tides correction -->
     <string name="procopt_rec_dynamics_title">Rec dynamics</string>
     <string name="procopt_rec_dynamics_summary">Estimate receiver velocity and acceleration</string>
@@ -638,5 +661,4 @@
     <string name="changelog_title">What\'s New</string>
     <string name="changelog_ok_button">OK</string>
     <string name="changelog_show_full">more…</string>
-	
 </resources>

@@ -6,6 +6,7 @@
   <string name="app_version_label">Version</string>
   <string name="app_legacy_info_label">Infos légales</string>
   <string name="about_licenses">Infos légales</string>
+  <string name="about_changelog">Notes de version</string>
   <string name="about_activity_label">À propos</string>
   <string name="crash_toast_text">Ooooops ! J\'ai planté, mais un rapport a été envoyé à mon développeur, pour l\'aider à résoudre le problème !</string>
   <string name="title_activity_input_stream_settings">Paramètres de flux d\'entrée</string>
@@ -271,6 +272,28 @@
     <item>35</item>
     <item>40</item>
   </string-array>
+  <string name="procopt_ambiguity_resolution_title">Résolution des ambiguïtés entières</string>
+  <string name="procopt_ambiguity_resolution_dialog_title">Résolution des ambiguïtés entières</string>
+  <string-array name="procopt_ambiguity_resolution_entries">
+    <item>Off</item>
+    <item>Continue</item>
+    <item>Instantanée</item>
+    <item>Résoudre et conserver (Fix &amp; Hold)</item>
+    <item>PPP</item>
+    <item>PPP (ILS)</item>
+  </string-array>
+  <string-array name="procopt_ambiguity_resolution_values">
+    <item>0</item>
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+    <item>4</item>
+    <item>5</item>
+  </string-array>
+  <string name="procopt_min_ratio_to_fix_ambiguity_title">Ratio mini pour résoudre l\'ambiguïté</string>
+  <string name="procopt_min_elevation_to_fix_ambiguity_title">Elévation mini pour résoudre l\'ambiguïté</string>
+  <string name="procopt_min_lock_to_fix_ambiguity_title">Vérouillage mini pour résoudre l\'ambiguïté</string>
+  <string name="procopt_ambiguity_resolution_sub_preference_title">Paramètres de résolution des ambiguïtés entières</string>
   <string name="procopt_rec_dynamics_title">Dynamique du récepteur</string>
   <string name="procopt_rec_dynamics_summary">Estimation de la vitesse et de l\'accélération du récepteur</string>
   <string name="procopt_rec_earth_tides_correction_title">Correction de la marée terrestre</string>
