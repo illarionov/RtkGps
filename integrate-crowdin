@@ -1,0 +1,20 @@
+#/bin/sh
+cd ~/Development/RtkGps
+mkdir CROWDIN-TMP
+cd CROWDIN-TMP
+unzip "$1"
+cp zh-CN/strings.xml ../res/values-zh-rCN/
+cp zh-CN/changelog.txt ../res/raw-zh-rCN/
+cp zh-CN/google_play_description.txt ../res/raw-zh-rCN/
+
+cp fr/strings.xml ../res/values-fr/
+cp fr/changelog.txt ../res/raw-fr/
+cp fr/google_play_description.txt ../res/raw-fr/
+
+cp es-ES/strings.xml ../res/values-es/
+#not yet
+#cp es-ES/changelog.txt ../res/raw-es/
+#cp es-ES/google_play_description.txt ../res/raw-es/
+
+cd ..
+rm -rf CROWDIN-TMP

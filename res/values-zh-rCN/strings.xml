@@ -6,7 +6,7 @@
   <string name="app_version_label">Version</string>
   <string name="app_legacy_info_label">版权信息</string>
   <string name="about_licenses">版权信息</string>
-  <string name="about_changelog">Changelog</string>
+  <string name="about_changelog">更新日志</string>
   <string name="about_activity_label">关于</string>
   <string name="crash_toast_text">哦，崩溃了，但是已经向开发人员发送了报告来解决这个问题。</string>
   <string name="title_activity_input_stream_settings">输入数据源设置</string>
@@ -272,13 +272,13 @@
     <item>35</item>
     <item>40</item>
   </string-array>
-  <string name="procopt_ambiguity_resolution_title">Integer ambiguity resolution</string>
-  <string name="procopt_ambiguity_resolution_dialog_title">Integer ambiguity resolution</string>
+  <string name="procopt_ambiguity_resolution_title">整周模糊度解算</string>
+  <string name="procopt_ambiguity_resolution_dialog_title">整周模糊度解算</string>
   <string-array name="procopt_ambiguity_resolution_entries">
     <item>无</item>
     <item>连续</item>
     <item>瞬时</item>
-    <item>Fix and hold</item>
+    <item>固定并保持</item>
     <item>PPP</item>
     <item>PPP (ILS)</item>
   </string-array>
@@ -290,10 +290,10 @@
     <item>4</item>
     <item>5</item>
   </string-array>
-  <string name="procopt_min_ratio_to_fix_ambiguity_title">Min ratio to fix ambiguity</string>
-  <string name="procopt_min_elevation_to_fix_ambiguity_title">Min elevation to fix ambiguity</string>
-  <string name="procopt_min_lock_to_fix_ambiguity_title">Min lock to fix ambiguity</string>
-  <string name="procopt_ambiguity_resolution_sub_preference_title">Integer ambiguity resolution settings</string>
+  <string name="procopt_min_ratio_to_fix_ambiguity_title">最小Ratio值</string>
+  <string name="procopt_min_elevation_to_fix_ambiguity_title">最小高度角</string>
+  <string name="procopt_min_lock_to_fix_ambiguity_title">最小锁定</string>
+  <string name="procopt_ambiguity_resolution_sub_preference_title">整周模糊度解算设定</string>
   <string name="procopt_rec_dynamics_title">Rec dynamics</string>
   <string name="procopt_rec_dynamics_summary">估计接收机速度和加速度</string>
   <string name="procopt_rec_earth_tides_correction_title">地球的潮汐改正</string>

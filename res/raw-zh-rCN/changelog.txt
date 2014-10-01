@@ -22,11 +22,11 @@
 $ 1.0 alpha 22
    % Build 22
   _ 2014-09-13
-    * support for different integer ambiguity resolution settings
+    * 支持不同的整周模糊度解算设置
     * 支持标准的外部Proj4文件和来自proj-datumgrid-1.5.zip的文件
-    * changelog is automatically shown or can be displayed in about activity
-    * add startup command for uBlox M8N raw messages on its uart #1
-    * test mode is enabled by default (new installation only)
+    * 在关于页面显示更改日志信息
+    * 增加了uBlox M8N原始数据在UART#1输出的启动命令
+    * 缺省启用测试模式 (仅适用于新的安装)
 $ 1.0 alpha 21
    % Build 21
   _ 2014-09-12
