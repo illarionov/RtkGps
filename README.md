@@ -95,7 +95,8 @@ You can freely create a translator account and with it you will be able request 
 I already made this translations:
 * English (source language)
 * French  
-* Chinese (translated by Yong Zhang)
+* Chinese (fully translated by Yong Zhang)
+* Spanish (need some corrections)
 
 
 ### Requirements

@@ -113,7 +113,7 @@
   </string-array>
   <string-array name="solution_view_coordinates_baseline_pyl">
     <item>Inclinación:</item>
-    <item>Yaw:</item>
+    <item>Guiñada:</item>
     <item>Distancia:</item>
   </string-array>
   <string-array name="solution_view_coordinates_proj4_custom">
@@ -148,7 +148,7 @@
   <string name="solq_dgps">DGPS/DGNSS</string>
   <string name="solq_single">Simple</string>
   <string name="solq_ppp">PPP</string>
-  <string name="solq_dr">Dead reckoning</string>
+  <string name="solq_dr">Navegación por estima</string>
   <string name="solq_internal">Interno</string>
   <string name="solf_llh">Lat/Long/Altura</string>
   <string name="solf_xyz">X/Y/Z — ECEF</string>
@@ -177,7 +177,7 @@
   <string name="strfmt_sbas">SBAS messages</string>
   <string name="strfmt_nmea">NMEA 0183</string>
   <string name="str_none">Ningún</string>
-  <string name="str_serial">Serial</string>
+  <string name="str_serial">Serie</string>
   <string name="str_file">Archivo</string>
   <string name="str_tcpsvr">Servidor TCP</string>
   <string name="str_tcpcli">Cliente TCP</string>
@@ -186,7 +186,7 @@
   <string name="str_ntripcli">Cliente NTRIP</string>
   <string name="str_ftp">FTP</string>
   <string name="str_http">HTTP</string>
-  <string name="str_unixsvr">Unix domain socket server</string>
+  <string name="str_unixsvr">Servidor de sockets de dominio UNIX</string>
   <string name="str_bluetooth">Bluetooth</string>
   <string name="str_usb">USB</string>
   <string name="ionoopt_off">Off</string>
@@ -218,16 +218,16 @@
   <string name="ephopt_ssrcom">Broadcast + SSR CoM</string>
   <string name="ephopt_lex">QZSS LEX ephemeris</string>
   <string name="stapos_in_prcopt">Posición especificada</string>
-  <string name="stapos_avg_of_single">Average of single position</string>
+  <string name="stapos_avg_of_single">Promedio de posición única</string>
   <string name="stapos_read_from_file">Leer desde archivo</string>
-  <string name="stapos_rinex_hdr">Rinex header</string>
+  <string name="stapos_rinex_hdr">Cabecera RINEX</string>
   <string name="stapos_rtcm_pos">Posición de la antena RTCM</string>
   <string name="procopt_category_processing_options_1">Opciones de procesamiento 1</string>
   <string name="procopt_category_solution_options">Opciones de solución</string>
   <string name="procopt_positioning_mode_title">Modo de posicionamiento</string>
   <string name="procopt_positioning_mode_dialog_title">Seleccionar el modo de posicionamiento</string>
   <string name="procopt_number_of_freqencies_title">Frecuencias</string>
-  <string name="procopt_number_of_freqencies_dialog_title">Select number of frequencies</string>
+  <string name="procopt_number_of_freqencies_dialog_title">Seleccione el número de frecuencias</string>
   <string-array name="procopt_number_of_frequencies_entries">
     <item>L1</item>
     <item>L1 + L2</item>
@@ -324,7 +324,7 @@
     <item>30</item>
     <item>60</item>
   </string-array>
-  <string name="solopt_output_header_title">Output header</string>
+  <string name="solopt_output_header_title">Salir la cabecera</string>
   <string name="solopt_output_header_summary">Set whether the header is output or not</string>
   <string name="solopt_output_mocklocation_title">Salida GPS localizaciones simuladas</string>
   <string name="solopt_output_mocklocation_summary">Establecer si la solución es enviado a otras aplicaciones como el GPS interno</string>
@@ -343,7 +343,7 @@
     <item>grado</item>
     <item>dms</item>
   </string-array>
-  <string name="solopt_field_separator_title">Field Separator</string>
+  <string name="solopt_field_separator_title">Separador de campos</string>
   <string name="solopt_height_title">Altura</string>
   <string name="solopt_height_dialog_title">Establecer el tipo de altura</string>
   <string-array name="solopt_height_entries">
@@ -358,7 +358,7 @@
   <string name="solopt_geoid_model_dialog_title">Seleccione el modelo geoidal</string>
   <string name="solopt_nmea_interval_rmc_gga_title">NMEA intervalo(s) para RMC/GGA mensajes</string>
   <string name="solopt_nmea_interval_gsa_gsv_title">NMEA intervalo(s) de GSA/GSV mensajes</string>
-  <string name="solopt_output_solution_status_title">Output solution status</string>
+  <string name="solopt_output_solution_status_title">Salir el estado de la solución</string>
   <string name="solopt_output_solution_status_dialog_title">Set the output level of the solution status file</string>
   <string-array name="solopt_output_solution_status_entries">
     <item>OFF</item>
@@ -436,7 +436,7 @@
   <string name="ntrip_client_dialog_title">Configuración del cliente NTRIP</string>
   <string name="ntrip_client_host_title">Servidor</string>
   <string name="ntrip_client_port_title">Puerto</string>
-  <string name="ntrip_client_mountpoint_title">NTRIP Mountpoint</string>
+  <string name="ntrip_client_mountpoint_title">punto de montaje NTRIP</string>
   <string name="ntrip_client_user_title">Usuario NTRIP</string>
   <string name="ntrip_client_password_title">Contraseña NTRIP</string>
   <string name="file_filename_title">Nombre de archivo</string>
