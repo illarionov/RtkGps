@@ -88,6 +88,20 @@ If you need precise ephemeris you have 2 ways for using them:
 * Manualy: In the correction tab you select "File" and type SP3 , in the filename you put the filename of the file you provide in RtkGps directory (ending with .SP3)  
 * Automatically: When the server is running, hit the "Tools" menu, here you have an option to download and inject automatically the latest ultra-rapid ephemeris from IGS or simply inject them if you already have the good file.  
   
+#### Building on Windows
+Android is Unix so it is easier to build under an *nix system. Personnaly I use MacOSX but it can be done under WIndows  
+You need a correctly installed ndk (under windows I use ndk-r9d), a correctly Installed ADT (I use x86_64-20140702)  
+Also you will need a working Cygwin installation with make, gcc-core gcc-c++ bash at least 
+Define ANDOID_NDK and ANDROID_SDK variable to there correct path, and add ANDROID_NDK path in PATH  
+copy RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\INCLUDE\*.h to:  
+  RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\SRC  
+  RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\INSTALL  
+  RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\BLAS\SRC  
+This is a workaround for the symlinks  
+You also need to deactivate the use of lapack since it cannot be build under windows  
+For that please modify RtkGps/jni/rtklib.mk and Android.mk for removing LAPACK flag and clapck module import  
+now under a cygwin terminal move to your RtkGps directory and build  
+Under Eclipse be sure that you do not set to build the native library since it fails  
   
 #### Translations
 Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.com/project/gpsplusrtkgps/invite).   
