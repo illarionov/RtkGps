@@ -110,7 +110,8 @@ I already made this translations:
 * English (source language)
 * French  
 * Chinese (fully translated by Yong Zhang)
-* Spanish (need some corrections)
+* Spanish (I and Enoc Sanz Ablanedo)
+* Polish (fully translated by Tomasz R.)
 
 
 ### Requirements
