@@ -16,13 +16,16 @@ cp fr/google_play_description.txt ../res/raw-fr/
 
 cp es-ES/strings.xml ../res/values-es/
 cp es-ES/google_play_description.txt ../res/raw-es/
-#not yet
-#cp es-ES/changelog.txt ../res/raw-es/
+cp es-ES/changelog.txt ../res/raw-es/
 
-#not yet
+#not enough 
 #cp de/strings.xml ../res/values-de/
 #cp de/changelog.txt ../res/raw-de/
 #cp de/google_play_description.txt ../res/raw-de/
+
+cp pl/strings.xml ../res/values-pl/
+cp pl/changelog.txt ../res/raw-pl/
+cp pl/google_play_description.txt ../res/raw-pl/
 
 cd ..
 rm -rf CROWDIN-TMP

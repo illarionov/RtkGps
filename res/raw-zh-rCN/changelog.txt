@@ -19,10 +19,16 @@
     </style>
   </head>
   <body>
-$ 1.0 alpha 22
+$ 1.0 alpha 23
+   % Build 23
+  _ 2014-10-16
+    * 支持NTRIP server功能  
+    * 支持在NTRIP的用户名和密码中输入特殊字符
+    * 西班牙语言翻译 (感谢Enoc Sanz Ablanedo的贡献)
+    * 波兰语言支持 (由Tomasz R翻译)
    % Build 22
   _ 2014-09-13
-    * 支持不同的整周模糊度解算设置
+    * 支持更多的整周模糊度解算设置
     * 支持标准的外部Proj4文件和来自proj-datumgrid-1.5.zip的文件
     * 在关于页面显示更改日志信息
     * 增加了uBlox M8N原始数据在UART#1输出的启动命令
@@ -42,7 +48,7 @@ $ 1.0 alpha 19
   _ 2014-08-31
     * rtklib 2.4.2p9
     * 增加对Trimble RT17，Sirf III/IV，Furuno LPY1000和Septentrio的格式支持
-    * 中文版本
+    * 中文语言支持 (由Yong Zhang翻译)
 $ 1.0 alpha 18
    % Build 18
   _ 2014-08-25

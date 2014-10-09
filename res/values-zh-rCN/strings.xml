@@ -121,15 +121,15 @@
     <item>b:</item>
     <item>高度:</item>
   </string-array>
-  <string name="pmode_single">单点解</string>
+  <string name="pmode_single">Single</string>
   <string name="pmode_dgps">DGPS/DGNSS</string>
-  <string name="pmode_kinema">动态</string>
-  <string name="pmode_static">静态</string>
-  <string name="pmode_moveb">移动基站</string>
-  <string name="pmode_fixed">固定</string>
-  <string name="pmode_ppp_kinema">PPP — 动态</string>
-  <string name="pmode_ppp_static">PPP — 静止</string>
-  <string name="pmode_ppp_fixed">PPP — 固定</string>
+  <string name="pmode_kinema">Kinematic</string>
+  <string name="pmode_static">Static</string>
+  <string name="pmode_moveb">Moving-Base</string>
+  <string name="pmode_fixed">Fixed</string>
+  <string name="pmode_ppp_kinema">PPP - Kinematic</string>
+  <string name="pmode_ppp_static">PPP - Static</string>
+  <string name="pmode_ppp_fixed">PPP - Fixed</string>
   <string name="navsys_none">无</string>
   <string name="navsys_gps">GPS</string>
   <string name="navsys_sbs">SBAS</string>
@@ -142,17 +142,17 @@
   <string name="times_utc">UTC</string>
   <string name="times_jst">JST</string>
   <string name="solq_none">无</string>
-  <string name="solq_fix">固定</string>
-  <string name="solq_float">浮动解</string>
+  <string name="solq_fix">Fixed</string>
+  <string name="solq_float">Float</string>
   <string name="solq_sbas">SBAS</string>
   <string name="solq_dgps">DGPS/DGNSS</string>
-  <string name="solq_single">单点解</string>
+  <string name="solq_single">Single</string>
   <string name="solq_ppp">PPP</string>
   <string name="solq_dr">航位推算</string>
   <string name="solq_internal">内置</string>
   <string name="solf_llh">纬度/经度/高</string>
   <string name="solf_xyz">X/Y/Z — ECEF</string>
-  <string name="solf_enu">E/N/U — 基线</string>
+  <string name="solf_enu">E/N/U - 基线</string>
   <string name="solf_nmea">NMEA 0183</string>
   <string name="solf_gsif">GSI-F1/2/3</string>
   <string name="strfmt_rtcm2">RTCM 2</string>
@@ -179,23 +179,23 @@
   <string name="str_none">无</string>
   <string name="str_serial">串口</string>
   <string name="str_file">文件</string>
-  <string name="str_tcpsvr">TCP 服务器</string>
-  <string name="str_tcpcli">TCP 客户端</string>
+  <string name="str_tcpsvr">TCP Server</string>
+  <string name="str_tcpcli">TCP Client</string>
   <string name="str_udp">UDP</string>
-  <string name="str_ntripsvr">NTRIP 服务器</string>
-  <string name="str_ntripcli">NTRIP 客户端</string>
+  <string name="str_ntripsvr">NTRIP server</string>
+  <string name="str_ntripcli">NTRIP client</string>
   <string name="str_ftp">FTP</string>
   <string name="str_http">HTTP</string>
   <string name="str_unixsvr">Unix 域名Socket服务器</string>
   <string name="str_bluetooth">Bluetooth</string>
   <string name="str_usb">USB</string>
   <string name="ionoopt_off">Off</string>
-  <string name="ionoopt_brdc">广播模式</string>
-  <string name="ionoopt_sbas">SBAS模式</string>
+  <string name="ionoopt_brdc">广播星历模型</string>
+  <string name="ionoopt_sbas">SBAS模型</string>
   <string name="ionoopt_iflc">L1/L2 或 L1/L5 iono-free LC</string>
   <string name="ionoopt_est">推算STEC</string>
   <string name="ionoopt_tec">IONEX TEC 模型</string>
-  <string name="ionoopt_qzs">QZSS 广播模式</string>
+  <string name="ionoopt_qzs">QZSS广播星历模型</string>
   <string name="ionoopt_lex">QZSS LEX 电离层</string>
   <string name="ionoopt_stec">SLANT TEC 模型</string>
   <string name="tropopt_off">关闭</string>
@@ -220,12 +220,12 @@
   <string name="stapos_in_prcopt">指定坐标</string>
   <string name="stapos_avg_of_single">单点定位平均值</string>
   <string name="stapos_read_from_file">从文件读取：</string>
-  <string name="stapos_rinex_hdr">Rinex header</string>
+  <string name="stapos_rinex_hdr">Rinex文件头</string>
   <string name="stapos_rtcm_pos">RTCM数据中的天线坐标</string>
-  <string name="procopt_category_processing_options_1">处理选项 1</string>
+  <string name="procopt_category_processing_options_1">处理选项1</string>
   <string name="procopt_category_solution_options">数据处理选项</string>
-  <string name="procopt_positioning_mode_title">定位模式</string>
-  <string name="procopt_positioning_mode_dialog_title">选择定位模式</string>
+  <string name="procopt_positioning_mode_title">定位解算模式</string>
+  <string name="procopt_positioning_mode_dialog_title">选择定位解算模式</string>
   <string name="procopt_number_of_freqencies_title">频率</string>
   <string name="procopt_number_of_freqencies_dialog_title">选择频率数</string>
   <string-array name="procopt_number_of_frequencies_entries">
@@ -238,8 +238,8 @@
     <item>2</item>
     <item>3</item>
   </string-array>
-  <string name="procopt_navigation_system_title">导航系统</string>
-  <string name="procopt_navigation_system_dialog_title">选择导航系统</string>
+  <string name="procopt_navigation_system_title">GNSS多星系统</string>
+  <string name="procopt_navigation_system_dialog_title">选择卫星系统</string>
   <string name="procopt_elevation_mask_title">高度角设置 (°)</string>
   <string name="procopt_elevation_mask_dialog_title">选择高度角 (°)</string>
   <string-array name="procopt_elevation_mask_entries">
@@ -312,7 +312,7 @@
   <string name="procopt_exclude_eclipsing_sat_measurements_title">剔除无效卫星</string>
   <string name="procopt_exclude_eclipsing_sat_measurements_summary">排除无效卫星的观测值</string>
   <string name="procopt_raim_fde_title">RAIM FDE</string>
-  <string name="procopt_raim_fde_summary">启用 RAIM 故障检测与排除</string>
+  <string name="procopt_raim_fde_summary">启用RAIM失败检测与排除</string>
   <string name="procopt_processing_cycle_title">处理周期 (s)</string>
   <string name="procopt_processing_cycle_summary">设置模拟位置和 GPX 轨迹信息的输出间隔</string>
   <string-array name="procopt_processing_cycle_entries">
@@ -370,8 +370,8 @@
     <item>1</item>
     <item>2</item>
   </string-array>
-  <string name="solopt_debug_trace_title">调试跟踪</string>
-  <string name="solopt_debug_trace_dialog_title">设置调试跟踪文件的输出级别</string>
+  <string name="solopt_debug_trace_title">跟踪调试</string>
+  <string name="solopt_debug_trace_dialog_title">设置调试文件的输出级别</string>
   <string-array name="solopt_debug_trace_entries">
     <item>OFF</item>
     <item>级别1</item>
@@ -399,14 +399,14 @@
   <string name="streams_settings_commands_at_startup_shutdown_title">在启动/关闭时发送命令......</string>
   <string name="streams_settings_base_station_position_title">基站坐标</string>
   <string name="streams_settings_rover_position_title">流动站位置</string>
-  <string name="input_streams_settings_enable_rover_title">启用流动站</string>
-  <string name="input_streams_settings_enable_base_title">启用参考站</string>
-  <string name="input_streams_settings_enable_correction_title">启动改正数</string>
-  <string name="input_streams_settings_rover_tab_title">输入流动站</string>
-  <string name="input_streams_settings_base_tab_title">输入参考站</string>
+  <string name="input_streams_settings_enable_rover_title">启用</string>
+  <string name="input_streams_settings_enable_base_title">启用</string>
+  <string name="input_streams_settings_enable_correction_title">启动</string>
+  <string name="input_streams_settings_rover_tab_title">流动站</string>
+  <string name="input_streams_settings_base_tab_title">参考站</string>
   <string name="input_streams_settings_correction_tab_title">输入改正数</string>
   <string name="input_streams_settings_receiver_option_title">接收机选项</string>
-  <string name="input_streams_settings_transmit_gpgga_to_base_title">传输GGA数据到参考站</string>
+  <string name="input_streams_settings_transmit_gpgga_to_base_title">发送GGA到服务器</string>
   <string name="input_streams_settings_transmit_gpgga_lat_title">纬度</string>
   <string name="input_streams_settings_transmit_gpgga_lon_title">经度</string>
   <string name="input_streams_setting_antenna_title">天线</string>
@@ -414,18 +414,18 @@
   <string-array name="input_streams_settings_transmit_gpgga_entries">
     <item>关闭</item>
     <item>纬度/经度</item>
-    <item>单点解算</item>
+    <item>单点解</item>
   </string-array>
   <string-array name="input_streams_settings_transmit_gpgga_vaues">
     <item>0</item>
     <item>1</item>
     <item>2</item>
   </string-array>
-  <string name="output_streams_settings_enable_solution1_title">启用解算1</string>
-  <string name="output_streams_settings_enable_solution2_title">启用解算2</string>
-  <string name="output_streams_settings_enable_gpxtrace_title">启用 GPX 跟踪</string>
-  <string name="output_streams_settings_solution1_tab_title">解算方式1</string>
-  <string name="output_streams_settings_solution2_tab_title">解算方式2</string>
+  <string name="output_streams_settings_enable_solution1_title">启用</string>
+  <string name="output_streams_settings_enable_solution2_title">启用</string>
+  <string name="output_streams_settings_enable_gpxtrace_title">启用GPX记录</string>
+  <string name="output_streams_settings_solution1_tab_title">解算结果输出1</string>
+  <string name="output_streams_settings_solution2_tab_title">解算结果输出2</string>
   <string name="output_streams_settings_gpxtrace_tab_title">GPX 跟踪</string>
   <string name="log_streams_settings_enable_rover_title">记录流动站</string>
   <string name="log_streams_settings_enable_base_title">记录参考站</string>
@@ -433,20 +433,21 @@
   <string name="log_stream_settings_rover_tab_title">记录流动站</string>
   <string name="log_stream_settings_base_tab_title">记录参考站</string>
   <string name="log_stream_settings_correction_tab_title">记录改正数</string>
-  <string name="ntrip_client_dialog_title">NTRIP 客户端设置</string>
-  <string name="ntrip_client_host_title">主机</string>
-  <string name="ntrip_client_port_title">端口</string>
+  <string name="ntrip_client_dialog_title">NTRIP客户端设置</string>
+  <string name="ntrip_client_host_title">IP地址</string>
+  <string name="ntrip_client_port_title">端口号</string>
   <string name="ntrip_client_mountpoint_title">NTRIP 挂载点</string>
-  <string name="ntrip_client_user_title">NTRIP 用户</string>
+  <string name="ntrip_client_user_title">NTRIP 用户名</string>
   <string name="ntrip_client_password_title">NTRIP 密码</string>
+  <string name="ntrip_server_dialog_title">NTRIP server设置</string>
   <string name="file_filename_title">文件名</string>
   <string name="file_filename_summary">动态命名可以包括%Y (年) %m (月) %d (日) %h (小时) %M (分钟) %S (秒)</string>
   <string name="file_syncdropbox_title">同步到 Dropbox</string>
   <string name="file_syncdropbox_summary">需要一个绝对文件名（即：不能包含%Y %m...）,Dropbox上的文件将会根据起始日期被重命名</string>
   <string name="file_zipbeforesync_title">同步前压缩文件</string>
   <string name="file_zipbeforesync_summary">发送到Dropbox前压缩文件</string>
-  <string name="tcp_client_dialog_title">TCP 客户端设置</string>
-  <string name="tcp_client_host_title">主机</string>
+  <string name="tcp_client_dialog_title">TCP客户端设置</string>
+  <string name="tcp_client_host_title">IP地址</string>
   <string name="tcp_client_port_title">端口</string>
   <string name="file_dialog_title">文件设置</string>
   <string name="bluetooth_dialog_title">蓝牙接收器设置</string>

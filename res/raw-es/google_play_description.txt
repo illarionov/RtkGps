@@ -1,4 +1,4 @@
-+++ DESCARGO DE RESPONSABILIDAD +++ 
++++ DECLARACION DE RESPONSABILIDAD +++ 
 ESTA ES UNA VERSIÓN ALFA
 He recibido algunas solicitudes para moverlo a una versión de producción, desde mi punto de vista funciona pero esta versión carece de algunas pruebas extensas.
 Sin embargo lo cambié al público con este aviso.

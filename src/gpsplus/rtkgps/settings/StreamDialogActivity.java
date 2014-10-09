@@ -1,13 +1,12 @@
 package gpsplus.rtkgps.settings;
 
-import gpsplus.rtkgps.R;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.constants.StreamType;
 
 public class StreamDialogActivity extends Activity {
@@ -47,6 +46,10 @@ public class StreamDialogActivity extends Activity {
         case NTRIPCLI:
             fragment = new StreamNtripClientFragment();
             title = R.string.ntrip_client_dialog_title;
+            break;
+        case NTRIPSVR:
+            fragment = new StreamNtripServerFragment();
+            title = R.string.ntrip_server_dialog_title;
             break;
         case TCPCLI:
             fragment = new StreamTcpClientFragment();

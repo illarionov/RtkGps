@@ -19,7 +19,13 @@
     </style>
   </head>
   <body>
-$ 1.0 alpha 22
+$ 1.0 alpha 23
+   % Build 23
+  _ 2014-10-16
+    * support de l'envoi à un caster ntrip  
+    * support des caractères spéciaux dans le nom d'utilisateur et le mot de passe NTRIP
+    * Traduction en espagnol (merci à Enoc Sanz Ablanedo pour sa contribution)
+    * Traduction en polonais (traduit par Tomasz R)
    % Build 22
   _ 2014-09-13
     * support des paramètres de résolution des ambiguïtés entières
@@ -36,13 +42,13 @@ $ 1.0 alpha 20
   _ 2014-09-08
     * Les orbites SP3 peuvent être fournies en tant que fichier dans l'onglet correction
     * Les antennes satellites sont incluses et utilisables (Satellites PCV)
-    * Nouvelle activité « Outils » pour télécharger les orbites ultra rapide IGS et les modèles de géoïdes communs
+    * Nouvelle activité « Outils » pour télécharger les orbites ultra rapides IGS et les modèles de géoïdes communs
 $ 1.0 alpha 19
    % Build 19
   _ 2014-08-31
     * rtklib 2.4.2p9
     Ajout du support pour Trimble RT17, Furuno LPY1000, Sirf III/IV et Septentrio
-    * traduction chinoise
+    * traduction en chinois (traduit par Yong Zhang)
 $ 1.0 alpha 18
    % Build 18
   _ 2014-08-25
@@ -62,7 +68,7 @@ $ 1.0 alpha 15
 $ 1.0 alpha 14
    % Build 14
   _ 2014-08-08
-    * support des conversions de coordonnées Proj4. C'est fait par l'intermédiaire de proj4J et non de proj4 jni or proj4J est un sous-ensemble de proj4, certaines fonctionnalités sont manquantes, par exemple, il n'y a aucun + paramètre pm (méridien). Il est encore impossible de convertir en Lambert II-Paris par exemple.
+    * support des conversions de coordonnées Proj4. C'est fait par l'intermédiaire de proj4J et non de proj4 jni or proj4J est un sous-ensemble de proj4.  Certaines fonctionnalités sont manquantes, par exemple, il n'y a aucun paramètre +pm (méridien). Il est encore impossible de convertir en Lambert II-Paris par exemple.
     conversion de coordonnées pour les réseaux actuels français (RGF93, RGF93CC43-> CC50) et NAD83 américain
     * afficher le modèle de géoïde dans la solution - mais la validité du fichier de modèle de géoïde n'est toujours pas testée
 $ 1.0 alpha 13

@@ -30,7 +30,7 @@ public class LogRoverFragment extends PreferenceFragment {
 
     static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
         StreamType.TCPCLI,
-        StreamType.NTRIPCLI,
+        StreamType.NTRIPSVR,
         StreamType.FILE
     };
 

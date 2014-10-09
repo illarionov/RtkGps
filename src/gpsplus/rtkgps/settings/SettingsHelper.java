@@ -3,7 +3,6 @@ package gpsplus.rtkgps.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.text.TextUtils;
 
 import gpsplus.rtklib.ProcessingOptions;
@@ -29,6 +28,7 @@ public class SettingsHelper {
         protected StreamType type;
         protected StreamFileClientFragment.Value fileClientDefaults;
         protected StreamNtripClientFragment.Value ntripClientDefaults;
+        protected StreamNtripServerFragment.Value ntripServerDefaults;
         protected StreamTcpClientFragment.Value tcpClientDefaults;
         protected StreamBluetoothFragment.Value bluetoothDefaults;
         protected StreamUsbFragment.Value usbDefaults;
@@ -38,6 +38,7 @@ public class SettingsHelper {
             type = StreamType.NTRIPCLI;
             fileClientDefaults = new StreamFileClientFragment.Value();
             ntripClientDefaults = new StreamNtripClientFragment.Value();
+            ntripServerDefaults = new StreamNtripServerFragment.Value();
             tcpClientDefaults = new StreamTcpClientFragment.Value();
             bluetoothDefaults = new StreamBluetoothFragment.Value();
             usbDefaults = new StreamUsbFragment.Value();
@@ -58,8 +59,14 @@ public class SettingsHelper {
             return this;
         }
 
-        public StreamDefaultsBase setNtripClientDEfaults(StreamNtripClientFragment.Value defaults) {
+        public StreamDefaultsBase setNtripClientDefaults(StreamNtripClientFragment.Value defaults) {
             this.ntripClientDefaults = defaults;
+            return this;
+        }
+
+
+        public StreamDefaultsBase setNtripServerDefaults(StreamNtripServerFragment.Value defaults) {
+            this.ntripServerDefaults = defaults;
             return this;
         }
 
@@ -226,7 +233,7 @@ public class SettingsHelper {
             ;
             e.commit();
             StreamFileClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.fileClientDefaults);
-            StreamNtripClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripClientDefaults);
+            StreamNtripServerFragment.setDefaultValue(ctx, sharedPrefsName, defaults.ntripServerDefaults);
             StreamTcpClientFragment.setDefaultValue(ctx, sharedPrefsName, defaults.tcpClientDefaults);
         }
 
@@ -328,6 +335,9 @@ public class SettingsHelper {
         case NTRIPCLI:
             settings = StreamNtripClientFragment.readSettings(prefs);
             break;
+        case NTRIPSVR:
+            settings = StreamNtripServerFragment.readSettings(prefs);
+            break;
         case TCPCLI:
             settings = StreamTcpClientFragment.readSettings(prefs);
             break;
@@ -377,6 +387,9 @@ public class SettingsHelper {
         case NTRIPCLI:
             summary = StreamNtripClientFragment.readSummary(prefs);
             break;
+        case NTRIPSVR:
+            summary = StreamNtripServerFragment.readSummary(prefs);
+            break;
         case TCPCLI:
             summary = StreamTcpClientFragment.readSummary(prefs);
             break;
@@ -416,12 +429,12 @@ public class SettingsHelper {
        emptyPasswd = TextUtils.isEmpty(passwd);
 
        if (!emptyUser) {
-           path.append(Uri.encode(user));
+          path.append(user.replaceAll(":", "")); //All characters except semicolon
        }
 
        if (!emptyPasswd) {
            if (!emptyUser) path.append(':');
-           path.append(Uri.encode(passwd));
+           path.append(passwd.replaceAll(":", "")); //All characters except semicolon);
        }
 
        if (!emptyUser || !emptyPasswd) {

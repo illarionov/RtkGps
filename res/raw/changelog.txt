@@ -19,7 +19,13 @@
     </style>
   </head>
   <body>
-$ 1.0 alpha 22
+$ 1.0 alpha 23
+   % Build 23
+  _ 2014-10-16
+    * support for sending to a ntrip caster  
+    * support for special characters in NTRIP username and password
+    * Spanish translation (thanks to Enoc Sanz Ablanedo for its contribution)
+    * Polish translation (translated by Tomasz R)
    % Build 22
   _ 2014-09-13
     * support for different integer ambiguity resolution settings
@@ -42,7 +48,7 @@ $ 1.0 alpha 19
   _ 2014-08-31
     * rtklib 2.4.2p9
     * add support for Trimble RT17, Furuno LPY1000, Sirf III/IV and Septentrio
-    * chinese translation
+    * chinese translation (translated by Yong Zhang)
 $ 1.0 alpha 18
    % Build 18
   _ 2014-08-25

@@ -6,12 +6,12 @@
   <string name="app_version_label">Version</string>
   <string name="app_legacy_info_label">Información legal</string>
   <string name="about_licenses">Información legal</string>
-  <string name="about_changelog">Ver los cambios</string>
+  <string name="about_changelog">Registro de cambios</string>
   <string name="about_activity_label">Acerca de</string>
-  <string name="crash_toast_text">Ooooops! Me bloqueè, pero un reporte ha sido enviado a mi programador para ayudarle a resolver este problema!</string>
-  <string name="title_activity_input_stream_settings">Configuración de flujo de entrada</string>
-  <string name="title_activity_output_stream_settings">Configuración de flujo de salida</string>
-  <string name="title_activity_log_stream_settings">Log stream settings</string>
+  <string name="crash_toast_text">Ooooops! Me colgué, pero se ha sido enviado un informe al programador para ayudarle a resolver este problema!</string>
+  <string name="title_activity_input_stream_settings">Configuración de los flujos de entrada</string>
+  <string name="title_activity_output_stream_settings">Configuración de los flujos de salida</string>
+  <string name="title_activity_log_stream_settings">Configuración del registro</string>
   <string name="menu_settings">Configuración</string>
   <string name="menu_start_service">Iniciar servicio</string>
   <string name="menu_stop_service">Detener servicio</string>
@@ -23,10 +23,10 @@
   <string name="menu_map_mode">Modo de mapa</string>
   <string name="menu_map_mode_osm">OpenStreetMap</string>
   <string name="menu_map_mode_bing_aerial">Bing Aéreo</string>
-  <string name="menu_map_mode_bing_road">Bing carreteras</string>
-  <string name="menu_map_mode_geoportail_map">Geoportail carreteras</string>
-  <string name="menu_map_mode_geoportail_cadastral">Geoportail catastro</string>
-  <string name="menu_map_mode_geoportail_orthoimages">Geoportail aéreo</string>
+  <string name="menu_map_mode_bing_road">Bing Carreteras</string>
+  <string name="menu_map_mode_geoportail_map">Geoportail Carreteras</string>
+  <string name="menu_map_mode_geoportail_cadastral">Geoportail Catastro</string>
+  <string name="menu_map_mode_geoportail_orthoimages">Geoportail Aérea</string>
   <string name="local_service_started">Servicio local comenzado</string>
   <string name="local_service_stopped">Servicio local detenido</string>
   <string name="local_service_label">RtkGps</string>
@@ -45,7 +45,7 @@
   <string name="navdraw_item_map">Mapa</string>
   <string name="navdraw_item_input_streams">Flujos de entrada</string>
   <string name="navdraw_item_output_streams">Flujos de salida</string>
-  <string name="navdraw_item_log_streams">Log streams</string>
+  <string name="navdraw_item_log_streams">Registrar secuencias</string>
   <string name="navdraw_item_processing_options">Opciones de procesamiento</string>
   <string name="navdraw_item_solution_options">Opciones de solución</string>
   <string-array name="rtk_server_receiver">
@@ -77,7 +77,7 @@
   <string name="solution_view_format_proj4_nad83">NAD83 X/Y/Z</string>
   <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
   <string name="solution_view_format_enu_baseline">X/Y/Z - Línea De Base</string>
-  <string name="solution_view_format_pyl_baseline">Pitch/Yaw/Length — Baseline</string>
+  <string name="solution_view_format_pyl_baseline">Pitch/Yaw/Length - Baselínea</string>
   <string name="solution_view_format_proj4_custom">Proj4 personalizado a/b/c</string>
   <string-array name="solution_view_coordinates_wgs84">
     <item>Lat:</item>
@@ -190,13 +190,13 @@
   <string name="str_bluetooth">Bluetooth</string>
   <string name="str_usb">USB</string>
   <string name="ionoopt_off">Off</string>
-  <string name="ionoopt_brdc">Broadcast model</string>
+  <string name="ionoopt_brdc">Modelo transmitido</string>
   <string name="ionoopt_sbas">Modelo SBAS</string>
   <string name="ionoopt_iflc">L1/L2 o L1/L5 sin iono LC</string>
   <string name="ionoopt_est">Estimación de STEC</string>
   <string name="ionoopt_tec">Modelo IONEX TEC</string>
-  <string name="ionoopt_qzs">QZSS broadcast model</string>
-  <string name="ionoopt_lex">QZSS LEX ionosphere</string>
+  <string name="ionoopt_qzs">Modelo transmitido por QZSS</string>
+  <string name="ionoopt_lex">Ionosfera QZSS LEX</string>
   <string name="ionoopt_stec">Modelo SLANT TEC</string>
   <string name="tropopt_off">Off</string>
   <string name="tropopt_saas">Modelo Saastamoinen</string>
@@ -211,12 +211,12 @@
   <string name="geoid_egm2008_m10">EGM2008 1.0x1.0\'</string>
   <string name="geoid_gsi2000_m15">GSI geoid 2000 1.0x1.5\'</string>
   <string name="geoid_raf09_m15x20">IGN RAF09 1.5x2.0\'</string>
-  <string name="ephopt_brdc">Broadcast ephemeris</string>
+  <string name="ephopt_brdc">Efemérides transmitidas</string>
   <string name="ephopt_prec">Efemérides precisas</string>
-  <string name="ephopt_sbas">Broadcast + SBAS</string>
-  <string name="ephopt_ssrapc">Broadcast + SSR APC</string>
-  <string name="ephopt_ssrcom">Broadcast + SSR CoM</string>
-  <string name="ephopt_lex">QZSS LEX ephemeris</string>
+  <string name="ephopt_sbas">Transmitidas + SBAS</string>
+  <string name="ephopt_ssrapc">Transmitidas + SSR APC</string>
+  <string name="ephopt_ssrcom">Transmitidas + SSR CoM</string>
+  <string name="ephopt_lex">Efemérides QZSS LEX</string>
   <string name="stapos_in_prcopt">Posición especificada</string>
   <string name="stapos_avg_of_single">Promedio de posición única</string>
   <string name="stapos_read_from_file">Leer desde archivo</string>
@@ -292,9 +292,9 @@
   </string-array>
   <string name="procopt_min_ratio_to_fix_ambiguity_title">Cociente min para fijar la ambigüedad</string>
   <string name="procopt_min_elevation_to_fix_ambiguity_title">Elevación mínima para fijar la ambigüedad</string>
-  <string name="procopt_min_lock_to_fix_ambiguity_title">Min lock to fix ambiguity</string>
-  <string name="procopt_ambiguity_resolution_sub_preference_title">Integer ambiguity resolution settings</string>
-  <string name="procopt_rec_dynamics_title">Rec dynamics</string>
+  <string name="procopt_min_lock_to_fix_ambiguity_title">Mínimo de fijados para resolver ambigüedades</string>
+  <string name="procopt_ambiguity_resolution_sub_preference_title">Ajustes de resolución de ambigüedades</string>
+  <string name="procopt_rec_dynamics_title">Dinámicos Rec</string>
   <string name="procopt_rec_dynamics_summary">Estimación de la velocidad y la aceleración del receptor</string>
   <string name="procopt_rec_earth_tides_correction_title">Corrección de mareas de la tierra</string>
   <string name="procopt_ionosphere_correction_title">Corrección de la ionosfera</string>
@@ -307,14 +307,14 @@
   <string name="procopt_sat_antenna_pcv_summary">Utilice la variación del centro de fase de la antena de satélite</string>
   <string name="procopt_receiver_antenna_pcv_title">PCV Receptor</string>
   <string name="procopt_receiver_antenna_pcv_summary">Utilice la variación del centro de fase del receptor</string>
-  <string name="procopt_phase_windup_correction_title">Phase windup correction</string>
-  <string name="procopt_phase_windup_correction_summary">Apply phase windup correction</string>
+  <string name="procopt_phase_windup_correction_title">Corrección por finalización de fase</string>
+  <string name="procopt_phase_windup_correction_summary">Aplicar corrección de finalización de fase</string>
   <string name="procopt_exclude_eclipsing_sat_measurements_title">Rechazan eclipsando satélite</string>
   <string name="procopt_exclude_eclipsing_sat_measurements_summary">Excluir las mediciones de eclipsando satélite</string>
   <string name="procopt_raim_fde_title">RAIM FDE</string>
-  <string name="procopt_raim_fde_summary">Enable RAIM failure detection and exclusion</string>
+  <string name="procopt_raim_fde_summary">Habilitar detección de errores y exclusión RAIM</string>
   <string name="procopt_processing_cycle_title">Ciclo de procesamiento</string>
-  <string name="procopt_processing_cycle_summary">Set the cycle for processing mock positions and GPX trace</string>
+  <string name="procopt_processing_cycle_summary">Establecer el periodo para las posiciones simuladas y trazas GPX</string>
   <string-array name="procopt_processing_cycle_entries">
     <item>1</item>
     <item>2</item>
@@ -325,7 +325,7 @@
     <item>60</item>
   </string-array>
   <string name="solopt_output_header_title">Salir la cabecera</string>
-  <string name="solopt_output_header_summary">Set whether the header is output or not</string>
+  <string name="solopt_output_header_summary">Establecer si la cabecera se graba o no</string>
   <string name="solopt_output_mocklocation_title">Salida GPS localizaciones simuladas</string>
   <string name="solopt_output_mocklocation_summary">Establecer si la solución es enviado a otras aplicaciones como el GPS interno</string>
   <string name="solopt_time_format_title">Formato de hora</string>
@@ -341,7 +341,7 @@
   </string-array>
   <string-array name="solopt_lat_lon_format_entry_values">
     <item>grado</item>
-    <item>dms</item>
+    <item>gms</item>
   </string-array>
   <string name="solopt_field_separator_title">Separador de campos</string>
   <string name="solopt_height_title">Altura</string>
@@ -359,7 +359,7 @@
   <string name="solopt_nmea_interval_rmc_gga_title">NMEA intervalo(s) para RMC/GGA mensajes</string>
   <string name="solopt_nmea_interval_gsa_gsv_title">NMEA intervalo(s) de GSA/GSV mensajes</string>
   <string name="solopt_output_solution_status_title">Salir el estado de la solución</string>
-  <string name="solopt_output_solution_status_dialog_title">Set the output level of the solution status file</string>
+  <string name="solopt_output_solution_status_dialog_title">Fijar la salida de la solución en el archivo de estado</string>
   <string-array name="solopt_output_solution_status_entries">
     <item>OFF</item>
     <item>Estados</item>
@@ -370,8 +370,8 @@
     <item>1</item>
     <item>2</item>
   </string-array>
-  <string name="solopt_debug_trace_title">Debug trace</string>
-  <string name="solopt_debug_trace_dialog_title">Set the output level of debug trace file</string>
+  <string name="solopt_debug_trace_title">Trazas de depuración</string>
+  <string name="solopt_debug_trace_dialog_title">Fijar la salida del fichero de depuración</string>
   <string-array name="solopt_debug_trace_entries">
     <item>OFF</item>
     <item>Nivel 1</item>
@@ -439,6 +439,7 @@
   <string name="ntrip_client_mountpoint_title">punto de montaje NTRIP</string>
   <string name="ntrip_client_user_title">Usuario NTRIP</string>
   <string name="ntrip_client_password_title">Contraseña NTRIP</string>
+  <string name="ntrip_server_dialog_title">Configuración del servidor NTRIP</string>
   <string name="file_filename_title">Nombre de archivo</string>
   <string name="file_filename_summary">puede incluir %Y (año) %m (mes) %d (día) %h (hora) %m (minutos) %S (segundos) para nombrar dinámico</string>
   <string name="file_syncdropbox_title">Sincronización con Dropbox</string>

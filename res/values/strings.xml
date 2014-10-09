@@ -544,6 +544,7 @@
     <string name="ntrip_client_mountpoint_title">NTRIP Mountpoint</string>
     <string name="ntrip_client_user_title">NTRIP user</string>
     <string name="ntrip_client_password_title">NTRIP password</string>
+    <string name="ntrip_server_dialog_title">NTRIP server settings</string>
     <string name="file_filename_title">Filename</string>
     <string name="file_filename_summary">can included %Y (year) %m (month) %d (day) %h (hour) %M (minutes) %S (seconds) for dynamic naming</string>
     <string name="file_syncdropbox_title">Sync to Dropbox</string>

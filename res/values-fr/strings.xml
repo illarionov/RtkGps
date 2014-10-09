@@ -439,6 +439,7 @@
   <string name="ntrip_client_mountpoint_title">Point de montage NTRIP</string>
   <string name="ntrip_client_user_title">Utilisateur NTRIP</string>
   <string name="ntrip_client_password_title">Mot de passe NTRIP</string>
+  <string name="ntrip_server_dialog_title">Paramètres du serveur NTRIP</string>
   <string name="file_filename_title">Nom de fichier</string>
   <string name="file_filename_summary">peut contenir %Y (année) %m (mois) %d (jour) %h (heure) %M (minutes) %S (secondes) pour générer un nom dynamique</string>
   <string name="file_syncdropbox_title">Synchronisation vers Dropbox</string>
