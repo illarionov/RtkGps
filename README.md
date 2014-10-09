@@ -106,6 +106,9 @@ Under Eclipse be sure that you do not set to build the native library since it f
 #### Translations
 Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.com/project/gpsplusrtkgps/invite).   
 You can freely create a translator account and with it you will be able request for a new translation.  
+Today target languages are English, French, Spanish, Polish, German and Russian  
+Current translation to this target languages [![Crowdin](https://d322cqt584bo4o.cloudfront.net/gpsplusrtkgps/localized.png)](https://crowdin.com/project/gpsplusrtkgps)  
+[If you want this in your native language or if you want to contribute to one of the current tranlation, you are welcome.](https://crowdin.com/project/gpsplusrtkgps/invite)  
 I already made this translations:
 * English (source language)
 * French  
