@@ -16,7 +16,6 @@ import java.util.Arrays;
 public class UsbFTDIController extends UsbSerialController {
 
     private static final String TAG = UsbFTDIController.class.getSimpleName();
-    private static final long FTDI_WAIT_MS = 10;
     private static D2xxManager ftD2xx;
     private FT_Device ftDev;
     private int devCount = 0;
@@ -235,6 +234,7 @@ public class UsbFTDIController extends UsbSerialController {
             data = Arrays.copyOfRange(buffer, offset, offset+count);
             synchronized(ftDev)
             {
+                @SuppressWarnings("unused")
                 int retSize = ftDev.write(data, data.length);
             }
         }

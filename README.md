@@ -115,7 +115,7 @@ I already made this translations:
 * French  
 * Chinese (fully translated by Yong Zhang)
 * Spanish (I and Enoc Sanz Ablanedo)
-* Polish (fully translated by Tomasz R.)
+* Polish (fully translated by Tomasz Robak)
 
 
 ### Requirements

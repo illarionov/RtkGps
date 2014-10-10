@@ -25,7 +25,7 @@ $ 1.0 alpha 23
     * soporte para enviar a un caster ntrip  
     * soporte para caracteres especiales en nombre de usuario y contraseña por NTRIP
     * Traducción al español (gracias a Enoc Sanz Ablanedo, por su contribución)
-    * Polish translation (translated by Tomasz R)
+    * traducción al polaco (traducido por Tomasz Robak)
    % Build 22
   _ 2014-09-13
     * soporte para diferentes modos de resolución de las ambigüedades

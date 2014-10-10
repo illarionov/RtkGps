@@ -25,7 +25,7 @@ $ 1.0 alpha 23
     * 支持NTRIP server功能  
     * 支持在NTRIP的用户名和密码中输入特殊字符
     * 西班牙语言翻译 (感谢Enoc Sanz Ablanedo的贡献)
-    * 波兰语言支持 (由Tomasz R翻译)
+    * 波兰语言支持 (由Tomasz Robak 翻译)
    % Build 22
   _ 2014-09-13
     * 支持更多的整周模糊度解算设置
