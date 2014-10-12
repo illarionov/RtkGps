@@ -8,11 +8,16 @@ import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.TextView;
 
 import gpsplus.rtkgps.utils.ChangeLog;
+import gpsplus.rtkgps.utils.Translated;
+
+import java.util.Locale;
 
 public class AboutActivity extends Activity {
 
@@ -26,6 +31,17 @@ public class AboutActivity extends Activity {
             ((TextView) findViewById(R.id.version)).setText(pi.versionName);
         } catch (NameNotFoundException nnfe) {
             nnfe.printStackTrace();
+        }
+
+        TextView translationTextView = (TextView)findViewById(R.id.translation_label);
+        TextView translationLink = (TextView)findViewById(R.id.translation_link);
+        if (!Translated.contains(Locale.getDefault().getISO3Language()))
+        {
+            translationTextView.setText(getResources().getString(R.string.about_translation_title,Locale.getDefault().getDisplayLanguage(Locale.ENGLISH))+"\n"+
+                    getResources().getString(R.string.about_translation_subtitle)+"\n"+
+                    getResources().getString(R.string.about_translation_message) );
+            translationLink.setText( Html.fromHtml(getResources().getString(R.string.about_translation_link) ));
+            translationLink.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
     }
