@@ -26,6 +26,7 @@ $ 1.0 alpha 23
     * obsługa znaków specjalnych w nazwie użytkownika i haśle NTRIP
     * tłumaczenie na hiszpański (dzięki Enoc Sens Ablanedo za wkład)
     * tłumaczenia na język polski (tłumaczenie Tomasz Robak)
+    * tłumaczenia na język niemiecki (tłumaczenie Hagen Felix)
    % Build 22
   _ 2014-09-13
     * obsługa różnych ustawień rozdzielczości dla całkowitej niejednoznaczności

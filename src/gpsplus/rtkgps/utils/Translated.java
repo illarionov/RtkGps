@@ -1,6 +1,8 @@
 package gpsplus.rtkgps.utils;
 
 public enum Translated {
+        de("ger"),
+        de_DE("deu"),
         en("eng"),
         fr("fre"),
         fr_FR("fra"),

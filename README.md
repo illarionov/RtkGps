@@ -89,20 +89,21 @@ If you need precise ephemeris you have 2 ways for using them:
 * Automatically: When the server is running, hit the "Tools" menu, here you have an option to download and inject automatically the latest ultra-rapid ephemeris from IGS or simply inject them if you already have the good file.  
   
 #### Building on Windows
-Android is Unix so it is easier to build under an Unix system. Personnaly I use MacOSX but it can be done under WIndows  
-You need a correctly installed ndk (under windows I use ndk-r9d), a correctly Installed ADT (I use x86_64-20140702)  
-Also you will need a working Cygwin installation with make, gcc-core gcc-c++ bash at least  
-Define ANDOID_NDK and ANDROID_SDK variable to there correct path, and add ANDROID_NDK path in PATH  
-* copy RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\INCLUDE\*.h to:  
- * RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\SRC  
- * RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\INSTALL  
- * RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\BLAS\SRC  
-   
-This is a workaround for the symlinks  
-You also need to deactivate the use of lapack since it cannot be build under windows  
-For that please modify RtkGps/jni/rtklib.mk and Android.mk for removing LAPACK flag and clapck module import  
-now under a cygwin terminal move to your RtkGps directory and build with ndk-build command  
-Under Eclipse be sure that you do not set to build the native library since it fails  
+Android is Unix so it is easier to build under an Unix system. Personnaly I use MacOSX but it can be done under Windows (tested under 8.1 x86_64).  
+You need a correctly installed ndk (under windows I use ndk-r9d), a correctly Installed ADT (I use x86_64-20140702).  
+Also you will need a working Cygwin installation with make, gcc-core gcc-c++ bash at least.  
+Define ANDOID_NDK and ANDROID_SDK variable to their correct paths, also add ANDROID_NDK path in PATH
+```  
+copy RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\INCLUDE\*.h to:  
+ RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\SRC  
+ RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\INSTALL  
+ RtkGps\jni\simonlynen_android_libs\lapack\jni\clapack\BLAS\SRC  
+```   
+This is a workaround for the symlinks.  
+You also need to deactivate the use of lapack since it cannot be build under windows.  
+For that please modify RtkGps/jni/rtklib.mk and Android.mk for removing LAPACK flag and clapck module import (with performance issues).  
+now under a cygwin terminal move to your RtkGps directory and build with ```ndk-build``` command.  
+Under Eclipse be sure that you do not set to build the native library since it fails.  
   
 #### Translations
 Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.com/project/gpsplusrtkgps/invite).   
@@ -116,6 +117,7 @@ I already made this translations:
 * Chinese (fully translated by Yong Zhang)
 * Spanish (I and Enoc Sanz Ablanedo)
 * Polish (fully translated by Tomasz Robak)
+* German (translated by Hagen Felix)
 
 
 ### Requirements

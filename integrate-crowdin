@@ -18,8 +18,8 @@ cp es-ES/strings.xml ../res/values-es/
 cp es-ES/google_play_description.txt ../res/raw-es/
 cp es-ES/changelog.txt ../res/raw-es/
 
-#not enough 
-#cp de/strings.xml ../res/values-de/
+cp de/strings.xml ../res/values-de/
+#not enough
 #cp de/changelog.txt ../res/raw-de/
 #cp de/google_play_description.txt ../res/raw-de/
 

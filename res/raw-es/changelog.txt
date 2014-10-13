@@ -26,6 +26,7 @@ $ 1.0 alpha 23
     * soporte para caracteres especiales en nombre de usuario y contraseña por NTRIP
     * Traducción al español (gracias a Enoc Sanz Ablanedo, por su contribución)
     * traducción al polaco (traducido por Tomasz Robak)
+    * traducción al alemán (traducido por Hagen Felix)
    % Build 22
   _ 2014-09-13
     * soporte para diferentes modos de resolución de las ambigüedades

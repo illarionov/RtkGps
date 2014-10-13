@@ -26,6 +26,7 @@ $ 1.0 alpha 23
     * support for special characters in NTRIP username and password
     * Spanish translation (thanks to Enoc Sanz Ablanedo for its contribution)
     * Polish translation (translated by Tomasz Robak)
+    * German translation (translated by Hagen Felix)
    % Build 22
   _ 2014-09-13
     * support for different integer ambiguity resolution settings

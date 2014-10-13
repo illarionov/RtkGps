@@ -26,6 +26,7 @@ $ 1.0 alpha 23
     * support des caractères spéciaux dans le nom d'utilisateur et le mot de passe NTRIP
     * Traduction en espagnol (merci à Enoc Sanz Ablanedo pour sa contribution)
     * Traduction en polonais (traduit par Tomasz Robak)
+    * Traduction en allemand (traduit par Hagen Felix)
    % Build 22
   _ 2014-09-13
     * support des paramètres de résolution des ambiguïtés entières
