@@ -21,10 +21,12 @@
 
 -dontobfuscate
 
--dontwarn butterknife.Views$InjectViewProcessor
+-dontwarn butterknife.internal.**
+-keep class **$$ViewInjector { *; }
+-keepnames class * { @butterknife.InjectView *;}
+
 -dontwarn org.osmdroid.google.**
 -dontwarn org.osmdroid.contributor.GpxToPHPUploader*
--keep class **$$ViewInjector { *; } 
 
 -keepclasseswithmembers class * {
     native <methods>;

@@ -1,14 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nonnull;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -28,11 +19,20 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.constants.StationPositionType;
-import butterknife.InjectView;
-import butterknife.Views;
+
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
+
 
 public class StationPositionActivity extends Activity {
 
@@ -120,7 +120,7 @@ public class StationPositionActivity extends Activity {
         }
         mHideUseRtcm = intent.getBooleanExtra(ARG_HIDE_USE_RTCM, false);
 
-        Views.inject(this);
+        ButterKnife.inject(this);
 
         createPositionFormatAdapter();
         mPositionFormatView.setAdapter(mPositionFormatAdapter);

@@ -26,8 +26,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.Views;
 import gpsplus.rtkgps.view.GTimeView;
 import gpsplus.rtkgps.view.GpsSkyView;
 import gpsplus.rtkgps.view.SnrView;
@@ -85,7 +85,7 @@ public class StatusFragment extends Fragment {
             Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_status, container, false);
-        Views.inject(this, v);
+        ButterKnife.inject(this, v);
 
         return v;
     }
@@ -93,7 +93,7 @@ public class StatusFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Views.reset(this);
+        ButterKnife.reset(this);
     }
 
     @Override

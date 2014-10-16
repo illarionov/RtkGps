@@ -1,12 +1,5 @@
 package gpsplus.rtkgps.settings;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-
-import gpsplus.rtkgps.BuildConfig;
-import gpsplus.rtkgps.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -20,8 +13,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+
+import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.Views;
+import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.R;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
 
 public class StartupShutdownSettingsActivity extends Activity {
 
@@ -59,7 +60,7 @@ public class StartupShutdownSettingsActivity extends Activity {
             throw new IllegalArgumentException("ARG_SHARED_PREFS_NAME not defined");
         }
 
-        Views.inject(this);
+        ButterKnife.inject(this);
 
         loadSettings();
     }

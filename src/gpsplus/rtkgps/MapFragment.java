@@ -18,8 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.Views;
 import gpsplus.rtkgps.geoportail.GeoportailLayer;
 import gpsplus.rtkgps.geoportail.GeoportailWMTSTileSource;
 import gpsplus.rtkgps.view.GTimeView;
@@ -121,7 +121,7 @@ public class MapFragment extends Fragment {
         final DisplayMetrics dm;
 
         View v = inflater.inflate(R.layout.fragment_map, container, false);
-        Views.inject(this, v);
+        ButterKnife.inject(this, v);
 
         context = inflater.getContext();
         dm = context.getResources().getDisplayMetrics();
@@ -254,7 +254,7 @@ public class MapFragment extends Fragment {
         mMyLocationOverlay = null;
         mCompassOverlay = null;
         mScaleBarOverlay = null;
-        Views.reset(this);
+        ButterKnife.reset(this);
     }
 
     @Override

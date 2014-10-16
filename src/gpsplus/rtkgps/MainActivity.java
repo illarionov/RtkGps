@@ -25,8 +25,8 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.Views;
 
 import com.dropbox.sync.android.DbxAccountManager;
 
@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
-        Views.inject(this);
+        ButterKnife.inject(this);
 
         createDrawerToggle();
 
