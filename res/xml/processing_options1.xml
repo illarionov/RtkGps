@@ -39,6 +39,13 @@
 	        android:key="ambiguity_resolution"
 	        android:defaultValue="0"
 	        android:title="@string/procopt_ambiguity_resolution_title" />
+	    <ListPreference 
+	        android:dialogTitle="@string/procopt_ambiguity_glonass_resolution_title"
+	        android:entries="@array/procopt_glonass_ambiguity_resolution_entries"
+	        android:entryValues="@array/procopt_glonass_ambiguity_resolution_values"
+	        android:key="glonass_ambiguity_resolution"
+	        android:defaultValue="0"
+	        android:title="@string/procopt_ambiguity_glonass_resolution_title"/>
 	    <EditTextPreference
 	          android:inputType="numberDecimal"
 			  android:defaultValue="3.0"

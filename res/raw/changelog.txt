@@ -19,7 +19,11 @@
     </style>
   </head>
   <body>
-$ 1.0 alpha 23
+$ 1.0 alpha 24
+   % Build 24
+  _ 2014-10-31
+    * Glonass integer ambiguity resolution
+    * TODO Full RTKLIB integer ambiguity settings 
    % Build 23
   _ 2014-10-16
     * support for sending to a ntrip caster  

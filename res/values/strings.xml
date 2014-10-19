@@ -330,7 +330,7 @@
         <item>PPP</item>
         <item>PPP (ILS)</item>
     </string-array>
-    <string-array name="procopt_ambiguity_resolution_values">
+        <string-array name="procopt_ambiguity_resolution_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
@@ -338,10 +338,31 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+    <string name="procopt_ambiguity_glonass_resolution_title">Glonass integer ambiguity resolution</string>
+    <string-array name="procopt_glonass_ambiguity_resolution_entries">
+        <item>Off</item>
+        <item>On</item>
+        <item>Auto calibrating</item>
+    </string-array>
+	<string-array name="procopt_glonass_ambiguity_resolution_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string name="procopt_ambiguity_resolution_sub_preference_title">Integer ambiguity resolution settings</string>
     <string name="procopt_min_ratio_to_fix_ambiguity_title">Min ratio to fix ambiguity</string>
+    <string name="procopt_min_confidence_to_fix_ambiguity_title">Min confidence to fix ambiguity</string>
+    <string name="procopt_max_fcb_to_fix_ambiguity_title">Max FCB to fix ambiguity</string>
     <string name="procopt_min_elevation_to_fix_ambiguity_title">Min elevation to fix ambiguity</string>
     <string name="procopt_min_lock_to_fix_ambiguity_title">Min lock to fix ambiguity</string>
-    <string name="procopt_ambiguity_resolution_sub_preference_title">Integer ambiguity resolution settings</string>
+    <string name="procopt_min_fix_to_hold_ambiguity_title">Min fix to hold ambiguity</string>
+    <string name="procopt_min_elevation_to_hold_ambiguity_title">Min elevation to hold ambiguity</string>
+    <string name="procopt_outage_to_reset_ambiguity_title">Outage to reset ambiguity</string>
+    <string name="procopt_slip_threshold_title">Slip threshold (m)</string>
+    <string name="procopt_max_age_of_diff_s_title">Max age of diff (s)</string>
+    <string name="procopt_reject_threshold_of_gdop_title">Reject threshold of GDOP</string>
+    <string name="procopt_reject_threshold_of_innov_title">Reject threshold of innov (m)</string>
+    <string name="procopt_number_of_filter_iteration_title">Number of filter iteration</string>
     
     <!-- Rec dynamics / Earth tides correction -->
     <string name="procopt_rec_dynamics_title">Rec dynamics</string>

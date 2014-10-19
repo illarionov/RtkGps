@@ -366,6 +366,22 @@ public class ProcessingOptions {
         this.mNative.modear = mode;
     }
     /**
+     * get glonass ambiguity resolution mode
+     * GLONASS AR mode (0:off,1:on,2:auto cal,3:ext cal)
+     * @return
+     */
+    public int getModeGAR(){
+        return this.mNative.glomodear;
+    }
+
+    /**
+     * set glonass ambiguity resolution mode
+     * @param mode GLONASS AR mode (0:off,1:on,2:auto cal,3:ext cal)
+     */
+    public void setModeGAR(int mode){
+        this.mNative.glomodear = mode;
+    }
+    /**
      * set the Min ratio to fix ambiguity
      * @param thres ratio
      */
