@@ -43,6 +43,7 @@
     <string name="navdraw_category_streams">Streams</string>
     <string name="navdraw_category_settings">Settings</string>
     <string name="navdraw_item_server_switch">Server</string>
+    <string name="navdraw_ntripcaster_server_switch">Caster</string>
     <string name="navdraw_item_status">Status</string>
     <string name="navdraw_item_map">Map</string>
 	<string name="navdraw_item_input_streams">Input streams</string>

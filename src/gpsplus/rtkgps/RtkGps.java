@@ -7,6 +7,8 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.util.PoGoPin;
 
+import gpsplus.ntripcaster.NTRIPCaster;
+
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 import org.proj4.PJ;
@@ -38,21 +40,13 @@ public class RtkGps extends Application {
         }
         super.onCreate();
         //ACRA.init(this);
-        try {
-            System.loadLibrary("proj");
-            Log.v("Proj4", "Proj4 version: " + PJ.getVersion());
-        }
-        catch (Exception e)
-        {
-              Log.e("Error","loadLibrary",e.getCause());
-        }
-        try {
-            System.loadLibrary("rtkgps");
-        }
-        catch (Exception e)
-        {
-            Log.e("Error","loadLibrary",e.getCause());
-        }
+        System.loadLibrary("proj");
+        Log.v("Proj4","Proj4 version: "+PJ.getVersion());
+
+        System.loadLibrary("ntripcaster");
+        Log.v("ntripcaster","NTRIP Caster "+NTRIPCaster.getVersion());
+
+        System.loadLibrary("rtkgps");
         //set version
         PackageInfo pi;
         try {

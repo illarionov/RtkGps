@@ -27,7 +27,13 @@
     	        android:text="@string/navdraw_item_server_switch"
     	        android:textOff="OFF"
     	        android:textOn="ON" />
-    	        
+    	    <Switch
+    	        android:id="@+id/navdraw_ntripcaster_switch"
+    	        style="@style/NavigationDrawerItem"
+    	        android:background="@null"
+    	        android:text="@string/navdraw_ntripcaster_server_switch"
+    	        android:textOff="OFF"
+    	        android:textOn="ON" />
     	    <TextView
     	        style="@style/NavigationDrawerItem"
     	        android:id="@+id/navdraw_item_status"
