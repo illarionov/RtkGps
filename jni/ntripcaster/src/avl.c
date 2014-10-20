@@ -1030,7 +1030,7 @@ compare_strings (const void *first, const void *second, void *param)
 
 	if (!first || !second)
 	{
-		LOGWRITE (LOG_DEFAULT, "WARNING: compare_strings called with null pointers");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: compare_strings called with null pointers");
 		return 0;
 	}
 
@@ -1047,7 +1047,7 @@ compare_threads (const void *first, const void *second, void *param)
 
 	if (!first || !second)
 	{
-		LOGWRITE (LOG_DEFAULT, "WARNING: compare_threads called with NULL pointers");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: compare_threads called with NULL pointers");
 		return 0;
 	}
 
@@ -1067,7 +1067,7 @@ compare_mutexes (const void *first, const void *second, void *param)
 
 	if (!first || !second)
 	{
-		LOGWRITE (LOG_DEFAULT, "WARNING: compare_mutex called with NULL pointers");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: compare_mutex called with NULL pointers");
 		return 0;
 	}
 
@@ -1084,7 +1084,7 @@ int compare_connection(const void *first, const void *second, void *param)
 
 	if (!first || !second)
 	{
-		LOGWRITE (LOG_DEFAULT, "WARNING!!! - Null pointer connection!");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING!!! - Null pointer connection!");
 		return -1;
 	}
 
@@ -1093,7 +1093,7 @@ int compare_connection(const void *first, const void *second, void *param)
 
 	if (a1->type != a2->type)
 	{
-		LOGWRITE (LOG_DEFAULT, "WARNING!!!! - Comparing different type connections");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING!!!! - Comparing different type connections");
 		return -1;
 	}
 
@@ -1110,7 +1110,7 @@ zero_trav(avl_traverser *trav)
 {
 	if (!trav)
 	{
-		LOGWRITE (LOG_DEFAULT, "WARNING: zero_trav called with NULL trav");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: zero_trav called with NULL trav");
 		return;
 	}
 	trav->init = 0;
@@ -1145,7 +1145,7 @@ avl_get_any_node (avl_tree *tree)
 	avl_traverser trav = {0};
 	if (!tree)
 	{
-		LOGWRITE (LOG_DEFAULT, "WARNING: avl_get_any_node called with NULL tree");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: avl_get_any_node called with NULL tree");
 		return NULL;
 	}
 

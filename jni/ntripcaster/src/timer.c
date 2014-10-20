@@ -105,7 +105,7 @@ void status_write(server_info_t *infostruct)
 
 //	if (running == SERVER_RUNNING) info.num_clients = (unsigned long int) count_clients();
 
-	LOGWRITE(LOG_DEFAULT, "Bandwidth:%fKB/s Sources:%ld Clients:%ld", info.bandwidth_usage, info.num_sources, info.num_clients);
+	LOGVWRITE(ANDROID_LOG_INFO, "Bandwidth:%fKB/s Sources:%ld Clients:%ld", info.bandwidth_usage, info.num_sources, info.num_clients);
 
 	if (lt)
 		free(lt);
@@ -193,7 +193,7 @@ timer_handle_transfer_statistics (time_t stime, time_t *trottime, time_t *juston
 				total_bytes = (stat.read_kilos - trotstat->read_kilos) + (stat.write_kilos - trotstat->write_kilos);
 				delta = get_time() - *trottime;
 				if (delta <= 0) {
-					LOGWRITE(LOG_DEFAULT, 
+					LOGVWRITE(ANDROID_LOG_INFO,
 						"ERROR: Losing track of time.. is it xmas already? [%d - %d == %d <= 0]", 
 						get_time (), *trottime, delta);
 				} else {
@@ -361,7 +361,7 @@ void get_running_stats_proc (statistics_t *stat, int lock)
 void zero_stats(statistics_t *stat)
 {
 	if (!stat) {
-		LOGWRITE (LOG_DEFAULT, "WARNING: zero_stats() called with NULL stat pointer");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: zero_stats() called with NULL stat pointer");
 		return;
 	}
 

@@ -32,6 +32,7 @@ bail:
 
 void *_serverstart()
 {
+	LOGVWRITE(ANDROID_LOG_INFO,"ntripcaster status before starting:%d",get_ntripcaster_state());
 	set_run_path(appPath);
 	thread_lib_init ();
 	init_thread_tree (__LINE__, __FILE__);
@@ -62,7 +63,10 @@ static jint NTRIPCaster_serverstart(JNIEnv* env, jclass clazz, jint port, jstrin
 static jint NTRIPCaster_serverstop(JNIEnv* env, jclass clazz)
 {
 
-	return (jint)pthread_kill(ntripcaster_thread, SIGINT);
+	LOGVWRITE(ANDROID_LOG_INFO,"ntripcaster status:%d",get_ntripcaster_state());
+	pthread_kill(ntripcaster_thread, SIGINT);
+//	pthread_join(ntripcaster_thread,NULL);
+	return (jint)0;
 
 }
 
@@ -84,7 +88,7 @@ JNIEXPORT void JNICALL NTRIPCaster_setApplicationPath
 {
     char *givenPath = (*env)->GetStringUTFChars(env, applicationPath, NULL);
     if (!givenPath) return ;
-    LOGWRITE(ANDROID_LOG_INFO,"GivenPath: %s", givenPath);
+    LOGVWRITE(ANDROID_LOG_INFO,"GivenPath: %s", givenPath);
     if (appPath) free(appPath);
     appPath = (char*) malloc( (strlen(givenPath)+1)*sizeof(char) );
     if (!appPath) return;

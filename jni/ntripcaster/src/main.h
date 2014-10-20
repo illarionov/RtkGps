@@ -61,5 +61,6 @@ RETSIGTYPE sig_child(int signo);
 #endif
 char *splitc(char *first, char *rest, const char divider);
 void close_socket(sock_t sock);
+int get_ntripcaster_state();
 
 #endif

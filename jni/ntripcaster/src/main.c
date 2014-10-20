@@ -118,45 +118,6 @@ server_info_t info;
 struct in_addr localaddr;
 
 
-int 
-main (int argc, char **argv)
-{
-	/* If defined, start the memory checker */
-	initialize_memory_checker ();
-
-	/* Setup run path and initialize memory debugging (if set) */
-	set_run_path (argv);
-
-	/* Initialize the system library mutex */
-	thread_lib_init ();
-
-	/* create a new thread entry */
-	init_thread_tree (__LINE__, __FILE__);
-	
-	/* Set all server variables to a default value */
-	setup_defaults ();
-
-	/* Trap some signals */
-	setup_signal_traps ();
-
-	/* Allocate client slots, source slots, etc */
-	allocate_resources ();
-
-	init_authentication_scheme ();
-
-	parse_default_config_file ();
-
-	//print_authentication_scheme(); // ajd
-
-	/* Initialize platform dependant network */
-	initialize_network ();
-
-	/* Print header, select console mode, start the main loop */
-	startup_mode ();
-
-	return 0;
-}
-
 #ifndef _WIN32
 void 
 increase_maximum_number_of_open_files()
@@ -179,8 +140,8 @@ increase_maximum_number_of_open_files()
 	{
 		xa_debug (1, "DEBUG: Max number of open files raised from: soft %d hard: %d, to soft: %d hard: %d", before.rlim_cur, before.rlim_max, after.rlim_cur, after.rlim_max);
 	} else {
-		LOGWRITE (LOG_DEFAULT, "ERROR: Increasing maximum number of open files from %d:%d to: %d:%d failed, try lowering the maximum values for listeners, admins, and sources.", before.rlim_cur, before.rlim_max, after.rlim_cur, after.rlim_max);
-		LOGWRITE (LOG_DEFAULT, "WARNING: The server will run out of file descriptors before the reaching specified limits!");
+		LOGVWRITE (ANDROID_LOG_INFO, "ERROR: Increasing maximum number of open files from %lu:%lu to: %lu:%lu failed, try lowering the maximum values for listeners, admins, and sources.", before.rlim_cur, before.rlim_max, after.rlim_cur, after.rlim_max);
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: The server will run out of file descriptors before the reaching specified limits!");
 	}
 #endif
 }
@@ -217,14 +178,14 @@ startup_mode()
 	running = SERVER_RUNNING;
 
 #ifdef _WIN32
-		LOGWRITE(LOG_DEFAULT, "Using stdout as NtripCaster logging window");
+		LOGWRITE(ANDROID_LOG_INFO, "Using stdout as NtripCaster logging window");
 #else
 	if (info.console_mode == 1)
 	{
 		server_detach();
 		info.detach = 1;
 	} else {
-		LOGWRITE(LOG_DEFAULT, "Using stdout as NtripCaster logging window");
+		LOGWRITE(ANDROID_LOG_INFO, "Using stdout as NtripCaster logging window");
 	}
 #endif
 
@@ -238,7 +199,7 @@ setup_signal_traps()
 
 #ifdef _WIN32
 	if (!SetConsoleCtrlHandler( win_sig_die, 1 ))
-		LOGWRITE(LOG_DEFAULT, "FAILED setting up win32 signal handler");
+		LOGWRITE(ANDROID_LOG_INFO, "FAILED setting up win32 signal handler");
 #else
 	
 # if (defined(SYSV) && !defined(hpux)) || defined(SVR4)
@@ -394,6 +355,7 @@ clean_shutdown (server_info_t *info)
 	avl_traverser trav = {0};
 	static int main_shutting_down = 0;
 	
+	LOGWRITE(ANDROID_LOG_INFO, "Starting shutting down...");
 	thread_library_lock ();
 		if (!main_shutting_down)
 			main_shutting_down = 1;
@@ -401,8 +363,8 @@ clean_shutdown (server_info_t *info)
 			thread_exit (0);
 	thread_library_unlock ();
 	
-	LOGWRITE(LOG_DEFAULT, "Cleanly shutting down...");
-	LOGWRITE(LOG_DEFAULT, "Closing all listening sockets...");
+	LOGWRITE(ANDROID_LOG_INFO, "Cleanly shutting down...");
+	LOGWRITE(ANDROID_LOG_INFO, "Closing all listening sockets...");
 
 	for (i = 0; i < MAXLISTEN; i++) 
 	{
@@ -422,7 +384,7 @@ clean_shutdown (server_info_t *info)
 
 	thread_mutex_lock(&info->source_mutex);
 
-	LOGWRITE(LOG_DEFAULT, "Removing remaining sources...");
+	LOGWRITE(ANDROID_LOG_INFO, "Removing remaining sources...");
 	while ((con = avl_traverse(info->sources, &trav)))
 		kick_connection(con, "Server shutting down");
 
@@ -435,7 +397,7 @@ clean_shutdown (server_info_t *info)
 	WSACleanup();
 #endif
 
-	LOGWRITE(LOG_DEFAULT, "Exiting..");
+	LOGWRITE(ANDROID_LOG_INFO, "Exiting..");
 	if (info->logfile != -1)
 		fd_close(info->logfile);
 	
@@ -446,12 +408,12 @@ clean_shutdown (server_info_t *info)
 		
 		while ((mi = avl_traverse(info->mem, &trav))) {
 			if (mi->thread_id != 0 && mi->thread_id != -1)
-				LOGWRITE(LOG_DEFAULT, "WARNING: %d bytes allocated by thread %d at line %d in %s not freed before thread exit", mi->size, mi->thread_id, mi->line, mi->file);
+				LOGWRITE(ANDROID_LOG_INFO, "WARNING: %d bytes allocated by thread %d at line %d in %s not freed before thread exit", mi->size, mi->thread_id, mi->line, mi->file);
 		}
 	}
 #endif
 	
-	exit(0);
+//	exit(0);
 }
 
 /* Main server loop, listen to the specified socket for new
@@ -463,7 +425,7 @@ threaded_server_proc (void *infoarg)
 	connection_t *con;
 	mythread_t *mt = thread_get_mythread ();
 
-	LOGWRITE(LOG_DEFAULT, "Starting main connection handler...");
+	LOGWRITE(ANDROID_LOG_INFO, "Starting main connection handler...");
   
 	/* Setup listeners */
 	setup_listeners();
@@ -471,7 +433,7 @@ threaded_server_proc (void *infoarg)
 	/* Just print some runtime server info */
 	print_startup_server_info();
 
-	LOGWRITE (LOG_DEFAULT, "Starting Calender Thread...");
+	LOGWRITE (ANDROID_LOG_INFO, "Starting Calender Thread...");
 	/* Fork another thread that handles time based actions */
 	thread_create("Calendar Thread", startup_timer_thread, NULL);
 	
@@ -500,7 +462,7 @@ threaded_server_proc (void *infoarg)
 BOOL WINAPI 
 win_sig_die(DWORD CtrlType)
 {
-	LOGWRITE(LOG_DEFAULT, "Caught signal %d, perhaps someone is at the door?", CtrlType);
+	LOGWRITE(ANDROID_LOG_INFO, "Caught signal %d, perhaps someone is at the door?", CtrlType);
 	running = SERVER_DYING;
 	return 1;
 }
@@ -525,7 +487,7 @@ sig_hup(int signo)
 	parse_default_config_file();
 	open_log_files();
 	
-	LOGWRITE(LOG_DEFAULT, "Caught SIGHUP, rehashed config and reopened logfiles...");
+	LOGWRITE(ANDROID_LOG_INFO, "Caught SIGHUP, rehashed config and reopened logfiles...");
 	
 	signal(SIGHUP, sig_hup);
 }
@@ -533,8 +495,13 @@ sig_hup(int signo)
 RETSIGTYPE 
 sig_die(int signo)
 {
-	LOGWRITE(LOG_DEFAULT, "Caught signal %d, perhaps someone is at the door?", signo);
+	LOGVWRITE(ANDROID_LOG_INFO, "Caught signal %d, perhaps someone is at the door?", signo);
 	running = SERVER_DYING;
+}
+
+int get_ntripcaster_state()
+{
+	return running;
 }
 
 RETSIGTYPE 
@@ -571,7 +538,7 @@ setup_listeners()
   
 		if (info.listen_sock[i] == INVALID_SOCKET) 
 		{
-			LOGWRITE(LOG_DEFAULT, "ERROR: Could not listen to port %d. Perhaps another process is using it?", info.port[i]);
+			LOGVWRITE(ANDROID_LOG_INFO, "ERROR: Could not listen to port %d. Perhaps another process is using it?", info.port[i]);
 			clean_shutdown(&info);
 		}
 
@@ -580,7 +547,7 @@ setup_listeners()
 
 		if (listen(info.listen_sock[i], LISTEN_QUEUE) == SOCKET_ERROR) 
 		{
-			LOGWRITE(LOG_DEFAULT, "Could not listen for clients on port %d", info.port[i]);
+			LOGVWRITE(ANDROID_LOG_INFO, "Could not listen for clients on port %d", info.port[i]);
 			clean_shutdown(&info);
 		} 
 	}
@@ -588,13 +555,13 @@ setup_listeners()
 	if (ice_strcasecmp(info.server_name, "dynamic") == 0) 
 	{
 		info.server_name = sock_get_local_ipaddress();
-		LOGWRITE(LOG_DEFAULT, "Dynamic server name, using the local ip [%s]", info.server_name);
+		LOGVWRITE(ANDROID_LOG_INFO, "Dynamic server name, using the local ip [%s]", info.server_name);
 	} else {
 		char *res, *buf = (char *)nmalloc(20);
 		res = forward(info.server_name, buf);
 		if (!res) {
 			nfree(buf);
-			LOGWRITE(LOG_DEFAULT, "WARNING: Resolving the server name [%s] does not work!", info.server_name);
+			LOGVWRITE(ANDROID_LOG_INFO, "WARNING: Resolving the server name [%s] does not work!", info.server_name);
 			return;
 		}
 		

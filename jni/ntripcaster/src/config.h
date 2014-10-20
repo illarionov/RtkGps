@@ -1,6 +1,8 @@
 #include <android/log.h>
 #define TAG "ntripcaster"
-#define LOGWRITE(LOG, ...) __android_log_print(LOG,TAG, __VA_ARGS__)
+
+#define LOGWRITE(LOG, MESSAGE) __android_log_print(LOG,TAG, MESSAGE)
+#define LOGVWRITE(LOG, FORMAT, ...) __android_log_print(LOG,TAG,FORMAT, __VA_ARGS__)
 
 /* Define if on AIX 3.
    System headers sometimes define this.

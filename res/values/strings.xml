@@ -51,6 +51,7 @@
     <string name="navdraw_item_log_streams">Log streams</string>
     <string name="navdraw_item_processing_options">Processing options</string>
     <string name="navdraw_item_solution_options">Solution options</string>
+    <string name="navdraw_item_ntripcaster_options">Caster options</string>
     
     <string-array name="rtk_server_receiver">
         <item>Rover</item>
@@ -832,4 +833,7 @@
     <string name="changelog_title">What\'s New</string>
     <string name="changelog_ok_button">OK</string>
     <string name="changelog_show_full">more…</string>
+    
+    <string name="ntripcaster_options_enabled_summary">Enable experimental NTRIP Caster</string>
+    <string name="ntripcaster_options_enabled_title">NTRIP Caster</string>
 </resources>

@@ -136,12 +136,12 @@ write_log (int whichlog, char *fmt, ...)
 		}
 
 		if (mt && fd != -1) {
-			if ((whichlog != LOG_DEFAULT) || (info.logfiledebuglevel > -1)) {
+			if ((whichlog != ANDROID_LOG_INFO) || (info.logfiledebuglevel > -1)) {
 				fd_write (fd, "[%s] [%d:%s] %s\n", logtime, mt->id, nullcheck_string (mt->name), buf);
 			}
 		}
 
-		if (whichlog != LOG_DEFAULT)
+		if (whichlog != ANDROID_LOG_INFO)
 		{
 			free (logtime);
 			va_end (ap);
@@ -181,12 +181,12 @@ log_no_thread (int whichlog, char *fmt, ...)
 		}
 
 		if (fd != -1) {
-			if ((whichlog != LOG_DEFAULT) || (info.logfiledebuglevel > -1)) {
+			if ((whichlog != ANDROID_LOG_INFO) || (info.logfiledebuglevel > -1)) {
 				fd_write (fd, "[%s] %s\n", logtime, buf);
 			}
 		}
 
-		if (whichlog != LOG_DEFAULT)
+		if (whichlog != ANDROID_LOG_INFO)
 		{
 			free (logtime);
 			va_end (ap);

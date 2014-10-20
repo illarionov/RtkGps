@@ -102,7 +102,7 @@ int password_match(const char *crypted, const char *uncrypted)
 {
 #ifndef USE_CRYPT
 	if (!crypted || !uncrypted)	{
-		LOGWRITE(LOG_DEFAULT, "ERROR: password_match called with NULL arguments");
+		LOGWRITE(ANDROID_LOG_INFO, "ERROR: password_match called with NULL arguments");
 		return 0;
 	}
 
@@ -116,7 +116,7 @@ int password_match(const char *crypted, const char *uncrypted)
 	extern char *crypt(const char *, const char *);
 
 	if (!crypted || !uncrypted)	{
-		LOGWRITE(LOG_DEFAULT, "ERROR: password_match called with NULL arguments");
+		LOGWRITE(ANDROID_LOG_INFO, "ERROR: password_match called with NULL arguments");
 		return 0;
 	}
 
@@ -133,7 +133,7 @@ int password_match(const char *crypted, const char *uncrypted)
 	thread_mutex_lock(&info.misc_mutex);
 	test_crypted = crypt(uncrypted, salt);
 	if (test_crypted == NULL) {
-		LOGWRITE(LOG_DEFAULT, "WARNING - crypt() failed, refusing access");
+		LOGWRITE(ANDROID_LOG_INFO, "WARNING - crypt() failed, refusing access");
 		thread_mutex_unlock(&info.misc_mutex);
 		return 0;
 	}
@@ -155,7 +155,7 @@ int find_frame_ofs(source_t *source)
 	
 	if (!source)
 	{
-		LOGWRITE (LOG_DEFAULT, "ERROR: find_frame_ofs() called with NULL argument");
+		LOGWRITE (ANDROID_LOG_INFO, "ERROR: find_frame_ofs() called with NULL argument");
 		return 0;
 	}
 
@@ -182,15 +182,15 @@ kick_connection(void *conarg, void *reasonarg)
 
 	if (!conarg || !reasonarg)
 	{
-		LOGWRITE (LOG_DEFAULT, "WARNING: kick_connection called with NULL pointers");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: kick_connection called with NULL pointers");
 		return;
 	}
 	
 	switch (con->type)
 	{
 		case client_e:
-			LOGWRITE (LOG_DEFAULT,
-				   "Kicking client %d [%s] [%s] [%s] [%s], connected for %s, %lu bytes transfered. %lu clients connected",
+			LOGVWRITE (ANDROID_LOG_INFO,
+				   "Kicking client %lu [%s] [%s] [%s] [%s], connected for %s, %lu bytes transfered. %lu clients connected",
 				   con->id, nullcheck_string(con->user), con_host (con), reason, con->food.client->type == listener_e ? "listener" : "relay",
 				   nice_time (get_time () - con->connect_time, timebuf), con->food.client->write_bytes, info.num_clients - 1);
 			con->food.client->alive = CLIENT_DEAD;
@@ -199,8 +199,8 @@ kick_connection(void *conarg, void *reasonarg)
 			break;
 
 		case source_e:
-			LOGWRITE (LOG_DEFAULT,
-				   "Kicking source %d [%s] [%s] [%s], connected for %s, %lu bytes transfered. %d sources connected",
+			LOGVWRITE (ANDROID_LOG_INFO,
+				   "Kicking source %lu [%s] [%s] [%s], connected for %s, %lu bytes transfered. %lu sources connected",
 				   con->id, con_host (con), reason, con->food.source->type == encoder_e ? "encoder" : "relay",
 				   nice_time (get_time () - con->connect_time, timebuf), con->food.source->stats.read_bytes, info.num_sources - 1);
 			if (con->food.source->connected == SOURCE_UNUSED)
@@ -214,7 +214,7 @@ kick_connection(void *conarg, void *reasonarg)
 			return;
 			break;
 		default:
-			LOGWRITE(LOG_DEFAULT, "Kicking unknown %d [%s] [%s], connected for %s", con->id, con_host (con), reason,
+			LOGVWRITE(ANDROID_LOG_INFO, "Kicking unknown %lu [%s] [%s], connected for %s", con->id, con_host (con), reason,
 				  nice_time (get_time () - con->connect_time, timebuf));
 			break;
 	}
@@ -264,7 +264,7 @@ close_connection(void *data, void *param)
 	connection_t *con = (connection_t *)data;
 	
 	if (!con) {
-		LOGWRITE(LOG_DEFAULT, "ERROR: close_connection called with null pointer!");
+		LOGWRITE(ANDROID_LOG_INFO, "ERROR: close_connection called with null pointer!");
 		return;
 	}
 	
@@ -306,7 +306,7 @@ close_connection(void *data, void *param)
 
 		if (!source)
 		{
-			LOGWRITE (LOG_DEFAULT, "WARNING!!! - Erroneous source without food");
+			LOGWRITE (ANDROID_LOG_INFO, "WARNING!!! - Erroneous source without food");
 			return;
 		}
 
@@ -315,7 +315,7 @@ close_connection(void *data, void *param)
 		if (source->clients != NULL)
 		{
 			avl_traverser trav = {0};
-			LOGWRITE(LOG_DEFAULT, "Kicking all %d clients for source %d",
+			LOGVWRITE(ANDROID_LOG_INFO, "Kicking all %lu clients for source %lu",
 				  source->num_clients, con->id);
 			while ((clicon = avl_traverse (source->clients, &trav)))
 			{
@@ -359,7 +359,7 @@ kick_not_connected (connection_t *con, char *reason)
 	char typebuf[10];
 
 	if (reason)
-		LOGWRITE (LOG_DEFAULT, "Kicking %s %d [%s] [%s], connected for %s", type_of_str (con->type, typebuf), con->id, con_host (con), reason,
+		LOGVWRITE (ANDROID_LOG_INFO, "Kicking %s %lu [%s] [%s], connected for %s", type_of_str (con->type, typebuf), con->id, con_host (con), reason,
 			   nice_time (get_time () - con->connect_time, timebuf));
 	
 	free_con (con);
@@ -389,17 +389,17 @@ int server_detach()
 {
 	pid_t icepid;
 
-	LOGWRITE(LOG_DEFAULT, "Trying to fork");
+	LOGWRITE(ANDROID_LOG_INFO, "Trying to fork");
 
 	icepid = fork();
 	if (icepid == -1) {
-		LOGWRITE(LOG_DEFAULT, "ERROR: Can't fork dammit!");
+		LOGWRITE(ANDROID_LOG_INFO, "ERROR: Can't fork dammit!");
 		return 1;
 	}
   
 	if (icepid != 0) {
 #if HAVE_SETPGID
-		LOGWRITE(LOG_DEFAULT, "Detached (pid: %d)", icepid);
+		LOGVWRITE(ANDROID_LOG_INFO, "Detached (pid: %d)", icepid);
 		setpgid(icepid, icepid);
 #endif
 		exit(0);
@@ -454,13 +454,13 @@ kill_threads ()
 	connection_t *con;
 	mythread_t *mt;
 
-	LOGWRITE (LOG_DEFAULT, "Telling threads to die...");
+	LOGWRITE (ANDROID_LOG_INFO, "Telling threads to die...");
 
 	while ((mt = avl_traverse (info.threads, &trav))) {
 		mt->running = THREAD_KILLED;
 	}
 	
-	LOGWRITE (LOG_DEFAULT, "Closing sockets for sources that keep hanging around...");
+	LOGWRITE (ANDROID_LOG_INFO, "Closing sockets for sources that keep hanging around...");
 	
 	zero_trav (&trav);
 
@@ -492,7 +492,7 @@ write_icecast_header ()
 	printf("NtripCaster Version %s Initializing...\n", info.version);
 	printf("NtripCaster comes with NO WARRANTY, to the extent permitted by law.\nYou may redistribute copies of NtripCaster under the terms of the\nGNU General Public License.\nFor more information about these matters, see the file named COPYING.\n");
 	printf("Starting thread engine...\n");
-	LOGWRITE(LOG_DEFAULT, "NtripCaster Version %s Starting..", info.version);
+	LOGVWRITE(ANDROID_LOG_INFO, "NtripCaster Version %s Starting..", info.version);
 }
 
 void
@@ -501,17 +501,17 @@ print_startup_server_info ()
 	int i;
 
 	if (info.myhostname && ice_strcmp (info.myhostname, "0.0.0.0"))
-		LOGWRITE(LOG_DEFAULT, "Listening on host %s...", info.myhostname);
+		LOGVWRITE(ANDROID_LOG_INFO, "Listening on host %s...", info.myhostname);
 
 	for (i = 0; i < MAXLISTEN; i++) {
 		if (info.port[i] > 0)
-			LOGWRITE(LOG_DEFAULT, "Listening on port %i...", info.port[i]);
+			LOGVWRITE(ANDROID_LOG_INFO, "Listening on port %i...", info.port[i]);
 	}
 
 	if (info.server_name)
-		LOGWRITE (LOG_DEFAULT, "Using '%s' as servername...", info.server_name);
+		LOGVWRITE (ANDROID_LOG_INFO, "Using '%s' as servername...", info.server_name);
 
-	LOGWRITE(LOG_DEFAULT, "Server limits: %d clients, %d clients per source, %d sources",
+	LOGVWRITE(ANDROID_LOG_INFO, "Server limits: %lu clients, %lu clients per source, %lu sources",
 		  info.max_clients, info.max_clients_per_source, info.max_sources);
 }
 
@@ -530,7 +530,7 @@ hostname_local (char *name)
 
 	if (!name)
 	{
-		LOGWRITE (LOG_DEFAULT, "ERROR: hostname_local called with NULL name");
+		LOGWRITE (ANDROID_LOG_INFO, "ERROR: hostname_local called with NULL name");
 		return 0;
 	}
 
@@ -587,7 +587,7 @@ build_request (char *line, request_t *req)
 
 	if (!line || !req)
 	{
-		LOGWRITE (LOG_DEFAULT, "ERROR: build_request called with NULL pointer");
+		LOGWRITE (ANDROID_LOG_INFO, "ERROR: build_request called with NULL pointer");
 		return;
 	}
 
@@ -743,7 +743,7 @@ generate_http_request (char *line, request_t *req)
 	
 	if (!line || !req)
 	{
-		LOGWRITE (LOG_DEFAULT, "ERROR: generate_request called with NULL pointer");
+		LOGWRITE (ANDROID_LOG_INFO, "ERROR: generate_request called with NULL pointer");
 		return;
 	}
 
@@ -799,7 +799,7 @@ void init_thread_tree(int line, char *file)
 	mt->name = strdup("Main Thread");
 
 	if (avl_insert(info.threads, mt)) {
-		LOGWRITE (LOG_DEFAULT, "WARNING: Could not insert main thread into the thread tree, DAMN!\n");
+		LOGWRITE (ANDROID_LOG_INFO, "WARNING: Could not insert main thread into the thread tree, DAMN!\n");
 		exit(1);
 	}
 	
@@ -817,7 +817,7 @@ void init_thread_tree(int line, char *file)
 void
 pending_connection (connection_t *con)
 {
-	LOGWRITE (LOG_DEFAULT, "Lost connection to source on mount %s, waiting %d seconds for timeout", con->food.source->audiocast.mount, info.client_timeout);
+	LOGVWRITE (ANDROID_LOG_INFO, "Lost connection to source on mount %s, waiting %d seconds for timeout", con->food.source->audiocast.mount, info.client_timeout);
 	con->food.source->connected = SOURCE_PENDING;
 
 }
@@ -1089,7 +1089,7 @@ set_run_path (char *argv)
 			info.runpath[i-3] = '\0';
 		}
 	}
-	LOGWRITE(ANDROID_LOG_INFO,"runpath: %s",info.runpath);
+	LOGVWRITE(ANDROID_LOG_INFO,"runpath: %s",info.runpath);
 }
 
 void
@@ -1210,7 +1210,7 @@ parse_config_file(char *file)
 
 	if ((cf = open_for_reading (file)) == -1)
 	{
-		LOGWRITE(LOG_DEFAULT, "No configfile found, using defaults.");
+		LOGWRITE(ANDROID_LOG_INFO, "No configfile found, using defaults.");
 		return 1;
 	}
 
@@ -1233,7 +1233,7 @@ parse_config_file(char *file)
 		}
 
 		if (splitc(word, line, ' ') == NULL) {
-			LOGWRITE(LOG_DEFAULT, "ERROR: No argument given to setting %s on line %d",
+			LOGVWRITE(ANDROID_LOG_INFO, "ERROR: No argument given to setting %s on line %d",
 				   line, lineno);
 			continue;
 		}
@@ -1250,7 +1250,7 @@ parse_config_file(char *file)
 		}		
 		
 		if (!se) {
-			LOGWRITE(LOG_DEFAULT, "Unknown setting %s on line %d", word, lineno);
+			LOGVWRITE(ANDROID_LOG_INFO, "Unknown setting %s on line %d", word, lineno);
 			continue;
 		}
 		

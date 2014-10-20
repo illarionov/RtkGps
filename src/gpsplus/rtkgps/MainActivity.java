@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -31,6 +32,7 @@ import butterknife.BindView;
 // import com.dropbox.sync.android.DbxAccountManager;
 
 import gpsplus.ntripcaster.NTRIPCaster;
+import gpsplus.rtkgps.settings.NTRIPCasterSettingsFragment;
 import gpsplus.rtkgps.settings.ProcessingOptions1Fragment;
 import gpsplus.rtkgps.settings.SettingsActivity;
 import gpsplus.rtkgps.settings.SettingsHelper;
@@ -92,6 +94,7 @@ public class MainActivity extends Activity {
         // copy assets/data
         try {
             copyAssetsToApplicationDirectory();
+            copyAssetsToWorkingDirectory();
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -107,6 +110,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        toggleCasterSwitch();
 
         createDrawerToggle();
 
@@ -136,7 +141,7 @@ public class MainActivity extends Activity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mDrawerLayout.closeDrawer(mNavDrawer);
                 if (isChecked) {
-                    mCaster = new NTRIPCaster(getFileStorageDirectory()+"/lib");
+                    mCaster = new NTRIPCaster(getFileStorageDirectory()+"/ntripcaster/conf");
                     mCaster.start(2101, "none");
                     //TEST
                 }else {
@@ -149,6 +154,12 @@ public class MainActivity extends Activity {
         ChangeLog cl = new ChangeLog(this);
         if (cl.firstRun())
             cl.getLogDialog().show();
+    }
+
+    private void toggleCasterSwitch() {
+        SharedPreferences casterSolution = getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, 0);
+        boolean bIsCasterEnabled = casterSolution.getBoolean(NTRIPCasterSettingsFragment.KEY_ENABLE_CASTER, false);
+        mNavDrawerCasterSwitch.setEnabled(bIsCasterEnabled);
     }
 
     public static DemoModeLocation getDemoModeLocation(){
@@ -263,16 +274,16 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    private void copyAssetsDirToApplicationDirectory(String dir) throws FileNotFoundException, IOException
+    private void copyAssetsDirToApplicationDirectory(String sourceDir, File destDir) throws FileNotFoundException, IOException
     {
         //copy assets/data to appdir/data
         java.io.InputStream stream = null;
         java.io.OutputStream output = null;
 
-        for(String fileName : this.getAssets().list(dir))
+        for(String fileName : this.getAssets().list(sourceDir))
         {
-            stream = this.getAssets().open(dir+File.separator + fileName);
-            String dest = this.getFilesDir()+ File.separator + dir + File.separator + fileName;
+            stream = this.getAssets().open(sourceDir+File.separator + fileName);
+            String dest = destDir+ File.separator + sourceDir + File.separator + fileName;
             File fdest = new File(dest);
             if (fdest.exists()) continue;
 
@@ -300,8 +311,13 @@ public class MainActivity extends Activity {
 
     private void copyAssetsToApplicationDirectory() throws FileNotFoundException, IOException
     {
-       copyAssetsDirToApplicationDirectory("data");
-       copyAssetsDirToApplicationDirectory("proj4");
+       copyAssetsDirToApplicationDirectory("data",this.getFilesDir());
+       copyAssetsDirToApplicationDirectory("proj4",this.getFilesDir());
+    }
+
+    private void copyAssetsToWorkingDirectory() throws FileNotFoundException, IOException
+    {
+        copyAssetsDirToApplicationDirectory("ntripcaster",getFileStorageDirectory());
     }
 
     private void proxyIfUsbAttached(Intent intent) {
@@ -355,6 +371,7 @@ public class MainActivity extends Activity {
             break;
         case R.id.navdraw_item_processing_options:
         case R.id.navdraw_item_solution_options:
+        case R.id.navdraw_item_ntripcaster_options:
             showSettings(itemId);
             break;
         default:
@@ -435,6 +452,10 @@ public class MainActivity extends Activity {
         case R.id.navdraw_item_solution_options:
             intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
                     SolutionOutputSettingsFragment.class.getName());
+            break;
+        case R.id.navdraw_item_ntripcaster_options:
+            intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                    NTRIPCasterSettingsFragment.class.getName());
             break;
         default:
             throw new IllegalStateException();

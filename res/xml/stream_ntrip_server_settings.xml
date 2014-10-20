@@ -4,7 +4,7 @@
     <EditTextPreference
         android:key="stream_ntrip_server_host"
         android:title="@string/ntrip_client_host_title"
-        android:defaultValue="caster.server.dom"
+        android:defaultValue="127.0.0.1"
         android:inputType="textUri" />
     
     <EditTextPreference
@@ -22,6 +22,6 @@
         android:key="stream_ntrip_server_password"
         android:title="@string/ntrip_client_password_title"
         android:inputType="textVisiblePassword" 
-        android:defaultValue="password"/>
+        android:defaultValue="rtkgps"/>
 
 </PreferenceScreen>
