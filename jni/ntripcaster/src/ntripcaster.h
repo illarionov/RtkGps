@@ -129,7 +129,7 @@
 #undef DEBUG_FULL 
 #undef OPTIMIZE
 #undef SAVE_CPU
-#define ANDROID_LOG_INFO 0
+#define ANDROID_LOG_VERBOSE 0
 
 #endif
 

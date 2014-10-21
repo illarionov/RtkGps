@@ -43,7 +43,7 @@
     <string name="navdraw_category_streams">Streams</string>
     <string name="navdraw_category_settings">Settings</string>
     <string name="navdraw_item_server_switch">Server</string>
-    <string name="navdraw_ntripcaster_server_switch">Caster</string>
+    <string name="navdraw_ntripcaster_server_switch">NTRIP Caster</string>
     <string name="navdraw_item_status">Status</string>
     <string name="navdraw_item_map">Map</string>
 	<string name="navdraw_item_input_streams">Input streams</string>
@@ -836,4 +836,7 @@
     
     <string name="ntripcaster_options_enabled_summary">Enable experimental NTRIP Caster</string>
     <string name="ntripcaster_options_enabled_title">NTRIP Caster</string>
+    <string name="ntripcaster_options_brutal_ending_summary">Ending NTRIP Caster will also shutown RTKGPS+, it is safer for being sure all connections are closed.</string>
+    <string name="ntripcaster_options_brutal_ending_title">Brutal ending</string>
+    <string name="ntripcaster_options_warning">Be carrefull\nThis is an highly experimental feature!\nRemember that when you will stop the caster, RTKGPS+ will close itself for cleaning the memory and closing the connections.\nPlease do not blame me for that...\nIf not sure to activate this feature.</string>
 </resources>

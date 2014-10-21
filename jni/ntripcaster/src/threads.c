@@ -159,7 +159,7 @@ icethread_t thread_create_c(char *name, void *(*start_routine)(void *), void *ar
 # endif
 			break;
 		else
-			LOGWRITE(ANDROID_LOG_INFO, "ERROR: Could not create new thread, retrying");
+			android_log(ANDROID_LOG_VERBOSE, "ERROR: Could not create new thread, retrying");
 	}
 
 	pthread_attr_destroy(&attr);	
@@ -170,7 +170,7 @@ icethread_t thread_create_c(char *name, void *(*start_routine)(void *), void *ar
 #else
 	if (i >= 10) {
 #endif
-		LOGWRITE(ANDROID_LOG_INFO, "System won't let me create more threads, giving up");
+		android_log(ANDROID_LOG_VERBOSE, "System won't let me create more threads, giving up");
 		clean_shutdown(&info);
 	}
 
@@ -181,7 +181,7 @@ icethread_t thread_create_c(char *name, void *(*start_routine)(void *), void *ar
 	internal_lock_mutex(&info.thread_mutex);
 	if (avl_insert(info.threads, mt))
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: Inserting thread resulted in duplicate.. sheit!");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: Inserting thread resulted in duplicate.. sheit!");
 	}
 	internal_unlock_mutex(&info.thread_mutex);
 
@@ -202,7 +202,7 @@ void
 thread_create_mutex_nl (mutex_t *mutex)
 {
 	if (!mutex) {
-		LOGWRITE(ANDROID_LOG_ERROR, "WARNING: thread_create_mutex_nl() called with NULL mutex\n");
+		android_log(ANDROID_LOG_ERROR, "WARNING: thread_create_mutex_nl() called with NULL mutex\n");
 		return;
 	}
 
@@ -227,7 +227,7 @@ void
 thread_create_mutex_c (mutex_t *mutex, int line, char *file)
 {
 	if (!mutex || !file) {
-		LOGWRITE(ANDROID_LOG_ERROR, "WARNING: thread_create_mutex_c() called with NULL mutex\n");
+		android_log(ANDROID_LOG_ERROR, "WARNING: thread_create_mutex_c() called with NULL mutex\n");
 		return;
 	}
 
@@ -285,7 +285,7 @@ thread_mutex_lock_c (mutex_t *mutex, int line, char *file)
 	char name[40];
 
 	if (!mt)
-		LOGVWRITE (ANDROID_LOG_INFO, "WARNING: No mt record for %u in lock [%s:%d]", thread_self (), file, line);
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: No mt record for %u in lock [%s:%d]", thread_self (), file, line);
 	xa_debug (5, "Locking %p (%s) on line %d in file %s by thread %d", mutex, mutex_to_string(mutex, name), line, file, mt ? mt->id : -1);
 
 # endif
@@ -304,7 +304,7 @@ thread_mutex_lock_c (mutex_t *mutex, int line, char *file)
 			{
 				if (tmutex->thread_id == mt->id) /* Deadlock, same thread can't lock the same mutex twice */
 				{
-					LOGWRITE (ANDROID_LOG_INFO, "DEADLOCK AVOIDED (%d == %d) on mutex [%s] in file %s line %d by thread %d [%s]", 
+					android_log (ANDROID_LOG_VERBOSE, "DEADLOCK AVOIDED (%d == %d) on mutex [%s] in file %s line %d by thread %d [%s]", 
 						   tmutex->thread_id, mt->id, mutex_to_string (mutex, name), file, line, mt->id, mt->name);
 					internal_unlock_mutex (&info.mutex_mutex);
 					return;
@@ -317,15 +317,15 @@ thread_mutex_lock_c (mutex_t *mutex, int line, char *file)
 		{
 			if (info.double_mutex.thread_id != mt->id) /* Tries to lock two mutexes, but has not got the double mutex */
 			{
-				LOGWRITE (ANDROID_LOG_INFO, "WARNING: (%d != %d) Thread %d [%s] tries to lock a second mutex [%s] in file %s line %d, without locking double mutex!",
+				android_log (ANDROID_LOG_VERBOSE, "WARNING: (%d != %d) Thread %d [%s] tries to lock a second mutex [%s] in file %s line %d, without locking double mutex!",
 					   info.double_mutex.thread_id, mt->id, mt->id, mt->name, mutex_to_string (mutex, name), file, line);
 			}
 		}
 		internal_unlock_mutex (&info.mutex_mutex);
 	}
 # endif
-	
-	internal_lock_mutex(mutex);
+internal_lock_mutex(mutex);
+
 
 # ifndef SAVE_CPU
 #  ifdef DEBUG_MUTEXES
@@ -355,7 +355,7 @@ thread_mutex_unlock_c(mutex_t *mutex, int line, char *file)
 	mythread_t *mt = thread_get_mythread();
 	char name[40];
 	if (!mt)
-		LOGVWRITE (ANDROID_LOG_INFO, "WARNING: No mt record for %u in unlock [%s:%d]", thread_self (), file, line);
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: No mt record for %u in unlock [%s:%d]", thread_self (), file, line);
 	xa_debug(5, "Unlocking %p (%s) on line %d in file %s by thread %d", mutex, mutex_to_string (mutex, name), line, file, mt ? mt->id : -1);
 
 	mutex->lineno = line;
@@ -374,7 +374,7 @@ thread_mutex_unlock_c(mutex_t *mutex, int line, char *file)
 			{
 				if (tmutex->thread_id != mt->id) /* Unlocking when it's not ours */
 				{
-					LOGWRITE (ANDROID_LOG_INFO, "ILLEGAL UNLOCK (%d != %d) on mutex [%s] in file %s line %d by thread %d [%s]", tmutex->thread_id, mt->id, 
+					android_log (ANDROID_LOG_VERBOSE, "ILLEGAL UNLOCK (%d != %d) on mutex [%s] in file %s line %d by thread %d [%s]", tmutex->thread_id, mt->id, 
 						   mutex_to_string (mutex, name), file, line, mt->id, mt->name);
 					internal_unlock_mutex (&info.mutex_mutex);
 					return;
@@ -385,7 +385,7 @@ thread_mutex_unlock_c(mutex_t *mutex, int line, char *file)
 
 		if ((locks > 0) && (info.double_mutex.thread_id != mt->id)) /* Don't have double mutex, has more than this mutex left */
 		{
-			LOGWRITE (ANDROID_LOG_INFO, "WARNING: (%d != %d) Thread %d [%s] tries to unlock a mutex [%s] in file %s line %d, without owning double mutex!",
+			android_log (ANDROID_LOG_VERBOSE, "WARNING: (%d != %d) Thread %d [%s] tries to unlock a mutex [%s] in file %s line %d, without owning double mutex!",
 				   info.double_mutex.thread_id, mt->id, mt->id, mt->name, mutex_to_string (mutex, name), file, line);
 		}
 		internal_unlock_mutex (&info.mutex_mutex);
@@ -426,7 +426,7 @@ thread_exit_c (int val, int line, char *file)
 		internal_lock_mutex (&info.mutex_mutex);
 		while ((tmutex = avl_traverse (info.mutexes, &trav)))
 			if (tmutex->thread_id == mt->id)
-				LOGWRITE (ANDROID_LOG_INFO, "WARNING: Thread %d [%s] exiting in file %s line %d, without unlocking mutex [%s]",
+				android_log (ANDROID_LOG_VERBOSE, "WARNING: Thread %d [%s] exiting in file %s line %d, without unlocking mutex [%s]",
 					   mt->id, mt->name, file, line, mutex_to_string (tmutex, name));
 		internal_unlock_mutex (&info.mutex_mutex);
 	}
@@ -484,7 +484,7 @@ thread_block_signals ()
 	sigdelset (&ss, SIGBUS);
 	if (pthread_sigmask (SIG_BLOCK, &ss, NULL) != 0) {
 #ifdef DEBUG_FULL
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: pthread_sigmask() failed!");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: pthread_sigmask() failed!");
 #endif
 	}
 #endif
@@ -511,7 +511,7 @@ thread_catch_signals ()
 #endif
 	
 	if (pthread_sigmask (SIG_UNBLOCK, &ss, NULL) != 0)
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: pthread_sigmask() failed!");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: pthread_sigmask() failed!");
 #endif
 }
 
@@ -596,7 +596,7 @@ thread_get_mythread()
 		}
 	}
 	internal_unlock_mutex (&info.thread_mutex);
-	LOGWRITE (ANDROID_LOG_INFO, "WARNING: Nonexistant thread alive...");
+	android_log (ANDROID_LOG_VERBOSE, "WARNING: Nonexistant thread alive...");
 	return NULL;
 }
 
@@ -643,7 +643,7 @@ thread_rename(const char *name)
 void internal_lock_mutex(mutex_t *mutex)
 {
 	if (!mutex) {
-		LOGWRITE(ANDROID_LOG_ERROR, "ERROR: internal_lock_mutex() called with NULL pointer!");
+		android_log(ANDROID_LOG_ERROR, "ERROR: internal_lock_mutex() called with NULL pointer!");
 	}
 
 #ifdef _WIN32
@@ -651,15 +651,14 @@ void internal_lock_mutex(mutex_t *mutex)
 #else
 	switch (pthread_mutex_lock(&mutex->mutex)) {
 		case EINVAL:
-			LOGWRITE(ANDROID_LOG_ERROR, "WARNING: Locking unitialized mutex\n");
+			android_log(ANDROID_LOG_ERROR, "WARNING: Locking unitialized mutex\n");
 			break;
-# if defined(DEBUG_MUTEXES) && defined (EDEADLK)
 		case EDEADLK:
-			LOGWRITE(ANDROID_LOG_ERROR, "WARNING: Locking mutex failed because a DEADLOCK would occur\n");
+			android_log(ANDROID_LOG_ERROR, "WARNING: Locking mutex failed because a DEADLOCK would occur\n");
 			break;
-# endif
 	}
 #endif
+
 }
 
 void internal_unlock_mutex(mutex_t *mutex)
@@ -669,11 +668,11 @@ void internal_unlock_mutex(mutex_t *mutex)
 #else
 	switch (pthread_mutex_unlock(&mutex->mutex)) {
 		case EINVAL:
-			LOGWRITE(ANDROID_LOG_ERROR, "WARNING: Unlocking unitialized mutex\n");
+			android_log(ANDROID_LOG_ERROR, "WARNING: Unlocking unitialized mutex\n");
 			break;
 # if defined(DEBUG_MUTEXES) && defined (EPERM)
 		case EPERM:
-			LOGWRITE(ANDROID_LOG_ERROR, "WARNING: Unlocking mutex failed because thread was not owner\n");
+			android_log(ANDROID_LOG_ERROR, "WARNING: Unlocking mutex failed because thread was not owner\n");
 			break;
 # endif
 	}
@@ -707,9 +706,9 @@ thread_setup_default_attributes ()
 {
 #if !defined(_WIN32) && defined(PTHREAD_CREATE_DETACHED)
 	if (pthread_attr_init (&info.defaultattr) != 0) 
-		LOGWRITE(ANDROID_LOG_ERROR, "WARNING: pthread_attr_init() failed!\n");
+		android_log(ANDROID_LOG_ERROR, "WARNING: pthread_attr_init() failed!\n");
 	if (pthread_attr_setdetachstate (&info.defaultattr, PTHREAD_CREATE_DETACHED) != 0)
-		LOGWRITE(ANDROID_LOG_ERROR, "WARNING: pthread_attr_setdetachstate() failed!\n");
+		android_log(ANDROID_LOG_ERROR, "WARNING: pthread_attr_setdetachstate() failed!\n");
 #endif
 }
 
@@ -729,21 +728,21 @@ thread_wait_for_solitude ()
 	if (avl_count (info.threads) <= 1)
 		return;
 	
-	LOGWRITE (ANDROID_LOG_INFO, "Waiting a wee while to let the other threads die..");
+	android_log (ANDROID_LOG_VERBOSE, "Waiting a wee while to let the other threads die..");
 	
 	do {
 
 		if (avl_count (info.threads) <= 1) {
-			LOGWRITE (ANDROID_LOG_INFO, "Finally alone");
+			android_log (ANDROID_LOG_VERBOSE, "Finally alone");
 			return;
 		}
 
 		max--;
 		
-		my_sleep (3000);
+		my_sleep (30000);
 	} while (max >= 0);
 	
-	LOGVWRITE (ANDROID_LOG_INFO, "Ok, that's enough, let's kill the remaining %d %s", avl_count (info.threads) - 1, avl_count (info.threads) > 2 ? "buggers" : "bugger");
+	android_log (ANDROID_LOG_VERBOSE, "Ok, that's enough, let's kill the remaining %d %s", avl_count (info.threads) - 1, avl_count (info.threads) > 2 ? "buggers" : "bugger");
 }
 
 /* memory.c. ajd ***************************************************************************/
@@ -806,19 +805,19 @@ n_malloc (const unsigned int size, const int lineno, const char *file)
 
 	if (size <= 0)
 	{
-		LOGWRITE(ANDROID_LOG_ERROR, "WARNING: n_malloc called with negative or zero size\n");
+		android_log(ANDROID_LOG_ERROR, "WARNING: n_malloc called with negative or zero size\n");
 		return NULL;
 	}
 
 	buf = malloc (size);
 
 	if (buf == NULL) {
-		LOGWRITE(ANDROID_LOG_ERROR, "OUCH, out of memory!");
+		android_log(ANDROID_LOG_ERROR, "OUCH, out of memory!");
 		clean_shutdown (&info);
 	}
 	
 	if (size <= 0) {
-		LOGWRITE(ANDROID_LOG_ERROR, "WARNING - Tried to allocate zero or negative size");
+		android_log(ANDROID_LOG_ERROR, "WARNING - Tried to allocate zero or negative size");
 		return NULL;
 	}
 
@@ -898,7 +897,7 @@ n_free (void *ptr, const int lineno, const char *file)
 	
 	if (!out && ptr)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "Couldn't find alloced memory at (%p)", ptr);
+		android_log (ANDROID_LOG_VERBOSE, "Couldn't find alloced memory at (%p)", ptr);
 		return;
 	}
 	
@@ -935,3 +934,84 @@ initialize_memory_checker ()
 #endif
 }
 
+//NEW
+#define PTHREAD_JOIN_POLL_INTERVAL 10
+#define false 0
+#define true (!false)
+
+typedef struct _waitData waitData;
+
+struct _waitData
+{
+  pthread_t waitID;
+  pthread_t helpID;
+  int done;
+};
+
+void
+sleep_msecs(int msecs)
+{
+  struct timeval tv;
+
+  tv.tv_sec = msecs/1000;
+  tv.tv_usec = (msecs % 1000) * 1000;
+  select (0,NULL,NULL,NULL,&tv);
+}
+unsigned int
+get_ticks()
+{
+  struct timeval tv;
+
+  gettimeofday(&tv, NULL);
+  return (tv.tv_usec/1000 + tv.tv_sec * 1000);
+}
+
+void *
+join_timeout_helper(void *arg)
+{
+	void thread_exit_handler(int sig)
+	 {
+		android_log(ANDROID_LOG_VERBOSE, "Thread cancelling...");
+		pthread_exit(0);
+	 }
+	struct sigaction actions;
+	 	memset(&actions, 0, sizeof(actions));
+	 	sigemptyset(&actions.sa_mask);
+	 	actions.sa_flags = 0;
+	 	actions.sa_handler = thread_exit_handler;
+	 	sigaction(SIGUSR1,&actions,NULL);
+  waitData *data = (waitData*)arg;
+
+  pthread_join(data->waitID, NULL);
+  data->done = true;
+  return (void *)0;
+}
+
+int
+pthread_join_timeout(pthread_t wid, int msecs)
+{
+  pthread_t id;
+  waitData data;
+  unsigned int start = get_ticks();
+  int timedOut = false;
+
+  data.waitID = wid;
+  data.done = false;
+
+  if (pthread_create(&id, NULL, join_timeout_helper, &data) != 0)
+    return (-1);
+  do {
+    if (data.done)
+      break;
+    /* you could also yield to your message loop here... */
+    sleep_msecs(PTHREAD_JOIN_POLL_INTERVAL);
+  } while ((get_ticks() - start) < msecs);
+  if (!data.done)
+  {
+	pthread_kill(id, SIGUSR1);
+    timedOut = true;
+  }
+  /* free helper thread resources */
+  pthread_join(id, NULL);
+  return (timedOut);
+}

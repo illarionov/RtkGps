@@ -6,6 +6,7 @@
 
 char *appPath = NULL;
 pthread_t ntripcaster_thread;
+int process_id = 0;
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
@@ -14,7 +15,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
     (void)reserved;
 
-    __android_log_print(ANDROID_LOG_INFO, TAG, "Entering JNI_OnLoad");
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "Entering JNI_OnLoad");
 
     if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
         goto bail;
@@ -26,13 +27,13 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
     result = JNI_VERSION_1_6;
 
 bail:
-	__android_log_print(ANDROID_LOG_INFO, TAG, "Leaving JNI_OnLoad (result=0x%x)", result);
+	__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Leaving JNI_OnLoad (result=0x%x)", result);
     return result;
 }
 
 void *_serverstart()
 {
-	LOGVWRITE(ANDROID_LOG_INFO,"ntripcaster status before starting:%d",get_ntripcaster_state());
+	android_log(ANDROID_LOG_VERBOSE,"ntripcaster status before starting:%d",get_ntripcaster_state());
 	set_run_path(appPath);
 	thread_lib_init ();
 	init_thread_tree (__LINE__, __FILE__);
@@ -43,6 +44,9 @@ void *_serverstart()
 	parse_default_config_file ();
 	initialize_network ();
 	startup_mode ();
+	android_log(ANDROID_LOG_VERBOSE,"ntripcaster status after ending:%d",get_ntripcaster_state());
+	pthread_exit(0);
+	android_log(ANDROID_LOG_VERBOSE,"ntripcaster ended");
 }
 
 static jint NTRIPCaster_serverstart(JNIEnv* env, jclass clazz, jint port, jstring conf_filename)
@@ -52,7 +56,7 @@ static jint NTRIPCaster_serverstart(JNIEnv* env, jclass clazz, jint port, jstrin
 	(*env)->ReleaseStringUTFChars(env,conf_filename, filename);
 	if(pthread_create(&ntripcaster_thread, NULL, &_serverstart, NULL)) {
 
-		LOGWRITE(ANDROID_LOG_ERROR,"Error creating thread\n");
+		android_log(ANDROID_LOG_ERROR,"Error creating thread\n");
 		return (jint)-1;
 
 	}
@@ -60,12 +64,24 @@ static jint NTRIPCaster_serverstart(JNIEnv* env, jclass clazz, jint port, jstrin
 	return (jint)ret;
 }
 
-static jint NTRIPCaster_serverstop(JNIEnv* env, jclass clazz)
+static jint NTRIPCaster_serverstop(JNIEnv* env, jclass clazz,jint force)
 {
 
-	LOGVWRITE(ANDROID_LOG_INFO,"ntripcaster status:%d",get_ntripcaster_state());
+	if (force)
+	{
+		android_log(ANDROID_LOG_VERBOSE,"ntripcaster brutal ending...");
+		pthread_kill(ntripcaster_thread, SIGKILL);
+		return (jint)-2;
+	}
+
+	android_log(ANDROID_LOG_VERBOSE,"ntripcaster status:%d",get_ntripcaster_state());
+	kick_everything ();
 	pthread_kill(ntripcaster_thread, SIGINT);
-//	pthread_join(ntripcaster_thread,NULL);
+	if (pthread_join_timeout(ntripcaster_thread,1000))
+	{
+		android_log(ANDROID_LOG_VERBOSE,"ntripcaster was not cleanly ended");
+		return (jint)-1;
+	}
 	return (jint)0;
 
 }
@@ -86,9 +102,9 @@ static jstring NTRIPCaster_getVersion(JNIEnv* env, jclass clazz){
 JNIEXPORT void JNICALL NTRIPCaster_setApplicationPath
   (JNIEnv *env, jclass class, jstring applicationPath)
 {
-    char *givenPath = (*env)->GetStringUTFChars(env, applicationPath, NULL);
+    const char *givenPath = (*env)->GetStringUTFChars(env, applicationPath, NULL);
     if (!givenPath) return ;
-    LOGVWRITE(ANDROID_LOG_INFO,"GivenPath: %s", givenPath);
+    android_log(ANDROID_LOG_VERBOSE,"GivenPath: %s", givenPath);
     if (appPath) free(appPath);
     appPath = (char*) malloc( (strlen(givenPath)+1)*sizeof(char) );
     if (!appPath) return;
@@ -103,7 +119,7 @@ char * getApplicationPath() {
 
 static JNINativeMethod nativeMethods[] = {
    {"start", "(ILjava/lang/String;)I",(void*)NTRIPCaster_serverstart},
-   {"stop", "()V",(void*)NTRIPCaster_serverstop},
+   {"stop", "(I)I",(void*)NTRIPCaster_serverstop},
    {"reset", "()V",(void*)NTRIPCaster_serverreset},
    {"getVersion","()Ljava/lang/String;",(void*)NTRIPCaster_getVersion},
    {"setApplicationPath","(Ljava/lang/String;)V",(void*)NTRIPCaster_setApplicationPath}

@@ -286,15 +286,19 @@ public class RtkNaviService extends IntentService implements LocationListener
     private void processStop() {
         mBoolIsRunning = false;
         mbStarted = false;
-        if (MainActivity.getDemoModeLocation().isInDemoMode())
-        {
-            MainActivity.getDemoModeLocation().stopDemoMode();
-        }
-        if (mBoolMockLocationsPref)
-        {
-            LocationManager lm = (LocationManager) getSystemService(
-                    Context.LOCATION_SERVICE);
-                  lm.removeTestProvider(GPS_PROVIDER);
+        try {
+            if (MainActivity.getDemoModeLocation().isInDemoMode())
+            {
+                MainActivity.getDemoModeLocation().stopDemoMode();
+            }
+            if (mBoolMockLocationsPref)
+            {
+                LocationManager lm = (LocationManager) getSystemService(
+                        Context.LOCATION_SERVICE);
+                      lm.removeTestProvider(GPS_PROVIDER);
+            }
+        } catch (Exception e) {
+            //nothing to do it may appear normally on brutal ending because MainActivity was already shutdown
         }
         stop();
         finalizeGpxTrace();

@@ -145,7 +145,7 @@ void *handle_connection(void *arg)
 	thread_init(); 
 
 	if (!con) {
-		LOGWRITE(ANDROID_LOG_INFO, "handle_connection: got NULL connection");
+		android_log(ANDROID_LOG_VERBOSE, "handle_connection: got NULL connection");
 		thread_exit(0);
 	}
 
@@ -156,7 +156,7 @@ void *handle_connection(void *arg)
 	
 	/* Fill line[] with the user header, ends with \n\n */
 	if ((res = sock_read_lines(con->sock, line, BUFSIZE)) <= 0) {
-		LOGVWRITE(ANDROID_LOG_INFO, "Socket error on connection %lu", con->id);
+		android_log(ANDROID_LOG_VERBOSE, "Socket error on connection %lu", con->id);
 		kick_not_connected(con, "Socket error");
 		thread_exit(0);
 	}
@@ -200,7 +200,7 @@ get_connection (sock_t *sock)
 
 	if (!sin)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: Weird stuff in get_connection. nmalloc returned NULL sin");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: Weird stuff in get_connection. nmalloc returned NULL sin");
 		return NULL;
 	}
 
@@ -555,7 +555,7 @@ reverse (const char *host)
 
   if (!host)
   {
-	  LOGWRITE (ANDROID_LOG_INFO, "ERROR: reverse() called with NULL host");
+	  android_log (ANDROID_LOG_VERBOSE, "ERROR: reverse() called with NULL host");
 	  return NULL;
   }
 

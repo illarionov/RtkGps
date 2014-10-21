@@ -136,12 +136,12 @@ write_log (int whichlog, char *fmt, ...)
 		}
 
 		if (mt && fd != -1) {
-			if ((whichlog != ANDROID_LOG_INFO) || (info.logfiledebuglevel > -1)) {
+			if ((whichlog != ANDROID_LOG_VERBOSE) || (info.logfiledebuglevel > -1)) {
 				fd_write (fd, "[%s] [%d:%s] %s\n", logtime, mt->id, nullcheck_string (mt->name), buf);
 			}
 		}
 
-		if (whichlog != ANDROID_LOG_INFO)
+		if (whichlog != ANDROID_LOG_VERBOSE)
 		{
 			free (logtime);
 			va_end (ap);
@@ -181,12 +181,12 @@ log_no_thread (int whichlog, char *fmt, ...)
 		}
 
 		if (fd != -1) {
-			if ((whichlog != ANDROID_LOG_INFO) || (info.logfiledebuglevel > -1)) {
+			if ((whichlog != ANDROID_LOG_VERBOSE) || (info.logfiledebuglevel > -1)) {
 				fd_write (fd, "[%s] %s\n", logtime, buf);
 			}
 		}
 
-		if (whichlog != ANDROID_LOG_INFO)
+		if (whichlog != ANDROID_LOG_VERBOSE)
 		{
 			free (logtime);
 			va_end (ap);
@@ -215,6 +215,14 @@ xa_debug (int level, char *format, ...)
 	   va_start(ap, format);
 	   __android_log_vprint(ANDROID_LOG_VERBOSE, TAG, format, ap);
 	   va_end(ap);
+}
+
+void android_log(int android_level, char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	__android_log_vprint(ANDROID_LOG_INFO, TAG, format, ap);
+	va_end(ap);
 }
 
 void open_log_files()

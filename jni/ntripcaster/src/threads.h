@@ -160,4 +160,4 @@ void icecast_mcheck_status (enum mcheck_status STATUS);
 #endif
 
 #endif
-
+int pthread_join_timeout(pthread_t wid, int msecs);

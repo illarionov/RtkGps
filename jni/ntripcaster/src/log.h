@@ -43,6 +43,7 @@
 
 void write_log(int whichlog, char *fmt, ...);
 void xa_debug (int level, char *fmt, ...);
+void android_log(int android_level, char *format, ...);
 void my_perror(char *where);
 void stats_write(server_info_t *info);
 void clear_logfile(char *logfilename) ;

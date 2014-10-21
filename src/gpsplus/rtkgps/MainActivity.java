@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -48,7 +49,7 @@ import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnSharedPreferenceChangeListener{
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 //    public static final int REQUEST_LINK_TO_DBX = 2654;
@@ -135,17 +136,29 @@ public class MainActivity extends Activity {
             }
         });
         mNavDrawerCasterSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            private NTRIPCaster mCaster;
+            private NTRIPCaster mCaster = null;
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mDrawerLayout.closeDrawer(mNavDrawer);
                 if (isChecked) {
-                    mCaster = new NTRIPCaster(getFileStorageDirectory()+"/ntripcaster/conf");
+                    if (mCaster == null)
+                    {
+                        mCaster = new NTRIPCaster(getFileStorageDirectory()+"/ntripcaster/conf");
+                    }
                     mCaster.start(2101, "none");
                     //TEST
                 }else {
-                    mCaster.stop();
+                    if (getCasterBrutalEnding())
+                    {
+                        stopRtkService();
+                        int ret = mCaster.stop(1);
+                        android.os.Process.killProcess(android.os.Process.myPid()); //in case of not stopping
+                    }else{
+                        int ret = mCaster.stop(0);
+                        Log.v(TAG, "NTRIPCaster.stop(0)="+ret);
+
+                    }
                 }
                 invalidateOptionsMenu();
             }
@@ -160,6 +173,11 @@ public class MainActivity extends Activity {
         SharedPreferences casterSolution = getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, 0);
         boolean bIsCasterEnabled = casterSolution.getBoolean(NTRIPCasterSettingsFragment.KEY_ENABLE_CASTER, false);
         mNavDrawerCasterSwitch.setEnabled(bIsCasterEnabled);
+    }
+
+    private boolean getCasterBrutalEnding() {
+        SharedPreferences casterSolution = getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, 0);
+        return casterSolution.getBoolean(NTRIPCasterSettingsFragment.KEY_BRUTAL_ENDING_CASTER, true);
     }
 
     public static DemoModeLocation getDemoModeLocation(){
@@ -539,6 +557,27 @@ public class MainActivity extends Activity {
     }
     public static String getApplicationDirectory() {
         return MainActivity.mApplicationDirectory;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (key.equalsIgnoreCase(NTRIPCasterSettingsFragment.KEY_ENABLE_CASTER))
+        {
+            toggleCasterSwitch();
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
     }
 
 }

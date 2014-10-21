@@ -128,7 +128,7 @@ void client_login(connection_t *con, char *expr)
 	xa_debug(3, "Client login...\n");
 
 	if (!con || !expr) {
-		LOGWRITE(ANDROID_LOG_INFO, "WARNING: client_login called with NULL pointer");
+		android_log(ANDROID_LOG_VERBOSE, "WARNING: client_login called with NULL pointer");
 		return;
 	}
 
@@ -241,7 +241,7 @@ void client_login(connection_t *con, char *expr)
 	}
 */
 
-	LOGVWRITE(ANDROID_LOG_INFO, "Accepted client %lu [%s] from [%s] on mountpoint [%s]. %lu clients connected", con->id,
+	android_log(ANDROID_LOG_VERBOSE, "Accepted client %lu [%s] from [%s] on mountpoint [%s]. %lu clients connected", con->id,
 		nullcheck_string(con->user), con_host (con), source->food.source->audiocast.mount, info.num_clients);
 
 //	greet_client(con, source->food.source);
@@ -290,13 +290,13 @@ void
 del_client(connection_t *client, source_t *source)
 {
 	if (!client || !source) {
-		LOGWRITE(ANDROID_LOG_INFO, "WARNING: del_client() called with NULL pointer");
+		android_log(ANDROID_LOG_VERBOSE, "WARNING: del_client() called with NULL pointer");
 		return;
 	}
 
 	if (source && client->food.client && (client->food.client->virgin != 1) && (client->food.client->virgin != -1)) {
 		if (source->num_clients == 0)
-			LOGWRITE (ANDROID_LOG_INFO, "WARNING: Bloody going below limits on client count!");
+			android_log (ANDROID_LOG_VERBOSE, "WARNING: Bloody going below limits on client count!");
 		else
 			source->num_clients--;
 	}
@@ -313,7 +313,7 @@ greet_client(connection_t *con, source_t *source)
 //	char *time;
 
 	if (!con) {
-		LOGWRITE(ANDROID_LOG_INFO, "WARNING: greet_client called with NULL pointer");
+		android_log(ANDROID_LOG_VERBOSE, "WARNING: greet_client called with NULL pointer");
 		return;
 	}
 
@@ -380,7 +380,7 @@ send_sourcetable (connection_t *con) {
 //	sock_write_line (con->sock, "Date: %s %s", time, info.timezone);
 	char pathBuffer[2000];
 	sprintf(pathBuffer,"%s%s",info.runpath,"/sourcetable.dat");
-	LOGVWRITE(ANDROID_LOG_INFO,"Sourcetable:%s",pathBuffer);
+	android_log(ANDROID_LOG_VERBOSE,"Sourcetable:%s",pathBuffer);
 	ifp = fopen(pathBuffer,"r");
 	if (ifp != NULL) {
 		fseek(ifp, 0, SEEK_END);
@@ -607,7 +607,7 @@ void parse_mount_authentication_file()
 	}
 
 	if (line[BUFSIZE-1] == '\0') {
-		LOGWRITE(ANDROID_LOG_INFO, "READ ERROR: too long authentication line in config file (exceeding BUFSIZE)");
+		android_log(ANDROID_LOG_VERBOSE, "READ ERROR: too long authentication line in config file (exceeding BUFSIZE)");
 	}
 
 	if (mountfile)
@@ -692,7 +692,7 @@ int add_authentication_mount(mount_t * mount)
 	out = avl_replace(mounttree, mount);
 
 	if (out) {
-		LOGVWRITE(ANDROID_LOG_INFO, "WARNING: Duplicate mount record %s, using latter", mount->name);
+		android_log(ANDROID_LOG_VERBOSE, "WARNING: Duplicate mount record %s, using latter", mount->name);
 		nfree(out->name);
 		avl_destroy(out->usertree, NULL);
 		nfree(out);

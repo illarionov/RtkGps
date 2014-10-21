@@ -140,8 +140,8 @@ increase_maximum_number_of_open_files()
 	{
 		xa_debug (1, "DEBUG: Max number of open files raised from: soft %d hard: %d, to soft: %d hard: %d", before.rlim_cur, before.rlim_max, after.rlim_cur, after.rlim_max);
 	} else {
-		LOGVWRITE (ANDROID_LOG_INFO, "ERROR: Increasing maximum number of open files from %lu:%lu to: %lu:%lu failed, try lowering the maximum values for listeners, admins, and sources.", before.rlim_cur, before.rlim_max, after.rlim_cur, after.rlim_max);
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: The server will run out of file descriptors before the reaching specified limits!");
+		android_log (ANDROID_LOG_VERBOSE, "ERROR: Increasing maximum number of open files from %lu:%lu to: %lu:%lu failed, try lowering the maximum values for listeners, admins, and sources.", before.rlim_cur, before.rlim_max, after.rlim_cur, after.rlim_max);
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: The server will run out of file descriptors before the reaching specified limits!");
 	}
 #endif
 }
@@ -178,14 +178,14 @@ startup_mode()
 	running = SERVER_RUNNING;
 
 #ifdef _WIN32
-		LOGWRITE(ANDROID_LOG_INFO, "Using stdout as NtripCaster logging window");
+		android_log(ANDROID_LOG_VERBOSE, "Using stdout as NtripCaster logging window");
 #else
 	if (info.console_mode == 1)
 	{
-		server_detach();
+		//server_detach();
 		info.detach = 1;
 	} else {
-		LOGWRITE(ANDROID_LOG_INFO, "Using stdout as NtripCaster logging window");
+		android_log(ANDROID_LOG_VERBOSE, "Using Android Log as NtripCaster logging window");
 	}
 #endif
 
@@ -199,7 +199,7 @@ setup_signal_traps()
 
 #ifdef _WIN32
 	if (!SetConsoleCtrlHandler( win_sig_die, 1 ))
-		LOGWRITE(ANDROID_LOG_INFO, "FAILED setting up win32 signal handler");
+		android_log(ANDROID_LOG_VERBOSE, "FAILED setting up win32 signal handler");
 #else
 	
 # if (defined(SYSV) && !defined(hpux)) || defined(SVR4)
@@ -294,7 +294,7 @@ setup_defaults()
 	if (!info.timezone) info.timezone = "";
 
 	if (!info.runpath) 
-		LOGWRITE (ANDROID_LOG_ERROR, "WARNING: info.runpath == NULL!!\n");
+		android_log (ANDROID_LOG_ERROR, "WARNING: info.runpath == NULL!!\n");
 
 	info.logdir = nstrdup(DEFAULT_LOG_DIR);
 	if (info.logdir[0] != DIR_DELIMITER) {
@@ -346,6 +346,15 @@ allocate_resources()
 
 }
 
+void mutex_locking_timeout(void *param)
+{
+	android_log(ANDROID_LOG_VERBOSE, "mutex_locking_timeout...");
+	mutex_t *mutex;
+	mutex = (mutex_t *)param;
+	internal_lock_mutex(mutex);
+	pthread_exit(0);
+}
+
 /* Shutdown server, make sure sockets are closed, free up the memory */
 void 
 clean_shutdown (server_info_t *info)
@@ -353,18 +362,26 @@ clean_shutdown (server_info_t *info)
 	connection_t *con;
 	int i;
 	avl_traverser trav = {0};
+	pthread_t mutex_locking_thread;
 	static int main_shutting_down = 0;
 	
-	LOGWRITE(ANDROID_LOG_INFO, "Starting shutting down...");
+	android_log(ANDROID_LOG_VERBOSE, "Starting shutting down...");
 	thread_library_lock ();
+	android_log(ANDROID_LOG_VERBOSE, "Thread library locked...");
 		if (!main_shutting_down)
+		{
 			main_shutting_down = 1;
+		}
 		else
+		{
+			android_log(ANDROID_LOG_VERBOSE, "thread_exit (0)...");
 			thread_exit (0);
+		}
+	android_log(ANDROID_LOG_VERBOSE, "Thread library unlocking...");
 	thread_library_unlock ();
 	
-	LOGWRITE(ANDROID_LOG_INFO, "Cleanly shutting down...");
-	LOGWRITE(ANDROID_LOG_INFO, "Closing all listening sockets...");
+	android_log(ANDROID_LOG_VERBOSE, "Cleanly shutting down...");
+	android_log(ANDROID_LOG_VERBOSE, "Closing all listening sockets...");
 
 	for (i = 0; i < MAXLISTEN; i++) 
 	{
@@ -382,9 +399,14 @@ clean_shutdown (server_info_t *info)
 	/* Wait for the last threads to die  */
 	thread_wait_for_solitude ();
 
-	thread_mutex_lock(&info->source_mutex);
+	android_log(ANDROID_LOG_VERBOSE, "Mutex locking with timeout...");
+	pthread_create(&mutex_locking_thread, NULL, (void*)mutex_locking_timeout,(void*)&info->source_mutex);
+	if (pthread_join_timeout(mutex_locking_thread, 300))
+	{
+		android_log(ANDROID_LOG_VERBOSE, "Joining thread timed out...");
+	}
 
-	LOGWRITE(ANDROID_LOG_INFO, "Removing remaining sources...");
+	android_log(ANDROID_LOG_VERBOSE, "Removing remaining sources...");
 	while ((con = avl_traverse(info->sources, &trav)))
 		kick_connection(con, "Server shutting down");
 
@@ -397,9 +419,9 @@ clean_shutdown (server_info_t *info)
 	WSACleanup();
 #endif
 
-	LOGWRITE(ANDROID_LOG_INFO, "Exiting..");
-	if (info->logfile != -1)
-		fd_close(info->logfile);
+	android_log(ANDROID_LOG_VERBOSE, "Exiting..");
+//	if (info->logfile != -1)
+//		fd_close(info->logfile);
 	
 #ifdef DEBUG_MEMORY
 	{
@@ -408,12 +430,12 @@ clean_shutdown (server_info_t *info)
 		
 		while ((mi = avl_traverse(info->mem, &trav))) {
 			if (mi->thread_id != 0 && mi->thread_id != -1)
-				LOGWRITE(ANDROID_LOG_INFO, "WARNING: %d bytes allocated by thread %d at line %d in %s not freed before thread exit", mi->size, mi->thread_id, mi->line, mi->file);
+				android_log(ANDROID_LOG_VERBOSE, "WARNING: %d bytes allocated by thread %d at line %d in %s not freed before thread exit", mi->size, mi->thread_id, mi->line, mi->file);
 		}
 	}
 #endif
-	
-//	exit(0);
+	pthread_exit(0);
+	//thread_exit(0);
 }
 
 /* Main server loop, listen to the specified socket for new
@@ -425,7 +447,7 @@ threaded_server_proc (void *infoarg)
 	connection_t *con;
 	mythread_t *mt = thread_get_mythread ();
 
-	LOGWRITE(ANDROID_LOG_INFO, "Starting main connection handler...");
+	android_log(ANDROID_LOG_VERBOSE, "Starting main connection handler...");
   
 	/* Setup listeners */
 	setup_listeners();
@@ -433,7 +455,7 @@ threaded_server_proc (void *infoarg)
 	/* Just print some runtime server info */
 	print_startup_server_info();
 
-	LOGWRITE (ANDROID_LOG_INFO, "Starting Calender Thread...");
+	android_log (ANDROID_LOG_VERBOSE, "Starting Calender Thread...");
 	/* Fork another thread that handles time based actions */
 	thread_create("Calendar Thread", startup_timer_thread, NULL);
 	
@@ -462,7 +484,7 @@ threaded_server_proc (void *infoarg)
 BOOL WINAPI 
 win_sig_die(DWORD CtrlType)
 {
-	LOGWRITE(ANDROID_LOG_INFO, "Caught signal %d, perhaps someone is at the door?", CtrlType);
+	android_log(ANDROID_LOG_VERBOSE, "Caught signal %d, perhaps someone is at the door?", CtrlType);
 	running = SERVER_DYING;
 	return 1;
 }
@@ -487,7 +509,7 @@ sig_hup(int signo)
 	parse_default_config_file();
 	open_log_files();
 	
-	LOGWRITE(ANDROID_LOG_INFO, "Caught SIGHUP, rehashed config and reopened logfiles...");
+	android_log(ANDROID_LOG_VERBOSE, "Caught SIGHUP, rehashed config and reopened logfiles...");
 	
 	signal(SIGHUP, sig_hup);
 }
@@ -495,7 +517,7 @@ sig_hup(int signo)
 RETSIGTYPE 
 sig_die(int signo)
 {
-	LOGVWRITE(ANDROID_LOG_INFO, "Caught signal %d, perhaps someone is at the door?", signo);
+	android_log(ANDROID_LOG_VERBOSE, "Caught signal %d, perhaps someone is at the door?", signo);
 	running = SERVER_DYING;
 }
 
@@ -538,7 +560,7 @@ setup_listeners()
   
 		if (info.listen_sock[i] == INVALID_SOCKET) 
 		{
-			LOGVWRITE(ANDROID_LOG_INFO, "ERROR: Could not listen to port %d. Perhaps another process is using it?", info.port[i]);
+			android_log(ANDROID_LOG_VERBOSE, "ERROR: Could not listen to port %d. Perhaps another process is using it?", info.port[i]);
 			clean_shutdown(&info);
 		}
 
@@ -547,7 +569,7 @@ setup_listeners()
 
 		if (listen(info.listen_sock[i], LISTEN_QUEUE) == SOCKET_ERROR) 
 		{
-			LOGVWRITE(ANDROID_LOG_INFO, "Could not listen for clients on port %d", info.port[i]);
+			android_log(ANDROID_LOG_VERBOSE, "Could not listen for clients on port %d", info.port[i]);
 			clean_shutdown(&info);
 		} 
 	}
@@ -555,13 +577,13 @@ setup_listeners()
 	if (ice_strcasecmp(info.server_name, "dynamic") == 0) 
 	{
 		info.server_name = sock_get_local_ipaddress();
-		LOGVWRITE(ANDROID_LOG_INFO, "Dynamic server name, using the local ip [%s]", info.server_name);
+		android_log(ANDROID_LOG_VERBOSE, "Dynamic server name, using the local ip [%s]", info.server_name);
 	} else {
 		char *res, *buf = (char *)nmalloc(20);
 		res = forward(info.server_name, buf);
 		if (!res) {
 			nfree(buf);
-			LOGVWRITE(ANDROID_LOG_INFO, "WARNING: Resolving the server name [%s] does not work!", info.server_name);
+			android_log(ANDROID_LOG_VERBOSE, "WARNING: Resolving the server name [%s] does not work!", info.server_name);
 			return;
 		}
 		

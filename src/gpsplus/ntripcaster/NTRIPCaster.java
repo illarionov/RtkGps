@@ -10,7 +10,7 @@ public class NTRIPCaster {
         this.mApplicationPath = path;
         setApplicationPath(path);
     }
-    public native void stop();
+    public native int stop(int force); //0 cleanly try to close everything, 1 brutal will exit(0)
 
     public native void reset();
 

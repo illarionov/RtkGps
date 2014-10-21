@@ -106,7 +106,7 @@ splitc (char *first, char *rest, const char divider)
 
 	if (!rest)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: splitc called with NULL pointers");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: splitc called with NULL pointers");
 		return NULL;
 	}
 
@@ -144,7 +144,7 @@ con_host (connection_t *con)
 
 	if (!con)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: con_host called with NULL connection");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: con_host called with NULL connection");
 		return null;
 	}
 
@@ -320,7 +320,7 @@ char *create_malloced_ascii_host (struct in_addr *in)
 char *makeasciihost(const struct in_addr *in, char *buf)
 {
 	if (!buf) {
-		LOGWRITE(ANDROID_LOG_INFO, "ERROR: makeasciihost called with NULL arguments");
+		android_log(ANDROID_LOG_VERBOSE, "ERROR: makeasciihost called with NULL arguments");
 		return NULL;
 	}
   
@@ -351,7 +351,7 @@ nice_time_minutes (unsigned long int minutes, char *buf)
 	
 	if (!buf)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "ERROR: nice_time_minutes called with NULL argument");
+		android_log (ANDROID_LOG_VERBOSE, "ERROR: nice_time_minutes called with NULL argument");
 		return NULL;
 	}
 
@@ -382,7 +382,7 @@ nice_time (unsigned long int seconds, char *buf)
 	
 	if (!buf)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "ERROR: nice_time called with NULL argument");
+		android_log (ANDROID_LOG_VERBOSE, "ERROR: nice_time called with NULL argument");
 		return NULL;
 	}
 

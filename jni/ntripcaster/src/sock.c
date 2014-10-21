@@ -183,7 +183,7 @@ int sock_set_keepalive(SOCKET sockfd, const int keepalive)
 	{
 		ice_socket_t *is = sock_find (sockfd);
 		if (!is) {
-			LOGWRITE (ANDROID_LOG_INFO, "WARNING: sock_set_keepalive() setting unknown socket");
+			android_log (ANDROID_LOG_VERBOSE, "WARNING: sock_set_keepalive() setting unknown socket");
 		} else {
 			is->keepalive = keepalive;
 		}
@@ -212,7 +212,7 @@ int sock_set_no_linger(SOCKET sockfd)
  	{
 		ice_socket_t *is = sock_find (sockfd);
 		if (!is) {
-			LOGWRITE (ANDROID_LOG_INFO, "WARNING: sock_set_no_linger() setting unknown socket");
+			android_log (ANDROID_LOG_VERBOSE, "WARNING: sock_set_no_linger() setting unknown socket");
 		} else {
 			is->linger = 0;
 		}
@@ -260,7 +260,7 @@ int sock_set_blocking(SOCKET sockfd, const int block)
 	{
 		ice_socket_t *is = sock_find (sockfd);
 		if (!is) {
-			LOGWRITE (ANDROID_LOG_INFO, "WARNING: sock_set_blocking(): Unknown socket %d", sockfd);
+			android_log (ANDROID_LOG_VERBOSE, "WARNING: sock_set_blocking(): Unknown socket %d", sockfd);
 			return -1;
 		} else {
 			is->blocking = block;
@@ -296,7 +296,7 @@ int
 sock_insert (ice_socket_t *is)
 {
 	if (!is || !sock_valid (is->sock)) {
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: Tried to insert NULL socket");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: Tried to insert NULL socket");
 		return -1;
 	}
 
@@ -305,7 +305,7 @@ sock_insert (ice_socket_t *is)
 	thread_mutex_lock (&sock_mutex);
 
 	if (avl_insert (sock_sockets, is)) {
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: Tried to insert duplicate socket. Weird!");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: Tried to insert duplicate socket. Weird!");
 		thread_mutex_unlock (&sock_mutex);
 		return 0;
 	}
@@ -413,7 +413,7 @@ SOCKET sock_accept(SOCKET s, struct sockaddr * addr, socklen_t * addrlen)
 void
 sock_close_all_sockets ()
 {
-	LOGWRITE (ANDROID_LOG_INFO, "Closing all remaining sockets...");
+	android_log (ANDROID_LOG_VERBOSE, "Closing all remaining sockets...");
 	my_sleep (30000);
 }
 
@@ -743,7 +743,7 @@ SOCKET sock_get_server_socket(const int port)
 	SOCKET sockfd;
 
 	if (port < 0) {
-		LOGVWRITE(ANDROID_LOG_INFO,
+		android_log(ANDROID_LOG_VERBOSE,
 			  "ERROR: Invalid port number %d. Cannot listen for requests, this is bad!",
 			  port);
 		return INVALID_SOCKET;
@@ -768,7 +768,7 @@ SOCKET sock_get_server_socket(const int port)
 		if (setsockopt
 		    (sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *) &tmp,
 		     sizeof (tmp)) != 0)
-			LOGWRITE(ANDROID_LOG_INFO,
+			android_log(ANDROID_LOG_VERBOSE,
 				  "ERROR: setsockopt() failed to set SO_REUSEADDR flag. (mostly harmless)");
 	}
 #endif
@@ -787,7 +787,7 @@ SOCKET sock_get_server_socket(const int port)
 			if (inet_aton
 			    (info.myhostname,
 			     (struct in_addr *) &localaddr) == 0) {
-				LOGVWRITE(ANDROID_LOG_INFO,
+				android_log(ANDROID_LOG_VERBOSE,
 					  "ERROR: Invalid ip number %s, will die now",
 					  info.myhostname);
 				clean_shutdown(&info);
@@ -802,7 +802,7 @@ SOCKET sock_get_server_socket(const int port)
 				ice_gethostbyname(info.myhostname, &hostinfo,
 						  buf, BUFSIZE, &error);
 			if (hostinfoptr == NULL) {
-				LOGVWRITE(ANDROID_LOG_INFO,
+				android_log(ANDROID_LOG_VERBOSE,
 					  "Unknown host %s, that's it for me!",
 					  info.myhostname);
 				ice_clean_hostent();
@@ -824,7 +824,7 @@ SOCKET sock_get_server_socket(const int port)
 	 */
 	error = bind(sockfd, (struct sockaddr *) &sin, sin_len);
 	if (error == SOCKET_ERROR) {
-		LOGVWRITE(ANDROID_LOG_INFO,
+		android_log(ANDROID_LOG_VERBOSE,
 			  "Bind to socket on port %d failed. Shutting down now.",
 			  port);
 		clean_shutdown(&info);
@@ -849,11 +849,11 @@ SOCKET sock_connect_wto(const char *hostname, const int port,
 	int error;
 
 	if (!hostname || !hostname[0]) {
-		LOGWRITE(ANDROID_LOG_INFO,
+		android_log(ANDROID_LOG_VERBOSE,
 			  "ERROR: sock_connect() called with NULL or empty hostname");
 		return INVALID_SOCKET;
 	} else if (port <= 0) {
-		LOGWRITE(ANDROID_LOG_INFO,
+		android_log(ANDROID_LOG_VERBOSE,
 			  "ERROR: sock_connect() called with invalid port number");
 		return INVALID_SOCKET;
 	}
@@ -878,7 +878,7 @@ SOCKET sock_connect_wto(const char *hostname, const int port,
 		    (sockfd, (struct sockaddr *) &localsin,
 		     sizeof (localsin)) == SOCKET_ERROR) {
 			xa_debug(2, "DEBUG: Unable to bind", info.myhostname);
-			LOGVWRITE(ANDROID_LOG_INFO,
+			android_log(ANDROID_LOG_VERBOSE,
 				  "ERROR: Bind to local address %s failed",
 				  info.myhostname);
 			sock_close(sockfd);
@@ -893,7 +893,7 @@ SOCKET sock_connect_wto(const char *hostname, const int port,
 	    && isdigit((int) hostname[ice_strlen(hostname) - 1])) {
 		if (inet_aton(hostname, (struct in_addr *) &sin.sin_addr) ==
 		    0) {
-			LOGVWRITE(ANDROID_LOG_INFO, "ERROR: Invalid ip number %s",
+			android_log(ANDROID_LOG_VERBOSE, "ERROR: Invalid ip number %s",
 				  hostname);
 			sock_close(sockfd);
 			return INVALID_SOCKET;

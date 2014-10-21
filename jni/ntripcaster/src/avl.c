@@ -1030,7 +1030,7 @@ compare_strings (const void *first, const void *second, void *param)
 
 	if (!first || !second)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: compare_strings called with null pointers");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: compare_strings called with null pointers");
 		return 0;
 	}
 
@@ -1047,7 +1047,7 @@ compare_threads (const void *first, const void *second, void *param)
 
 	if (!first || !second)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: compare_threads called with NULL pointers");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: compare_threads called with NULL pointers");
 		return 0;
 	}
 
@@ -1067,7 +1067,7 @@ compare_mutexes (const void *first, const void *second, void *param)
 
 	if (!first || !second)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: compare_mutex called with NULL pointers");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: compare_mutex called with NULL pointers");
 		return 0;
 	}
 
@@ -1084,7 +1084,7 @@ int compare_connection(const void *first, const void *second, void *param)
 
 	if (!first || !second)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING!!! - Null pointer connection!");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING!!! - Null pointer connection!");
 		return -1;
 	}
 
@@ -1093,7 +1093,7 @@ int compare_connection(const void *first, const void *second, void *param)
 
 	if (a1->type != a2->type)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING!!!! - Comparing different type connections");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING!!!! - Comparing different type connections");
 		return -1;
 	}
 
@@ -1110,7 +1110,7 @@ zero_trav(avl_traverser *trav)
 {
 	if (!trav)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: zero_trav called with NULL trav");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: zero_trav called with NULL trav");
 		return;
 	}
 	trav->init = 0;
@@ -1145,7 +1145,7 @@ avl_get_any_node (avl_tree *tree)
 	avl_traverser trav = {0};
 	if (!tree)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: avl_get_any_node called with NULL tree");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: avl_get_any_node called with NULL tree");
 		return NULL;
 	}
 

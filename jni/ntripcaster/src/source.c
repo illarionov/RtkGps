@@ -214,7 +214,7 @@ void source_login(connection_t *con, char *expr)
 		sock_write_line (con->sock, "OK");
 		source->connected = SOURCE_CONNECTED;
 
-		LOGVWRITE (ANDROID_LOG_INFO, "Accepted encoder on mountpoint %s from %s. %d sources connected",
+		android_log (ANDROID_LOG_VERBOSE, "Accepted encoder on mountpoint %s from %s. %d sources connected",
 			   source->audiocast.mount, con_host (con), info.num_sources);
 
 		thread_mutex_lock(&info.source_mutex);
@@ -226,7 +226,7 @@ void source_login(connection_t *con, char *expr)
 		source_func(con);
 	}
 
-	LOGWRITE (ANDROID_LOG_INFO, "WARNING: Thread exiting in source_login(), this should not happen");
+	android_log (ANDROID_LOG_VERBOSE, "WARNING: Thread exiting in source_login(), this should not happen");
 	thread_exit(0);
 }
 
@@ -374,7 +374,7 @@ find_mount_with_req (request_t *req)
 	
 	if (!req || !req->path || !req->host)
 	{
-		LOGWRITE (ANDROID_LOG_INFO, "WARNING: find_mount_with_req called with NULL request!");
+		android_log (ANDROID_LOG_VERBOSE, "WARNING: find_mount_with_req called with NULL request!");
 		return NULL;
 	}
 
@@ -519,7 +519,7 @@ add_chunk (connection_t *con)
 	} while ((((double)read_bytes < ((double)SOURCE_READSIZE*3.0)/4.0) && (tries < (READ_TIMEOUT / READ_RETRY_DELAY))));
 
 	if (read_bytes <= 0) {
-		LOGVWRITE(ANDROID_LOG_INFO, "Didn't receive data from source after %d microseconds, assuming it died...", tries * READ_RETRY_DELAY);
+		android_log(ANDROID_LOG_VERBOSE, "Didn't receive data from source after %d microseconds, assuming it died...", tries * READ_RETRY_DELAY);
 		
 		/* Set this source as pending (not connected) */
 		pending_connection (con);
