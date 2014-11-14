@@ -132,9 +132,6 @@ For that please modify RtkGps/jni/rtklib.mk and Android.mk for removing LAPACK f
 now under a cygwin terminal move to your RtkGps directory and build with ```ndk-build``` command.  
 Under Eclipse be sure that you do not set to build the native library since it fails.  
   
-#### NTRIP Caster  
-I made an highly experimental version with an embedded ntripcaster 0.1.5 server, if you are intersting you can find it in the [ntripcaster branch](https://github.com/eltorio/RtkGps/tree/ntripcaster).  Do not hesitate to discuss about it.  
-  
 #### Translations
 Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.com/project/gpsplusrtkgps/invite).   
 You can freely create a translator account and with it you will be able request for a new translation.  
