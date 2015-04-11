@@ -21,15 +21,23 @@
 
 -dontobfuscate
 
--dontwarn butterknife.Views$InjectViewProcessor
+-dontwarn butterknife.internal.**
+-keep class **$$ViewInjector { *; }
+-keepnames class * { @butterknife.InjectView *;}
+
 -dontwarn org.osmdroid.google.**
 -dontwarn org.osmdroid.contributor.GpxToPHPUploader*
--keep class **$$ViewInjector { *; } 
 
 -keepclasseswithmembers class * {
     native <methods>;
 }
 
+-keepclassmembers class gpsplus.rtklib.** {
+    <methods>;
+}
+-keep public class gpsplus.rtklib.RtkServer {
+   *;
+}
 #ACRA specifics
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
@@ -60,3 +68,9 @@
 -keep public class org.acra.ErrorReporter {
     public void handleSilentException(java.lang.Throwable);
 }
+
+#dropbox
+-keep class com.dropbox.** {*;}
+-dontwarn com.dropbox.ledger**
+
+#jscience

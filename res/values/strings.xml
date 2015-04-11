@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">RtkGps</string>
-    <string name="app_url">http://github.com/illarionov/RtkGps</string>
+    <string name="app_name">RTKGPS+</string>
+    <string name="app_url">http://github.com/eltorio/RtkGps</string>
     <string name="app_version_label">Version</string>
     <string name="app_legacy_info_label">Legacy info</string>
     <string name="about_licenses">Legacy info</string>
+    <string name="about_changelog">Changelog</string>
     <string name="about_activity_label">About</string>
     <string name="crash_toast_text">Ooooops! I crashed, but a report has been sent to my developer to help fix the issue!</string>
 	<string name="title_activity_input_stream_settings">Input stream settings</string>
@@ -14,6 +15,8 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_start_service">Start service</string>
     <string name="menu_stop_service">Stop service</string>
+    <string name="menu_dropbox">Dropbox</string>
+    <string name="menu_tools">Tools</string>
     <string name="menu_select_solution_format">Select solution format</string>
     <string name="menu_select_gtime_format">Select time format</string>
     <string name="menu_about">About</string>
@@ -21,6 +24,9 @@
     <string name="menu_map_mode_osm">OpenStreetMap</string>
     <string name="menu_map_mode_bing_aerial">Bing Aerial</string>
     <string name="menu_map_mode_bing_road">Bing Road</string>
+    <string name="menu_map_mode_geoportail_map">Geoportail map</string>
+    <string name="menu_map_mode_geoportail_cadastral">Geoportail cadastral</string>
+    <string name="menu_map_mode_geoportail_orthoimages">Geoportail aerial</string>
     <string name="local_service_started">Local service started</string>
     <string name="local_service_stopped">Local service stopped</string>
     <string name="local_service_label">RtkGps</string>
@@ -58,17 +64,49 @@
 
     <!-- Solution view -->
     <string name="solution_view_solution">Solution:</string>
+    <string name="solution_view_geoid">Geoid:</string>
+    <string name="solution_view_crs">CRS:</string>
     <string name="solution_view_age_text_format">Age: %1$.1fs\nRatio: %2$.1f\n#Of sat: %3$d</string>
     <string name="solution_view_format_wgs84">Lat/Lon/Height</string>
     <string name="solution_view_format_wgs84_float">Lat/Lon/Height — Float</string>
+    <string name="solution_view_format_utm">UTM E/N/H/Zone</string>
+    <string name="solution_view_format_proj4_lambertIIextended">Lambert II extended E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93">RGF93 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc43">RGF93 CC43 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc44">RGF93 CC44 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc45">RGF93 CC45 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc46">RGF93 CC46 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc47">RGF93 CC47 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc48">RGF93 CC48 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc49">RGF93 CC49 E/N/H</string>
+    <string name="solution_view_format_proj4_lambert93_cc50">RGF93 CC50 E/N/H</string>
+    <string name="solution_view_format_proj4_nad83">NAD83 E/N/H</string>
     <string name="solution_view_format_ecef">X/Y/Z — ECEF</string>
     <string name="solution_view_format_enu_baseline">E/N/U — Baseline</string>
     <string name="solution_view_format_pyl_baseline">Pitch/Yaw/Length — Baseline</string>
+    <string name="solution_view_format_proj4_custom">User defined Proj4 a/b/c</string>
 
     <string-array name="solution_view_coordinates_wgs84">
         <item>Lat:</item>
         <item>Lon:</item>
         <item>Height:</item>
+        <item >Altitude:</item>
+    </string-array>
+    <string-array name="solution_view_coordinates_utm">
+        <item>Easting:</item>
+        <item>Northing:</item>
+        <item>Altitude:</item>
+        <item >Zone:</item>
+    </string-array>
+    <string-array name="solution_view_coordinates_proj4_lambert93">
+        <item>Easting:</item>
+        <item>Northing:</item>
+        <item>Altitude:</item>
+    </string-array>
+    <string-array name="solution_view_coordinates_proj4_nad83">
+        <item>Easting:</item>
+        <item>Northing:</item>
+        <item>Altitude:</item>
     </string-array>
     <string-array name="solution_view_coordinates_ecef">
         <item>X:</item>
@@ -85,7 +123,12 @@
         <item>Yaw:</item>
         <item>Length:</item>
     </string-array>
-
+    <string-array name="solution_view_coordinates_proj4_custom">
+        <item>a:</item>
+        <item>b:</item>
+        <item>height:</item>
+    </string-array>
+    
     <!-- PMODE_XXX positioning mode -->
     <string name="pmode_single">Single</string>
     <string name="pmode_dgps">DGPS/DGNSS</string>
@@ -93,7 +136,7 @@
     <string name="pmode_static">Static</string>
     <string name="pmode_moveb">Moving — base</string>
     <string name="pmode_fixed">Fixed</string>
-    <string name="pmode_ppp_kinema">PPP — Kinemaric</string>
+    <string name="pmode_ppp_kinema">PPP — Kinematic</string>
     <string name="pmode_ppp_static">PPP — Static</string>
     <string name="pmode_ppp_fixed">PPP — Fixed</string>
 
@@ -120,7 +163,8 @@
     <string name="solq_dgps">DGPS/DGNSS</string>
     <string name="solq_single">Single</string>
     <string name="solq_ppp">PPP</string>
-    <string name="solq_dr">Dead reconing</string>
+    <string name="solq_dr">Dead reckoning</string>
+    <string name="solq_internal">Internal</string>
     
     <!-- SOLF_XXX  Solution Format -->
     <string name="solf_llh">Lat/Long/Height</string>
@@ -142,7 +186,9 @@
     <string name="strfmt_javad">JAVAD GRIL/GREIS</string>
     <string name="strfmt_nvs">NVS NVC08C</string>
     <string name="strfmt_binex">BINEX</string>
+    <string name="strfmt_rt17">Trimble RT17</string>
     <string name="strfmt_lexr">Furuno LPY-10000</string>
+    <string name="strfmt_sept">Septentrio</string>
     <string name="strfmt_sirf">SiRF</string>
     <string name="strfmt_rinex">RINEX</string>
     <string name="strfmt_sp3">SP3</string>
@@ -173,7 +219,7 @@
     <string name="ionoopt_est">Estimate STEC</string>
     <string name="ionoopt_tec">IONEX TEC model</string>
     <string name="ionoopt_qzs">QZSS broadcast model</string>
-    <string name="ionoopt_lex">QZSS LEX ionospehre</string>
+    <string name="ionoopt_lex">QZSS LEX ionosphere</string>
     <string name="ionoopt_stec">SLANT TEC model</string>
 
     <!-- TROPOPT_XXX Troposphere option -->
@@ -191,6 +237,7 @@
     <string name="geoid_egm2008_m25">EGM2008 2.5x2.5\'</string>
     <string name="geoid_egm2008_m10">EGM2008 1.0x1.0\'</string>
     <string name="geoid_gsi2000_m15">GSI geoid 2000 1.0x1.5\'</string>
+    <string name="geoid_raf09_m15x20">IGN RAF09 1.5x2.0\'</string>
 
     <!-- EPHOPT_XXX Exhemeris Options -->
     <string name="ephopt_brdc">Broadcast ephemeris</string>
@@ -272,7 +319,51 @@
         <item>35</item>
         <item>40</item>
     </string-array>
-
+    
+    <string name="procopt_ambiguity_resolution_title">Integer ambiguity resolution</string>
+    <string name="procopt_ambiguity_resolution_dialog_title">Integer ambiguity resolution</string>
+    <string-array name="procopt_ambiguity_resolution_entries">
+        <item>Off</item>
+        <item>Continuous</item>
+        <item>Instantaneous</item>
+        <item>Fix and hold</item>
+        <item>PPP</item>
+        <item>PPP (ILS)</item>
+    </string-array>
+        <string-array name="procopt_ambiguity_resolution_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string name="procopt_ambiguity_glonass_resolution_title">Glonass integer ambiguity resolution</string>
+    <string-array name="procopt_glonass_ambiguity_resolution_entries">
+        <item>Off</item>
+        <item>On</item>
+        <item>Auto calibrating</item>
+    </string-array>
+	<string-array name="procopt_glonass_ambiguity_resolution_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string name="procopt_ambiguity_resolution_sub_preference_title">Integer ambiguity resolution settings</string>
+    <string name="procopt_min_ratio_to_fix_ambiguity_title">Min ratio to fix ambiguity</string>
+    <string name="procopt_min_confidence_to_fix_ambiguity_title">Min confidence to fix ambiguity</string>
+    <string name="procopt_max_fcb_to_fix_ambiguity_title">Max FCB to fix ambiguity</string>
+    <string name="procopt_min_elevation_to_fix_ambiguity_title">Min elevation to fix ambiguity</string>
+    <string name="procopt_min_lock_to_fix_ambiguity_title">Min lock to fix ambiguity</string>
+    <string name="procopt_min_fix_to_hold_ambiguity_title">Min fix to hold ambiguity</string>
+    <string name="procopt_min_elevation_to_hold_ambiguity_title">Min elevation to hold ambiguity</string>
+    <string name="procopt_outage_to_reset_ambiguity_title">Outage to reset ambiguity</string>
+    <string name="procopt_slip_threshold_title">Slip threshold (m)</string>
+    <string name="procopt_max_age_of_diff_s_title">Max age of diff (s)</string>
+    <string name="procopt_reject_threshold_of_gdop_title">Reject threshold of GDOP</string>
+    <string name="procopt_reject_threshold_of_innov_title">Reject threshold of innov (m)</string>
+    <string name="procopt_number_of_filter_iteration_title">Number of filter iteration</string>
+    
     <!-- Rec dynamics / Earth tides correction -->
     <string name="procopt_rec_dynamics_title">Rec dynamics</string>
     <string name="procopt_rec_dynamics_summary">Estimate receiver velocity and acceleration</string>
@@ -310,9 +401,26 @@
     <string name="procopt_raim_fde_title">RAIM FDE</string>
     <string name="procopt_raim_fde_summary">Enable RAIM failure detection and exclusion</string>
 
+    <!-- PROCESSING CYCLE -->
+    <string name="procopt_processing_cycle_title">Processing cycle (s)</string>
+	<string name="procopt_processing_cycle_summary">Set the cycle for processing mock positions and GPX trace</string>
+	<string-array name="procopt_processing_cycle_entries">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+    
     <!-- Output header -->
     <string name="solopt_output_header_title">Output header</string>
     <string name="solopt_output_header_summary">Set whether the header is output or not</string>
+    
+    <!-- Output mocklocation -->
+    <string name="solopt_output_mocklocation_title">Output GPS mock locations</string>
+    <string name="solopt_output_mocklocation_summary">Set if solution is sent to other applications like the internal GPS</string>
 
     <!-- Time format -->
     <string name="solopt_time_format_title">Time format</string>
@@ -395,6 +503,11 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+    <string name="solopt_output_customproj4_title">User defined Proj4 projection</string>
+    <string name="solopt_output_customproj4_summary">This is for power users. Must be a correct proj4 string</string>
+    <string name="solopt_output_customproj4_default">+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs</string>
+    <string name="solopt_output_testmode_title">Enable test mode</string>
+    <string name="solopt_output_testmode_summary">If this is enabled and Rover/Base/Correction are off, it runs in a special test mode with positions coming from internal GPS. Obviously no algorithm from RTKLIB can work</string>
     
     <!-- Input streams settings -->
 	<string name="streams_settings_type_title">Type</string>
@@ -413,6 +526,8 @@
     <string name="input_streams_settings_transmit_gpgga_to_base_title">Transmit GPGGA to Base Station</string>
     <string name="input_streams_settings_transmit_gpgga_lat_title">Latitude</string>
     <string name="input_streams_settings_transmit_gpgga_lon_title">Longitude</string> 
+    <string name="input_streams_setting_antenna_title">Antenna</string>
+    <string name="input_streams_setting_antenna_summary">Antenna official IGS name (for phase center variation)</string>
     
 	<string-array name="input_streams_settings_transmit_gpgga_entries">
         <item>OFF</item>
@@ -429,8 +544,11 @@
     <!-- Output stream settings -->
     <string name="output_streams_settings_enable_solution1_title">Enable Solution 1</string>
     <string name="output_streams_settings_enable_solution2_title">Enable Solution 2</string>
+    <string name="output_streams_settings_enable_gpxtrace_title">Enable GPX Trace</string>
     <string name="output_streams_settings_solution1_tab_title">Solution 1</string>
     <string name="output_streams_settings_solution2_tab_title">Solution 2</string>
+    <string name="output_streams_settings_gpxtrace_tab_title">GPX Trace</string>
+
     
     <!-- Log stream settings -->
     <string name="log_streams_settings_enable_rover_title">Log rover</string>
@@ -447,8 +565,13 @@
     <string name="ntrip_client_mountpoint_title">NTRIP Mountpoint</string>
     <string name="ntrip_client_user_title">NTRIP user</string>
     <string name="ntrip_client_password_title">NTRIP password</string>
+    <string name="ntrip_server_dialog_title">NTRIP server settings</string>
     <string name="file_filename_title">Filename</string>
-    
+    <string name="file_filename_summary">can included %Y (year) %m (month) %d (day) %h (hour) %M (minutes) %S (seconds) for dynamic naming</string>
+    <string name="file_syncdropbox_title">Sync to Dropbox</string>
+    <string name="file_syncdropbox_summary">Needs an absolute file names (ie: not containing %Y %m …), the file on Dropbox will be renamed according to the starting date</string>
+    <string name="file_zipbeforesync_title">Zip before syncing</string>
+    <string name="file_zipbeforesync_summary">Compress this file before sending to Dropbox</string>
     <!-- TCP client stream preferences -->
 	<string name="tcp_client_dialog_title">TCP client settings</string>
     <string name="tcp_client_host_title">Host</string>
@@ -547,6 +670,17 @@
 	<string name="status_view_skyplot_base_l2">Skyplot Base L2</string>
 	<string name="status_view_skyplot_base_l5">Skyplot Base L5</string>
 	<string name="status_view_baseline">Baseline</string>
+	<string name="tools_download_and_inject_igu">Download and inject IGS Ultra rapid ephemeris (500kB)</string>
+	<string name="tools_inject">Inject</string>
+	<string name="tools_get_inject">Get+Inject</string>
+	<string name="tools_download_raf09_geoid">Install IGN RAF09 Geoid (2MB)</string>
+	<string name="tools_install">Install</string>
+	<string name="tools_download_egm2008_m25_geoid">Install EGM 2008 2.5\' Geoid (135MB)</string>
+	<string name="tools_download_egm2008_m10_geoid">Install EGM 2008 1.0\' Geoid (825MB)</string>
+	<string name="tools_download_egm96_m150_geoid">Install EGM 96 15\' Geoid (2MB)</string>
 	
-	
+	<string name="changelog_full_title">Change Log</string>
+    <string name="changelog_title">What\'s New</string>
+    <string name="changelog_ok_button">OK</string>
+    <string name="changelog_show_full">more…</string>
 </resources>

@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <style type='text/css'>
+      a            { color:#a0a0e0 }
+      div.title    { 
+          color:#C0F0C0; 
+          font-size:1.2em; 
+          font-weight:bold; 
+          margin-top:1em; 
+          margin-bottom:0.5em; 
+          text-align:center }
+      div.subtitle { 
+          color:#C0F0C0; 
+          font-size:0.8em; 
+          margin-bottom:1em; 
+          text-align:center }
+      div.freetext { color:#F0F0F0 }
+      div.list     { color:#C0C0F0 }
+    </style>
+  </head>
+  <body>
+$ 1.0 alpha 23
+   % Build 23
+  _ 2014-10-16
+    * soporte para enviar a un caster ntrip  
+    * soporte para caracteres especiales en nombre de usuario y contraseña por NTRIP
+    * Traducción al español (gracias a Enoc Sanz Ablanedo, por su contribución)
+    * traducción al polaco (traducido por Tomasz Robak)
+    * traducción al alemán (traducido por Hagen Felix)
+   % Build 22
+  _ 2014-09-13
+    * soporte para diferentes modos de resolución de las ambigüedades
+    * soporte de todos los archivos externos Proj4 estándar y todos los archivos de proj-datumgrid-1.5.zip
+    * changelog se muestra automáticamente o puede visualizarse en la pantalla "acerca de "
+    * comandos de inicio para uBlox M8N mensajes raw en uart #1
+    * modo de test está activado por defecto (nueva instalación solamente)
+$ 1.0 alpha 21
+   % Build 21
+  _ 2014-09-12
+    * soporte de la antena del móvil o del la estación de referencia
+$ 1.0 alpha 20
+   % Build 20
+  _ 2014-09-08
+    * SP3 orbits can be provided as file in correction tab
+    * Satellites antennas are included and usable with (Satellites antennas PCV)
+    * New « Tools » activity for downloading latest IGS ultra rapid orbits and commons geoid models
+$ 1.0 alpha 19
+   % Build 19
+  _ 2014-08-31
+    * rtklib 2.4.2p9
+    * soporte para Trimble RT17, Furuno LPY1000, Sirf III/IV y Septentrio
+    * traducción al chino (traducido por Yong Zhang)
+$ 1.0 alpha 18
+   % Build 18
+  _ 2014-08-25
+    * pequeñas mejoras del modo de prueba
+$ 1.0 alpha 17
+   % Build 17
+  _ 2014-08-16
+    * modo de prueba con las posiciones de GPS interno
+$ 1.0 alpha 16
+   % Build 16
+  _ 2014-08-15
+    * soporte para mapas de geoportail IGN francés
+$ 1.0 alpha 15
+   % Build 15
+  _ 2014-08-10
+    * soporte para geoide francés RAF09
+$ 1.0 alpha 14
+   % Build 14
+  _ 2014-08-08
+    * support for some Proj4 coordinates conversion. It is done via proj4J not proj4 jni or proj4J is a subset of proj4, some features are missing for example there is no +pm (prime meridian) parameter. This cause it is yet impossible to convert to Lambert II-Paris for example.
+    * coordinate conversion for french current grids (RGF93, RGF93CC43->CC50) and american NAD83
+    * display the geoid model in solution view - but validity of geoid model file is still not tested
+$ 1.0 alpha 13
+   % Build 13
+  _ 2014-08-07
+    * support for FTDI USB to serial chipsets    
+$ 1.0 alpha 12
+   % Build 12
+  _ 2014-08-03
+    * bug: altitude is not correctly computed in UTM
+add: dropbox files can be zipped before sending
+$ 1.0 alpha 11
+   % Build 11
+  _ 2014-07-21
+    * add UTM coordinates in status view
+$ 1.0 alpha 10
+   % Build 10
+  _ 2014-07-20
+    * actualizar a rtklib 2.4.2p8
+$ 1.0 alpha 9
+  % Build 9
+  _ 2014-07-14
+    * bug: bluetooth address exception
+    * processing cycle can be adjust in processing options
+$ END_OF_CHANGE_LOG
+  </body>
+</html>

@@ -1,0 +1,38 @@
++++ DECLARACION DE RESPONSABILIDAD +++ 
+ESTA ES UNA VERSIÓN ALFA
+He recibido algunas solicitudes para moverlo a una versión de producción, desde mi punto de vista funciona pero esta versión carece de algunas pruebas extensas.
+Sin embargo lo cambié al público con este aviso.
+
+También como una versión alfa esperan actualizaciones frecuentes.
+SE PROPORCIONA COMO ES...
+SIN NINGÚN TIPO DE GARANTÍA.
+++++++++++++++++++++++++++++++++++++++
+
+Android RTKLIB frontend.
+
+el código fuente puede descargarse en https://github.com/eltorio/RtkGps
+
+Fuertemente basado en RtkGps de Alexey Illarionov, este es un fork de su trabajo. Se permite explícitamente a modificar y redistribuir su trabajo sólo con la distribución de sus derechos de autor. Encontrará la licencia original en la pantalla "About/Legacy Info". Gracias a todos los colaboradores de respetar esta cláusula de la licencia original.
+
+No hay ninguna nueva versión así he revisado el código para agregar algunas características que necesito:
+
+1 - Mostrar la altitud en la pantalla de estado.
+       para activar esto debes elegir altura: geodésica en la vista "Opciones de la solución"
+2 - enviar posiciones ficticias para otras aplicaciones.
+       para esto se necesita de comprobar la opción en la vista "Opciones de la solución" , pero esto sólo funcionara si ha permitido "Mock locations" en la configuración de Android.
+       hoy (en 1.0alpha13) las posiciones ficticias no son utilizables con la API Google map.
+3 - automáticamente subir archivo de registro o archivo de solución a su cuenta de Dropbox
+4 - puede generar un archivo gpx de la pista
+5 - puede mostrar el resultado en ECEF, WGS84 Lat/Lon, NAD83, 93 Lambert (RGF93) o sistema de coordenadas UTM (con zonificación de auto)
+5B - uso cualquier proyección Proj4
+6 - se puede mostrar la altura elipsoidal o el altitud geodésico (diferentes modelos de geoide se pueden seleccionar, consulte: https://github.com/eltorio/RtkGps para instalar un modelo de geoide)
+7 - Utilice cualquier GNSS compatible con RTKLIB con salida conectada vía USB (ACM/PL2303/FTDI), Bluetooth, TCP/IP o NTRIP
+8 - puede mostrar algunos mapas del Geoportail IGN (catastro, satélite, carreteras), OpenStreetMap Mapnik, Bing (satélite, carreteras).
+9 - puede descargar y usar ultra rapidas efemérides del IGS
+
+Este software es un puerto de RTKLIB 2.4.2p9 desarrollado por Tomoki Takasu (http://www.rtklib.com), si no sabe lo que esta aplicación es; esta aplicación no es probablemente lo que está buscando!
+Esta aplicación puede computar posiciones GPS precisas utilizando algoritmos de RTKLIB (RTK o PPP) pero se debe utilizar un GPS - externo - compatible con salida de la fase cruda.
+Esto no es un GPS "estándar" como las que encajan en su teléfono o su coche, el más barato que puede encontrar es un modelo como el uBlox LEA-6T.
+NO HAY NINGUNA MANERA de usar el GPS que se encuentra en Samsung Galaxy(s), ni cualquier teléfono que he visto.
+
+Pero hay un modo especial de prueba utilizando el GPS interno, solo para probar, obviamente ningun algoritmo de precisión que se encuentra en RTKLIB se puede utilizar.

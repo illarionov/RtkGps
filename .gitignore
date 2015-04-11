@@ -1,5 +1,6 @@
 *~
 *.swp
+*.DS_Store*
 
 /bin
 /trash
@@ -13,11 +14,26 @@
 /projectSet.psf
 
 /obj/
-/libs/armeabi-v7a/
-/libs/armeabi/
-/libs/x86/
+/libs/mips/librtkgps.so
+/libs/armeabi-v7a/librtkgps.so
+/libs/armeabi/librtkgps.so
+/libs/x86/librtkgps.so
 
 /.gradle
 /build
 
 
+
+.README.md.html
+
+.settings/org.eclipse.core.resources.prefs
+
+custom_rules.xml
+
+egm2008_se.geoid
+
+my-release-key.keystore
+
+src/gpsplus/rtkgps/geoportail/License.java
+
+.crowdin-api-key

@@ -9,8 +9,8 @@
 #define TAG "nativeProcessingOptions"
 #define LOGV(...) showmsg(__VA_ARGS__)
 
-#define PROCESSING_OPTIONS_CLASS "ru0xdc/rtklib/ProcessingOptions$Native"
-#define SNR_MASK_CLASS "ru0xdc/rtklib/ProcessingOptions$SnrMask"
+#define PROCESSING_OPTIONS_CLASS "gpsplus/rtklib/ProcessingOptions$Native"
+#define SNR_MASK_CLASS "gpsplus/rtklib/ProcessingOptions$SnrMask"
 
 static struct {
    jfieldID mode;
@@ -82,7 +82,7 @@ static struct {
    jfieldID rnxoptBase;
    jfieldID rnxoptRover;
    jfieldID posopt;
-} ru0xdc_rtklib_prcopt_fields;
+} gpsplus_rtklib_prcopt_fields;
 
 static struct {
    jfieldID enableRover;
@@ -90,13 +90,49 @@ static struct {
    jfieldID maskL1;
    jfieldID maskL2;
    jfieldID maskL5;
-} ru0xdc_rtklib_snrmask_fields;
+} gpsplus_rtklib_snrmask_fields;
 
 static int init_prcopt_fields_methods(JNIEnv* env, jclass clazz);
 static int init_snrmask_fields_methods(JNIEnv* env, jclass clazz);
 jboolean SnrMask_load(JNIEnv* env, jobject j_snrmask, const snrmask_t *snrmask);
 void SnrMask_save(JNIEnv* env, jobject j_snrmask, snrmask_t *dst);
 
+jboolean processing_options_get_applcation_dir(JNIEnv* env, jobject thiz, char **dst){
+	jclass clazz;
+	jmethodID getApplicationDirectory;
+	jstring j_path;
+	jsize ssize=0;
+
+	clazz = (*env)->FindClass(env, "gpsplus/rtkgps/MainActivity");
+	if (clazz == NULL){
+		trace(3,"ERROR FindClass gpsplus/rtkgps/MainActivity");
+		return JNI_FALSE;}
+
+	getApplicationDirectory = (*env)->GetStaticMethodID(env, clazz, "getApplicationDirectory",
+			"()Ljava/lang/String;");
+
+	if (getApplicationDirectory == NULL){
+		trace(3,"ERROR GetStaticMethodID getApplicationDirectory\n");
+		return JNI_FALSE;
+	}
+
+	j_path = (*env)->CallStaticObjectMethod(env, clazz, getApplicationDirectory);
+	if (j_path == NULL){
+		trace(3,"ERROR CallStaticObjectMethod getApplicationDirectory\n");
+		return JNI_FALSE;
+	}
+
+	ssize = (*env)->GetStringUTFLength(env, j_path);
+
+	*dst = (char*)malloc((ssize+1)*sizeof(char));
+	if (*dst == NULL){
+		trace(3,"ERROR malloc dst\n");
+		return JNI_FALSE;
+	}
+	j_str2buf(env, j_path, *dst, (ssize+1));
+
+	return JNI_TRUE;
+}
 void processing_options2prcopt_t(JNIEnv* env, jobject thiz, prcopt_t *dst)
 {
    int string_size;
@@ -104,6 +140,13 @@ void processing_options2prcopt_t(JNIEnv* env, jobject thiz, prcopt_t *dst)
    jobject jarr;
    jobject jsnrmask;
    jclass clazz;
+   pcvs_t pcvr={0};
+   pcv_t *pcv;
+   gtime_t gtime=timeget();
+   int i;
+   #define IGS_08_RELATIVE_PATH "/files/data/igs08.atx"
+   char *antexPath;
+   char *antexFile;
 
    clazz = (*env)->FindClass(env, PROCESSING_OPTIONS_CLASS);
    if (clazz == NULL)
@@ -115,8 +158,8 @@ void processing_options2prcopt_t(JNIEnv* env, jobject thiz, prcopt_t *dst)
 
    *dst = prcopt_default;
 
-#define GET_FIELD(_name, _type) { dst->_name = (*env)->Get ## _type ## Field(env, thiz, ru0xdc_rtklib_prcopt_fields._name); }
-#define GET_FIELD2(_name, _type) (*env)->Get ## _type ## Field(env, thiz, ru0xdc_rtklib_prcopt_fields._name);
+#define GET_FIELD(_name, _type) { dst->_name = (*env)->Get ## _type ## Field(env, thiz, gpsplus_rtklib_prcopt_fields._name); }
+#define GET_FIELD2(_name, _type) (*env)->Get ## _type ## Field(env, thiz, gpsplus_rtklib_prcopt_fields._name);
    GET_FIELD(mode, Int)
    GET_FIELD(soltype, Int)
    GET_FIELD(nf, Int)
@@ -175,10 +218,40 @@ void processing_options2prcopt_t(JNIEnv* env, jobject thiz, prcopt_t *dst)
    dst->rb[1] = GET_FIELD2(baseY, Double)
    dst->rb[2] = GET_FIELD2(baseZ, Double)
 
-   jstr = GET_FIELD2(anttypeBase, Object)
-   j_str2buf(env, jstr, dst->anttype[0], sizeof(dst->anttype[0]));
    jstr = GET_FIELD2(anttypeRover, Object)
+   j_str2buf(env, jstr, dst->anttype[0], sizeof(dst->anttype[0]));
+
+   jstr = GET_FIELD2(anttypeBase, Object)
    j_str2buf(env, jstr, dst->anttype[1], sizeof(dst->anttype[1]));
+
+
+  processing_options_get_applcation_dir(env,thiz,&antexPath);
+
+   if (antexPath) {
+	   antexFile = (char*)malloc((strlen(antexPath)+strlen(IGS_08_RELATIVE_PATH)+2)*sizeof(char));
+	   strcpy(antexFile,antexPath);
+	   strcat(antexFile,IGS_08_RELATIVE_PATH);
+
+	   if (antexFile) {
+		   if ( (strlen(dst->anttype[0])>1) || (strlen(dst->anttype[1])>1) ){
+			   if (!readpcv(antexFile,&pcvr)){
+				   trace(3,"error reading antex antenna file: file=%s\n",antexFile);
+			   }else{
+				   for (i = 0; i < 2; ++i) {
+					   if ((pcv=searchpcv(0,dst->anttype[i],gtime,&pcvr))) {
+						   dst->pcvr[i]=*pcv;
+						   trace(3,"rcv[%d] antenna \"%s\" found in file=%s\n",i,dst->pcvr[i].type,antexFile);
+					   }
+				   }
+				   free(pcvr.pcv);
+			   }
+		   }else{
+			   trace(3,"No antenna for rover nor for base");
+		   }
+		   free(antexFile);
+	   }
+	   free(antexPath);
+   }
 
    dst->antdel[0][0] = GET_FIELD2(antdelRovE, Double)
    dst->antdel[0][1] = GET_FIELD2(antdelRovN, Double)
@@ -220,13 +293,13 @@ static void ProcessingOptions_load_defaults(JNIEnv* env, jobject thiz)
    jobject jarr, jobj;
    const prcopt_t *src = &prcopt_default;
 
-   if (ru0xdc_rtklib_prcopt_fields.mode == NULL) {
+   if (gpsplus_rtklib_prcopt_fields.mode == NULL) {
       if ( ! init_prcopt_fields_methods(env, (*env)->GetObjectClass(env, thiz)))
 	 return;
    }
 
-#define SET_FIELD(_name, _type) { (*env)->Set ## _type ## Field(env, thiz, ru0xdc_rtklib_prcopt_fields._name, src->_name); }
-#define SET_FIELD2(_name, _type, _value) { (*env)->Set ## _type ## Field(env, thiz, ru0xdc_rtklib_prcopt_fields._name, _value); }
+#define SET_FIELD(_name, _type) { (*env)->Set ## _type ## Field(env, thiz, gpsplus_rtklib_prcopt_fields._name, src->_name); }
+#define SET_FIELD2(_name, _type, _value) { (*env)->Set ## _type ## Field(env, thiz, gpsplus_rtklib_prcopt_fields._name, _value); }
    SET_FIELD(mode, Int)
    SET_FIELD(soltype, Int)
    SET_FIELD(nf, Int)
@@ -234,7 +307,7 @@ static void ProcessingOptions_load_defaults(JNIEnv* env, jobject thiz)
    SET_FIELD(elmin, Double)
    {
       // SnrMask
-      jobj = (*env)->GetObjectField(env, thiz, ru0xdc_rtklib_prcopt_fields.snrmask);
+      jobj = (*env)->GetObjectField(env, thiz, gpsplus_rtklib_prcopt_fields.snrmask);
       if (!SnrMask_load(env, jobj, &src->snrmask))
 	 return;
    }
@@ -306,7 +379,7 @@ static void ProcessingOptions_load_defaults(JNIEnv* env, jobject thiz)
       int i;
       jboolean *j_bool_arr;
 
-      jarr = (*env)->GetObjectField(env, thiz, ru0xdc_rtklib_prcopt_fields.exsats);
+      jarr = (*env)->GetObjectField(env, thiz, gpsplus_rtklib_prcopt_fields.exsats);
       j_bool_arr = (*env)->GetBooleanArrayElements(env, jarr, NULL);
       if (j_bool_arr == NULL) return;
       for (i=0; i<sizeof(src->exsats)/sizeof(src->exsats[0]); ++i)
@@ -321,7 +394,7 @@ static void ProcessingOptions_load_defaults(JNIEnv* env, jobject thiz)
    jstr = (*env)->NewStringUTF(env, src->rnxopt[1]);
    SET_FIELD2(rnxoptRover, Object, jstr)
    // posopt
-   jarr = (*env)->GetObjectField(env, thiz, ru0xdc_rtklib_prcopt_fields.posopt);
+   jarr = (*env)->GetObjectField(env, thiz, gpsplus_rtklib_prcopt_fields.posopt);
    (*env)->SetIntArrayRegion(env, jarr, 0,
 	 sizeof(src->posopt)/sizeof(src->posopt[0]), src->posopt);
 
@@ -337,12 +410,12 @@ jboolean SnrMask_load(JNIEnv* env, jobject j_snrmask, const snrmask_t *snrmask)
    if (snrmask == NULL)
       return JNI_FALSE;
 
-   (*env)->SetBooleanField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.enableRover, snrmask->ena[0]);
-   (*env)->SetBooleanField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.enableBase, snrmask->ena[1]);
+   (*env)->SetBooleanField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.enableRover, snrmask->ena[0]);
+   (*env)->SetBooleanField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.enableBase, snrmask->ena[1]);
 
-   j_arr_l1 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL1);
-   j_arr_l2 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL2);
-   j_arr_l5 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL5);
+   j_arr_l1 = (*env)->GetObjectField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.maskL1);
+   j_arr_l2 = (*env)->GetObjectField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.maskL2);
+   j_arr_l5 = (*env)->GetObjectField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.maskL5);
    (*env)->SetDoubleArrayRegion(env, j_arr_l1, 0, sizeof(snrmask->mask[0])/sizeof(snrmask->mask[0][0]), snrmask->mask[0]);
    (*env)->SetDoubleArrayRegion(env, j_arr_l2, 0, sizeof(snrmask->mask[1])/sizeof(snrmask->mask[1][0]), snrmask->mask[1]);
    (*env)->SetDoubleArrayRegion(env, j_arr_l5, 0, sizeof(snrmask->mask[2])/sizeof(snrmask->mask[2][0]), snrmask->mask[2]);
@@ -356,12 +429,12 @@ void SnrMask_save(JNIEnv* env, jobject j_snrmask, snrmask_t *dst)
    if (dst == NULL)
       return;
 
-   dst->ena[0] = (*env)->GetBooleanField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.enableRover);
-   dst->ena[1] = (*env)->GetBooleanField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.enableBase);
+   dst->ena[0] = (*env)->GetBooleanField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.enableRover);
+   dst->ena[1] = (*env)->GetBooleanField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.enableBase);
 
-   j_arr_l1 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL1);
-   j_arr_l2 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL2);
-   j_arr_l5 = (*env)->GetObjectField(env, j_snrmask, ru0xdc_rtklib_snrmask_fields.maskL5);
+   j_arr_l1 = (*env)->GetObjectField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.maskL1);
+   j_arr_l2 = (*env)->GetObjectField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.maskL2);
+   j_arr_l5 = (*env)->GetObjectField(env, j_snrmask, gpsplus_rtklib_snrmask_fields.maskL5);
    (*env)->GetDoubleArrayRegion(env, j_arr_l1, 0, sizeof(dst->mask[0])/sizeof(dst->mask[0][0]), dst->mask[0]);
    (*env)->GetDoubleArrayRegion(env, j_arr_l2, 0, sizeof(dst->mask[1])/sizeof(dst->mask[1][0]), dst->mask[1]);
    (*env)->GetDoubleArrayRegion(env, j_arr_l5, 0, sizeof(dst->mask[2])/sizeof(dst->mask[2][0]), dst->mask[2]);
@@ -374,9 +447,9 @@ static int init_prcopt_fields_methods(JNIEnv* env, jclass clazz)
 {
 
 #define INIT_FIELD(_name, _type) { \
-      ru0xdc_rtklib_prcopt_fields._name = (*env)->GetFieldID(env, clazz, #_name, _type); \
-      if (ru0xdc_rtklib_prcopt_fields._name == NULL) { \
-	 LOGV("ru0xdc/rtklib/ProcessingOptions$Native$%s not found", #_name); \
+      gpsplus_rtklib_prcopt_fields._name = (*env)->GetFieldID(env, clazz, #_name, _type); \
+      if (gpsplus_rtklib_prcopt_fields._name == NULL) { \
+	 LOGV("gpsplus/rtklib/ProcessingOptions$Native$%s not found", #_name); \
 	 return JNI_FALSE; \
       } \
       }
@@ -386,7 +459,7 @@ static int init_prcopt_fields_methods(JNIEnv* env, jclass clazz)
    INIT_FIELD(nf, "I")
    INIT_FIELD(navsys, "I")
    INIT_FIELD(elmin, "D")
-   INIT_FIELD(snrmask, "Lru0xdc/rtklib/ProcessingOptions$SnrMask;")
+   INIT_FIELD(snrmask, "Lgpsplus/rtklib/ProcessingOptions$SnrMask;")
    INIT_FIELD(sateph, "I")
    INIT_FIELD(modear, "I")
    INIT_FIELD(glomodear, "I")
@@ -459,9 +532,9 @@ static int init_prcopt_fields_methods(JNIEnv* env, jclass clazz)
 static int init_snrmask_fields_methods(JNIEnv* env, jclass clazz)
 {
 #define INIT_FIELD(_name, _type) { \
-      ru0xdc_rtklib_snrmask_fields._name = (*env)->GetFieldID(env, clazz, #_name, _type); \
-      if (ru0xdc_rtklib_snrmask_fields._name == NULL) { \
-	 LOGV("ru0xdc/rtklib/ProcessingOptions$SnrMask$%s not found", #_name); \
+      gpsplus_rtklib_snrmask_fields._name = (*env)->GetFieldID(env, clazz, #_name, _type); \
+      if (gpsplus_rtklib_snrmask_fields._name == NULL) { \
+	 LOGV("gpsplus/rtklib/ProcessingOptions$SnrMask$%s not found", #_name); \
 	 return JNI_FALSE; \
       } \
       }
