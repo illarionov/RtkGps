@@ -18,30 +18,26 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.dropbox.sync.android.DbxAccountManager;
-import com.dropbox.sync.android.DbxException;
-import com.dropbox.sync.android.DbxException.Unauthorized;
-import com.dropbox.sync.android.DbxFile;
-import com.dropbox.sync.android.DbxFileSystem;
-import com.dropbox.sync.android.DbxPath;
-import com.dropbox.sync.android.DbxPath.InvalidPathException;
+//import com.dropbox.sync.android.DbxAccountManager;
+//import com.dropbox.sync.android.DbxException;
+//import com.dropbox.sync.android.DbxException.Unauthorized;
+//import com.dropbox.sync.android.DbxFile;
+//import com.dropbox.sync.android.DbxFileSystem;
+//import com.dropbox.sync.android.DbxPath;
+//import com.dropbox.sync.android.DbxPath.InvalidPathException;
 
-import gpsplus.rtkgps.settings.LogBaseFragment;
-import gpsplus.rtkgps.settings.LogRoverFragment;
 import gpsplus.rtkgps.settings.OutputGPXTraceFragment;
-import gpsplus.rtkgps.settings.OutputSolution1Fragment;
-import gpsplus.rtkgps.settings.OutputSolution2Fragment;
 import gpsplus.rtkgps.settings.ProcessingOptions1Fragment;
 import gpsplus.rtkgps.settings.SettingsHelper;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtkgps.settings.StreamBluetoothFragment;
 import gpsplus.rtkgps.settings.StreamBluetoothFragment.Value;
-import gpsplus.rtkgps.settings.StreamFileClientFragment;
+import gpsplus.rtkgps.settings.StreamMobileMapperFragment;
 import gpsplus.rtkgps.settings.StreamUsbFragment;
-import gpsplus.rtkgps.utils.ZipHelper;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.RtkControlResult;
@@ -55,12 +51,7 @@ import gpsplus.rtklib.constants.GeoidModel;
 import gpsplus.rtklib.constants.StreamType;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
 
 public class RtkNaviService extends IntentService implements LocationListener
   {
@@ -109,7 +100,7 @@ public class RtkNaviService extends IntentService implements LocationListener
 
     public static final String ACTION_START = "gpsplus.rtkgps.RtkNaviService.START";
     public static final String ACTION_STOP = "gpsplus.rtkgps.RtkNaviService.STOP";
-    private static final String RTK_GPS_MOCK_LOCATION_SERVICE = "RtkGps mock location service";
+    private static final String RTK_GPS_MOCK_LOC_SERVICE = "RtkGps mock loc service";
     private static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
     private int NOTIFICATION = R.string.local_service_started;
     private RtkCommon rtkCommon;
@@ -124,6 +115,7 @@ public class RtkNaviService extends IntentService implements LocationListener
 
     private BluetoothToRtklib mBtRover, mBtBase;
     private UsbToRtklib mUsbReceiver;
+    private MobileMapperToRtklib mMobileMapperToRtklib;
     private boolean mBoolIsRunning = false;
     private boolean mBoolLocationServiceIsConnected = false;
     private boolean mBoolMockLocationsPref = false;
@@ -238,6 +230,7 @@ public class RtkNaviService extends IntentService implements LocationListener
         if (isServiceStarted()) return;
 
         settings = SettingsHelper.loadSettings(this);
+
         mRtkServer.setServerSettings(settings);
 
         mLStartingTime = System.currentTimeMillis();
@@ -248,6 +241,7 @@ public class RtkNaviService extends IntentService implements LocationListener
 
         startBluetoothPipes();
         startUsb();
+        startMobileMapper();
 
         mCpuLock.acquire();
 
@@ -265,7 +259,7 @@ public class RtkNaviService extends IntentService implements LocationListener
                 if (Settings.Secure.getString(getContentResolver(),
                         Settings.Secure.ALLOW_MOCK_LOCATION).equals("0") )
                 {
-                    Log.e(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock Location is not allowed");
+                    Log.e(RTK_GPS_MOCK_LOC_SERVICE,"Mock Location is not allowed");
                 }else{
                  // Connect to Location Services
                     LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -273,12 +267,12 @@ public class RtkNaviService extends IntentService implements LocationListener
                         locationManager.addTestProvider(GPS_PROVIDER, false, false,
                                 false, false, true, false, true, 0, Criteria.ACCURACY_FINE);
                     } catch (IllegalArgumentException e) {
-                        Log.e(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock Location gps provider already exist");
+                        Log.e(RTK_GPS_MOCK_LOC_SERVICE,"Mock Location gps provider already exist");
                     }
                     locationManager.setTestProviderEnabled(GPS_PROVIDER, true);
                     locationManager.requestLocationUpdates(GPS_PROVIDER, 0, 0, this);
 
-                    Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock Location service was started");
+                    Log.i(RTK_GPS_MOCK_LOC_SERVICE,"Mock Location service was started");
                 }
         }
         GeoidModel model = GeoidModel.valueOf( prefs.getString(SolutionOutputSettingsFragment.KEY_GEOID_MODEL,GeoidModel.EMBEDDED.name()) );
@@ -304,7 +298,7 @@ public class RtkNaviService extends IntentService implements LocationListener
         }
         stop();
         finalizeGpxTrace();
-        syncDropbox();
+//        syncDropbox();
         stopSelf();
     }
 
@@ -312,16 +306,16 @@ public class RtkNaviService extends IntentService implements LocationListener
         if (mBoolGenerateGPXTrace && (mGpxTrace != null))
         {
             SharedPreferences prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
-            if(prefs.getBoolean(OutputGPXTraceFragment.KEY_SYNCDROPBOX, false))
-                {
-                    String szFilename = prefs.getString(OutputGPXTraceFragment.KEY_FILENAME, "");
-                    if (szFilename.length()>0)
-                    {
-                        String szPath = MainActivity.getFileStorageDirectory() + File.separator + szFilename;
-                        mGpxTrace.writeFile(szPath);
-                    }
-
-                }
+//            if(prefs.getBoolean(OutputGPXTraceFragment.KEY_SYNCDROPBOX, false))
+//                {
+//                    String szFilename = prefs.getString(OutputGPXTraceFragment.KEY_FILENAME, "");
+//                    if (szFilename.length()>0)
+//                    {
+//                        String szPath = MainActivity.getFileStorageDirectory() + File.separator + szFilename;
+//                        mGpxTrace.writeFile(szPath);
+//                    }
+//
+//                }
         }
 
     }
@@ -330,7 +324,7 @@ public class RtkNaviService extends IntentService implements LocationListener
     {
         return filename+".zip";
     }
-
+/*
     private String insertDateTimeInDropboxFilename(String file)
     {
         File _file = new File(file);
@@ -452,7 +446,7 @@ public class RtkNaviService extends IntentService implements LocationListener
              }
         }
     }
-
+*/
     private void stop() {
         stopForeground(true);
         if (mCpuLock.isHeld()) mCpuLock.release();
@@ -462,6 +456,7 @@ public class RtkNaviService extends IntentService implements LocationListener
 
             stopBluetoothPipes();
             stopUsb();
+            stopMobileMapper();
             // Tell the user we stopped.
             Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT)
             .show();
@@ -477,18 +472,21 @@ public class RtkNaviService extends IntentService implements LocationListener
     private Notification createForegroundNotification() {
         CharSequence text = getText(R.string.local_service_started);
 
-        Notification notification = new Notification(R.drawable.ic_launcher,
-                text, System.currentTimeMillis());
-
         // The PendingIntent to launch our activity if the user selects this
         // notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class), 0);
 
-        notification.setLatestEventInfo(this,
-                getText(R.string.local_service_label), text, contentIntent);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setContentTitle(getText(R.string.local_service_label));
+        builder.setContentText(text);
+        builder.setContentIntent(contentIntent);
+        builder.setSmallIcon(R.drawable.ic_launcher);
+        builder.setOngoing(true);
+        builder.setNumber(100);
+        builder.setAutoCancel(false);
 
-        return notification;
+        return builder.build();
     }
 
     private class BluetoothCallbacks implements BluetoothToRtklib.Callbacks {
@@ -617,14 +615,31 @@ public class RtkNaviService extends IntentService implements LocationListener
         mBtBase = null;
     }
 
+    private void startMobileMapper()
+    {
+        RtkServerSettings settings = mRtkServer.getServerSettings();
+        final TransportSettings roverSettings;
+        roverSettings = settings.getInputRover().getTransportSettings();
+        if (roverSettings.getType() == StreamType.MOBILEMAPPER) {
+            StreamMobileMapperFragment.Value mobileMapperSettings = (gpsplus.rtkgps.settings.StreamMobileMapperFragment.Value)roverSettings;
+            mMobileMapperToRtklib = new MobileMapperToRtklib(this, mobileMapperSettings.getPath());
+            mMobileMapperToRtklib.start();
+        }
+    }
+
+    private void stopMobileMapper()
+    {
+            mMobileMapperToRtklib.stop();
+    }
+
     private void startUsb() {
         RtkServerSettings settings = mRtkServer.getServerSettings();
 
         {
-            final TransportSettings roverSettngs;
-            roverSettngs = settings.getInputRover().getTransportSettings();
-            if (roverSettngs.getType() == StreamType.USB) {
-                StreamUsbFragment.Value usbSettings = (gpsplus.rtkgps.settings.StreamUsbFragment.Value)roverSettngs;
+            final TransportSettings roverSettings;
+            roverSettings = settings.getInputRover().getTransportSettings();
+            if (roverSettings.getType() == StreamType.USB) {
+                StreamUsbFragment.Value usbSettings = (gpsplus.rtkgps.settings.StreamUsbFragment.Value)roverSettings;
                 mUsbReceiver = new UsbToRtklib(this, usbSettings.getPath());
                 mUsbReceiver.setSerialLineConfiguration(usbSettings.getSerialLineConfiguration());
                 mUsbReceiver.setCallbacks(new UsbCallbacks(RtkServer.RECEIVER_ROVER));
@@ -704,7 +719,7 @@ public class RtkNaviService extends IntentService implements LocationListener
 
                 } catch (InterruptedException e) {
                     mBoolIsRunning = false;
-                    Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location service was interrupted");
+                    Log.i(RTK_GPS_MOCK_LOC_SERVICE,"Mock location service was interrupted");
                 }
             }
           }
@@ -762,14 +777,14 @@ public class RtkNaviService extends IntentService implements LocationListener
     @Override
     public void onProviderDisabled(String arg0) {
         mBoolLocationServiceIsConnected = false;
-        Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location provide "+GPS_PROVIDER+" was disabled");
+        Log.i(RTK_GPS_MOCK_LOC_SERVICE,"Mock location provide "+GPS_PROVIDER+" was disabled");
 
     }
 
     @Override
     public void onProviderEnabled(String arg0) {
         mBoolLocationServiceIsConnected = true;
-        Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location provide "+GPS_PROVIDER+" is enabled");
+        Log.i(RTK_GPS_MOCK_LOC_SERVICE,"Mock location provide "+GPS_PROVIDER+" is enabled");
 
     }
 

@@ -341,6 +341,12 @@ public class SettingsHelper {
         case TCPCLI:
             settings = StreamTcpClientFragment.readSettings(prefs);
             break;
+        case UDPCLI:
+            settings = StreamUdpClientFragment.readSettings(prefs);
+            break;
+        case MOBILEMAPPER:
+            settings = StreamMobileMapperFragment.readSettings(context, prefs, stream);
+            break;
         case BLUETOOTH:
             settings = StreamBluetoothFragment.readSettings(context, prefs, stream);
             break;
@@ -393,11 +399,17 @@ public class SettingsHelper {
         case TCPCLI:
             summary = StreamTcpClientFragment.readSummary(prefs);
             break;
+        case UDPCLI:
+            summary = StreamUdpClientFragment.readSummary(prefs);
+            break;
         case BLUETOOTH:
             summary = StreamBluetoothFragment.readSummary(resources, prefs);
             break;
         case USB:
             summary = StreamUsbFragment.readSummary(resources, prefs);
+            break;
+        case MOBILEMAPPER:
+            summary = StreamMobileMapperFragment.readSummary(prefs);
             break;
         case NONE:
             summary="";

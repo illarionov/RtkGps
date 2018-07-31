@@ -1,4 +1,4 @@
-RtkGps+
+RtkGps+ extended
 =======
 
 RTKLIB rtknavi port on android.
@@ -8,7 +8,7 @@ RTKLIB rtknavi port on android.
 
 #### [rtklib][rtklib] features:
 
-* Version pre 2.4.2p9
+* Version pre 2.4.3b29
 * GPS, GLONASS, Galileo, QZSS, BeiDou and SBAS Navigation systems
 * Single, DGPS/DGNSS, Kinematic, Static, Moving-Baseline, Fixed,
   PPP-Kinematic, PPP-Static and PPP-Fixed positioning modes.
@@ -29,6 +29,7 @@ RTKLIB rtknavi port on android.
 
 * Test mode for obtaining positions from internal GPS (without any RTKLIB function)
 * Bluetooth communication
+* Support for internal Trimble / Spectra Precision MobileMapper 50 internal receiver (U-Blox M8N) 
 * USB OTG communication with speed/parity/stop configuration (ACM, PL2303 chips and alpha for FTDI chips)
 * SiRF IV protocol (experimental)
 * Show altitude in status view if Height/Geodetic is choosen

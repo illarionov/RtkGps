@@ -37,6 +37,7 @@
   <string name="sky_plot_num_of_sat"># de Sat: %d</string>
   <string name="drawer_open">Ouvrir le volet de navigation</string>
   <string name="drawer_close">Fermer le volet de navigation</string>
+  <!-- Navigation drawer -->
   <string name="navdraw_category_server">Serveur</string>
   <string name="navdraw_category_streams">Flux</string>
   <string name="navdraw_category_settings">Paramètres</string>
@@ -57,6 +58,7 @@
   <string name="gtime_format_utc">UTC</string>
   <string name="gtime_format_local">Local</string>
   <string name="gtime_format_gps_tow">GPS TOW</string>
+  <!-- Solution view -->
   <string name="solution_view_solution">Solution:</string>
   <string name="solution_view_geoid">Géoïde:</string>
   <string name="solution_view_crs">CRS:</string>
@@ -121,15 +123,18 @@
     <item>b:</item>
     <item>hauteur:</item>
   </string-array>
+  <!-- PMODE_XXX positioning mode -->
   <string name="pmode_single">Simple</string>
   <string name="pmode_dgps">DGPS/DGNSS</string>
   <string name="pmode_kinema">Cinématique</string>
   <string name="pmode_static">Statique</string>
+  <string name="pmode_statstart">Static — Start</string>
   <string name="pmode_moveb">Base se déplaçant</string>
   <string name="pmode_fixed">Fixe</string>
   <string name="pmode_ppp_kinema">PPP – Cinématique</string>
   <string name="pmode_ppp_static">PPP – Statique</string>
   <string name="pmode_ppp_fixed">PPP – Fixe</string>
+  <!-- SYS_XXX Navigation system -->
   <string name="navsys_none">Aucun</string>
   <string name="navsys_gps">GPS</string>
   <string name="navsys_sbs">SBAS</string>
@@ -138,9 +143,11 @@
   <string name="navsys_qzs">QZSS</string>
   <string name="navsys_cmp">BeiDou</string>
   <string name="navsys_all">Tous</string>
+  <!-- TIMES_XXX Time system -->
   <string name="times_gpst">Heure GPS</string>
   <string name="times_utc">UTC</string>
   <string name="times_jst">JST</string>
+  <!-- SOLQ_XXX Solution status -->
   <string name="solq_none">Aucune</string>
   <string name="solq_fix">Fixe</string>
   <string name="solq_float">Flottante</string>
@@ -150,11 +157,13 @@
   <string name="solq_ppp">PPP</string>
   <string name="solq_dr">Navigation à l\'estime</string>
   <string name="solq_internal">Interne</string>
+  <!-- SOLF_XXX  Solution Format -->
   <string name="solf_llh">Lat/Long/Hauteur</string>
   <string name="solf_xyz">X/Y/Z — ECEF</string>
   <string name="solf_enu">X/Y/Z — Ligne de base</string>
   <string name="solf_nmea">NMEA 0183</string>
   <string name="solf_gsif">GSI-F1/2/3</string>
+  <!-- STRFMT_XXX Stream format -->
   <string name="strfmt_rtcm2">RTCM 2</string>
   <string name="strfmt_rtcm3">RTCM 3</string>
   <string name="strfmt_oem4">NovAtel OEMV/4</string>
@@ -176,6 +185,7 @@
   <string name="strfmt_rnxclk">RINEX CLK</string>
   <string name="strfmt_sbas">SBAS messages</string>
   <string name="strfmt_nmea">NMEA 0183</string>
+  <!-- STR_XXX Stream type -->
   <string name="str_none">Aucun</string>
   <string name="str_serial">Série</string>
   <string name="str_file">Fichier</string>
@@ -186,9 +196,12 @@
   <string name="str_ntripcli">Client NTRIP</string>
   <string name="str_ftp">FTP</string>
   <string name="str_http">HTTP</string>
+  <string name="str_udpcli">Client UDP</string>
   <string name="str_unixsvr">Serveur de socket UNIX</string>
   <string name="str_bluetooth">Bluetooth</string>
+  <string name="str_mobilemapper">MobileMapper 50 interne</string>
   <string name="str_usb">USB</string>
+  <!-- IONOOPT_XXX Ionosphere option -->
   <string name="ionoopt_off">Off</string>
   <string name="ionoopt_brdc">Modèle radiodiffusé</string>
   <string name="ionoopt_sbas">Modèle SBAS</string>
@@ -198,6 +211,7 @@
   <string name="ionoopt_qzs">Modèle radiodiffusé QZSS</string>
   <string name="ionoopt_lex">Ionosphère QZSS LEX</string>
   <string name="ionoopt_stec">Modèle SLANT TEC</string>
+  <!-- TROPOPT_XXX Troposphere option -->
   <string name="tropopt_off">Off</string>
   <string name="tropopt_saas">Modèle Saastamoinen</string>
   <string name="tropopt_sbas">Modèle SBAS</string>
@@ -205,41 +219,50 @@
   <string name="tropopt_estg">Estimation du ZTD+grad</string>
   <string name="tropopt_cor">Correction du ZTD</string>
   <string name="tropopt_corg">Correction du ZTD+grad</string>
+  <!-- GEOID_XXX geoid model -->
   <string name="geoid_embedded">Interne</string>
   <string name="geoid_egm96_m150">EGM96 15x15\'</string>
   <string name="geoid_egm2008_m25">EGM2008 2.5x2.5\'</string>
   <string name="geoid_egm2008_m10">EGM2008 1.0x1.0\'</string>
   <string name="geoid_gsi2000_m15">GSI geoid 2000 1.0x1.5\'</string>
   <string name="geoid_raf09_m15x20">IGN RAF09 1.5x2.0\'</string>
+  <!-- EPHOPT_XXX Exhemeris Options -->
   <string name="ephopt_brdc">Éphémérides radiodiffusées</string>
   <string name="ephopt_prec">Éphémérides précises</string>
   <string name="ephopt_sbas">Radiodiffusées + SBAS</string>
   <string name="ephopt_ssrapc">Radiodiffusées + SSR APC</string>
   <string name="ephopt_ssrcom">Radiodiffusées + SSR CoM</string>
   <string name="ephopt_lex">Éphémérides QZSS LEX</string>
+  <!-- Station position type -->
   <string name="stapos_in_prcopt">Position spécifiée</string>
   <string name="stapos_avg_of_single">Moyenne de position simple</string>
   <string name="stapos_read_from_file">Lire depuis le fichier</string>
   <string name="stapos_rinex_hdr">En-tête RINEX</string>
   <string name="stapos_rtcm_pos">Position de l\'antenne RTCM</string>
+  <!-- Procession options -->
   <string name="procopt_category_processing_options_1">Options de traitement 1</string>
   <string name="procopt_category_solution_options">Options de solution</string>
+  <!-- Positionong mode -->
   <string name="procopt_positioning_mode_title">Algorithme de positionnement</string>
   <string name="procopt_positioning_mode_dialog_title">Sélectionnez l\'algorithme de positionnement</string>
+  <!-- Number of frequencies -->
   <string name="procopt_number_of_freqencies_title">Fréquences</string>
   <string name="procopt_number_of_freqencies_dialog_title">Sélectionnez le nombre de fréquences</string>
   <string-array name="procopt_number_of_frequencies_entries">
     <item>L1</item>
     <item>L1 + L2</item>
     <item>L1 + L2 + L5</item>
+    <item>L1 + L5</item>
   </string-array>
   <string-array name="procopt_number_of_frequencies_values">
     <item>1</item>
     <item>2</item>
     <item>3</item>
   </string-array>
+  <!-- Navigation system -->
   <string name="procopt_navigation_system_title">Système GNSS</string>
   <string name="procopt_navigation_system_dialog_title">Sélectionnez le système GNSS</string>
+  <!-- Elevation mask -->
   <string name="procopt_elevation_mask_title">Masque d\'élévation (°)</string>
   <string name="procopt_elevation_mask_dialog_title">Sélectionnez le masque de l\'élévation (°)</string>
   <string-array name="procopt_elevation_mask_entries">
@@ -259,6 +282,7 @@
     <item>65</item>
     <item>70</item>
   </string-array>
+  <!-- SNR mask -->
   <string name="procopt_snr_mask_title">Masque SNR (dbHz)</string>
   <string name="procopt_snr_mask_dialog_title">Sélectionnez le masque SNR (dbHz)</string>
   <string-array name="procopt_snr_entries">
@@ -272,15 +296,14 @@
     <item>35</item>
     <item>40</item>
   </string-array>
-  <string name="procopt_ambiguity_resolution_title">Résolution des ambiguïtés entières</string>
-  <string name="procopt_ambiguity_resolution_dialog_title">Résolution des ambiguïtés entières</string>
+  <string name="procopt_ambiguity_resolution_title">Résolution des ambiguïtés entières GPS</string>
+  <string name="procopt_ambiguity_resolution_dialog_title">Résolution des ambiguïtés entières GPS</string>
   <string-array name="procopt_ambiguity_resolution_entries">
     <item>Off</item>
     <item>Continue</item>
     <item>Instantanée</item>
     <item>Résoudre et conserver (Fix &amp; Hold)</item>
-    <item>PPP</item>
-    <item>PPP (ILS)</item>
+    <item>PPP-AR</item>
   </string-array>
   <string-array name="procopt_ambiguity_resolution_values">
     <item>0</item>
@@ -288,31 +311,149 @@
     <item>2</item>
     <item>3</item>
     <item>4</item>
-    <item>5</item>
   </string-array>
-  <string name="procopt_min_ratio_to_fix_ambiguity_title">Ratio mini pour résoudre l\'ambiguïté</string>
-  <string name="procopt_min_elevation_to_fix_ambiguity_title">Elévation mini pour résoudre l\'ambiguïté</string>
-  <string name="procopt_min_lock_to_fix_ambiguity_title">Vérouillage mini pour résoudre l\'ambiguïté</string>
+  <string name="procopt_ambiguity_glonass_resolution_title">Résolution des ambiguïtés entières Glonass</string>
+  <string name="procopt_ambiguity_glonass_resolution_dialog_title">Résolution des ambiguïtés entières Glonass</string>
+  <string-array name="procopt_glonass_ambiguity_resolution_entries">
+    <item>Off</item>
+    <item>On</item>
+    <item>Calibration Auto</item>
+    <item>Résoudre et conserver (Fix &amp; Hold)</item>
+  </string-array>
+  <string-array name="procopt_glonass_ambiguity_resolution_values">
+    <item>0</item>
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
+  <string name="procopt_ambiguity_gps_resolution_title">Résolution des ambiguïtés entières GPS</string>
+  <string-array name="procopt_gps_ambiguity_resolution_entries">
+    <item>Off</item>
+    <item>On</item>
+  </string-array>
+  <string-array name="procopt_gps_ambiguity_resolution_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
+  <string name="procopt_ambiguity_bds_resolution_title">Résolution des ambiguïtés entières BeiDou</string>
+  <string name="procopt_ambiguity_bds_resolution_dialog_title">Résolution des ambiguïtés entières BeiDou</string>
+  <string-array name="procopt_bds_ambiguity_resolution_entries">
+    <item>Off</item>
+    <item>On</item>
+  </string-array>
+  <string-array name="procopt_bds_ambiguity_resolution_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
   <string name="procopt_ambiguity_resolution_sub_preference_title">Paramètres de résolution des ambiguïtés entières</string>
+  <!-- implemented so far -->
+  <string name="procopt_min_ratio_to_fix_ambiguity_title">Ratio mini pour résoudre l\'ambiguïté</string>
+  <string name="procopt_min_lock_to_fix_ambiguity_title">Vérouillage mini pour résoudre l\'ambiguïté</string>
+  <string name="procopt_min_elevation_to_fix_ambiguity_title">Elévation mini pour résoudre l\'ambiguïté</string>
+  <!-- implemented from rtkexplorer -->
+  <string name="procopt_max_pos_var_ambiguity_title">Max Pos Var pour résoudre l’ambiguïté</string>
+  <string name="procopt_number_of_ar_iterations_title">Nombre Max itérations AR</string>
+  <string name="procopt_number_of_filter_iterations_title">Nombre de filtre d\'itérations</string>
+  <string name="procopt_max_averaging_epochs_title">Max averaging epochs</string>
+  <string name="procopt_ar_filter_title">Filtrage AR pour rejeter les mauvais sats</string>
+  <string-array name="procopt_ar_filter_entries">
+    <item>Off</item>
+    <item>On</item>
+  </string-array>
+  <string-array name="procopt_ar_filter_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
+  <string name="procopt_min_fix_sats_title">Sats minimum pour résoudre l’ambiguïté entier</string>
+  <string name="procopt_min_hold_sats_title">Sats minimum pour maintenir l’ambiguïté entier</string>
+  <string name="procopt_min_drop_sats_title">Sats minimum pour rejeter en mode AR</string>
+  <string name="procopt_var_hold_amb_title">Variance Fix &amp; Hold (cycle ^ 2)</string>
+  <string name="procopt_gain_hold_amb_title">Gain GLO et SBAS pour ajuster l’ambiguïté</string>
+  <string name="procopt_rcv_stds_title">Utilisation Rcv Std Devs</string>
+  <string-array name="procopt_rcv_stds_entries">
+    <item>Off</item>
+    <item>On</item>
+  </string-array>
+  <string-array name="procopt_rcv_stds_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
+  <string name="procopt_init_rst_title">Init par redémarrage</string>
+  <string-array name="procopt_init_rst_entries">
+    <item>Off</item>
+    <item>On</item>
+  </string-array>
+  <string-array name="procopt_init_rst_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
+  <string name="procopt_out_single_title">Output single solution</string>
+  <string-array name="procopt_out_single_entries">
+    <item>Off</item>
+    <item>On</item>
+  </string-array>
+  <string-array name="procopt_out_single_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
+  <string name="procopt_sync_sol_title">Synchronous solution</string>
+  <string-array name="procopt_sync_sol_entries">
+    <item>Off</item>
+    <item>On</item>
+  </string-array>
+  <string-array name="procopt_sync_sol_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
+  <string name="procopt_freq_opt_title">Disable L2-AR</string>
+  <string-array name="procopt_freq_opt_entries">
+    <item>Off</item>
+    <item>On</item>
+  </string-array>
+  <string-array name="procopt_freq_opt_values">
+    <item>0</item>
+    <item>1</item>
+  </string-array>
+  <string name="procopt_armin_fix_ambiguity_title">Min fix count to hold ambiguity</string>
+  <string name="procopt_min_elevation_to_hold_ambiguity_title">Min elevation to hold ambiguity</string>
+  <!-- not implemented yet all these require numerical values rather than a selection ie on/off-->
+  <string name="procopt_outage_to_reset_ambiguity_title">Outage to reset ambiguity</string>
+  <string name="procopt_slip_threshold_title">Slip threshold (m)</string>
+  <string name="procopt_max_age_of_diff_s_title">Max age of diff (s)</string>
+  <string name="procopt_reject_threshold_of_gdop_title">Reject threshold of GDOP</string>
+  <string name="procopt_reject_threshold_of_innov_title">Reject threshold of innov (m)</string>
+  <!-- not implemented yet from rtkexplorer -->
+  <string name="procopt_min_confidence_to_fix_ambiguity_title">Min confidence to fix ambiguity</string>
+  <string name="procopt_max_fcb_to_fix_ambiguity_title">Max FCB to fix ambiguity</string>
+  <!-- Rec dynamics / Earth tides correction -->
   <string name="procopt_rec_dynamics_title">Dynamique du récepteur</string>
   <string name="procopt_rec_dynamics_summary">Estimation de la vitesse et de l\'accélération du récepteur</string>
   <string name="procopt_rec_earth_tides_correction_title">Correction de la marée terrestre</string>
+  <!-- Ionosphere correction -->
   <string name="procopt_ionosphere_correction_title">Correction de l\'ionosphère</string>
   <string name="procopt_ionosphere_correction_dialog_title">Sélectionnez la méthode de correction de l\'ionosphère</string>
+  <!-- Troposphere correcton -->
   <string name="procopt_troposphere_correction_title">Correction de la troposphère</string>
   <string name="procopt_troposphere_correction_dialog_title">Sélectionnez la méthode de correction de la troposphère</string>
+  <!-- Satellite Ephemeris/Clock -->
   <string name="procopt_satellite_ephemeris_clock_title">Éphémérides/Horloges satellites</string>
   <string name="procopt_satellite_ephemeris_clock_dialog_title">Éphémérides/Horloges satellites</string>
+  <!-- Sat PCV -->
   <string name="procopt_sat_antenna_pcv_title">PCV satellite</string>
   <string name="procopt_sat_antenna_pcv_summary">Utiliser la variation du centre de phase de l\'antenne satellite</string>
+  <!-- Receiver PCV -->
   <string name="procopt_receiver_antenna_pcv_title">PCV récepteur</string>
   <string name="procopt_receiver_antenna_pcv_summary">Utiliser la variation du centre de phase de l\'antenne du récepteur</string>
+  <!-- Phase windup correction -->
   <string name="procopt_phase_windup_correction_title">Correction de l\'effet wind-up</string>
   <string name="procopt_phase_windup_correction_summary">Appliquer la correction de phase wind-up (rotation du satellite sur sa trajectoire décalant ainsi son centre de phase)</string>
+  <!-- Exclude eclipsing sat measurements -->
   <string name="procopt_exclude_eclipsing_sat_measurements_title">Ignorer les satellites disparaissant</string>
   <string name="procopt_exclude_eclipsing_sat_measurements_summary">Exclure les mesures provenant de satellites disparaissants</string>
+  <!-- RAIM FDE -->
   <string name="procopt_raim_fde_title">RAIM FDE</string>
   <string name="procopt_raim_fde_summary">RAIM (Receiver autonomous integrity monitoring) active le contrôle d\'intégrité des signaux GNSS, et exclut les signaux invalides</string>
+  <!-- PROCESSING CYCLE -->
   <string name="procopt_processing_cycle_title">Cycle de traitement (s)</string>
   <string name="procopt_processing_cycle_summary">Régler la fréquence du cycle de traitement des positions fictives et de la trace GPX</string>
   <string-array name="procopt_processing_cycle_entries">
@@ -324,14 +465,19 @@
     <item>30</item>
     <item>60</item>
   </string-array>
+  <!-- Output header -->
   <string name="solopt_output_header_title">En-tête de sortie</string>
   <string name="solopt_output_header_summary">Générer l\'en-tête ou pas</string>
+  <!-- Output mocklocation -->
   <string name="solopt_output_mocklocation_title">Générer des positions GPS fictives</string>
   <string name="solopt_output_mocklocation_summary">La solution sera envoyée vers d\'autres applications en se faisant passer pour le GPS interne</string>
+  <!-- Time format -->
   <string name="solopt_time_format_title">Format de l\'heure</string>
   <string name="solopt_time_format_dialog_title">Définir le format d\'heure</string>
+  <!-- Latitude/Longitude Format -->
   <string name="solopt_lat_lon_format_title">Format Latitude/Longitude</string>
   <string name="solopt_lat_lon_format_dialog_title">Format Latitude/Longitude</string>
+  <!-- Earth tide correction -->
   <string name="earth_tide_correction_off">OFF</string>
   <string name="earth_tide_correction_solid">Solide</string>
   <string name="earth_tide_correction_solid_otl_pole">Solide, océanique, polaire</string>
@@ -343,7 +489,9 @@
     <item>degré</item>
     <item>dms</item>
   </string-array>
+  <!-- Field Separator -->
   <string name="solopt_field_separator_title">Séparateur de champ</string>
+  <!-- Height -->
   <string name="solopt_height_title">Altitude</string>
   <string name="solopt_height_dialog_title">Définissez le type d\'altitude</string>
   <string-array name="solopt_height_entries">
@@ -354,10 +502,13 @@
     <item>Ellipsoïdale</item>
     <item>Géodésique</item>
   </string-array>
+  <!-- Geoid model -->
   <string name="solopt_geoid_model_title">Modèle de géoïde</string>
   <string name="solopt_geoid_model_dialog_title">Sélectionnez le modèle de géoïde</string>
+  <!-- Nmea interval -->
   <string name="solopt_nmea_interval_rmc_gga_title">Intervalle NMEA (s) pour les messages RMC/GGA</string>
   <string name="solopt_nmea_interval_gsa_gsv_title">Intervalle NMEA (s) pour les messages GSA/GSV</string>
+  <!-- Output solution status -->
   <string name="solopt_output_solution_status_title">Trace de la solution</string>
   <string name="solopt_output_solution_status_dialog_title">Régler le niveau de détail dans le fichier de statut de la solution</string>
   <string-array name="solopt_output_solution_status_entries">
@@ -370,6 +521,7 @@
     <item>1</item>
     <item>2</item>
   </string-array>
+  <!-- Debug trace -->
   <string name="solopt_debug_trace_title">Trace de débogage</string>
   <string name="solopt_debug_trace_dialog_title">Régler le niveau de détail du fichier de trace de débogage</string>
   <string-array name="solopt_debug_trace_entries">
@@ -393,6 +545,7 @@
   <string name="solopt_output_customproj4_default">+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs</string>
   <string name="solopt_output_testmode_title">Activer le mode test</string>
   <string name="solopt_output_testmode_summary">Si cette option est activée et Mobile/Base/Correction sont désactivés, RtkGps+ s\'exécute dans un mode spécial de test avec des positions venant du GPS interne. Évidemment aucun algorithme de RTKLIB ne peut fonctionner</string>
+  <!-- Input streams settings -->
   <string name="streams_settings_type_title">Type</string>
   <string name="streams_settings_format_title">Format</string>
   <string name="streams_settings_button_title">Paramètres de flux&#8230;</string>
@@ -421,18 +574,21 @@
     <item>1</item>
     <item>2</item>
   </string-array>
+  <!-- Output stream settings -->
   <string name="output_streams_settings_enable_solution1_title">Activez la Solution 1</string>
   <string name="output_streams_settings_enable_solution2_title">Activez la Solution 2</string>
   <string name="output_streams_settings_enable_gpxtrace_title">Activer la trace GPX</string>
   <string name="output_streams_settings_solution1_tab_title">Solution 1</string>
   <string name="output_streams_settings_solution2_tab_title">Solution 2</string>
   <string name="output_streams_settings_gpxtrace_tab_title">Trace GPX</string>
+  <!-- Log stream settings -->
   <string name="log_streams_settings_enable_rover_title">Log mobile</string>
   <string name="log_streams_settings_enable_base_title">Log base </string>
   <string name="log_streams_settings_enable_correction_title">Log correction</string>
   <string name="log_stream_settings_rover_tab_title">Log Mobile</string>
   <string name="log_stream_settings_base_tab_title">Log Base</string>
   <string name="log_stream_settings_correction_tab_title">Log Correction</string>
+  <!-- NTRIP client stream preferences -->
   <string name="ntrip_client_dialog_title">Paramètres client NTRIP</string>
   <string name="ntrip_client_host_title">Hôte</string>
   <string name="ntrip_client_port_title">Port</string>
@@ -446,10 +602,17 @@
   <string name="file_syncdropbox_summary">A besoin d\'un nom de fichier réel (c\'est à dire: ne contenant ne pas de %Y %m...), le fichier sur Dropbox est renommé selon la date de démarrage.</string>
   <string name="file_zipbeforesync_title">Zipper avant la synchronisation</string>
   <string name="file_zipbeforesync_summary">Compresser ce fichier avant de l\'envoyer à Dropbox</string>
+  <!-- TCP client stream preferences -->
   <string name="tcp_client_dialog_title">Paramètres client TCP</string>
   <string name="tcp_client_host_title">Hôte</string>
   <string name="tcp_client_port_title">Port</string>
+  <!-- UDP client stream preferences -->
+  <string name="udp_client_dialog_title">UDP client settings</string>
+  <string name="udp_client_host_title">Host</string>
+  <string name="udp_client_port_title">Port</string>
+  <!-- File stream preferences -->
   <string name="file_dialog_title">Paramètres du fichier</string>
+  <!-- Bluetooth stream preferences -->
   <string name="bluetooth_dialog_title">Réglage du récepteur Bluetooth</string>
   <string name="bluetooth_device_not_selected">appareil non sélectionné</string>
   <string name="bluetooth_disabled_summary">Activer Bluetooth et sélectionnez le récepteur</string>
@@ -458,6 +621,10 @@
   <string name="bluetooth_system_settings_summary">Afficher les paramètres Bluetooth</string>
   <string name="bluetooth_connected">Bluetooth connecté</string>
   <string name="bluetooth_connection_lost">Bluetooth connexion perdue</string>
+  <!-- MobileMapper stream preferences -->
+  <string name="mobilemapper_dialog_title">MobileMapper 50 internal settings</string>
+  <string name="mobilemapper_autocapture_title">Auto U-Blox Capture</string>
+  <!-- USB stream preferences -->
   <string name="usb_connected">USB connecté</string>
   <string name="usb_connection_lost">Connexion USB perdue</string>
   <string name="usb_dialog_title">Réglage du récepteur USB</string>
@@ -506,17 +673,20 @@
     <item>1</item>
     <item>2</item>
   </string-array>
+  <!-- Startup/shutdown commands preference widget -->
   <string name="send_commands_at_startup">Envoyer des commandes au démarrage</string>
   <string name="send_commands_at_shutdown">Envoyer des commandes à l\'arrêt</string>
   <string name="commands_at_startup">Commandes au démarrage</string>
   <string name="commands_at_shutdown">Commandes à l\'arrêt</string>
   <string name="load_startup_shutdown_commands">Charger</string>
   <string name="load_startup_shutdown_dialog_title">Sélectionnez le fichier</string>
+  <!-- Rover/base position -->
   <string name="station_position_format_llh">Lat/Lon/hauteur (deg/m)</string>
   <string name="station_position_format_llh_dms">Lat/Lon/hauteur (dms/m)</string>
   <string name="station_position_format_ecef">X/Y/Z — ECEF</string>
   <string name="station_position_for_fixed_mode">Pour le mode fixe</string>
   <string name="station_position_for_relative_mode">Pour le mode relatif</string>
+  <!-- StatusView -->
   <string name="status_view_snr">SNR Mobile/Base</string>
   <string name="status_view_snr_l1">SNR Mobile/Base L1</string>
   <string name="status_view_snr_l2">SNR Mobile/Base L2</string>

@@ -15,7 +15,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.BindView;
 import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.R;
 
@@ -43,10 +43,10 @@ public class StartupShutdownSettingsActivity extends Activity {
 
     private String mSharedPrefsName;
 
-    @InjectView(R.id.send_commands_at_startup) CheckBox mSendCommandsAtStartupView;
-    @InjectView(R.id.send_commands_at_shutdown) CheckBox mSendCommandsAtShutdownView;
-    @InjectView(R.id.commands_at_startup) EditText mCommandsAtStartupView;
-    @InjectView(R.id.commands_at_shutdown) EditText mCommandsAtShutdownView;
+    @BindView(R.id.send_commands_at_startup) CheckBox mSendCommandsAtStartupView;
+    @BindView(R.id.send_commands_at_shutdown) CheckBox mSendCommandsAtShutdownView;
+    @BindView(R.id.commands_at_startup) EditText mCommandsAtStartupView;
+    @BindView(R.id.commands_at_shutdown) EditText mCommandsAtShutdownView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,7 +60,7 @@ public class StartupShutdownSettingsActivity extends Activity {
             throw new IllegalArgumentException("ARG_SHARED_PREFS_NAME not defined");
         }
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         loadSettings();
     }

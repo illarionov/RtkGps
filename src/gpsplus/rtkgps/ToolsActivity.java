@@ -26,7 +26,7 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
     @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
-    private final String IGUURLTemplateDir = "ftp://anonymous:world.com@cddis.gsfc.nasa.gov/gps/products/%W/";
+    private final String IGUURLTemplateDir = "ftp://anonymous:world.com@cddis.gsfc.nasa.gov/gnss/products/%W/";
     private final String IGUURLTemplateFileDest = "igu%W%D_%hb.sp3";
     private final String IGUURLTemplateFileCompressExt = ".Z";
     private final String IGUURLTemplate = IGUURLTemplateDir+IGUURLTemplateFileDest+IGUURLTemplateFileCompressExt;

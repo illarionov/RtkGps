@@ -1,5 +1,5 @@
 #/bin/sh
-cd ~/Development/RtkGps
+cd ~/Development/Android/RtkGps
 . ./.crowdin-api-key
 mkdir CROWDIN-TMP
 cd CROWDIN-TMP

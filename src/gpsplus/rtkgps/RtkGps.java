@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.StrictMode;
 import android.util.Log;
+import android.util.PoGoPin;
 
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -37,9 +38,21 @@ public class RtkGps extends Application {
         }
         super.onCreate();
         //ACRA.init(this);
-        System.loadLibrary("proj");
-        Log.v("Proj4","Proj4 version: "+PJ.getVersion());
-        System.loadLibrary("rtkgps");
+        try {
+            System.loadLibrary("proj");
+            Log.v("Proj4", "Proj4 version: " + PJ.getVersion());
+        }
+        catch (Exception e)
+        {
+              Log.e("Error","loadLibrary",e.getCause());
+        }
+        try {
+            System.loadLibrary("rtkgps");
+        }
+        catch (Exception e)
+        {
+            Log.e("Error","loadLibrary",e.getCause());
+        }
         //set version
         PackageInfo pi;
         try {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <EditTextPreference
+        android:key="stream_udp_client_host"
+        android:title="@string/tcp_client_host_title"
+        android:inputType="textUri"
+        />
+    
+    <EditTextPreference
+        android:key="stream_udp_client_port"
+        android:title="@string/tcp_client_port_title"
+        android:inputType="number"
+        />
+    
+
+</PreferenceScreen>

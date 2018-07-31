@@ -36,13 +36,18 @@ public enum StreamType implements IHasRtklibId {
     /** stream type: http */
     HTTP(9, R.string.str_http),
 
+    UDPCLI(13, R.string.str_udpcli),
+
     /** stream type: unix server */
-    UNIXSVR(10, R.string.str_unixsvr),
+    UNIXSVR(15, R.string.str_unixsvr),
 
     // XXX
-    BLUETOOTH(10, R.string.str_bluetooth),
+    BLUETOOTH(15, R.string.str_bluetooth),
 
-    USB(10, R.string.str_usb)
+    USB(15, R.string.str_usb),
+
+    // XXX
+    MOBILEMAPPER(15, R.string.str_mobilemapper),
 
     ;
 

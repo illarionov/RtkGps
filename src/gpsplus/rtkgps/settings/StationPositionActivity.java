@@ -20,7 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.BindView;
 import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.R;
 import gpsplus.rtklib.RtkCommon;
@@ -97,14 +97,14 @@ public class StationPositionActivity extends Activity {
 
     private StationPositionType mPositionType;
 
-    @InjectView(R.id.use_rtcm_antenna_position) CheckBox mUseRtcmPosition;
-    @InjectView(R.id.position_format) Spinner mPositionFormatView;
-    @InjectView(R.id.coord1_title) TextView mCoord1TitleView;
-    @InjectView(R.id.coord2_title) TextView mCoord2TitleView;
-    @InjectView(R.id.coord3_title) TextView mCoord3TitleView;
-    @InjectView(R.id.coord1) EditText mCoord1View;
-    @InjectView(R.id.coord2) EditText mCoord2View;
-    @InjectView(R.id.coord3) EditText mCoord3View;
+    @BindView(R.id.use_rtcm_antenna_position) CheckBox mUseRtcmPosition;
+    @BindView(R.id.position_format) Spinner mPositionFormatView;
+    @BindView(R.id.coord1_title) TextView mCoord1TitleView;
+    @BindView(R.id.coord2_title) TextView mCoord2TitleView;
+    @BindView(R.id.coord3_title) TextView mCoord3TitleView;
+    @BindView(R.id.coord1) EditText mCoord1View;
+    @BindView(R.id.coord2) EditText mCoord2View;
+    @BindView(R.id.coord3) EditText mCoord3View;
 
 
     @Override
@@ -120,7 +120,7 @@ public class StationPositionActivity extends Activity {
         }
         mHideUseRtcm = intent.getBooleanExtra(ARG_HIDE_USE_RTCM, false);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         createPositionFormatAdapter();
         mPositionFormatView.setAdapter(mPositionFormatAdapter);

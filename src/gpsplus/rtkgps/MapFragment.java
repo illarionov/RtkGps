@@ -19,7 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.BindView;
 import gpsplus.rtkgps.geoportail.GeoportailLayer;
 import gpsplus.rtkgps.geoportail.GeoportailWMTSTileSource;
 import gpsplus.rtkgps.view.GTimeView;
@@ -78,10 +78,10 @@ public class MapFragment extends Fragment {
 
     private RtkControlResult mRtkStatus;
 
-    @InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
-    @InjectView(R.id.map_container) ViewGroup mMapViewContainer;
-    @InjectView(R.id.gtimeView) GTimeView mGTimeView;
-    @InjectView(R.id.solutionView) SolutionView mSolutionView;
+    @BindView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
+    @BindView(R.id.map_container) ViewGroup mMapViewContainer;
+    @BindView(R.id.gtimeView) GTimeView mGTimeView;
+    @BindView(R.id.solutionView) SolutionView mSolutionView;
 
     private MapView mMapView;
     private MapTileProviderBase mGeoportailTileProvider;
@@ -121,7 +121,7 @@ public class MapFragment extends Fragment {
         final DisplayMetrics dm;
 
         View v = inflater.inflate(R.layout.fragment_map, container, false);
-        ButterKnife.inject(this, v);
+        ButterKnife.bind(this, v);
 
         context = inflater.getContext();
         dm = context.getResources().getDisplayMetrics();
@@ -254,7 +254,7 @@ public class MapFragment extends Fragment {
         mMyLocationOverlay = null;
         mCompassOverlay = null;
         mScaleBarOverlay = null;
-        ButterKnife.reset(this);
+       // ButterKnife.reset(this);
     }
 
     @Override

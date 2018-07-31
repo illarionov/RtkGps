@@ -48,7 +48,9 @@ public class InputRoverFragment extends PreferenceFragment {
     private static final StreamType INPUT_STREAM_TYPES[] = new StreamType[] {
         StreamType.BLUETOOTH,
         StreamType.USB,
+        StreamType.MOBILEMAPPER,
         StreamType.TCPCLI,
+        StreamType.UDPCLI,
         StreamType.NTRIPCLI,
         StreamType.FILE
     };

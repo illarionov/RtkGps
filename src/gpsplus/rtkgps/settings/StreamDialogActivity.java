@@ -55,6 +55,10 @@ public class StreamDialogActivity extends Activity {
             fragment = new StreamTcpClientFragment();
             title = R.string.tcp_client_dialog_title;
             break;
+        case UDPCLI:
+            fragment = new StreamUdpClientFragment();
+            title = R.string.udp_client_dialog_title;
+            break;
         case FILE:
             fragment = new StreamFileClientFragment();
             title = R.string.file_dialog_title;
@@ -66,6 +70,10 @@ public class StreamDialogActivity extends Activity {
         case USB:
             fragment = new StreamUsbFragment();
             title = R.string.usb_dialog_title;
+            break;
+        case MOBILEMAPPER:
+            fragment = new StreamMobileMapperFragment();
+            title = R.string.mobilemapper_dialog_title;
             break;
         case TCPSVR:
             // TODO

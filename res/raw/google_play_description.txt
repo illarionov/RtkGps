@@ -30,7 +30,7 @@ Since there is no new version I reworked the code for adding some features I nee
 8- can display some maps coming from IGN Geoportail (cadastral parcels, satellite, roads), OpenStreetMap Mapnik, Bing (satellite, roads).
 9- can download and use IGS ultra-rapid ephemeris
 
-This software is a port of RTKLIB 2.4.2p9 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
+This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
 This application can compute precise GPS positions using RTKLIB algorithms (RTK or PPP) but for this you need a supported -external- GPS with raw carrier phase output.
 This is not a "standard" GPS like those embedded into your phone or your car, the cheapest one you can find is something like uBlox LEA-6T .
 THERE IS NO WAY to use the GPS found in Samsung Galaxy(s) nor any phone I seen.

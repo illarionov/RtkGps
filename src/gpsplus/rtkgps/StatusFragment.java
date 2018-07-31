@@ -26,8 +26,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import gpsplus.rtkgps.view.GTimeView;
 import gpsplus.rtkgps.view.GpsSkyView;
 import gpsplus.rtkgps.view.SnrView;
@@ -58,16 +58,16 @@ public class StatusFragment extends Fragment {
     private final RtkServerObservationStatus mRoverObservationStatus, mBaseObservationStatus;
     private RtkControlResult mRtkStatus;
 
-    @InjectView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
-    @InjectView(R.id.gtimeView) GTimeView mGTimeView;
-    @InjectView(R.id.solutionView) SolutionView mSolutionView;
-    @InjectView(R.id.streamStatus) TextView mStreamStatusView;
+    @BindView(R.id.streamIndicatorsView) StreamIndicatorsView mStreamIndicatorsView;
+    @BindView(R.id.gtimeView) GTimeView mGTimeView;
+    @BindView(R.id.solutionView) SolutionView mSolutionView;
+    @BindView(R.id.streamStatus) TextView mStreamStatusView;
 
-    @InjectView(R.id.status_view_spinner) Spinner mStatusViewSpinner;
-    @InjectView(R.id.status_view_container) ViewGroup mStatusViewContainer;
-    @InjectView(R.id.Sky) GpsSkyView mSkyView;
-    @InjectView(R.id.Snr1) SnrView mSnr1View;
-    @InjectView(R.id.Snr2) SnrView mSnr2View;
+    @BindView(R.id.status_view_spinner) Spinner mStatusViewSpinner;
+    @BindView(R.id.status_view_container) ViewGroup mStatusViewContainer;
+    @BindView(R.id.Sky) GpsSkyView mSkyView;
+    @BindView(R.id.Snr1) SnrView mSnr1View;
+    @BindView(R.id.Snr2) SnrView mSnr2View;
 
     private ArrayAdapter<StatusView> mStatusViewSpinnerAdapter;
 
@@ -85,7 +85,7 @@ public class StatusFragment extends Fragment {
             Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_status, container, false);
-        ButterKnife.inject(this, v);
+        ButterKnife.bind(this, v);
 
         return v;
     }
@@ -93,7 +93,7 @@ public class StatusFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.reset(this);
+      //  ButterKnife.reset(this);
     }
 
     @Override
