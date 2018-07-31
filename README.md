@@ -1,4 +1,4 @@
-RtkGps+ extended
+RtkGps+
 =======
 
 RTKLIB rtknavi port on android.
