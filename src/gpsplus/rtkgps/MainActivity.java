@@ -478,6 +478,11 @@ public class MainActivity extends Activity {
     }
 
     @Nonnull
+    public static File getFileInStorageDirectory(String nameWithExtension) {
+        return new File(Environment.getExternalStorageDirectory(), "RtkGps/"+nameWithExtension);
+    }
+
+    @Nonnull
     public static File getLocalSocketPath(Context ctx, String socketName) {
         return ctx.getFileStreamPath(socketName);
     }

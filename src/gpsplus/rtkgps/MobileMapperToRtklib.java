@@ -10,20 +10,28 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.PoGoPin;
 
-import com.spectraprecision.ublox.Message;
+import gpsplus.rtkgps.utils.ublox.Message;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
 import gpsplus.rtkgps.utils.BytesTool;
 import gpsplus.rtkgps.utils.HexString;
+import gpsplus.rtkgps.settings.StreamMobileMapperFragment.Value;
+
+import static gpsplus.rtkgps.settings.StreamMobileMapperFragment.MOBILEMAPPER_INTERNAL_SENSOR_POGOPIN_PORT;
 
 
+@SuppressWarnings("ALL")
 public class MobileMapperToRtklib implements android.location.GpsStatus.Listener, LocationListener {
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
@@ -33,14 +41,18 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
     final LocalSocketThread mLocalSocketThread;
     private static Context mParentContext = null;
     private MobileMapperReceiver mMobileMapperReceiver;
+    private Value mMobileMapperSettings;
     LocationManager locationManager = null;
+    FileOutputStream autoCaptureFileOutputStream = null;
+    File autoCaptureFile=null;
     private int nbSat = 0;
     private boolean isStarting = false;
 
-    public MobileMapperToRtklib(Context parentContext, @Nonnull String localSocketPath) {
+    public MobileMapperToRtklib(Context parentContext, @Nonnull Value mobileMapperSettings) {
         MobileMapperToRtklib.mParentContext = parentContext;
-        mLocalSocketThread = new LocalSocketThread(localSocketPath);
-        mLocalSocketThread.setBindpoint(localSocketPath);
+        this.mMobileMapperSettings = mobileMapperSettings;
+        mLocalSocketThread = new LocalSocketThread(mMobileMapperSettings.getPath());
+        mLocalSocketThread.setBindpoint(mMobileMapperSettings.getPath());
     }
 
     public void start()
@@ -56,9 +68,10 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
 
     public void stop()
     {
+        locationManager.removeUpdates(this);
         mMobileMapperReceiver.cancel();
         mLocalSocketThread.cancel();
-        locationManager.removeUpdates(this);
+
     }
 
 
@@ -89,23 +102,23 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
 
             Iterable<GpsSatellite> satellites = gpsStatus.getSatellites();
             Iterator<GpsSatellite> sat = satellites.iterator();
+            nbSat = 0;
             while (sat.hasNext()) {
                 GpsSatellite satellite = sat.next();
-                nbSat = 0;
                 if (satellite.usedInFix()) {
                     nbSat++;
                     Log.d(TAG, "PRN:" + satellite.getPrn() + ", SNR:" + satellite.getSnr() + ", AZI:" + satellite.getAzimuth() + ", ELE:" + satellite.getElevation());
                 }
-            }
-            if ( (nbSat > 0) && isStarting) // run only if MobileMapper is starting
-                {
-                    Log.i(TAG,"Starting MobileMapper PoGoPin");
-                    mLocalSocketThread.start();
-                    mMobileMapperReceiver.configure();
-                    mMobileMapperReceiver.start();
-                    isStarting = false;
+                if ( (satellite.getPrn()>0) && (satellite.getSnr()>0) && isStarting) // run only if MobileMapper is starting
+                    {
+                        Log.i(TAG,"Starting MobileMapper PoGoPin");
+                        mLocalSocketThread.start();
+                        mMobileMapperReceiver.configure();
+                        mMobileMapperReceiver.start();
+                        isStarting = false;
+                    }
                 }
-        }
+            }
     }
 
     @Override
@@ -161,12 +174,12 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
     {
         private boolean mbIsRunning = false;
 
-        private void sendCommand(byte[] byteArray) {
-            PoGoPin.writeDevice(byteArray, byteArray.length);
+        private int sendCommand(byte[] byteArray) {
+            return PoGoPin.writeDevice(byteArray, byteArray.length);
         }
 
         private void pollAidHui() {
-            PoGoPin.openBeidou("/dev/ttyHSL1");
+            PoGoPin.openBeidou(MOBILEMAPPER_INTERNAL_SENSOR_POGOPIN_PORT);
             sendCommand(Message.pollAidHui());
             PoGoPin.closeBeidou();
         }
@@ -189,40 +202,140 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
             sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.ZDA, (byte) 0));
         }
 
+        public void enableNMEA() {
+            sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.GGA, (byte) 1));
+            sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.GSV, (byte) 1));
+            sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.GST, (byte) 1));
+            sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.GLL, (byte) 1));
+            sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.GSA, (byte) 1));
+            sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.RMC, (byte) 1));
+            sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.VTG, (byte) 1));
+            sendCommand(Message.setNmeaMessageRate(Message.NmeaMsg.ZDA, (byte) 1));
+        }
+
+        public void hotStart() {
+            sendCommand(Message.hotStart());
+        }
+
+        public void coldStart() {
+            sendCommand(Message.coldStart());
+        }
+
+        public void warmStart() {
+            sendCommand(Message.warmStart());
+        }
+
         public void configure()
         {
             if (isMobileMapper()) {
-                PoGoPin.openBeidou("/dev/ttyHSL1");
-                sendCommand(Message.setDynamicMode(Message.DynModel.PORTABLE));
-                sendCommand(Message.enableSbasCorrection());
+                PoGoPin.openBeidou(MOBILEMAPPER_INTERNAL_SENSOR_POGOPIN_PORT);
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    //TODO better handling
+                    e.printStackTrace();
+                }
+                sendCommand(Message.enableSbas());
+                if (mMobileMapperSettings.isForceColdStart()) {
+                    coldStart();
+                }
+                sendCommand(Message.setUbloxDynamicMode(Message.DynModel.getModel(mMobileMapperSettings.getDynamicModel()) ));
+                if (mMobileMapperSettings.isEnableNativeSBAS()) {
+                    sendCommand(Message.enableSbasCorrection());
+                }
                 enableRawData();
+                if (mMobileMapperSettings.isDisableNMEA()) {
+                    disableNMEA();
+                }
                 sendCommand(Message.pollAidHui());
+                PoGoPin.closeBeidou();
             }
         }
 
         @Override
         public void run() {
             mbIsRunning = true;
-            byte[] buffer = new byte[0x20];
+            byte[] buffer = new byte[0x10];
+            ByteBuffer longUbloxBuffer = ByteBuffer.allocate(8*1024);
+
             int count;
-            DatagramSocket datagramSocketReceiver;
-            DatagramPacket packet;
+            DatagramSocket datagramSocketReceiver = null;
+            DatagramPacket packet = null;
             Log.v("Start Read","OK");
 
+    //        PoGoPin.openBeidou(MOBILEMAPPER_INTERNAL_SENSOR_POGOPIN_PORT);
             try {
                 datagramSocketReceiver = new DatagramSocket(MOBILEMAPPER_RAW_PORT, InetAddress.getByName("localhost"));
                    packet = new DatagramPacket(buffer, buffer.length);
+                if (mMobileMapperSettings.isAutocapture()) {
+                    autoCaptureFile = MainActivity.getFileInStorageDirectory("MM50_" + System.currentTimeMillis()+".ubx");
+                    autoCaptureFileOutputStream = new FileOutputStream(autoCaptureFile);
+                    // if file doesnt exists, then create it
+                    if (!autoCaptureFile.exists()) {
+                        autoCaptureFile.createNewFile();
+                    }
+                }
                 while(mbIsRunning) {
                     datagramSocketReceiver.receive(packet);
-                    Log.v("Packet:", "" + packet.getLength());
-                    Log.v("  content:", HexString.bytesToHex(buffer,packet.getLength()));
+                    for (int i=0; i< packet.getLength();i++)
+                    {
+                        byte curByte = packet.getData()[i];
+                        if ( (curByte == Message.SYNC1) && (longUbloxBuffer.position() > 0) )
+                        {
+                            if (longUbloxBuffer.get(longUbloxBuffer.position()-1) ==  Message.SYNC0)
+                            {
+                                //U-Blox sequence is starting
+                                //Flush to log buffer and clear
+                                if ((longUbloxBuffer.position()>1) && (longUbloxBuffer.get(0)==Message.SYNC0) && (longUbloxBuffer.get(1)==Message.SYNC1) ){
+                                    Log.v("  U-Blox RAW data", HexString.bytesToHex(longUbloxBuffer.array(), longUbloxBuffer.position()-1)); // last char is the previous SYNC0
+                                    if (Message.IsChecksumOK(longUbloxBuffer.array(), longUbloxBuffer.position()-1)) {
+                                        Log.v("  U-Blox RAW data","Checksum OK");
+                                    }
+                                }
+
+                                longUbloxBuffer.clear();
+                                longUbloxBuffer.put(Message.SYNC0);
+                            }
+                        }
+                        if(longUbloxBuffer.position() == (longUbloxBuffer.capacity()-1))
+                        {
+                            longUbloxBuffer.clear();
+                            longUbloxBuffer.put(Message.SYNC0);
+                        }
+                        longUbloxBuffer.put(curByte);
+                    }
+                    if (mMobileMapperSettings.isAutocapture()) {
+                        autoCaptureFileOutputStream.write (buffer,0,packet.getLength());
+                        autoCaptureFileOutputStream.flush();
+                    }
+
                     mLocalSocketThread.write(buffer,0,packet.getLength());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            PoGoPin.closeBeidou();
+            if (mMobileMapperSettings.isDisableNMEA()) {
+                enableNMEA();
+            }
+            if (mMobileMapperSettings.isForceColdStart()) {
+                coldStart();
+            }
+  //          PoGoPin.closeBeidou();
+            if (datagramSocketReceiver != null) {
+                if (!datagramSocketReceiver.isClosed()){
+                    datagramSocketReceiver.close();
+                }
+                datagramSocketReceiver.disconnect();
+                datagramSocketReceiver.close();
+            }
+            try {
+                autoCaptureFileOutputStream.close();
+            } catch (IOException e) {
+                //TODO autoCaptureFileOutputStream.close() Handling
+                e.printStackTrace();
+            }
+            packet = null;
+            mLocalSocketThread.cancel();
             Log.v(TAG,"Stop run MobileMapper PoGoPin in to RtkLib socket thread OK");
 
         }

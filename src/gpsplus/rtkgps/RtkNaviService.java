@@ -622,14 +622,17 @@ public class RtkNaviService extends IntentService implements LocationListener
         roverSettings = settings.getInputRover().getTransportSettings();
         if (roverSettings.getType() == StreamType.MOBILEMAPPER) {
             StreamMobileMapperFragment.Value mobileMapperSettings = (gpsplus.rtkgps.settings.StreamMobileMapperFragment.Value)roverSettings;
-            mMobileMapperToRtklib = new MobileMapperToRtklib(this, mobileMapperSettings.getPath());
+            mMobileMapperToRtklib = new MobileMapperToRtklib(this, mobileMapperSettings);
             mMobileMapperToRtklib.start();
         }
     }
 
     private void stopMobileMapper()
     {
+        if (mMobileMapperToRtklib != null) {
             mMobileMapperToRtklib.stop();
+            mMobileMapperToRtklib = null;
+        }
     }
 
     private void startUsb() {
@@ -649,10 +652,10 @@ public class RtkNaviService extends IntentService implements LocationListener
         }
 
         {
-            final TransportSettings baseSettngs;
-            baseSettngs = settings.getInputBase().getTransportSettings();
-            if (baseSettngs.getType() == StreamType.USB) {
-                StreamUsbFragment.Value usbSettings = (gpsplus.rtkgps.settings.StreamUsbFragment.Value)baseSettngs;
+            final TransportSettings baseSettings;
+            baseSettings = settings.getInputBase().getTransportSettings();
+            if (baseSettings.getType() == StreamType.USB) {
+                StreamUsbFragment.Value usbSettings = (gpsplus.rtkgps.settings.StreamUsbFragment.Value)baseSettings;
                 mUsbReceiver = new UsbToRtklib(this, usbSettings.getPath());
                 mUsbReceiver.setSerialLineConfiguration(usbSettings.getSerialLineConfiguration());
                 mUsbReceiver.setCallbacks(new UsbCallbacks(RtkServer.RECEIVER_BASE));
