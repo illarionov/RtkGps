@@ -624,6 +624,30 @@
   <!-- MobileMapper stream preferences -->
   <string name="mobilemapper_dialog_title">MobileMapper 50 internal settings</string>
   <string name="mobilemapper_autocapture_title">Auto U-Blox Capture</string>
+  <string name="stream_mobilemapper_force_coldstart_title">Force cold start</string>
+  <string name="stream_mobilemapper_enable_native_sbas_title">Enable native SBAS</string>
+  <string name="stream_mobilemapper_disable_NMEA_title">Disable NMEA</string>
+  <string name="stream_mobilemapper_dynmodel_title">Dynamic model</string>
+  <string-array name="stream_mobilemapper_dynmodel_entries">
+    <item>AIRBORANE4g</item>
+    <item>AIRBORNE1g</item>
+    <item>AIRBORNE2g</item>
+    <item>AUTOMOTIVE</item>
+    <item>PEDESTRIAN</item>
+    <item>PORTABLE</item>
+    <item>SEA</item>
+    <item>STATIONARY</item>
+  </string-array>
+  <string-array name="stream_mobilemapper_dynmodel_values">
+    <item>8</item>
+    <item>6</item>
+    <item>7</item>
+    <item>4</item>
+    <item>3</item>
+    <item>0</item>
+    <item>5</item>
+    <item>1</item>
+  </string-array>
   <!-- USB stream preferences -->
   <string name="usb_connected">Conectado por USB</string>
   <string name="usb_connection_lost">Conexión USB perdida</string>

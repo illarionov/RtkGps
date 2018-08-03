@@ -10,17 +10,17 @@
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="stream_mobilemapper_force_coldstart"
-        android:title="Force cold start" />
+        android:title="@string/stream_mobilemapper_force_coldstart_title" />
 
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="stream_mobilemapper_enable_native_sbas"
-        android:title="Enable native SBAS" />
+        android:title="@string/stream_mobilemapper_enable_native_sbas_title" />
 
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="stream_mobilemapper_disable_NMEA"
-        android:title="Disable NMEA" />
+        android:title="@string/stream_mobilemapper_disable_NMEA_title" />
 
     <ListPreference
         android:key="stream_mobilemapper_dynmodel"

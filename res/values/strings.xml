@@ -714,6 +714,10 @@
     <!-- MobileMapper stream preferences -->
     <string name="mobilemapper_dialog_title">MobileMapper 50 internal settings</string>
     <string name="mobilemapper_autocapture_title">Auto U-Blox Capture</string>
+    <string name="stream_mobilemapper_force_coldstart_title">Force cold start</string>
+    <string name="stream_mobilemapper_enable_native_sbas_title">Enable native SBAS</string>
+    <string name="stream_mobilemapper_disable_NMEA_title">Disable NMEA</string>
+    <string name="stream_mobilemapper_dynmodel_title">Dynamic model</string>
     <string-array name="stream_mobilemapper_dynmodel_entries">
         <item>AIRBORANE4g</item>
         <item>AIRBORNE1g</item>
