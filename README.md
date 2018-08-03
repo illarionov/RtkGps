@@ -42,10 +42,10 @@ RTKLIB rtknavi port on android.
 
 #### Proj4
 * Due to multiple issues (error in projection and lacks of features) Proj4J was removed and C lib proj4 was added
-* All conversion are done with proj4 4.8.0
+* All conversion are done with proj4 5.1.0
 * French projections are done with IGN certified method, Lambert II extended is computed with IGN certified grid ntf_r93.gsb
 * One custom proj4 specification string can be specified (take care of exact syntax).  
-* all standard proj4 formats and grids are included, all grids from http://download.osgeo.org/proj/proj-datumgrid-1.5.zip are also included. In other words you have access to this external files: alaska, chenyx06etrs.gsb, conus, epsg,esri, esri.extra, FL, GL27, hawaii, IGNF, MD, nad27, nad83, ntf_r93.gsb, ntv1_can.dat, null, nzgd2kgrid0005.gsb, other.extra, proj_def.dat, prvi, stgeorge, strlnc, stpaul, TN, WI, WO, world
+* all standard proj4 formats and grids are included, all grids from http://download.osgeo.org/proj/proj-datumgrid-1.7.zip are also included. In other words you have access to this external files: alaska, chenyx06etrs.gsb, conus, epsg,esri, esri.extra, FL, GL27, hawaii, IGNF, MD, nad27, nad83, ntf_r93.gsb, ntv1_can.dat, null, nzgd2kgrid0005.gsb, other.extra, proj_def.dat, prvi, stgeorge, strlnc, stpaul, TN, WI, WO, world, BETA2007.gsb, egm96_15.gtx
 * If you need another specific "free" or freely distributable grid or definition file, do not hesitate to drop me an email.
 
 #### Geoids
@@ -145,4 +145,4 @@ I already made this translations:
 
 ###### Binary distribution
 
-* the latest apk wich is maybe very instable can be found in bin directory, but prefer the Google Play version
+* the latest apk with Mobile Mapper 50 and proj4 5.1.0 wich is maybe very instable can be found in bin directory, but prefer the Google Play version

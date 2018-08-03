@@ -5,16 +5,16 @@ import android.util.Base64;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 import gpsplus.rtkgps.BuildConfig;
 import gpsplus.rtkgps.ToolsActivity.DownloaderCaller;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.osmdroid.http.HttpClientFactory;
+import cz.msebera.android.httpclient.HttpEntity;
+import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.client.ClientProtocolException;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.client.methods.HttpGet;
+import cz.msebera.android.httpclient.client.methods.HttpUriRequest;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -81,7 +81,7 @@ public class HTTPDownloader extends AsyncTask<Void, Integer, String> {
     protected String doInBackground(Void... arg0) {
         int progress = 0;
         String downloadedFile = null;
-        HttpClient httpClient = HttpClientFactory.createHttpClient();
+        HttpClient httpClient = HttpClientBuilder.create().build();
         HttpUriRequest req = new HttpGet(remoteFile);
         if ((USER != null) && (PASSWORD != null)) {
             String credentials = USER + ":" + PASSWORD;

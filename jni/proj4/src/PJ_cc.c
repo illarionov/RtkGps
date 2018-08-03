@@ -1,19 +1,41 @@
-#define PROJ_PARMS__ \
-	double ap;
 #define PJ_LIB__
-#include	<projects.h>
+
+#include <math.h>
+
+#include "proj.h"
+#include "projects.h"
+
 PROJ_HEAD(cc, "Central Cylindrical") "\n\tCyl, Sph";
 #define EPS10 1.e-10
-FORWARD(s_forward); /* spheroid */
-	if (fabs(fabs(lp.phi) - HALFPI) <= EPS10) F_ERROR;
-	xy.x = lp.lam;
-	xy.y = tan(lp.phi);
-	return (xy);
+
+
+static XY s_forward (LP lp, PJ *P) {           /* Spheroidal, forward */
+    XY xy = {0.0,0.0};
+    if (fabs (fabs(lp.phi) - M_HALFPI) <= EPS10) {
+        proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);
+        return xy;
+    }
+    xy.x = lp.lam;
+    xy.y = tan(lp.phi);
+    return xy;
 }
-INVERSE(s_inverse); /* spheroid */
-	lp.phi = atan(xy.y);
-	lp.lam = xy.x;
-	return (lp);
+
+
+static LP s_inverse (XY xy, PJ *P) {           /* Spheroidal, inverse */
+    LP lp = {0.0,0.0};
+    (void) P;
+    lp.phi = atan(xy.y);
+    lp.lam = xy.x;
+    return lp;
 }
-FREEUP; if (P) pj_dalloc(P); }
-ENTRY0(cc) P->es = 0.; P->inv = s_inverse; P->fwd = s_forward; ENDENTRY(P)
+
+
+
+PJ *PROJECTION(cc) {
+    P->es = 0.;
+
+    P->inv = s_inverse;
+    P->fwd = s_forward;
+
+    return P;
+}

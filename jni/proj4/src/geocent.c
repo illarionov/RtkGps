@@ -320,7 +320,7 @@ void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
 * das Gravitationspotential der Erde. Wiss. Arb. Univ. Hannover
 * Nr. 137, p. 130-131.
 
-* Programmed by GGA- Leibniz-Institue of Applied Geophysics
+* Programmed by GGA- Leibniz-Institute of Applied Geophysics
 *               Stilleweg 2
 *               D-30655 Hannover
 *               Federal Republic of Germany
@@ -344,7 +344,7 @@ void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
 * (e.g. -6300000.m),	algorithm needs about 15 steps.
 */
 
-/* local defintions and variables */
+/* local definitions and variables */
 /* end-criterium of loop, accuracy of sin(Latitude) */
 #define genau   1.E-12
 #define genau2  (genau*genau)
@@ -362,10 +362,8 @@ void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
     double CPHI;     /* cos of searched geodetic latitude */
     double SPHI;     /* sin of searched geodetic latitude */
     double SDPHI;    /* end-criterium: addition-theorem of sin(Latitude(iter)-Latitude(iter-1)) */
-    int At_Pole;     /* indicates location is in polar region */
-    int iter;        /* # of continous iteration, max. 30 is always enough (s.a.) */
+    int iter;        /* # of continuous iteration, max. 30 is always enough (s.a.) */
 
-    At_Pole = FALSE;
     P = sqrt(X*X+Y*Y);
     RR = sqrt(X*X+Y*Y+Z*Z);
 
@@ -373,7 +371,6 @@ void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
     if (P/gi->Geocent_a < genau) {
 
 /*  special case, if P=0. (X=0., Y=0.) */
-        At_Pole = TRUE;
 	*Longitude = 0.;
 
 /*  if (X,Y,Z)=(0.,0.,0.) then Height becomes semi-minor axis
@@ -392,7 +389,7 @@ void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
     }
 
 /* --------------------------------------------------------------
- * Following iterative algorithm was developped by
+ * Following iterative algorithm was developed by
  * "Institut für Erdmessung", University of Hannover, July 1988.
  * Internet: www.ife.uni-hannover.de
  * Iterative computation of CPHI,SPHI and Height.
@@ -417,6 +414,11 @@ void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
 /*  ellipsoidal (geodetic) height */
         *Height = P*CPHI0+Z*SPHI0-RN*(1.0-gi->Geocent_e2*SPHI0*SPHI0);
 
+        /* avoid zero division */
+        if (RN+*Height==0.0) {
+            *Latitude = 0.0;
+            return;
+        }
         RK = gi->Geocent_e2*RN/(RN+*Height);
         RX = 1.0/sqrt(1.0-RK*(2.0-RK)*ST*ST);
         CPHI = ST*(1.0-RK)*RX;
@@ -428,8 +430,7 @@ void pj_Convert_Geocentric_To_Geodetic (GeocentricInfo *gi,
     while (SDPHI*SDPHI > genau2 && iter < maxiter);
 
 /*	ellipsoidal (geodetic) latitude */
-    *Latitude=atan(SPHI/fabs(CPHI));
+    *Latitude=atan2(SPHI, fabs(CPHI));
 
-    return;
 #endif /* defined(USE_ITERATIVE_METHOD) */
 } /* END OF Convert_Geocentric_To_Geodetic */

@@ -9,16 +9,18 @@
 #  endif
 #endif
 
+#include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
-#include <errno.h>
 #include <string.h>
-#include <proj_api.h>
+
+#include "proj_api.h"
 #define EMESS_ROUTINE
 #include "emess.h"
+
 	void
-emess(int code, char *fmt, ...) {
+emess(int code, const char *fmt, ...) {
 	va_list args;
 
 	va_start(args, fmt);
@@ -37,13 +39,18 @@ emess(int code, char *fmt, ...) {
 		putc('\n', stderr);
 	/* if |code|==2, print errno code data */
 	if (code == 2 || code == -2)
-		(void)fprintf(stderr, "Sys errno: %d: %s\n",
-			errno,
+        {
+                int my_errno = errno;
 #ifdef HAVE_STRERROR
-			strerror(errno));
-#else
-			"<system mess. texts unavail.>");
+                const char* my_strerror = strerror(my_errno);
 #endif
+#ifndef HAVE_STRERROR
+                const char* my_strerror = "<system mess. texts unavail.>";
+#endif
+		(void)fprintf(stderr, "Sys errno: %d: %s\n",
+			my_errno, my_strerror);
+        }
+
 	/* post remainder of call data */
 	(void)vfprintf(stderr,fmt,args);
 	va_end(args);

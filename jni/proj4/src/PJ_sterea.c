@@ -3,8 +3,6 @@
 **
 ** Copyright (c) 2003   Gerald I. Evenden
 */
-static const char
-LIBPROJ_ID[] = "$Id: PJ_sterea.c 2022 2011-05-20 13:04:08Z warmerdam $";
 /*
 ** Permission is hereby granted, free of charge, to any person obtaining
 ** a copy of this software and associated documentation files (the
@@ -25,61 +23,93 @@ LIBPROJ_ID[] = "$Id: PJ_sterea.c 2022 2011-05-20 13:04:08Z warmerdam $";
 ** TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 ** SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#define PROJ_PARMS__ \
-	double phic0; \
-	double cosc0, sinc0; \
-	double R2; \
-	void *en;
-
 #define PJ_LIB__
-#include	<projects.h>
+#include <errno.h>
+#include "projects.h"
+#include "proj_math.h"
 
-PROJ_HEAD(sterea, "Oblique Stereographic Alternative")
-	"\n\tAzimuthal, Sph&Ell";
-# define DEL_TOL	1.e-14
-# define MAX_ITER	10
 
-FORWARD(e_forward); /* ellipsoid */
-	double cosc, sinc, cosl, k;
+struct pj_opaque {
+    double phic0;
+    double cosc0, sinc0;
+    double R2;
+    void *en;
+};
 
-	lp = pj_gauss(P->ctx, lp, P->en);
-	sinc = sin(lp.phi);
-	cosc = cos(lp.phi);
-	cosl = cos(lp.lam);
-	k = P->k0 * P->R2 / (1. + P->sinc0 * sinc + P->cosc0 * cosc * cosl);
-	xy.x = k * cosc * sin(lp.lam);
-	xy.y = k * (P->cosc0 * sinc - P->sinc0 * cosc * cosl);
-	return (xy);
+
+PROJ_HEAD(sterea, "Oblique Stereographic Alternative") "\n\tAzimuthal, Sph&Ell";
+
+
+
+static XY e_forward (LP lp, PJ *P) {          /* Ellipsoidal, forward */
+    XY xy = {0.0,0.0};
+    struct pj_opaque *Q = P->opaque;
+    double cosc, sinc, cosl, k;
+
+    lp = pj_gauss(P->ctx, lp, Q->en);
+    sinc = sin(lp.phi);
+    cosc = cos(lp.phi);
+    cosl = cos(lp.lam);
+    k = P->k0 * Q->R2 / (1. + Q->sinc0 * sinc + Q->cosc0 * cosc * cosl);
+    xy.x = k * cosc * sin(lp.lam);
+    xy.y = k * (Q->cosc0 * sinc - Q->sinc0 * cosc * cosl);
+    return xy;
 }
-INVERSE(e_inverse); /* ellipsoid */
-	double rho, c, sinc, cosc;
 
-	xy.x /= P->k0;
-	xy.y /= P->k0;
-	if((rho = hypot(xy.x, xy.y))) {
-		c = 2. * atan2(rho, P->R2);
-		sinc = sin(c);
-		cosc = cos(c);
-		lp.phi = asin(cosc * P->sinc0 + xy.y * sinc * P->cosc0 / rho);
-		lp.lam = atan2(xy.x * sinc, rho * P->cosc0 * cosc -
-			xy.y * P->sinc0 * sinc);
-	} else {
-		lp.phi = P->phic0;
-		lp.lam = 0.;
-	}
-	return(pj_inv_gauss(P->ctx, lp, P->en));
+
+static LP e_inverse (XY xy, PJ *P) {          /* Ellipsoidal, inverse */
+    LP lp = {0.0,0.0};
+    struct pj_opaque *Q = P->opaque;
+    double rho, c, sinc, cosc;
+
+    xy.x /= P->k0;
+    xy.y /= P->k0;
+    if ( (rho = hypot (xy.x, xy.y)) != 0.0 ) {
+        c = 2. * atan2 (rho, Q->R2);
+        sinc = sin (c);
+        cosc = cos (c);
+        lp.phi = asin (cosc * Q->sinc0 + xy.y * sinc * Q->cosc0 / rho);
+        lp.lam = atan2 (xy.x * sinc, rho * Q->cosc0 * cosc - xy.y * Q->sinc0 * sinc);
+    } else {
+        lp.phi = Q->phic0;
+        lp.lam = 0.;
+    }
+    return pj_inv_gauss(P->ctx, lp, Q->en);
 }
-FREEUP; if (P) { if (P->en) free(P->en); free(P); } }
-ENTRYA(sterea)
 
-        P->en=0; 
-ENTRYX
-	double R;
 
-	if (!(P->en = pj_gauss_ini(P->e, P->phi0, &(P->phic0), &R))) E_ERROR_0;
-	P->sinc0 = sin(P->phic0);
-	P->cosc0 = cos(P->phic0);
-	P->R2 = 2. * R;
-	P->inv = e_inverse;
-	P->fwd = e_forward;
-ENDENTRY(P)
+static void *destructor (PJ *P, int errlev) {
+    if (0==P)
+        return 0;
+
+    if (0==P->opaque)
+        return pj_default_destructor (P, errlev);
+
+    pj_dealloc (P->opaque->en);
+    return pj_default_destructor (P, errlev);
+}
+
+
+PJ *PROJECTION(sterea) {
+    double R;
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+
+    if (0==Q)
+        return pj_default_destructor (P, ENOMEM);
+    P->opaque = Q;
+
+    Q->en = pj_gauss_ini(P->e, P->phi0, &(Q->phic0), &R);
+    if (0==Q->en)
+        return pj_default_destructor (P, ENOMEM);
+
+    Q->sinc0 = sin (Q->phic0);
+    Q->cosc0 = cos (Q->phic0);
+    Q->R2 = 2. * R;
+
+    P->inv = e_inverse;
+    P->fwd = e_forward;
+    P->destructor = destructor;
+
+    return P;
+}
+

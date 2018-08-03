@@ -3,8 +3,6 @@
 **
 ** Copyright (c) 2003, 2006   Gerald I. Evenden
 */
-static const char
-LIBPROJ_ID[] = "$Id: proj_mdist.c 1856 2010-06-11 03:26:04Z warmerdam $";
 /*
 ** Permission is hereby granted, free of charge, to any person obtaining
 ** a copy of this software and associated documentation files (the
@@ -29,8 +27,13 @@ LIBPROJ_ID[] = "$Id: proj_mdist.c 1856 2010-06-11 03:26:04Z warmerdam $";
 ** and inverse on unit ellipsoid.
 ** Precision commensurate with double precision.
 */
-#define PROJ_LIB__
-#include <projects.h>
+#define PJ_LIB__
+
+#include <math.h>
+#include <stdlib.h>
+
+#include "projects.h"
+
 #define MAX_ITER 20
 #define TOL 1e-14
 
@@ -40,7 +43,6 @@ struct MDIST {
 	double E;
 	double b[1];
 };
-#define B ((struct MDIST *)b)
 	void *
 proj_mdist_ini(double es) {
 	double numf, numfi, twon1, denf, denfi, ens, T, twon;
@@ -90,34 +92,36 @@ proj_mdist_ini(double es) {
 	return (b);
 }
 	double
-proj_mdist(double phi, double sphi, double cphi, const void *b) {
+proj_mdist(double phi, double sphi, double cphi, const void *data) {
+	const struct MDIST *b = (const struct MDIST *)data;
 	double sc, sum, sphi2, D;
 	int i;
 
 	sc = sphi * cphi;
 	sphi2 = sphi * sphi;
-	D = phi * B->E - B->es * sc / sqrt(1. - B->es * sphi2);
-	sum = B->b[i = B->nb];
-	while (i) sum = B->b[--i] + sphi2 * sum;
+	D = phi * b->E - b->es * sc / sqrt(1. - b->es * sphi2);
+	sum = b->b[i = b->nb];
+	while (i) sum = b->b[--i] + sphi2 * sum;
 	return(D + sc * sum);
 }
 	double
-proj_inv_mdist(projCtx ctx, double dist, const void *b) {
+proj_inv_mdist(projCtx ctx, double dist, const void *data) {
+	const struct MDIST *b = (const struct MDIST *)data;
 	double s, t, phi, k;
 	int i;
 
-	k = 1./(1.- B->es);
+	k = 1./(1.- b->es);
 	i = MAX_ITER;
 	phi = dist;
 	while ( i-- ) {
 		s = sin(phi);
-		t = 1. - B->es * s * s;
+		t = 1. - b->es * s * s;
 		phi -= t = (proj_mdist(phi, s, cos(phi), b) - dist) *
 			(t * sqrt(t)) * k;
 		if (fabs(t) < TOL) /* that is no change */
 			return phi;
 	}
 		/* convergence failed */
-	pj_ctx_set_errno(ctx, -17);
+	pj_ctx_set_errno(ctx, PJD_ERR_NON_CONV_INV_MERI_DIST);
 	return phi;
 }

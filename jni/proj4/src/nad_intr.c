@@ -1,6 +1,9 @@
 /* Determine nad table correction value */
 #define PJ_LIB__
-#include <projects.h>
+#include "proj_internal.h"
+#include "proj_math.h"
+#include "projects.h"
+
 	LP
 nad_intr(LP t, struct CTABLE *ct) {
 	LP val, frct;
@@ -10,8 +13,11 @@ nad_intr(LP t, struct CTABLE *ct) {
 	long index;
 	int in;
 
-	indx.lam = floor(t.lam /= ct->del.lam);
-	indx.phi = floor(t.phi /= ct->del.phi);
+	t.lam /= ct->del.lam;
+	indx.lam = isnan(t.lam) ? 0 : (pj_int32)lround(floor(t.lam));
+	t.phi /= ct->del.phi;
+	indx.phi = isnan(t.phi) ? 0 : (pj_int32)lround(floor(t.phi));
+
 	frct.lam = t.lam - indx.lam;
 	frct.phi = t.phi - indx.phi;
 	val.lam = val.phi = HUGE_VAL;

@@ -6,22 +6,27 @@
 #include <errno.h>
 #include "emess.h"
 #ifndef COEF_LINE_MAX
-#define COEF_LINE_MAX 60
+#define COEF_LINE_MAX 50
 #endif
-	void
-gen_cheb(int inverse, projUV (*proj)(projUV), char *s, PJ *P, int iargc, char **iargv) {
-	int NU = 15, NV = 15, i, res = -1, errin = 0, pwr;
+
+/* FIXME: put the declaration in a header. Also used in proj.c */
+void gen_cheb(int inverse, projUV (*proj)(projUV), char *s, PJ *P,
+              int iargc, char **iargv);
+extern void p_series(Tseries *, FILE *, char *);
+
+void gen_cheb(int inverse, projUV (*proj)(projUV), char *s, PJ *P,
+              int iargc, char **iargv) {
+	int NU = 15, NV = 15, res = -1, errin = 0, pwr;
 	char *arg, fmt[15];
 	projUV low, upp, resid;
 	Tseries *F;
-	extern void p_series(Tseries *, FILE *, char *);
 	double (*input)(const char *, char **);
 
 	input = inverse ? strtod : dmstor;
-	if (*s) low.u = input(s, &s); else ++errin;
-	if (*s == ',') upp.u = input(s+1, &s); else ++errin;
-	if (*s == ',') low.v = input(s+1, &s); else ++errin;
-	if (*s == ',') upp.v = input(s+1, &s); else ++errin;
+	if (*s) low.u = input(s, &s); else { low.u = 0; ++errin; }
+	if (*s == ',') upp.u = input(s+1, &s); else { upp.u = 0; ++errin; }
+	if (*s == ',') low.v = input(s+1, &s); else { low.v = 0; ++errin; }
+	if (*s == ',') upp.v = input(s+1, &s); else { upp.v = 0; ++errin; }
 	if (errin)
 		emess(16,"null or absent -T parameters");
 	if (*s == ',') if (*++s != ',') res = strtol(s, &s, 10);
@@ -33,12 +38,12 @@ gen_cheb(int inverse, projUV (*proj)(projUV), char *s, PJ *P, int iargc, char **
 	if (iargc > 0) { /* proj execution audit trail */
 		int n = 0, L;
 
-		for( i = 0 ; iargc ; --iargc) {
+		for ( ; iargc ; --iargc) {
 			arg = *iargv++;
 			if (*arg != '+') {
 				if (!n) { putchar('#'); ++n; }
 				(void)printf(" %s%n",arg, &L);
-				if ((n += L) > 50) { putchar('\n'); n = 0; }
+				if ((n += L) > COEF_LINE_MAX) { putchar('\n'); n = 0; }
 			}
 		}
 		if (n) putchar('\n');
@@ -48,7 +53,7 @@ gen_cheb(int inverse, projUV (*proj)(projUV), char *s, PJ *P, int iargc, char **
 	if (low.u == upp.u || low.v >= upp.v)
 		emess(16,"approx. argument range error");
 	if (low.u > upp.u)
-		low.u -= TWOPI;
+		low.u -= M_TWOPI;
 	if (NU < 2 || NV < 2)
 		emess(16,"approx. work dimensions (%d %d) too small",NU,NV);
 	if (!(F = mk_cheby(low, upp, pow(10., (double)res)*.5, &resid, proj,

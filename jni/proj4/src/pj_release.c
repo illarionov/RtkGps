@@ -1,11 +1,18 @@
 /* <<< Release Notice for library >>> */
 
-#include <projects.h>
+#include "proj.h"
+#include "projects.h"
 
-char const pj_release[]="Rel. 4.8.0, 6 March 2012";
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
 
-const char *pj_get_release()
+char const pj_release[] =
+    "Rel. "
+    STR(PROJ_VERSION_MAJOR)"."
+    STR(PROJ_VERSION_MINOR)"."
+    STR(PROJ_VERSION_PATCH)", "
+    "June 1st, 2018";
 
-{
+const char *pj_get_release() {
     return pj_release;
 }

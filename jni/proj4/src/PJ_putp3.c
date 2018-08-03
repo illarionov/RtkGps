@@ -1,26 +1,65 @@
-#define PROJ_PARMS__ \
-	double	A;
 #define PJ_LIB__
-# include	<projects.h>
+#include <errno.h>
+#include "projects.h"
+
+struct pj_opaque {
+    double  A;
+};
+
 PROJ_HEAD(putp3, "Putnins P3") "\n\tPCyl., Sph.";
-PROJ_HEAD(putp3p, "Putnins P3'") "\n\tPCyl., no inv., Sph.";
-#define C	0.79788456
-#define RPISQ	0.1013211836
-FORWARD(s_forward); /* spheroid */
-	xy.x = C * lp.lam * (1. - P->A * lp.phi * lp.phi);
-	xy.y = C * lp.phi;
-	return (xy);
+PROJ_HEAD(putp3p, "Putnins P3'") "\n\tPCyl., Sph.";
+
+#define C       0.79788456
+#define RPISQ   0.1013211836
+
+
+static XY s_forward (LP lp, PJ *P) {           /* Spheroidal, forward */
+    XY xy = {0.0,0.0};
+
+    xy.x = C * lp.lam * (1. - P->opaque->A * lp.phi * lp.phi);
+    xy.y = C * lp.phi;
+
+    return xy;
 }
-INVERSE(s_inverse); /* spheroid */
-	lp.phi = xy.y / C;
-	lp.lam = xy.x / (C * (1. - P->A * lp.phi * lp.phi));
-	return (lp);
+
+
+static LP s_inverse (XY xy, PJ *P) {           /* Spheroidal, inverse */
+    LP lp = {0.0,0.0};
+
+    lp.phi = xy.y / C;
+    lp.lam = xy.x / (C * (1. - P->opaque->A * lp.phi * lp.phi));
+
+    return lp;
 }
-FREEUP; if (P) pj_dalloc(P); }
-	static PJ *
-setup(PJ *P) {
-	P->es = 0.; P->inv = s_inverse; P->fwd = s_forward;
-	return P;
+
+
+PJ *PROJECTION(putp3) {
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+    if (0==Q)
+        return pj_default_destructor (P, ENOMEM);
+    P->opaque = Q;
+
+    Q->A = 4. * RPISQ;
+
+    P->es = 0.;
+    P->inv = s_inverse;
+    P->fwd = s_forward;
+
+    return P;
 }
-ENTRY0(putp3)  P->A = 4. * RPISQ; ENDENTRY(setup(P))
-ENTRY0(putp3p) P->A = 2. * RPISQ; ENDENTRY(setup(P))
+
+PJ *PROJECTION(putp3p) {
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+    if (0==Q)
+        return pj_default_destructor (P, ENOMEM);
+    P->opaque = Q;
+
+    Q->A = 2. * RPISQ;
+
+    P->es = 0.;
+    P->inv = s_inverse;
+    P->fwd = s_forward;
+
+    return P;
+}
+

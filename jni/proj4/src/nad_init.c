@@ -1,6 +1,4 @@
 /******************************************************************************
- * $Id: nad_init.c 2142 2012-01-25 19:23:31Z warmerdam $
- *
  * Project:  PROJ.4
  * Purpose:  Load datum shift files into memory.
  * Author:   Frank Warmerdam, warmerdam@pobox.com
@@ -29,20 +27,13 @@
 
 #define PJ_LIB__
 
-#include <projects.h>
-#include <stdio.h>
 #include <errno.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN32_WCE
-/* assert.h includes all Windows API headers and causes 'LP' name clash.
- * Here assert we disable assert() for Windows CE.
- * TODO - mloskot: re-implement porting friendly assert
- */
-# define assert(exp)	((void)0)
-#else
-# include <assert.h>
-#endif /* _WIN32_WCE */
+#include "projects.h"
 
 /************************************************************************/
 /*                             swap_words()                             */
@@ -50,8 +41,8 @@
 /*      Convert the byte order of the given word(s) in place.           */
 /************************************************************************/
 
-static int  byte_order_test = 1;
-#define IS_LSB	(((unsigned char *) (&byte_order_test))[0] == 1)
+static const int  byte_order_test = 1;
+#define IS_LSB	(((const unsigned char *) (&byte_order_test))[0] == 1)
 
 static void swap_words( void *data_in, int word_size, int word_count )
 
@@ -65,7 +56,7 @@ static void swap_words( void *data_in, int word_size, int word_count )
         
         for( i = 0; i < word_size/2; i++ )
         {
-            int	t;
+            unsigned char	t;
             
             t = data[i];
             data[i] = data[word_size-i-1];
@@ -82,25 +73,25 @@ static void swap_words( void *data_in, int word_size, int word_count )
 /*      Load the data portion of a ctable formatted grid.               */
 /************************************************************************/
 
-int nad_ctable_load( projCtx ctx, struct CTABLE *ct, FILE *fid )
+int nad_ctable_load( projCtx ctx, struct CTABLE *ct, PAFile fid )
 
 {
-    int  a_size;
+    size_t a_size;
 
-    fseek( fid, sizeof(struct CTABLE), SEEK_SET );
+    pj_ctx_fseek( ctx, fid, sizeof(struct CTABLE), SEEK_SET );
 
     /* read all the actual shift values */
     a_size = ct->lim.lam * ct->lim.phi;
     ct->cvs = (FLP *) pj_malloc(sizeof(FLP) * a_size);
     if( ct->cvs == NULL 
-        || fread(ct->cvs, sizeof(FLP), a_size, fid) != a_size )
+        || pj_ctx_fread(ctx, ct->cvs, sizeof(FLP), a_size, fid) != a_size )
     {
         pj_dalloc( ct->cvs );
         ct->cvs = NULL;
 
         pj_log( ctx, PJ_LOG_ERROR, 
-                "ctable loading failed on fread() - binary incompatible?\n" );
-        pj_ctx_set_errno( ctx, -38 );
+                "ctable loading failed on fread() - binary incompatible?" );
+        pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
         return 0;
     }
 
@@ -113,7 +104,7 @@ int nad_ctable_load( projCtx ctx, struct CTABLE *ct, FILE *fid )
 /*      Read the header portion of a "ctable" format grid.              */
 /************************************************************************/
 
-struct CTABLE *nad_ctable_init( projCtx ctx, FILE * fid )
+struct CTABLE *nad_ctable_init( projCtx ctx, PAFile fid )
 {
     struct CTABLE *ct;
     int		id_end;
@@ -121,9 +112,10 @@ struct CTABLE *nad_ctable_init( projCtx ctx, FILE * fid )
     /* read the table header */
     ct = (struct CTABLE *) pj_malloc(sizeof(struct CTABLE));
     if( ct == NULL 
-        || fread( ct, sizeof(struct CTABLE), 1, fid ) != 1 )
+        || pj_ctx_fread( ctx, ct, sizeof(struct CTABLE), 1, fid ) != 1 )
     {
-        pj_ctx_set_errno( ctx, -38 );
+        pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
+        pj_dalloc( ct );
         return NULL;
     }
 
@@ -131,12 +123,13 @@ struct CTABLE *nad_ctable_init( projCtx ctx, FILE * fid )
     if( ct->lim.lam < 1 || ct->lim.lam > 100000 
         || ct->lim.phi < 1 || ct->lim.phi > 100000 )
     {
-        pj_ctx_set_errno( ctx, -38 );
+        pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
+        pj_dalloc( ct );
         return NULL;
     }
     
     /* trim white space and newlines off id */
-    for( id_end = strlen(ct->id)-1; id_end > 0; id_end-- )
+    for( id_end = (int)strlen(ct->id)-1; id_end > 0; id_end-- )
     {
         if( ct->id[id_end] == '\n' || ct->id[id_end] == ' ' )
             ct->id[id_end] = '\0';
@@ -155,18 +148,18 @@ struct CTABLE *nad_ctable_init( projCtx ctx, FILE * fid )
 /*      Load the data portion of a ctable2 formatted grid.              */
 /************************************************************************/
 
-int nad_ctable2_load( projCtx ctx, struct CTABLE *ct, FILE *fid )
+int nad_ctable2_load( projCtx ctx, struct CTABLE *ct, PAFile fid )
 
 {
-    int  a_size;
+    size_t a_size;
 
-    fseek( fid, 160, SEEK_SET );
+    pj_ctx_fseek( ctx, fid, 160, SEEK_SET );
 
     /* read all the actual shift values */
     a_size = ct->lim.lam * ct->lim.phi;
     ct->cvs = (FLP *) pj_malloc(sizeof(FLP) * a_size);
     if( ct->cvs == NULL 
-        || fread(ct->cvs, sizeof(FLP), a_size, fid) != a_size )
+        || pj_ctx_fread(ctx, ct->cvs, sizeof(FLP), a_size, fid) != a_size )
     {
         pj_dalloc( ct->cvs );
         ct->cvs = NULL;
@@ -177,13 +170,13 @@ int nad_ctable2_load( projCtx ctx, struct CTABLE *ct, FILE *fid )
             "ctable2 loading failed on fread() - binary incompatible?\n" );
         }
 
-        pj_ctx_set_errno( ctx, -38 );
+        pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
         return 0;
     }
 
     if( !IS_LSB )
     {
-        swap_words( ct->cvs, 4, a_size * 2 );
+        swap_words( ct->cvs, 4, (int)a_size * 2 );
     }
 
     return 1;
@@ -195,15 +188,15 @@ int nad_ctable2_load( projCtx ctx, struct CTABLE *ct, FILE *fid )
 /*      Read the header portion of a "ctable2" format grid.             */
 /************************************************************************/
 
-struct CTABLE *nad_ctable2_init( projCtx ctx, FILE * fid )
+struct CTABLE *nad_ctable2_init( projCtx ctx, PAFile fid )
 {
     struct CTABLE *ct;
     int		id_end;
     char        header[160];
 
-    if( fread( header, sizeof(header), 1, fid ) != 1 )
+    if( pj_ctx_fread( ctx, header, sizeof(header), 1, fid ) != 1 )
     {
-        pj_ctx_set_errno( ctx, -38 );
+        pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
         return NULL;
     }
 
@@ -216,7 +209,7 @@ struct CTABLE *nad_ctable2_init( projCtx ctx, FILE * fid )
     if( strncmp(header,"CTABLE V2",9) != 0 )
     {
         pj_log( ctx, PJ_LOG_ERROR, "ctable2 - wrong header!" );
-        pj_ctx_set_errno( ctx, -38 );
+        pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
         return NULL;
     }
 
@@ -224,7 +217,7 @@ struct CTABLE *nad_ctable2_init( projCtx ctx, FILE * fid )
     ct = (struct CTABLE *) pj_malloc(sizeof(struct CTABLE));
     if( ct == NULL )
     {
-        pj_ctx_set_errno( ctx, -38 );
+        pj_ctx_set_errno( ctx, ENOMEM );
         return NULL;
     }
 
@@ -240,12 +233,13 @@ struct CTABLE *nad_ctable2_init( projCtx ctx, FILE * fid )
     if( ct->lim.lam < 1 || ct->lim.lam > 100000 
         || ct->lim.phi < 1 || ct->lim.phi > 100000 )
     {
-        pj_ctx_set_errno( ctx, -38 );
+        pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
+        pj_dalloc( ct );
         return NULL;
     }
     
     /* trim white space and newlines off id */
-    for( id_end = strlen(ct->id)-1; id_end > 0; id_end-- )
+    for( id_end = (int)strlen(ct->id)-1; id_end > 0; id_end-- )
     {
         if( ct->id[id_end] == '\n' || ct->id[id_end] == ' ' )
             ct->id[id_end] = '\0';
@@ -268,7 +262,7 @@ struct CTABLE *nad_init(projCtx ctx, char *name)
 {
     char 	fname[MAX_PATH_FILENAME+1];
     struct CTABLE *ct;
-    FILE 	*fid;
+    PAFile      fid;
 
     ctx->last_errno = 0;
 
@@ -290,7 +284,7 @@ struct CTABLE *nad_init(projCtx ctx, char *name)
         }
     }
 
-    fclose(fid);
+    pj_ctx_fclose(ctx, fid);
     return ct;
 }
 

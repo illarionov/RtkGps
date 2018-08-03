@@ -1,6 +1,4 @@
 /******************************************************************************
- * $Id: package-info.java 2092 2011-08-27 20:30:36Z desruisseaux $
- *
  * Project:  PROJ.4
  * Purpose:  Java/JNI wrappers for PROJ.4 API.
  * Author:   Martin Desruisseaux

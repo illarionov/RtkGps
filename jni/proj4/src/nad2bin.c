@@ -1,10 +1,10 @@
 /* Convert bivariate ASCII NAD27 to NAD83 tables to NTv2 binary structure */
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #define PJ_LIB__
-#include <projects.h>
+#include "proj_internal.h"
+#include "projects.h"
 #define U_SEC_TO_RAD 4.848136811095359935899141023e-12
 
 /************************************************************************/
@@ -13,8 +13,8 @@
 /*      Convert the byte order of the given word(s) in place.           */
 /************************************************************************/
 
-static int  byte_order_test = 1;
-#define IS_LSB	(((unsigned char *) (&byte_order_test))[0] == 1)
+static const int  byte_order_test = 1;
+#define IS_LSB	(((const unsigned char *) (&byte_order_test))[0] == 1)
 
 static void swap_words( void *data_in, int word_size, int word_count )
 
@@ -28,7 +28,7 @@ static void swap_words( void *data_in, int word_size, int word_count )
         
         for( i = 0; i < word_size/2; i++ )
         {
-            int	t;
+            unsigned char	t;
             
             t = data[i];
             data[i] = data[word_size-i-1];
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 /* ==================================================================== */
     for( i = 1; i < argc; i++ )
     {
-        if( strcmp(argv[i],"-f") == 0 && i < argc-1 ) 
+        if( i < argc-1 && strcmp(argv[i],"-f") == 0 ) 
         {
             format = argv[++i];
         }
@@ -98,10 +98,12 @@ int main(int argc, char **argv) {
 /*      Read the ASCII Table                                            */
 /* ==================================================================== */
 
+    memset(ct.id,0,MAX_TAB_ID);
     if ( NULL == fgets(ct.id, MAX_TAB_ID, stdin) ) {
         perror("fgets");
         exit(1);
     }
+    /* cppcheck-suppress invalidscanf */
     if ( EOF == scanf("%d %d %*d %lf %lf %lf %lf", &ct.lim.lam, &ct.lim.phi,
           &ct.ll.lam, &ct.del.lam, &ct.ll.phi, &ct.del.phi) ) {
         perror("scanf");
@@ -118,6 +120,7 @@ int main(int argc, char **argv) {
     ct.del.phi *= DEG_TO_RAD;
     /* load table */
     for (p = ct.cvs, i = 0; i < ct.lim.phi; ++i) {
+        /* cppcheck-suppress invalidscanf */
         if ( EOF == scanf("%d:%ld %ld", &ichk, &laml, &phil) ) {
             perror("scanf on row");
             exit(1);
@@ -126,16 +129,17 @@ int main(int argc, char **argv) {
             fprintf(stderr,"format check on row\n");
             exit(1);
         }
-        t.lam = laml * U_SEC_TO_RAD;
-        t.phi = phil * U_SEC_TO_RAD;
+        t.lam = (float) (laml * U_SEC_TO_RAD);
+        t.phi = (float) (phil * U_SEC_TO_RAD);
         *p++ = t;
         for (j = 1; j < ct.lim.lam; ++j) {
+            /* cppcheck-suppress invalidscanf */
             if ( EOF == scanf("%ld %ld", &lam, &phi) ) {
                 perror("scanf on column");
                 exit(1);
             }
-            t.lam = (laml += lam) * U_SEC_TO_RAD;
-            t.phi = (phil += phi) * U_SEC_TO_RAD;
+            t.lam = (float) ((laml += lam) * U_SEC_TO_RAD);
+            t.phi = (float) ((phil += phi) * U_SEC_TO_RAD);
             *p++ = t;
         }
     }
@@ -176,8 +180,10 @@ int main(int argc, char **argv) {
             exit(2);
 	}
 
-        assert( MAX_TAB_ID == 80 );
-        assert( sizeof(int) == 4 ); /* for ct.lim.lam/phi */
+	/* cppcheck-suppress sizeofCalculation */
+        STATIC_ASSERT( MAX_TAB_ID == 80 );
+        /* cppcheck-suppress sizeofCalculation */
+        STATIC_ASSERT( sizeof(pj_int32) == 4 ); /* for ct.lim.lam/phi */
 
         memset( header, 0, sizeof(header) );
 
@@ -195,7 +201,7 @@ int main(int argc, char **argv) {
         {
             swap_words( header +  96, 8, 4 );
             swap_words( header + 128, 4, 2 );
-            swap_words( ct.cvs, 4, ct.lim.lam * ct.lim.phi );
+            swap_words( ct.cvs, 4, ct.lim.lam * 2 * ct.lim.phi );
         }
 
         if( fwrite( header, sizeof(header), 1, fp ) != 1 ) {
@@ -266,13 +272,14 @@ int main(int argc, char **argv) {
         {
             unsigned char achHeader[11*16];
             double dfValue;
-            int nGSCount = ct.lim.lam * ct.lim.phi;
+            pj_int32 nGSCount = ct.lim.lam * ct.lim.phi;
             LP ur;
 
             ur.lam = ct.ll.lam + (ct.lim.lam-1) * ct.del.lam;
             ur.phi = ct.ll.phi + (ct.lim.phi-1) * ct.del.phi;
 
-            assert( sizeof(nGSCount) == 4 );
+            /* cppcheck-suppress sizeofCalculation */
+            STATIC_ASSERT( sizeof(nGSCount) == 4 );
 
             memset( achHeader, 0, sizeof(achHeader) );
 
@@ -341,16 +348,14 @@ int main(int argc, char **argv) {
 
             for( row = 0; row < ct.lim.phi; row++ )
             {
-                int	    i;
-
                 for( i = 0; i < ct.lim.lam; i++ )
                 {
                     FLP *cvs = ct.cvs + (row) * ct.lim.lam
                         + (ct.lim.lam - i - 1);
 
                     /* convert radians to seconds */
-                    row_buf[i*4+0] = cvs->phi * (3600.0 / (PI/180.0));
-                    row_buf[i*4+1] = cvs->lam * (3600.0 / (PI/180.0));
+                    row_buf[i*4+0] = (float) (cvs->phi * (3600.0 / (M_PI/180.0)));
+                    row_buf[i*4+1] = (float) (cvs->lam * (3600.0 / (M_PI/180.0)));
 
                     /* We leave the accuracy values as zero */
                 }
@@ -359,7 +364,7 @@ int main(int argc, char **argv) {
                     swap_words( row_buf, 4, ct.lim.lam * 4 );
 
                 if( fwrite( row_buf, sizeof(float), ct.lim.lam*4, fp ) 
-                    != 4 * ct.lim.lam )
+                    != (size_t)( 4 * ct.lim.lam ) )
                 {
                     perror( "write()" );
                     exit( 2 );

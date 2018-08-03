@@ -47,7 +47,7 @@ pj_out27    --- Comparison files for above test procedures.
 pj_out83
 
 The following NADCON conversion files are distributed in separate,
-uncompressed distibution file(s).
+uncompressed distribution file(s).
 
        Ascii source (in delta format) of grid data to convert geographic
 	   coordinates from NAD27 to NAD83
@@ -67,6 +67,3 @@ TN.lla.Z    --- Tennessee
 WI.lla.Z    --- Wisconsin
 WO.lla.Z    --- Washington, Oregon, N. California
 
-	Other grid shift files
-ntv1_can.dat	--- Canadian NTv1 grid shift file (NAD27-->NAD83)
-ntf_r93.gsb	--- French NTv2 grid shift file (NTF-->RGF93)

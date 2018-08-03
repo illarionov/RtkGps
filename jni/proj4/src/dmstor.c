@@ -1,17 +1,21 @@
 /* Convert DMS string to radians */
-#include <projects.h>
-#include <string.h>
+
 #include <ctype.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "projects.h"
 
 static double proj_strtod(char *nptr, char **endptr);
 
-/* following should be sufficient for all but the rediculous */
+/* following should be sufficient for all but the ridiculous */
 #define MAX_WORK 64
 	static const char
 *sym = "NnEeSsWw";
 	static const double
 vm[] = {
-	.0174532925199433,
+	DEG_TO_RAD,
 	.0002908882086657216,
 	.0000048481368110953599
 };
@@ -51,7 +55,7 @@ dmstor_ctx(projCtx ctx, const char *is, char **rs) {
 			n = 2; break;
 		case 'r': case 'R':
 			if (nl) {
-				pj_ctx_set_errno( ctx, -16 );
+				pj_ctx_set_errno( ctx, PJD_ERR_WRONG_FORMAT_DMS_VALUE );
 				return HUGE_VAL;
 			}
 			++s;
@@ -63,7 +67,7 @@ dmstor_ctx(projCtx ctx, const char *is, char **rs) {
 			continue;
 		}
 		if (n < nl) {
-			pj_ctx_set_errno( ctx, -16 );
+			pj_ctx_set_errno( ctx, PJD_ERR_WRONG_FORMAT_DMS_VALUE );
 			return HUGE_VAL;
 		}
 		v += tv * vm[n];
@@ -108,6 +112,6 @@ proj_strtod(char *nptr, char **endptr)
 
     /* no offending characters, just handle normally */
 
-    return strtod(nptr, endptr);
+    return pj_strtod(nptr, endptr);
 }
 

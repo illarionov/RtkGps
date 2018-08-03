@@ -1,6 +1,9 @@
-#include <projects.h>
-/* meridinal distance for ellipsoid and inverse
-**	8th degree - accurate to < 1e-5 meters when used in conjuction
+#include <math.h>
+
+#include "projects.h"
+
+/* meridional distance for ellipsoid and inverse
+**	8th degree - accurate to < 1e-5 meters when used in conjunction
 **		with typical major axis values.
 **	Inverse determines phi to EPS (1e-11) radians, about 1e-6 seconds.
 */
@@ -19,19 +22,23 @@
 #define EPS 1e-11
 #define MAX_ITER 10
 #define EN_SIZE 5
-	double *
-pj_enfn(double es) {
-	double t, *en;
 
-	if ((en = (double *)pj_malloc(EN_SIZE * sizeof(double))) != NULL) {
-		en[0] = C00 - es * (C02 + es * (C04 + es * (C06 + es * C08)));
-		en[1] = es * (C22 - es * (C04 + es * (C06 + es * C08)));
-		en[2] = (t = es * es) * (C44 - es * (C46 + es * C48));
-		en[3] = (t *= es) * (C66 - es * C68);
-		en[4] = t * es * C88;
-	} /* else return NULL if unable to allocate memory */
-	return en;
+double *pj_enfn(double es) {
+    double t, *en;
+
+	en = (double *) pj_malloc(EN_SIZE * sizeof (double));
+	if (0==en)
+	    return 0;
+
+    en[0] = C00 - es * (C02 + es * (C04 + es * (C06 + es * C08)));
+    en[1] = es * (C22 - es * (C04 + es * (C06 + es * C08)));
+    en[2] = (t = es * es) * (C44 - es * (C46 + es * C48));
+    en[3] = (t *= es) * (C66 - es * C68);
+	en[4] = t * es * C88;
+
+    return en;
 }
+
 	double
 pj_mlfn(double phi, double sphi, double cphi, double *en) {
 	cphi *= sphi;
@@ -52,6 +59,6 @@ pj_inv_mlfn(projCtx ctx, double arg, double es, double *en) {
 		if (fabs(t) < EPS)
 			return phi;
 	}
-	pj_ctx_set_errno( ctx, -17 );
+	pj_ctx_set_errno( ctx, PJD_ERR_NON_CONV_INV_MERI_DIST );
 	return phi;
 }

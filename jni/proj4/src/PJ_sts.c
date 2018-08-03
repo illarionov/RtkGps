@@ -1,54 +1,107 @@
-#define PROJ_PARMS__ \
-	double C_x, C_y, C_p; \
-	int tan_mode;
 #define PJ_LIB__
-# include	<projects.h>
-PROJ_HEAD(kav5, "Kavraisky V") "\n\tPCyl., Sph.";
-PROJ_HEAD(qua_aut, "Quartic Authalic") "\n\tPCyl., Sph.";
-PROJ_HEAD(mbt_s, "McBryde-Thomas Flat-Polar Sine (No. 1)") "\n\tPCyl., Sph.";
-PROJ_HEAD(fouc, "Foucaut") "\n\tPCyl., Sph.";
-FORWARD(s_forward); /* spheroid */
+
+#include <errno.h>
+#include <math.h>
+
+#include "projects.h"
+
+PROJ_HEAD(kav5,    "Kavraisky V")         "\n\tPCyl., Sph.";
+PROJ_HEAD(qua_aut, "Quartic Authalic")    "\n\tPCyl., Sph.";
+PROJ_HEAD(fouc,    "Foucaut")             "\n\tPCyl., Sph.";
+PROJ_HEAD(mbt_s,   "McBryde-Thomas Flat-Polar Sine (No. 1)") "\n\tPCyl., Sph.";
+
+
+struct pj_opaque {
+	double C_x, C_y, C_p;
+	int tan_mode;
+};
+
+
+static XY s_forward (LP lp, PJ *P) {           /* Spheroidal, forward */
+    XY xy = {0.0,0.0};
+    struct pj_opaque *Q = P->opaque;
 	double c;
 
-	xy.x = P->C_x * lp.lam * cos(lp.phi);
-	xy.y = P->C_y;
-	lp.phi *= P->C_p;
+	xy.x = Q->C_x * lp.lam * cos(lp.phi);
+	xy.y = Q->C_y;
+	lp.phi *= Q->C_p;
 	c = cos(lp.phi);
-	if (P->tan_mode) {
+	if (Q->tan_mode) {
 		xy.x *= c * c;
-		xy.y *= tan(lp.phi);
+		xy.y *= tan (lp.phi);
 	} else {
 		xy.x /= c;
-		xy.y *= sin(lp.phi);
+		xy.y *= sin (lp.phi);
 	}
-	return (xy);
+	return xy;
 }
-INVERSE(s_inverse); /* spheroid */
+
+
+static LP s_inverse (XY xy, PJ *P) {           /* Spheroidal, inverse */
+    LP lp = {0.0,0.0};
+    struct pj_opaque *Q = P->opaque;
 	double c;
-	
-	xy.y /= P->C_y;
-	c = cos(lp.phi = P->tan_mode ? atan(xy.y) : aasin(P->ctx,xy.y));
-	lp.phi /= P->C_p;
-	lp.lam = xy.x / (P->C_x * cos(lp.phi));
-	if (P->tan_mode)
+
+	xy.y /= Q->C_y;
+	c = cos (lp.phi = Q->tan_mode ? atan (xy.y) : aasin (P->ctx, xy.y));
+	lp.phi /= Q->C_p;
+	lp.lam = xy.x / (Q->C_x * cos(lp.phi));
+	if (Q->tan_mode)
 		lp.lam /= c * c;
 	else
 		lp.lam *= c;
-	return (lp);
+	return lp;
 }
-FREEUP; if (P) pj_dalloc(P); }
-	static PJ *
-setup(PJ *P, double p, double q, int mode) {
-	P->es = 0.;
+
+
+static PJ *setup(PJ *P, double p, double q, int mode) {
+	P->es  = 0.;
 	P->inv = s_inverse;
 	P->fwd = s_forward;
-	P->C_x = q / p;
-	P->C_y = p;
-	P->C_p = 1/ q;
-	P->tan_mode = mode;
+	P->opaque->C_x = q / p;
+	P->opaque->C_y = p;
+	P->opaque->C_p = 1/ q;
+	P->opaque->tan_mode = mode;
 	return P;
 }
-ENTRY0(kav5) ENDENTRY(setup(P, 1.50488, 1.35439, 0))
-ENTRY0(qua_aut) ENDENTRY(setup(P, 2., 2., 0))
-ENTRY0(mbt_s) ENDENTRY(setup(P, 1.48875, 1.36509, 0))
-ENTRY0(fouc) ENDENTRY(setup(P, 2., 2., 1))
+
+
+
+PJ *PROJECTION(fouc) {
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+    if (0==Q)
+        return pj_default_destructor(P, ENOMEM);
+    P->opaque = Q;
+    return setup(P, 2., 2., 1);
+}
+
+
+
+PJ *PROJECTION(kav5) {
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+    if (0==Q)
+        return pj_default_destructor(P, ENOMEM);
+    P->opaque = Q;
+
+    return setup(P, 1.50488, 1.35439, 0);
+}
+
+
+
+PJ *PROJECTION(qua_aut) {
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+    if (0==Q)
+        return pj_default_destructor(P, ENOMEM);
+    P->opaque = Q;
+    return setup(P, 2., 2., 0);
+}
+
+
+
+PJ *PROJECTION(mbt_s) {
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+    if (0==Q)
+        return pj_default_destructor(P, ENOMEM);
+    P->opaque = Q;
+    return setup(P, 1.48875, 1.36509, 0);
+}

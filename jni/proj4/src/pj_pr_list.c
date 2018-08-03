@@ -1,7 +1,11 @@
 /* print projection's list of parameters */
-#include <projects.h>
+
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "projects.h"
+
 #define LINE_LEN 72
 	static int
 pr_list(PJ *P, int not_used) {
@@ -11,7 +15,7 @@ pr_list(PJ *P, int not_used) {
 	(void)putchar('#');
 	for (t = P->params; t; t = t->next)
 		if ((!not_used && t->used) || (not_used && !t->used)) {
-			l = strlen(t->param) + 1;
+			l = (int)strlen(t->param) + 1;
 			if (n + l > LINE_LEN) {
 				(void)fputs("\n#", stdout);
 				n = 2;
@@ -58,9 +62,12 @@ char *pj_get_def( PJ *P, int options )
     paralist *t;
     int l;
     char *definition;
-    int  def_max = 10;
+    size_t def_max = 10;
+    (void) options;
 
     definition = (char *) pj_malloc(def_max);
+    if (!definition)
+        return NULL;
     definition[0] = '\0';
 
     for (t = P->params; t; t = t->next)
@@ -70,16 +77,22 @@ char *pj_get_def( PJ *P, int options )
             continue;
 
         /* grow the resulting string if needed */
-        l = strlen(t->param) + 1;
+        l = (int)strlen(t->param) + 1;
         if( strlen(definition) + l + 5 > def_max )
         {
             char *def2;
 
             def_max = def_max * 2 + l + 5;
             def2 = (char *) pj_malloc(def_max);
-            strcpy( def2, definition );
-            pj_dalloc( definition );
-            definition = def2;
+            if (def2) {
+                strcpy( def2, definition );
+                pj_dalloc( definition );
+                definition = def2;
+            }
+            else {
+                pj_dalloc( definition );
+                return NULL;
+            }
         }
 
         /* append this parameter */

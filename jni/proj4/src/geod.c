@@ -1,6 +1,8 @@
 /* <<<< Geodesic filter program >>>> */
+
+#include "proj.h"
 # include "projects.h"
-# include "geodesic.h"
+# include "geod_interface.h"
 # include "emess.h"
 # include <ctype.h>
 # include <stdio.h>
@@ -19,7 +21,7 @@ inverse = 0;	/* != 0 then inverse geodesic */
 *osform = "%.3f",	/* output format for S */
 pline[50],		/* work string */
 *usage =
-"%s\nusage: %s [ -afFIptTwW [args] ] [ +opts[=arg] ] [ files ]\n";
+"%s\nusage: %s [ -afFIlptwW [args] ] [ +opts[=arg] ] [ files ]\n";
 	static void
 printLL(double p, double l) {
 	if (oform) {
@@ -55,7 +57,7 @@ do_geod(void) {
 	}
 	printLL(phil, laml); putchar('\n');
 }
-	void static	/* file processing function */
+	static void	/* file processing function */
 process(FILE *fid) {
 	char line[MAXLINE+3], *s;
 
@@ -87,8 +89,8 @@ process(FILE *fid) {
 		}
 		if (!*s && (s > line)) --s; /* assumed we gobbled \n */
 		if (pos_azi) {
-			if (al12 < 0.) al12 += TWOPI;
-			if (al21 < 0.) al21 += TWOPI;
+			if (al12 < 0.) al12 += M_TWOPI;
+			if (al21 < 0.) al21 += M_TWOPI;
 		}
 		if (fullout) {
 			printLL(phi1, lam1); TAB;
@@ -127,7 +129,7 @@ static char *pargv[MAX_PARGS];
 static int   pargc = 0;
 
 int main(int argc, char **argv) {
-	char *arg, **eargv = argv, *strnchr();
+	char *arg, **eargv = argv;
 	FILE *fid;
 	static int eargc = 0, c;
 
@@ -175,15 +177,15 @@ noargument:		   emess(1,"missing argument for -%c",*arg);
 				continue;
 			case 'l':
 				if (!arg[1] || arg[1] == 'e') { /* list of ellipsoids */
-                                    struct PJ_ELLPS *le;
+                                    const struct PJ_ELLPS *le;
                                     
-                                    for (le=pj_get_ellps_ref(); le->id ; ++le)
+                                    for (le=proj_list_ellps(); le->id ; ++le)
                                         (void)printf("%9s %-16s %-16s %s\n",
                                                      le->id, le->major, le->ell, le->name);
 				} else if (arg[1] == 'u') { /* list of units */
-                                    struct PJ_UNITS *lu;
+                                    const struct PJ_UNITS *lu;
                                     
-                                    for (lu = pj_get_units_ref();lu->id ; ++lu)
+                                    for (lu = proj_list_units();lu->id ; ++lu)
                                         (void)printf("%12s %-20s %s\n",
                                                      lu->id, lu->to_meter, lu->name);
 				} else

@@ -1,8 +1,6 @@
 /******************************************************************************
- * $Id: pj_latlong.c 1504 2009-01-06 02:11:57Z warmerdam $
- *
  * Project:  PROJ.4
- * Purpose:  Stub projection implementation for lat/long coordinates. We 
+ * Purpose:  Stub projection implementation for lat/long coordinates. We
  *           don't actually change the coordinates, but we want proj=latlong
  *           to act sort of like a projection.
  * Author:   Frank Warmerdam, warmerdam@pobox.com
@@ -31,50 +29,96 @@
 
 /* very loosely based upon DMA code by Bradford W. Drew */
 #define PJ_LIB__
-#include	<projects.h>
+#include "proj_internal.h"
+#include "projects.h"
+
 PROJ_HEAD(lonlat, "Lat/long (Geodetic)")  "\n\t";
 PROJ_HEAD(latlon, "Lat/long (Geodetic alias)")  "\n\t";
 PROJ_HEAD(latlong, "Lat/long (Geodetic alias)")  "\n\t";
 PROJ_HEAD(longlat, "Lat/long (Geodetic alias)")  "\n\t";
 
-FORWARD(forward);
 
-        xy.x = lp.lam / P->a;
-        xy.y = lp.phi / P->a;
-        return xy;
+ static XY latlong_forward(LP lp, PJ *P) {
+    XY xy = {0.0,0.0};
+    (void) P;
+    xy.x = lp.lam;
+    xy.y = lp.phi;
+    return xy;
 }
-INVERSE(inverse);
 
-        lp.phi = xy.y * P->a;
-        lp.lam = xy.x * P->a;
-        return lp;
+
+static LP latlong_inverse(XY xy, PJ *P) {
+    LP lp = {0.0,0.0};
+    (void) P;
+    lp.phi = xy.y;
+    lp.lam = xy.x;
+    return lp;
 }
-FREEUP; if (P) pj_dalloc(P); }
 
-ENTRY0(latlong)
-        P->is_latlong = 1;
-        P->x0 = 0.0;
-        P->y0 = 0.0;
-	P->inv = inverse; P->fwd = forward;
-ENDENTRY(P)
 
-ENTRY0(longlat)
-        P->is_latlong = 1;
-        P->x0 = 0.0;
-        P->y0 = 0.0;
-	P->inv = inverse; P->fwd = forward;
-ENDENTRY(P)
+ static XYZ latlong_forward_3d (LPZ lpz, PJ *P) {
+    XYZ xyz = {0,0,0};
+    (void) P;
+    xyz.x = lpz.lam;
+    xyz.y = lpz.phi;
+    xyz.z = lpz.z;
+    return xyz;
+}
 
-ENTRY0(latlon)
-        P->is_latlong = 1;
-        P->x0 = 0.0;
-        P->y0 = 0.0;
-	P->inv = inverse; P->fwd = forward;
-ENDENTRY(P)
 
-ENTRY0(lonlat)
-        P->is_latlong = 1;
-        P->x0 = 0.0;
-        P->y0 = 0.0;
-	P->inv = inverse; P->fwd = forward;
-ENDENTRY(P)
+static LPZ latlong_inverse_3d (XYZ xyz, PJ *P) {
+    LPZ lpz = {0,0,0};
+    (void) P;
+    lpz.lam = xyz.x;
+    lpz.phi = xyz.y;
+    lpz.z   = xyz.z;
+    return lpz;
+}
+
+static PJ_COORD latlong_forward_4d (PJ_COORD obs, PJ *P) {
+    (void) P;
+    return obs;
+}
+
+
+static PJ_COORD latlong_inverse_4d (PJ_COORD obs, PJ *P) {
+    (void) P;
+    return obs;
+}
+
+
+
+static PJ *latlong_setup (PJ *P) {
+    P->is_latlong = 1;
+    P->x0 = 0;
+    P->y0 = 0;
+    P->inv = latlong_inverse;
+    P->fwd = latlong_forward;
+    P->inv3d = latlong_inverse_3d;
+    P->fwd3d = latlong_forward_3d;
+    P->inv4d = latlong_inverse_4d;
+    P->fwd4d = latlong_forward_4d;
+    P->left = PJ_IO_UNITS_ANGULAR;
+    P->right = PJ_IO_UNITS_ANGULAR;
+    return P;
+}
+
+PJ *PROJECTION(latlong) {
+    return latlong_setup (P);
+}
+
+
+PJ *PROJECTION(longlat) {
+    return latlong_setup (P);
+}
+
+
+PJ *PROJECTION(latlon) {
+    return latlong_setup (P);
+}
+
+
+PJ *PROJECTION(lonlat) {
+    return latlong_setup (P);
+}
+

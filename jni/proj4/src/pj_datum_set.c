@@ -1,6 +1,4 @@
 /******************************************************************************
- * $Id: pj_datum_set.c 1856 2010-06-11 03:26:04Z warmerdam $
- *
  * Project:  PROJ.4
  * Purpose:  Apply datum definition to PJ structure from initialization string.
  * Author:   Frank Warmerdam, warmerda@home.com
@@ -27,8 +25,10 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <projects.h>
+#include <errno.h>
 #include <string.h>
+
+#include "projects.h"
 
 /* SEC_TO_RAD = Pi/180/3600 */
 #define SEC_TO_RAD 4.84813681109535993589914102357e-6
@@ -40,7 +40,7 @@
 int pj_datum_set(projCtx ctx, paralist *pl, PJ *projdef)
 
 {
-    const char *name, *towgs84, *nadgrids;
+    const char *name, *towgs84, *nadgrids, *catalog;
 
     projdef->datum_type = PJD_UNKNOWN;
 
@@ -62,34 +62,65 @@ int pj_datum_set(projCtx ctx, paralist *pl, PJ *projdef)
 
         /* find the end of the list, so we can add to it */
         for (curr = pl; curr && curr->next ; curr = curr->next) {}
-        
+
+        /* cannot happen in practice, but makes static analyzers happy */
+        if( !curr ) return -1;
+
         /* find the datum definition */
         for (i = 0; (s = pj_datums[i].id) && strcmp(name, s) ; ++i) {}
 
-        if (!s) { pj_ctx_set_errno(ctx, -9); return 1; }
+        if (!s) {
+            pj_ctx_set_errno(ctx, PJD_ERR_UNKNOWN_ELLP_PARAM);
+            return 1;
+        }
 
         if( pj_datums[i].ellipse_id && strlen(pj_datums[i].ellipse_id) > 0 )
         {
             char	entry[100];
             
             strcpy( entry, "ellps=" );
-            strncat( entry, pj_datums[i].ellipse_id, 80 );
+            strncpy( entry + strlen(entry), pj_datums[i].ellipse_id,
+                     sizeof(entry) - 1 - strlen(entry) );
+            entry[ sizeof(entry) - 1 ] = '\0';
+
             curr = curr->next = pj_mkparam(entry);
         }
         
         if( pj_datums[i].defn && strlen(pj_datums[i].defn) > 0 )
             curr = curr->next = pj_mkparam(pj_datums[i].defn);
+
+        (void)curr; /* make clang static analyzer happy */
     }
 
 /* -------------------------------------------------------------------- */
 /*      Check for nadgrids parameter.                                   */
 /* -------------------------------------------------------------------- */
-    if( (nadgrids = pj_param(ctx, pl,"snadgrids").s) != NULL )
+    nadgrids = pj_param(ctx, pl,"snadgrids").s;
+    if( nadgrids != NULL )
     {
         /* We don't actually save the value separately.  It will continue
            to exist int he param list for use in pj_apply_gridshift.c */
 
         projdef->datum_type = PJD_GRIDSHIFT;
+    }
+
+/* -------------------------------------------------------------------- */
+/*      Check for grid catalog parameter, and optional date.            */
+/* -------------------------------------------------------------------- */
+    else if( (catalog = pj_param(ctx, pl,"scatalog").s) != NULL )
+    {
+        const char *date;
+
+        projdef->datum_type = PJD_GRIDSHIFT;
+        projdef->catalog_name = pj_strdup(catalog);
+        if (!projdef->catalog_name) {
+            pj_ctx_set_errno(ctx, ENOMEM);
+            return 1;
+        }
+
+        date = pj_param(ctx, pl, "sdate").s;
+        if( date != NULL) 
+            projdef->datum_date = pj_gc_parsedate( ctx, date);
     }
 
 /* -------------------------------------------------------------------- */
@@ -103,10 +134,9 @@ int pj_datum_set(projCtx ctx, paralist *pl, PJ *projdef)
         memset( projdef->datum_params, 0, sizeof(double) * 7);
 
         /* parse out the parameters */
-        s = towgs84;
         for( s = towgs84; *s != '\0' && parm_count < 7; ) 
         {
-            projdef->datum_params[parm_count++] = atof(s);
+            projdef->datum_params[parm_count++] = pj_atof(s);
             while( *s != '\0' && *s != ',' )
                 s++;
             if( *s == ',' )

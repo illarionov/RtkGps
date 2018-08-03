@@ -1,5 +1,5 @@
 /* procedures for evaluating Tseries */
-# include <projects.h>
+# include "projects.h"
 # define NEAR_ONE	1.00001
 static double ceval(struct PW_COEF *C, int n, projUV w, projUV w2) {
     double d=0, dd=0, vd, vdd, tmp, *c;
@@ -37,7 +37,7 @@ bcheval(projUV in, Tseries *T) {
     w.v = ( in.v + in.v - T->a.v ) * T->b.v;
     if (fabs(w.u) > NEAR_ONE || fabs(w.v) > NEAR_ONE) {
         out.u = out.v = HUGE_VAL;
-        pj_errno = -36;
+        pj_errno = PJD_ERR_TCHEBY_VAL_OUT_OF_RANGE;
     } else { /* double evaluation */
         w2.u = w.u + w.u;
         w2.v = w.v + w.v;

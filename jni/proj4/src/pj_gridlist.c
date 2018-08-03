@@ -1,6 +1,4 @@
 /******************************************************************************
- * $Id: pj_gridlist.c 1990 2011-03-28 18:06:43Z warmerdam $
- *
  * Project:  PROJ.4
  * Purpose:  Code to manage the list of currently loaded (cached) PJ_GRIDINFOs
  *           See pj_gridinfo.c for details of loading individual grids.
@@ -30,21 +28,14 @@
 
 #define PJ_LIB__
 
-#include <projects.h>
+#include <errno.h>
+#include <stddef.h>
 #include <string.h>
-#include <math.h>
 
-#ifdef _WIN32_WCE
-/* assert.h includes all Windows API headers and causes 'LP' name clash.
- * Here assert we disable assert() for Windows CE.
- * TODO - mloskot: re-implement porting friendly assert
- */
-# define assert(exp)	((void)0)
-#else
-# include <assert.h>
-#endif /* _WIN32_WCE */
+#include "projects.h"
 
 static PJ_GRIDINFO *grid_list = NULL;
+#define PJ_MAX_PATH_LENGTH 1024
 
 /************************************************************************/
 /*                        pj_deallocate_grids()                         */
@@ -93,7 +84,7 @@ static int pj_gridlist_merge_gridfile( projCtx ctx,
         {
             got_match = 1;
 
-            /* dont add to the list if it is invalid. */
+            /* don't add to the list if it is invalid. */
             if( this_grid->ct == NULL )
                 return 0;
 
@@ -103,11 +94,15 @@ static int pj_gridlist_merge_gridfile( projCtx ctx,
                 PJ_GRIDINFO **new_list;
                 int new_max = *p_gridmax + 20;
 
-                new_list = (PJ_GRIDINFO **) pj_malloc(sizeof(void*) * new_max);
+                new_list = (PJ_GRIDINFO **) pj_calloc(new_max, sizeof(void *));
+                if (!new_list) {
+                    pj_ctx_set_errno( ctx, ENOMEM );
+                    return 0;
+                }
                 if( *p_gridlist != NULL )
                 {
                     memcpy( new_list, *p_gridlist,
-                            sizeof(void*) * (*p_gridmax) );
+                            sizeof(void *) * (*p_gridmax) );
                     pj_dalloc( *p_gridlist );
                 }
 
@@ -133,8 +128,6 @@ static int pj_gridlist_merge_gridfile( projCtx ctx,
 
     if( this_grid == NULL )
     {
-        /* we should get at least a stub grid with a missing "ct" member */
-        assert( FALSE );
         return 0;
     }
     
@@ -178,9 +171,9 @@ PJ_GRIDINFO **pj_gridlist_from_nadgrids( projCtx ctx, const char *nadgrids,
 /* -------------------------------------------------------------------- */
     for( s = nadgrids; *s != '\0'; )
     {
-        int   end_char;
-        int   required = 1;
-        char  name[128];
+        size_t end_char;
+        int    required = 1;
+        char   name[PJ_MAX_PATH_LENGTH];
 
         if( *s == '@' )
         {
@@ -194,7 +187,8 @@ PJ_GRIDINFO **pj_gridlist_from_nadgrids( projCtx ctx, const char *nadgrids,
 
         if( end_char >= sizeof(name) )
         {
-            pj_ctx_set_errno( ctx, -38 );
+            pj_dalloc( gridlist );
+            pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
             pj_release_lock();
             return NULL;
         }
@@ -210,7 +204,8 @@ PJ_GRIDINFO **pj_gridlist_from_nadgrids( projCtx ctx, const char *nadgrids,
                                          &grid_max) 
             && required )
         {
-            pj_ctx_set_errno( ctx, -38 );
+            pj_dalloc( gridlist );
+            pj_ctx_set_errno( ctx, PJD_ERR_FAILED_TO_LOAD_GRID );
             pj_release_lock();
             return NULL;
         }

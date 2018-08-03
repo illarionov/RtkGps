@@ -6,7 +6,7 @@ struct EMESS {
 	char	*File_name,	/* input file name */
 			*Prog_name;	/* name of program */
 	int		File_line;	/* approximate line read
-							where error occured */
+							where error occurred */
 };
 
 #ifdef EMESS_ROUTINE	/* use type */
@@ -21,8 +21,9 @@ extern char *sys_errlist[];
 #else	/* for for calling procedures */
 
 extern struct EMESS emess_dat;
-void emess(int, char *, ...);
 
 #endif /* use type */
+
+void emess(int, const char *, ...);
 
 #endif /* end EMESS_H */

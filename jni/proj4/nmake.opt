@@ -22,9 +22,9 @@ PROJ_LIB_DIR=$(INSTDIR)\SHARE
 # Uncomment the first for an optimized build, or the second for debug.
 !IFNDEF OPTFLAGS
 !IFNDEF DEBUG
-OPTFLAGS=	/nologo /Ox /Op /MD
+OPTFLAGS=	/Ox /Op /MD
 !ELSE
-OPTFLAGS=	/nologo /Zi /MD /Fdproj.pdb
+OPTFLAGS=	/Zi /MDd /Fdproj.pdb
 !ENDIF
 !ENDIF
 

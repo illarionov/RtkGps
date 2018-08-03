@@ -1,9 +1,8 @@
 /******************************************************************************
- * $Id: PJ_airy.c 1856 2010-06-11 03:26:04Z warmerdam $
- *
  * Project:  PROJ.4
  * Purpose:  Implementation of the airy (Airy) projection.
- * Author:   Gerald Evenden
+ * Author:   Gerald Evenden (1995)
+ *           Thomas Knudsen (2016) - revise/add regression tests
  *
  ******************************************************************************
  * Copyright (c) 1995, Gerald Evenden
@@ -27,98 +26,126 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#define PROJ_PARMS__ \
-	double	p_halfpi; \
-	double	sinph0; \
-	double	cosph0; \
-	double	Cb; \
-	int		mode; \
-	int		no_cut;	/* do not cut at hemisphere limit */
 #define PJ_LIB__
-#include <projects.h>
-
-PJ_CVSID("$Id: PJ_airy.c 1856 2010-06-11 03:26:04Z warmerdam $");
+#include "proj.h"
+#include <errno.h>
+#include "projects.h"
 
 PROJ_HEAD(airy, "Airy") "\n\tMisc Sph, no inv.\n\tno_cut lat_b=";
 
+
+enum Mode {
+    N_POLE = 0,
+    S_POLE = 1,
+    EQUIT  = 2,
+    OBLIQ  = 3
+};
+
+struct pj_opaque {
+    double  p_halfpi;
+    double  sinph0;
+    double  cosph0;
+    double  Cb;
+    enum Mode mode;
+    int     no_cut; /* do not cut at hemisphere limit */
+};
+
+
 # define EPS 1.e-10
-# define N_POLE	0
-# define S_POLE 1
-# define EQUIT	2
-# define OBLIQ	3
-FORWARD(s_forward); /* spheroid */
-	double  sinlam, coslam, cosphi, sinphi, t, s, Krho, cosz;
 
-	sinlam = sin(lp.lam);
-	coslam = cos(lp.lam);
-	switch (P->mode) {
-	case EQUIT:
-	case OBLIQ:
-		sinphi = sin(lp.phi);
-		cosphi = cos(lp.phi);
-		cosz = cosphi * coslam;
-		if (P->mode == OBLIQ)
-			cosz = P->sinph0 * sinphi + P->cosph0 * cosz;
-		if (!P->no_cut && cosz < -EPS)
-			F_ERROR;
-		if (fabs(s = 1. - cosz) > EPS) {
-			t = 0.5 * (1. + cosz);
-			Krho = -log(t)/s - P->Cb / t;
-		} else
-			Krho = 0.5 - P->Cb;
-		xy.x = Krho * cosphi * sinlam;
-		if (P->mode == OBLIQ)
-			xy.y = Krho * (P->cosph0 * sinphi -
-				P->sinph0 * cosphi * coslam);
-		else
-			xy.y = Krho * sinphi;
-		break;
-	case S_POLE:
-	case N_POLE:
-		lp.phi = fabs(P->p_halfpi - lp.phi);
-		if (!P->no_cut && (lp.phi - EPS) > HALFPI)
-			F_ERROR;
-		if ((lp.phi *= 0.5) > EPS) {
-			t = tan(lp.phi);
-			Krho = -2.*(log(cos(lp.phi)) / t + t * P->Cb);
-			xy.x = Krho * sinlam;
-			xy.y = Krho * coslam;
-			if (P->mode == N_POLE)
-				xy.y = -xy.y;
-		} else
-			xy.x = xy.y = 0.;
-	}
-	return (xy);
+
+static XY s_forward (LP lp, PJ *P) {           /* Spheroidal, forward */
+    XY xy = {0.0,0.0};
+    struct pj_opaque *Q = P->opaque;
+    double  sinlam, coslam, cosphi, sinphi, t, s, Krho, cosz;
+
+    sinlam = sin(lp.lam);
+    coslam = cos(lp.lam);
+    switch (Q->mode) {
+    case EQUIT:
+    case OBLIQ:
+        sinphi = sin(lp.phi);
+        cosphi = cos(lp.phi);
+        cosz = cosphi * coslam;
+        if (Q->mode == OBLIQ)
+            cosz = Q->sinph0 * sinphi + Q->cosph0 * cosz;
+        if (!Q->no_cut && cosz < -EPS) {
+            proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);
+            return xy;
+        }
+        if (fabs(s = 1. - cosz) > EPS) {
+            t = 0.5 * (1. + cosz);
+            Krho = -log(t)/s - Q->Cb / t;
+        } else
+            Krho = 0.5 - Q->Cb;
+        xy.x = Krho * cosphi * sinlam;
+        if (Q->mode == OBLIQ)
+            xy.y = Krho * (Q->cosph0 * sinphi -
+                Q->sinph0 * cosphi * coslam);
+        else
+            xy.y = Krho * sinphi;
+        break;
+    case S_POLE:
+    case N_POLE:
+        lp.phi = fabs(Q->p_halfpi - lp.phi);
+        if (!Q->no_cut && (lp.phi - EPS) > M_HALFPI) {
+            proj_errno_set(P, PJD_ERR_TOLERANCE_CONDITION);
+            return xy;
+        }
+        if ((lp.phi *= 0.5) > EPS) {
+            t = tan(lp.phi);
+            Krho = -2.*(log(cos(lp.phi)) / t + t * Q->Cb);
+            xy.x = Krho * sinlam;
+            xy.y = Krho * coslam;
+            if (Q->mode == N_POLE)
+                xy.y = -xy.y;
+        } else
+            xy.x = xy.y = 0.;
+    }
+    return xy;
 }
-FREEUP; if (P) pj_dalloc(P); }
-ENTRY0(airy)
-	double beta;
 
-	P->no_cut = pj_param(P->ctx, P->params, "bno_cut").i;
-	beta = 0.5 * (HALFPI - pj_param(P->ctx, P->params, "rlat_b").f);
-	if (fabs(beta) < EPS)
-		P->Cb = -0.5;
-	else {
-		P->Cb = 1./tan(beta);
-		P->Cb *= P->Cb * log(cos(beta));
-	}
-	if (fabs(fabs(P->phi0) - HALFPI) < EPS)
-		if (P->phi0 < 0.) {
-			P->p_halfpi = -HALFPI;
-			P->mode = S_POLE;
-		} else {
-			P->p_halfpi =  HALFPI;
-			P->mode = N_POLE;
-		}
-	else {
-		if (fabs(P->phi0) < EPS)
-			P->mode = EQUIT;
-		else {
-			P->mode = OBLIQ;
-			P->sinph0 = sin(P->phi0);
-			P->cosph0 = cos(P->phi0);
-		}
-	}
-	P->fwd = s_forward;
-	P->es = 0.;
-ENDENTRY(P)
+
+
+
+PJ *PROJECTION(airy) {
+    double beta;
+
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+    if (0==Q)
+        return pj_default_destructor (P, ENOMEM);
+
+    P->opaque = Q;
+
+    Q->no_cut = pj_param(P->ctx, P->params, "bno_cut").i;
+    beta = 0.5 * (M_HALFPI - pj_param(P->ctx, P->params, "rlat_b").f);
+    if (fabs(beta) < EPS)
+        Q->Cb = -0.5;
+    else {
+        Q->Cb = 1./tan(beta);
+        Q->Cb *= Q->Cb * log(cos(beta));
+    }
+
+    if (fabs(fabs(P->phi0) - M_HALFPI) < EPS)
+        if (P->phi0 < 0.) {
+            Q->p_halfpi = -M_HALFPI;
+            Q->mode = S_POLE;
+        } else {
+            Q->p_halfpi =  M_HALFPI;
+            Q->mode = N_POLE;
+        }
+    else {
+        if (fabs(P->phi0) < EPS)
+            Q->mode = EQUIT;
+        else {
+            Q->mode = OBLIQ;
+            Q->sinph0 = sin(P->phi0);
+            Q->cosph0 = cos(P->phi0);
+        }
+    }
+    P->fwd = s_forward;
+    P->es = 0.;
+    return P;
+}
+
+

@@ -1,13 +1,13 @@
 /******************************************************************************
- * $Id: jniproj.c 2095 2011-09-02 08:44:02Z desruisseaux $
- *
  * Project:  PROJ.4
- * Purpose:  Java/JNI wrappers for PROJ.4 API.
+ * Purpose:  Java/JNI wrappers for PROJ API.
  * Author:   Antonello Andrea
  *           Martin Desruisseaux
  *
  ******************************************************************************
- * Copyright (c) 2005, Antonello Andrea
+ * Copyright (c) 2005, Andrea Antonello
+ * Copyright (c) 2011, Martin Desruisseaux
+ * Copyright (c) 2018, Even Rouault
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,7 +32,7 @@
  * \file jniproj.c
  *
  * \brief
- * Functions used by the Java Native Interface (JNI) wrappers of Proj.4
+ * Functions used by the Java Native Interface (JNI) wrappers of PROJ.
  *
  *
  * \author Antonello Andrea
@@ -51,33 +51,9 @@
 #include "projects.h"
 #include "org_proj4_PJ.h"
 #include <jni.h>
-#include <android/log.h>
 
 #define PJ_FIELD_NAME "ptr"
 #define PJ_FIELD_TYPE "J"
-#define PJ_MAX_DIMENSION 100
-/* The PJ_MAX_DIMENSION value appears also in quoted strings.
-   Please perform a search-and-replace if this value is changed. */
-
-PJ_CVSID("$Id: jniproj.c 2095 2011-09-02 08:44:02Z desruisseaux $");
-
-JavaVM* gJavaVM = NULL;
-char *appPath = NULL;
-
-//------------------------------------------------------------------------
-JNIEXPORT jint  JNI_OnLoad(JavaVM* vm, void* aReserved)
-{
- // cache java VM
- gJavaVM = vm;
-
- JNIEnv* env;
- if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK)
- {
-	 __android_log_print(ANDROID_LOG_INFO, "Proj4", "Failed to get the environment");
-  return -1;
- }
- return JNI_VERSION_1_6;
-}
 
 /*!
  * \brief
@@ -94,6 +70,45 @@ PJ *getPJ(JNIEnv *env, jobject object)
 {
     jfieldID id = (*env)->GetFieldID(env, (*env)->GetObjectClass(env, object), PJ_FIELD_NAME, PJ_FIELD_TYPE);
     return (id) ? (PJ*) (*env)->GetLongField(env, object, id) : NULL;
+}
+
+/*!
+ * \brief
+ * Internal method returning the java.lang.Double.NaN constant value.
+ * Efficiency is no a high concern for this particular method, because it
+ * is used mostly when the user wrongly attempt to use a disposed PJ object.
+ *
+ * \param  env - The JNI environment.
+ * \return The java.lang.Double.NaN constant value.
+ */
+jdouble javaNaN(JNIEnv *env)
+{
+    jclass c = (*env)->FindClass(env, "java/lang/Double");
+    if (c) { // Should never be NULL, but let be paranoiac.
+        jfieldID id = (*env)->GetStaticFieldID(env, c, "NaN", "D");
+        if (id) { // Should never be NULL, but let be paranoiac.
+            return (*env)->GetStaticDoubleField(env, c, id);
+        }
+    }
+    return 0.0; // Should never happen.
+}
+
+char *appPath = NULL;
+JNIEXPORT void JNICALL Java_org_proj4_PJ_setApplicationPath
+        (JNIEnv *env, jclass class, jstring applicationPath)
+{
+    char *givenPath = (*env)->GetStringUTFChars(env, applicationPath, NULL);
+    if (!givenPath) return ;
+    if (appPath) free(appPath);
+    appPath = (char*) malloc( (strlen(givenPath)+1)*sizeof(char) );
+    if (!appPath) return;
+    strcpy(appPath,givenPath);
+    (*env)->ReleaseStringUTFChars(env, applicationPath, givenPath);
+
+}
+
+char * getApplicationPath() {
+    return appPath;
 }
 
 /*!
@@ -125,29 +140,11 @@ JNIEXPORT jlong JNICALL Java_org_proj4_PJ_allocatePJ
 {
     const char *def_utf = (*env)->GetStringUTFChars(env, definition, NULL);
     if (!def_utf) return 0; /* OutOfMemoryError already thrown. */
-
     PJ *pj = pj_init_plus(def_utf);
     (*env)->ReleaseStringUTFChars(env, definition, def_utf);
-
     return (jlong) pj;
 }
 
-JNIEXPORT void JNICALL Java_org_proj4_PJ_setApplicationPath
-  (JNIEnv *env, jclass class, jstring applicationPath)
-{
-    char *givenPath = (*env)->GetStringUTFChars(env, applicationPath, NULL);
-    if (!givenPath) return ;
-    if (appPath) free(appPath);
-    appPath = (char*) malloc( (strlen(givenPath)+1)*sizeof(char) );
-    if (!appPath) return;
-    strcpy(appPath,givenPath);
-    (*env)->ReleaseStringUTFChars(env, applicationPath, givenPath);
-
-}
-
-char * getApplicationPath() {
-	return appPath;
-}
 /*!
  * \brief
  * Allocates a new geographic PJ structure from an existing one.
@@ -254,7 +251,7 @@ JNIEXPORT jdouble JNICALL Java_org_proj4_PJ_getSemiMajorAxis
   (JNIEnv *env, jobject object)
 {
     PJ *pj = getPJ(env, object);
-    return pj ? pj->a_orig : NAN;
+    return pj ? pj->a_orig : javaNaN(env);
 }
 
 /*!
@@ -270,7 +267,7 @@ JNIEXPORT jdouble JNICALL Java_org_proj4_PJ_getSemiMinorAxis
   (JNIEnv *env, jobject object)
 {
     PJ *pj = getPJ(env, object);
-    if (!pj) return NAN;
+    if (!pj) return javaNaN(env);
     double a = pj->a_orig;
     return sqrt(a*a * (1.0 - pj->es_orig));
 }
@@ -287,7 +284,7 @@ JNIEXPORT jdouble JNICALL Java_org_proj4_PJ_getEccentricitySquared
   (JNIEnv *env, jobject object)
 {
     PJ *pj = getPJ(env, object);
-    return pj ? pj->es_orig : NAN;
+    return pj ? pj->es_orig : javaNaN(env);
 }
 
 /*!
@@ -333,7 +330,7 @@ JNIEXPORT jdouble JNICALL Java_org_proj4_PJ_getGreenwichLongitude
   (JNIEnv *env, jobject object)
 {
     PJ *pj = getPJ(env, object);
-    return (pj) ? (pj->from_greenwich)*(180/M_PI) : NAN;
+    return (pj) ? (pj->from_greenwich)*(180/M_PI) : javaNaN(env);
 }
 
 /*!
@@ -352,7 +349,7 @@ JNIEXPORT jdouble JNICALL Java_org_proj4_PJ_getLinearUnitToMetre
     if (pj) {
         return (vertical) ? pj->vto_meter : pj->to_meter;
     }
-    return NAN;
+    return javaNaN(env);
 }
 
 /*!
@@ -360,7 +357,7 @@ JNIEXPORT jdouble JNICALL Java_org_proj4_PJ_getLinearUnitToMetre
  * Converts input values from degrees to radians before coordinate operation, or the output
  * values from radians to degrees after the coordinate operation.
  *
- * \param pj        - The Proj.4 PJ structure.
+ * \param pj        - The PROJ.4 PJ structure.
  * \param data      - The coordinate array to transform.
  * \param numPts    - Number of points to transform.
  * \param dimension - Dimension of points in the coordinate array.
@@ -371,11 +368,8 @@ void convertAngularOrdinates(PJ *pj, double* data, jint numPts, int dimension, d
     if (pj_is_latlong(pj)) {
         /* Convert only the 2 first ordinates and skip all the other dimensions. */
         dimToSkip = dimension - 2;
-    } else if (pj_is_geocent(pj)) {
-        /* Convert only the 3 first ordinates and skip all the other dimensions. */
-        dimToSkip = dimension - 3;
     } else {
-        /* Not a geographic or geocentric CRS: nothing to convert. */
+        /* Not a geographic CRS: nothing to convert. */
         return;
     }
     double *stop = data + dimension*numPts;
@@ -412,9 +406,9 @@ JNIEXPORT void JNICALL Java_org_proj4_PJ_transform
         if (c) (*env)->ThrowNew(env, c, "The target CRS and the coordinates array can not be null.");
         return;
     }
-    if (dimension < 2 || dimension > PJ_MAX_DIMENSION) { /* Arbitrary upper value for catching potential misuse. */
+    if (dimension < 2 || dimension > org_proj4_PJ_DIMENSION_MAX) { /* Arbitrary upper value for catching potential misuse. */
         jclass c = (*env)->FindClass(env, "java/lang/IllegalArgumentException");
-        if (c) (*env)->ThrowNew(env, c, "Illegal dimension. Must be in the [2-100] range.");
+        if (c) (*env)->ThrowNew(env, c, "Illegal number of dimensions.");
         return;
     }
     if ((offset < 0) || (numPts < 0) || (offset + dimension*numPts) > (*env)->GetArrayLength(env, coordinates)) {
@@ -474,7 +468,7 @@ JNIEXPORT jstring JNICALL Java_org_proj4_PJ_getLastError
  * This method will also set the Java "ptr" final field to 0 as a safety. In theory we are not
  * supposed to change the value of a final field. But no Java code should use this field, and
  * the PJ object is being garbage collected anyway. We set the field to 0 as a safety in case
- * some user invoked the finalize() method explicitely despite our warning in the Javadoc to
+ * some user invoked the finalize() method explicitly despite our warning in the Javadoc to
  * never do such thing.
  *
  * \param env    - The JNI environment.
@@ -491,177 +485,6 @@ JNIEXPORT void JNICALL Java_org_proj4_PJ_finalize
             pj_free(pj);
         }
     }
-}
-
-
-
-
-/* ===============================================================================================
- *
- * Below this point are the previous JNI bindings that existed in the legacy org.proj4.Projections
- * class before the new bindings defined above. We keep those binding for now, but may remove them
- * in a future version. There is a few issues with the code below:
- *
- *  1) Every call to (*env)->GetStringUTFChars(...) shall have a corresponding call to
- *     (*env)->ReleaseStringUTFChars(...).
- *
- *  2) Every call to (*env)->GetFoo(...) shall check for NULL return value.  If the return
- *     value is NULL, than a java.lang.OutOfMemoryError has already been thrown in the JVM;
- *     we just need to return from the C method after releasing allocated objects (if any).
- *
- *  3) If a Proj.4 method fails to execute, we should invoke (*env)->ThrowNew(...) instead
- *     than exit(1) in order to throw an exception in the Java program instead than stopping
- *     the JVM.
- *
- *  4) We should check the user arguments for null values or index out of bounds, and
- *     throw the appropriate Java exception if an argument is invalid.
- */
-
-#include "org_proj4_Projections.h"
-
-#define arraysize 300
-
-/*!
- * \brief
- * executes reprojection
- *
- * JNI informations:
- * Class:     org_proj4_Projections
- * Method:    transform
- * Signature: ([D[D[DLjava/lang/String;Ljava/lang/String;JI)V
- *
- *
- * \param env - parameter used by jni (see JNI specification)
- * \param parent - parameter used by jni (see JNI specification)
- * \param firstcoord - array of x coordinates
- * \param secondcoord - array of y coordinates
- * \param values - array of z coordinates
- * \param src - definition of the source projection
- * \param dest - definition of the destination projection
- * \param pcount
- * \param poffset
-*/
-JNIEXPORT void JNICALL Java_org_proj4_Projections_transform
-  (JNIEnv * env, jobject parent, jdoubleArray firstcoord, jdoubleArray secondcoord, jdoubleArray values, jstring src, jstring dest, jlong pcount, jint poffset)
-{
-	int i;
-	projPJ src_pj, dst_pj;
-	char * srcproj_def = (char *) (*env)->GetStringUTFChars (env, src, 0);
-	char * destproj_def = (char *) (*env)->GetStringUTFChars (env, dest, 0);
-
-	if (!(src_pj = pj_init_plus(srcproj_def)))
-		exit(1);
-	if (!(dst_pj = pj_init_plus(destproj_def)))
-		exit(1);
-
-	double *xcoord = (* env)-> GetDoubleArrayElements(env, firstcoord, NULL);
-	double *ycoord = (* env) -> GetDoubleArrayElements(env, secondcoord, NULL);
-	double *zcoord = (* env) -> GetDoubleArrayElements(env, values, NULL);
-
-        pj_transform( src_pj, dst_pj, pcount,poffset, xcoord, ycoord, zcoord);
-
-	(* env)->ReleaseDoubleArrayElements(env,firstcoord,(jdouble *) xcoord, 0);
-	(* env)->ReleaseDoubleArrayElements(env,secondcoord,(jdouble *) ycoord, 0);
-	(* env)->ReleaseDoubleArrayElements(env,values,(jdouble *) zcoord, 0);
-
-	pj_free( src_pj );
-	pj_free( dst_pj );
-}
-
-/*!
- * \brief
- * retrieves projection parameters
- *
- * JNI informations:
- * Class:     org_proj4_Projections
- * Method:    getProjInfo
- * Signature: (Ljava/lang/String;)Ljava/lang/String;
- *
- *
- * \param env - parameter used by jni (see JNI specification)
- * \param parent - parameter used by jni (see JNI specification)
- * \param projdefinition - definition of the projection
-*/
-JNIEXPORT jstring JNICALL Java_org_proj4_Projections_getProjInfo
-  (JNIEnv * env, jobject parent, jstring projdefinition)
-{
-	PJ *pj;
-	char * pjdesc;
-	char info[arraysize];
-
-	char * proj_def = (char *) (*env)->GetStringUTFChars (env, projdefinition, 0);
-
-	if (!(pj = pj_init_plus(proj_def)))
-		exit(1);
-
-	/* put together all the info of the projection and free the pointer to pjdesc */
-	pjdesc = pj_get_def(pj, 0);
-	strcpy(info,pjdesc);
-	pj_dalloc(pjdesc);
-
-	return (*env)->NewStringUTF(env,info);
-}
-
-
-/*!
- * \brief
- * retrieves ellipsoid parameters
- *
- * JNI informations:
- * Class:     org_proj4_Projections
- * Method:    getEllipsInfo
- * Signature: (Ljava/lang/String;)Ljava/lang/String;
- *
- *
- * \param env - parameter used by jni (see JNI specification)
- * \param parent - parameter used by jni (see JNI specification)
- * \param projdefinition - definition of the projection
-*/
-JNIEXPORT jstring JNICALL Java_org_proj4_Projections_getEllipsInfo
-  (JNIEnv * env, jobject parent, jstring projdefinition)
-{
-	PJ *pj;
-	char * pjdesc;
-	char ellipseinfo[arraysize];
-	char temp[50];
-
-	char * proj_def = (char *) (*env)->GetStringUTFChars (env, projdefinition, 0);
-
-	if (!(pj = pj_init_plus(proj_def)))
-		exit(1);
-
-	/* put together all the info of the ellipsoid  */
-/* 	sprintf(temp,"name: %s;", pj->descr); */
-	sprintf(temp,"name: not available;");
-	strcpy(ellipseinfo,temp);
-	sprintf(temp,"a: %lf;", pj->a);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"e: %lf;", pj->e);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"es: %lf;", pj->es);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"ra: %lf;", pj->ra);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"one_es: %lf;", pj->one_es);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"rone_es: %lf;", pj->rone_es);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"lam0: %lf;", pj->lam0);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"phi0: %lf;", pj->phi0);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"x0: %lf;", pj->x0);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"y0: %lf;", pj->y0);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"k0: %lf;", pj->k0);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"to_meter: %lf;", pj->to_meter);
-	strcat(ellipseinfo,temp);
-	sprintf(temp,"fr_meter: %lf;", pj->fr_meter);
-	strcat(ellipseinfo,temp);
-
-	return (*env)->NewStringUTF(env,ellipseinfo);
 }
 
 #endif

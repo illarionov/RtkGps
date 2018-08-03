@@ -1,15 +1,24 @@
 #define PJ_LIB__
-#include	<projects.h>
+
+#include <math.h>
+
+#include "projects.h"
+
 PROJ_HEAD(putp2, "Putnins P2") "\n\tPCyl., Sph.";
+
 #define C_x	1.89490
 #define C_y	1.71848
 #define C_p 0.6141848493043784
 #define EPS	1e-10
 #define NITER	10
 #define PI_DIV_3	1.0471975511965977
-FORWARD(s_forward); /* spheroid */
+
+
+static XY s_forward (LP lp, PJ *P) {           /* Spheroidal, forward */
+    XY xy = {0.0,0.0};
 	double p, c, s, V;
 	int i;
+	(void) P;
 
 	p = C_p * sin(lp.phi);
 	s = lp.phi * lp.phi;
@@ -26,15 +35,27 @@ FORWARD(s_forward); /* spheroid */
 		lp.phi = lp.phi < 0 ? - PI_DIV_3 : PI_DIV_3;
 	xy.x = C_x * lp.lam * (cos(lp.phi) - 0.5);
 	xy.y = C_y * sin(lp.phi);
-	return (xy);
+
+	return xy;
 }
-INVERSE(s_inverse); /* spheroid */
+
+
+static LP s_inverse (XY xy, PJ *P) {           /* Spheroidal, inverse */
+    LP lp = {0.0,0.0};
 	double c;
 
 	lp.phi = aasin(P->ctx,xy.y / C_y);
 	lp.lam = xy.x / (C_x * ((c = cos(lp.phi)) - 0.5));
 	lp.phi = aasin(P->ctx,(lp.phi + sin(lp.phi) * (c - 1.)) / C_p);
-	return (lp);
+
+	return lp;
 }
-FREEUP; if (P) pj_dalloc(P); }
-ENTRY0(putp2) P->es = 0.; P->inv = s_inverse; P->fwd = s_forward; ENDENTRY(P)
+
+
+PJ *PROJECTION(putp2) {
+    P->es = 0.;
+    P->inv = s_inverse;
+    P->fwd = s_forward;
+
+    return P;
+}

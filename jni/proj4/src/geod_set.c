@@ -1,10 +1,14 @@
-
 #define _IN_GEOD_SET
 
+#include <math.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include "proj.h"
 #include "projects.h"
-#include "geodesic.h"
+#include "geod_interface.h"
 #include "emess.h"
+
 	void
 geod_set(int argc, char **argv) {
 	paralist *start = 0, *curr;
@@ -15,33 +19,29 @@ geod_set(int argc, char **argv) {
     /* put arguments into internal linked list */
 	if (argc <= 0)
 		emess(1, "no arguments in initialization list");
-	for (i = 0; i < argc; ++i)
-		if (i)
-			curr = curr->next = pj_mkparam(argv[i]);
-		else
-			start = curr = pj_mkparam(argv[i]);
+	start = curr = pj_mkparam(argv[0]);
+	if (!curr)
+		emess(1, "memory allocation failed");
+	for (i = 1; curr != 0 && i < argc; ++i) {
+		curr->next = pj_mkparam(argv[i]);
+		if (!curr->next)
+			emess(1, "memory allocation failed");
+		curr = curr->next;
+	}
 	/* set elliptical parameters */
 	if (pj_ell_set(pj_get_default_ctx(),start, &geod_a, &es)) emess(1,"ellipse setup failure");
 	/* set units */
 	if ((name = pj_param(NULL,start, "sunits").s) != NULL) {
 		char *s;
-                struct PJ_UNITS *unit_list = pj_get_units_ref();
+                const struct PJ_UNITS *unit_list = proj_list_units();
 		for (i = 0; (s = unit_list[i].id) && strcmp(name, s) ; ++i) ;
 		if (!s)
 			emess(1,"%s unknown unit conversion id", name);
 		fr_meter = 1. / (to_meter = atof(unit_list[i].to_meter));
 	} else
 		to_meter = fr_meter = 1.;
-	if ((ellipse = es) != 0.) {
-		onef = sqrt(1. - es);
-		geod_f = 1 - onef;
-		f2 = geod_f/2;
-		f4 = geod_f/4;
-		f64 = geod_f*geod_f/64;
-	} else {
-		onef = 1.;
-		geod_f = f2 = f4 = f64 = 0.;
-	}
+	geod_f = es/(1 + sqrt(1 - es));
+	geod_ini();
 	/* check if line or arc mode */
 	if (pj_param(NULL,start, "tlat_1").i) {
 		double del_S;
@@ -59,10 +59,10 @@ geod_set(int argc, char **argv) {
 			geod_for();
 		} else emess(1,"incomplete geodesic/arc info");
 		if ((n_alpha = pj_param(NULL,start, "in_A").i) > 0) {
-			if (!(del_alpha = pj_param(NULL,start, "rdel_A").f))
+			if ((del_alpha = pj_param(NULL,start, "rdel_A").f) == 0.0)
 				emess(1,"del azimuth == 0");
 		} else if ((del_S = fabs(pj_param(NULL,start, "ddel_S").f)) != 0.) {
-			n_S = geod_S / del_S + .5;
+			n_S = (int)(geod_S / del_S + .5);
 		} else if ((n_S = pj_param(NULL,start, "in_S").i) <= 0)
 			emess(1,"no interval divisor selected");
 	}

@@ -1,0 +1,27 @@
+--- proj-5.1.0/src/jniproj.c	2018-06-01 14:07:32.000000000 +0200
++++ proj4/src/jniproj.c	2018-08-03 17:36:40.000000000 +0200
+@@ -93,6 +93,24 @@
+     return 0.0; // Should never happen.
+ }
+ 
++char *appPath = NULL;
++JNIEXPORT void JNICALL Java_org_proj4_PJ_setApplicationPath
++        (JNIEnv *env, jclass class, jstring applicationPath)
++{
++    char *givenPath = (*env)->GetStringUTFChars(env, applicationPath, NULL);
++    if (!givenPath) return ;
++    if (appPath) free(appPath);
++    appPath = (char*) malloc( (strlen(givenPath)+1)*sizeof(char) );
++    if (!appPath) return;
++    strcpy(appPath,givenPath);
++    (*env)->ReleaseStringUTFChars(env, applicationPath, givenPath);
++
++}
++
++char * getApplicationPath() {
++    return appPath;
++}
++
+ /*!
+  * \brief
+  * Returns the Proj4 release number.

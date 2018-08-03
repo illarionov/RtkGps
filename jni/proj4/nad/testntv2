@@ -3,6 +3,7 @@
 # Test NTv2 (.gsb) support.  Assumes ntv2_0.gsb is installed.
 #
 #
+NAD_DIR=`dirname $0`
 EXE=$1
 
 usage()
@@ -35,7 +36,7 @@ echo "##############################################################" >> ${OUT}
 echo Point in the ONwinsor subgrid. >> ${OUT}
 #
 $EXE +proj=latlong +ellps=clrk66 +nadgrids=ntv2_0.gsb \
- +to +proj=latlong +datum=NAD83 -E -w6 >>${OUT} <<EOF
+ +to +proj=latlong +datum=NAD83 -E -w4 >>${OUT} <<EOF
 82d00'00.000"W 42d00'00.000"N 0.0
 82d00'01.000"W 42d00'00.000"N 0.0
 82d00'02.000"W 42d00'00.000"N 0.0
@@ -46,7 +47,7 @@ echo "##############################################################" >> ${OUT}
 echo Try with NTv2 and NTv1 together ... falls back to NTv1 >> ${OUT}
 #
 $EXE +proj=latlong +ellps=clrk66 +nadgrids=ntv2_0.gsb,ntv1_can.dat,conus \
- +to +proj=latlong +datum=NAD83 -E -w6 >>${OUT} <<EOF
+ +to +proj=latlong +datum=NAD83 -E -w4 >>${OUT} <<EOF
 99d00'00.000"W 65d00'00.000"N 0.0
 111d00'00.000"W 46d00'00.000"N 0.0
 111d00'00.000"W 47d30'00.000"N 0.0
@@ -56,10 +57,10 @@ EOF
 # Done! 
 # do 'diff' with distribution results
 echo "diff ${OUT} with ${OUT}.dist"
-diff -b ${OUT} ${OUT}.dist
+diff -b ${OUT} ${NAD_DIR}/${OUT}.dist
 if [ $? -ne 0 ] ; then
 	echo  ""
-	echo "PROBLEMS HAVE OCCURED"
+	echo "PROBLEMS HAVE OCCURRED"
 	echo "test file ${OUT} saved"
     echo
     exit 100

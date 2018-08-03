@@ -1,85 +1,120 @@
-#define PROJ_PARMS__ \
-	double phi1; \
-	double phi2; \
-	double n; \
-	double rho; \
-	double rho0; \
-	double c; \
-	double *en; \
-	int		ellips;
 #define PJ_LIB__
-#include	<projects.h>
+
+#include <errno.h>
+#include <math.h>
+
+#include "proj.h"
+#include "projects.h"
+#include "proj_math.h"
+
+struct pj_opaque {
+    double phi1;
+    double phi2;
+    double n;
+    double rho;
+    double rho0;
+    double c;
+    double *en;
+    int     ellips;
+};
+
 PROJ_HEAD(eqdc, "Equidistant Conic")
-	"\n\tConic, Sph&Ell\n\tlat_1= lat_2=";
-# define EPS10	1.e-10
-FORWARD(e_forward); /* sphere & ellipsoid */
-	P->rho = P->c - (P->ellips ? pj_mlfn(lp.phi, sin(lp.phi),
-		cos(lp.phi), P->en) : lp.phi);
-	xy.x = P->rho * sin( lp.lam *= P->n );
-	xy.y = P->rho0 - P->rho * cos(lp.lam);
-	return (xy);
-}
-INVERSE(e_inverse); /* sphere & ellipsoid */
-	if ((P->rho = hypot(xy.x, xy.y = P->rho0 - xy.y)) != 0.0 ) {
-		if (P->n < 0.) {
-			P->rho = -P->rho;
-			xy.x = -xy.x;
-			xy.y = -xy.y;
-		}
-		lp.phi = P->c - P->rho;
-		if (P->ellips)
-			lp.phi = pj_inv_mlfn(P->ctx, lp.phi, P->es, P->en);
-		lp.lam = atan2(xy.x, xy.y) / P->n;
-	} else {
-		lp.lam = 0.;
-		lp.phi = P->n > 0. ? HALFPI : - HALFPI;
-	}
-	return (lp);
-}
-SPECIAL(fac) {
-	double sinphi, cosphi;
+    "\n\tConic, Sph&Ell\n\tlat_1= lat_2=";
+# define EPS10  1.e-10
 
-	sinphi = sin(lp.phi);
-	cosphi = cos(lp.phi);
-	fac->code |= IS_ANAL_HK;
-	fac->h = 1.;
-	fac->k = P->n * (P->c - (P->ellips ? pj_mlfn(lp.phi, sinphi,
-		cosphi, P->en) : lp.phi)) / pj_msfn(sinphi, cosphi, P->es);
+
+static XY e_forward (LP lp, PJ *P) {          /* Ellipsoidal, forward */
+    XY xy = {0.0,0.0};
+    struct pj_opaque *Q = P->opaque;
+
+    Q->rho = Q->c - (Q->ellips ? pj_mlfn(lp.phi, sin(lp.phi),
+        cos(lp.phi), Q->en) : lp.phi);
+    xy.x = Q->rho * sin( lp.lam *= Q->n );
+    xy.y = Q->rho0 - Q->rho * cos(lp.lam);
+
+    return xy;
 }
-FREEUP; if (P) { if (P->en) pj_dalloc(P->en); pj_dalloc(P); } }
-ENTRY1(eqdc, en)
-	double cosphi, sinphi;
-	int secant;
 
-	P->phi1 = pj_param(P->ctx, P->params, "rlat_1").f;
-	P->phi2 = pj_param(P->ctx, P->params, "rlat_2").f;
-	if (fabs(P->phi1 + P->phi2) < EPS10) E_ERROR(-21);
-	if (!(P->en = pj_enfn(P->es)))
-		E_ERROR_0;
-	P->n = sinphi = sin(P->phi1);
-	cosphi = cos(P->phi1);
-	secant = fabs(P->phi1 - P->phi2) >= EPS10;
-	if( (P->ellips = (P->es > 0.)) ) {
-		double ml1, m1;
 
-		m1 = pj_msfn(sinphi, cosphi, P->es);
-		ml1 = pj_mlfn(P->phi1, sinphi, cosphi, P->en);
-		if (secant) { /* secant cone */
-			sinphi = sin(P->phi2);
-			cosphi = cos(P->phi2);
-			P->n = (m1 - pj_msfn(sinphi, cosphi, P->es)) /
-				(pj_mlfn(P->phi2, sinphi, cosphi, P->en) - ml1);
-		}
-		P->c = ml1 + m1 / P->n;
-		P->rho0 = P->c - pj_mlfn(P->phi0, sin(P->phi0),
-			cos(P->phi0), P->en);
-	} else {
-		if (secant)
-			P->n = (cosphi - cos(P->phi2)) / (P->phi2 - P->phi1);
-		P->c = P->phi1 + cos(P->phi1) / P->n;
-		P->rho0 = P->c - P->phi0;
-	}
-	P->inv = e_inverse;
-	P->fwd = e_forward;
-	P->spc = fac;
-ENDENTRY(P)
+static LP e_inverse (XY xy, PJ *P) {          /* Ellipsoidal, inverse */
+    LP lp = {0.0,0.0};
+    struct pj_opaque *Q = P->opaque;
+
+    if ((Q->rho = hypot(xy.x, xy.y = Q->rho0 - xy.y)) != 0.0 ) {
+        if (Q->n < 0.) {
+            Q->rho = -Q->rho;
+            xy.x = -xy.x;
+            xy.y = -xy.y;
+        }
+        lp.phi = Q->c - Q->rho;
+        if (Q->ellips)
+            lp.phi = pj_inv_mlfn(P->ctx, lp.phi, P->es, Q->en);
+        lp.lam = atan2(xy.x, xy.y) / Q->n;
+    } else {
+        lp.lam = 0.;
+        lp.phi = Q->n > 0. ? M_HALFPI : -M_HALFPI;
+    }
+    return lp;
+}
+
+
+static void *destructor (PJ *P, int errlev) {                        /* Destructor */
+    if (0==P)
+        return 0;
+
+    if (0==P->opaque)
+        return pj_default_destructor (P, errlev);
+
+    pj_dealloc (P->opaque->en);
+    return pj_default_destructor (P, errlev);
+}
+
+
+PJ *PROJECTION(eqdc) {
+    double cosphi, sinphi;
+    int secant;
+
+    struct pj_opaque *Q = pj_calloc (1, sizeof (struct pj_opaque));
+    if (0==Q)
+        return pj_default_destructor (P, ENOMEM);
+    P->opaque = Q;
+    P->destructor = destructor;
+
+    Q->phi1 = pj_param(P->ctx, P->params, "rlat_1").f;
+    Q->phi2 = pj_param(P->ctx, P->params, "rlat_2").f;
+
+    if (fabs(Q->phi1 + Q->phi2) < EPS10)
+        return pj_default_destructor (P, PJD_ERR_CONIC_LAT_EQUAL);
+
+    if (!(Q->en = pj_enfn(P->es)))
+        return pj_default_destructor(P, ENOMEM);
+
+    Q->n = sinphi = sin(Q->phi1);
+    cosphi = cos(Q->phi1);
+    secant = fabs(Q->phi1 - Q->phi2) >= EPS10;
+    if( (Q->ellips = (P->es > 0.)) ) {
+        double ml1, m1;
+
+        m1 = pj_msfn(sinphi, cosphi, P->es);
+        ml1 = pj_mlfn(Q->phi1, sinphi, cosphi, Q->en);
+        if (secant) { /* secant cone */
+            sinphi = sin(Q->phi2);
+            cosphi = cos(Q->phi2);
+            Q->n = (m1 - pj_msfn(sinphi, cosphi, P->es)) /
+                (pj_mlfn(Q->phi2, sinphi, cosphi, Q->en) - ml1);
+        }
+        Q->c = ml1 + m1 / Q->n;
+        Q->rho0 = Q->c - pj_mlfn(P->phi0, sin(P->phi0),
+            cos(P->phi0), Q->en);
+    } else {
+        if (secant)
+            Q->n = (cosphi - cos(Q->phi2)) / (Q->phi2 - Q->phi1);
+        Q->c = Q->phi1 + cos(Q->phi1) / Q->n;
+        Q->rho0 = Q->c - P->phi0;
+    }
+
+    P->inv = e_inverse;
+    P->fwd = e_forward;
+
+    return P;
+}

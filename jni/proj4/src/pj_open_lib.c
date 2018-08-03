@@ -1,6 +1,4 @@
 /******************************************************************************
- * $Id: pj_open_lib.c 2130 2011-12-15 01:20:23Z warmerdam $
- *
  * Project:  PROJ.4
  * Purpose:  Implementation of pj_open_lib(), and pj_set_finder().  These
  *           provide a standard interface for opening projections support
@@ -31,21 +29,25 @@
  *****************************************************************************/
 
 #define PJ_LIB__
-#include <projects.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#ifdef __ANDROID__
-#include <android/log.h>
-char * getApplicationPath() ;
-#endif
 
-PJ_CVSID("$Id: pj_open_lib.c 2130 2011-12-15 01:20:23Z warmerdam $");
+#include <errno.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "proj_internal.h"
+#include "projects.h"
 
 static const char *(*pj_finder)(const char *) = NULL;
 static int path_count = 0;
 static char **search_path = NULL;
-static char * proj_lib_name = 0;
+static const char * proj_lib_name =
+#ifdef PROJ_LIB
+PROJ_LIB;
+#else
+0;
+#endif
 
 /************************************************************************/
 /*                           pj_set_finder()                            */
@@ -93,15 +95,25 @@ void pj_set_searchpath ( int count, const char **path )
     path_count = count;
 }
 
+/* just a couple of helper functions that lets other functions
+   access the otherwise private search path */
+const char * const *proj_get_searchpath(void) {
+    return (const char * const *)search_path;
+}
+
+int proj_get_path_count(void) {
+    return path_count;
+}
 /************************************************************************/
-/*                            pj_open_lib()                             */
+/*                          pj_open_lib_ex()                            */
 /************************************************************************/
 
-FILE *
-pj_open_lib(projCtx ctx, char *name, char *mode) {
+static PAFile
+pj_open_lib_ex(projCtx ctx, const char *name, const char *mode,
+               char* out_full_filename, size_t out_full_filename_size) {
     char fname[MAX_PATH_FILENAME+1];
     const char *sysname;
-    FILE *fid;
+    PAFile fid;
     int n = 0;
     int i;
 #ifdef WIN32
@@ -110,13 +122,18 @@ pj_open_lib(projCtx ctx, char *name, char *mode) {
     static const char dir_chars[] = "/";
 #endif
 
-#ifndef _WIN32_WCE
+    if( out_full_filename != NULL && out_full_filename_size > 0 )
+        out_full_filename[0] = '\0';
 
     /* check if ~/name */
     if (*name == '~' && strchr(dir_chars,name[1]) )
         if ((sysname = getenv("HOME")) != NULL) {
+            if( strlen(sysname) + 1 + strlen(name) + 1 > sizeof(fname) )
+            {
+                return NULL;
+            }
             (void)strcpy(fname, sysname);
-            fname[n = strlen(fname)] = DIR_CHAR;
+            fname[n = (int)strlen(fname)] = DIR_CHAR;
             fname[++n] = '\0';
             (void)strcpy(fname+n, name + 1);
             sysname = fname;
@@ -125,7 +142,7 @@ pj_open_lib(projCtx ctx, char *name, char *mode) {
 
     /* or fixed path: /name, ./name or ../name */
     else if (strchr(dir_chars,*name)
-             || (*name == '.' && strchr(dir_chars,name[1]))
+             || (*name == '.' && strchr(dir_chars,name[1])) 
              || (!strncmp(name, "..", 2) && strchr(dir_chars,name[2]))
              || (name[1] == ':' && strchr(dir_chars,name[2])) )
         sysname = name;
@@ -134,27 +151,28 @@ pj_open_lib(projCtx ctx, char *name, char *mode) {
     else if( pj_finder != NULL && pj_finder( name ) != NULL )
         sysname = pj_finder( name );
 
-    else if (getApplicationPath() != NULL) {
-    	char *appPath = getApplicationPath();
-    	(void)strcpy(fname, appPath);
-    	fname[n = strlen(fname)] = DIR_CHAR;
-        (void)strcpy(fname+n, "/files/proj4/");
-        n += 13;
+    /* or is environment PROJ_LIB defined */
+    else if ((sysname = getenv("PROJ_LIB")) || (sysname = proj_lib_name)) {
+        if( strlen(sysname) + 1 + strlen(name) + 1 > sizeof(fname) )
+        {
+            return NULL;
+        }
+        (void)strcpy(fname, sysname);
+        fname[n = (int)strlen(fname)] = DIR_CHAR;
+        fname[++n] = '\0';
         (void)strcpy(fname+n, name);
-
         sysname = fname;
     } else /* just try it bare bones */
         sysname = name;
 
-    if ((fid = fopen(sysname, mode)) != NULL) {
+    if ((fid = pj_ctx_fopen(ctx, sysname, mode)) != NULL)
+    {
+        if( out_full_filename != NULL && out_full_filename_size > 0 )
+        {
+            strncpy(out_full_filename, sysname, out_full_filename_size);
+            out_full_filename[out_full_filename_size-1] = '\0';
+        }
         errno = 0;
-#ifdef __ANDROID__
-        __android_log_print(ANDROID_LOG_INFO,"Proj4","OK loading:%s",sysname);
-#endif
-    }else{
-#ifdef __ANDROID__
-    	__android_log_print(ANDROID_LOG_INFO,"Proj4","ERROR loading:%s",sysname);
-#endif
     }
 
     /* If none of those work and we have a search path, try it */
@@ -162,24 +180,68 @@ pj_open_lib(projCtx ctx, char *name, char *mode) {
     {
         for (i = 0; fid == NULL && i < path_count; i++)
         {
-            sprintf(fname, "%s%c%s", search_path[i], DIR_CHAR, name);
-            sysname = fname;
-            fid = fopen (sysname, mode);
+            if( strlen(search_path[i]) + 1 + strlen(name) + 1 <= sizeof(fname) )
+            {
+                sprintf(fname, "%s%c%s", search_path[i], DIR_CHAR, name);
+                sysname = fname;
+                fid = pj_ctx_fopen(ctx, sysname, mode);
+            }
         }
         if (fid)
+        {
+            if( out_full_filename != NULL && out_full_filename_size > 0 )
+            {
+                strncpy(out_full_filename, sysname, out_full_filename_size);
+                out_full_filename[out_full_filename_size-1] = '\0';
+            }
             errno = 0;
+        }
     }
 
     if( ctx->last_errno == 0 && errno != 0 )
         pj_ctx_set_errno( ctx, errno );
 
-    pj_log( ctx, PJ_LOG_DEBUG_MAJOR,
-            "pj_open_lib(%s): call fopen(%s) - %s\n",
+    pj_log( ctx, PJ_LOG_DEBUG_MAJOR, 
+            "pj_open_lib(%s): call fopen(%s) - %s",
             name, sysname,
             fid == NULL ? "failed" : "succeeded" );
 
     return(fid);
-#else
-    return NULL;
-#endif /* _WIN32_WCE */
+}
+
+/************************************************************************/
+/*                            pj_open_lib()                             */
+/************************************************************************/
+
+PAFile
+pj_open_lib(projCtx ctx, const char *name, const char *mode) {
+    return pj_open_lib_ex(ctx, name, mode, NULL, 0);
+}
+
+/************************************************************************/
+/*                           pj_find_file()                             */
+/************************************************************************/
+
+/** Returns the full filename corresponding to a proj resource file specified
+ *  as a short filename.
+ * 
+ * @param ctx context.
+ * @param short_filename short filename (e.g. egm96_15.gtx)
+ * @param out_full_filename output buffer, of size out_full_filename_size, that
+ *                          will receive the full filename on success.
+ *                          Will be zero-terminated.
+ * @param out_full_filename_size size of out_full_filename.
+ * @return 1 if the file was found, 0 otherwise.
+ */
+int pj_find_file(projCtx ctx, const char *short_filename,
+                 char* out_full_filename, size_t out_full_filename_size)
+{
+    PAFile f = pj_open_lib_ex(ctx, short_filename, "rb", out_full_filename,
+                              out_full_filename_size);
+    if( f != NULL )
+    {
+        pj_ctx_fclose(ctx, f);
+        return 1;
+    }
+    return 0;
 }
