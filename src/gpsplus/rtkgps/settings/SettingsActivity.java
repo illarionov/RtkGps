@@ -24,4 +24,15 @@ public class SettingsActivity extends PreferenceActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    protected boolean isValidFragmentA(String fragmentName) {
+        return ProcessingOptions1Fragment.class.getName().equals(fragmentName);
+    }
+    protected boolean isValidFragment(String fragmentName) {
+        // Two setting panels can hit this:
+        String processingPanel = ProcessingOptions1Fragment.class.getName();
+        String solutionPanel = SolutionOutputSettingsFragment.class.getName();
+        return (processingPanel.equals(fragmentName) || solutionPanel.equals(fragmentName));
+    }
+
 }

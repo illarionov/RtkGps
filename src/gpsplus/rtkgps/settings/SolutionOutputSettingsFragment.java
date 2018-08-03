@@ -308,5 +308,4 @@ public class SolutionOutputSettingsFragment extends PreferenceFragment {
     };
     private static String mSzEllipsoidal;
     private static String mSzGeodetic;
-
 }
