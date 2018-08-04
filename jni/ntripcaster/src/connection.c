@@ -68,7 +68,7 @@
 #include <fcntl.h>
 
 #ifndef _WIN32
-#include <sys/socket.h> 
+#include <sys/socket.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
 #include <sys/time.h>
@@ -142,7 +142,7 @@ void *handle_connection(void *arg)
 	char line[BUFSIZE] = "";
 	int res;
 
-	thread_init(); 
+	thread_init();
 
 	if (!con) {
 		android_log(ANDROID_LOG_VERBOSE, "handle_connection: got NULL connection");
@@ -153,7 +153,7 @@ void *handle_connection(void *arg)
 		con->hostname = reverse(con->host);
 
 	sock_set_blocking(con->sock, SOCK_BLOCK);
-	
+
 	/* Fill line[] with the user header, ends with \n\n */
 	if ((res = sock_read_lines(con->sock, line, BUFSIZE)) <= 0) {
 		android_log(ANDROID_LOG_VERBOSE, "Socket error on connection %lu", con->id);
@@ -163,7 +163,7 @@ void *handle_connection(void *arg)
 
 	if (ice_strncmp(line, "GET", 3) == 0) {
 		client_login(con, line);
-	} else if (ice_strncmp(line, "SOURCE", 6) == 0) {
+	} else if (ice_strncmp(line, "SOURCE", 6) == 0 || ice_strncmp(line, "POST", 4) == 0) {
 		source_login (con, line);
 	} else {
 		write_400 (con);
@@ -207,14 +207,14 @@ get_connection (sock_t *sock)
 	/* setup sockaddr structure */
 	sin_len = sizeof(struct sockaddr_in);
 	memset(sin, 0, sin_len);
-  
+
 	/* try to accept a connection */
 	FD_ZERO(&rfds);
-	
+
 	for (i = 0; i < MAXLISTEN; i++) {
 		if (sock_valid (sock[i])) {
 			FD_SET(sock[i], &rfds);
-			if (sock[i] > maxport) 
+			if (sock[i] > maxport)
 				maxport = sock[i];
 		}
 	}
@@ -225,16 +225,16 @@ get_connection (sock_t *sock)
 
 	if (select(maxport, &rfds, NULL, NULL, &tv) > 0) {
 		for (i = 0; i < MAXLISTEN; i++) {
-			if (sock_valid (sock[i]) && FD_ISSET(sock[i], &rfds)) 
+			if (sock_valid (sock[i]) && FD_ISSET(sock[i], &rfds))
 				break;
 		}
 	} else {
 		nfree(sin);
 		return NULL;
 	}
-	
+
 	sockfd = sock_accept(sock[i], (struct sockaddr *)sin, &sin_len);
-  
+
 	if (sockfd >= 0) {
 		con = create_connection();
 		if (!sin)
@@ -264,7 +264,7 @@ get_connection (sock_t *sock)
 	}
 
 	if (!is_recoverable (errno))
-		xa_debug (1, "WARNING: accept() failed with on socket %d, max: %d, [%d:%s]", sock[i], maxport, 
+		xa_debug (1, "WARNING: accept() failed with on socket %d, max: %d, [%d:%s]", sock[i], maxport,
 			  errno, strerror(errno));
 	nfree (sin);
 	return NULL;
@@ -331,22 +331,22 @@ pool_add (connection_t *con)
 {
 	if (!con)
 		return ICE_ERROR_NULL;
-	
+
 	if ((pool_mutex.thread_id == MUTEX_STATE_UNINIT) || pool == NULL) {
 		xa_debug (1, "WARNING: Tried to use an unitialized pool");
 		return ICE_ERROR_NOT_INITIALIZED;
 	}
-	
+
 	/* Acquire mutex lock */
 	pool_lock_write ();
-	
+
 	/* Throw connection into the pool */
 	if (avl_replace (pool, con) != NULL)
 		xa_debug (1, "WARNING: Duplicate connections in the pool (id = %d)", con->id);
-	
+
 	/* Release mutex lock */
 	pool_unlock_write ();
-	
+
 	return OK;
 }
 
@@ -361,28 +361,28 @@ pool_get_my_clients (const source_t *source)
 {
 	avl_traverser trav = {0};
 	connection_t *clicon = NULL;
-	
+
 	if (!source) {
 		xa_debug (1, "WARNING: pool_get_my_clients() called with NULL source!");
 		return NULL;
 	}
-	
+
 	/* Acquire mutex lock */
 	pool_lock_write ();
-	
+
 	/* Search for clients for this source */
 	while ((clicon = avl_traverse (pool, &trav)))
 		if (clicon->food.client->source == source)
 			break;
-	
+
 	/* If found, remove it from the pool */
 	if (clicon)
 		if (avl_delete (pool, clicon) == NULL)
 			xa_debug (1, "WARNING: pool_get_my_clients(): Connection Pool Security Comprimised!");
-	
+
 	/* Release mutex lock */
 	pool_unlock_write ();
-	
+
 	return clicon;
 }
 
@@ -584,14 +584,14 @@ forward (const char *name, char *target)
 	struct sockaddr_in sin;
 	char buf[BUFSIZE];
 	int error;
-	
+
 	xa_debug (1, "forward() resolving %s", name);
 
 	if (isdigit ((int)name[0]) && isdigit ((int)name[strlen(name) - 1]))
 		return NULL; /* No point in resolving ip's */
-	
+
 	hostinfoptr = ice_gethostbyname (name, &hostinfo, buf, BUFSIZE, &error);
-	
+
 	if (!hostinfoptr)
 	{
 		ice_clean_hostent();
@@ -599,13 +599,13 @@ forward (const char *name, char *target)
 	}
 
 	memset (&sin, 0, sizeof (sin));
-	
+
 	sin.sin_addr.s_addr = *(unsigned long *)hostinfoptr->h_addr_list[0];
 
 	makeasciihost(&sin.sin_addr, target);
 
 	ice_clean_hostent();
-	
+
 	return target;
 }
 

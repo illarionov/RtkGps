@@ -68,7 +68,7 @@
 #include <fcntl.h>
 
 #ifndef _WIN32
-#include <sys/socket.h> 
+#include <sys/socket.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
 #else
@@ -133,13 +133,13 @@ void source_login(connection_t *con, char *expr)
 				sock_read_lines_np (con->sock, expr, BUFSIZE);
 			}
 		}
-		
+
 		/* The delimiter on the first line is ' ', on the following lines ':' */
 		if (go_on == 2)
 			res = splitc (command, line, ' ');
 		else
 			res = splitc (command, line, ':');
-		
+
 		if (!res)
 		{
 			strncpy (command, line, BUFSIZE);
@@ -147,7 +147,7 @@ void source_login(connection_t *con, char *expr)
 		} else {
 			strncpy (arg, line, BUFSIZE);
 		}
-		
+
 		if (line[0])
 			xa_debug (2, "DEBUG: Source line: [%s] [%s]", command, arg);
 
@@ -159,7 +159,7 @@ void source_login(connection_t *con, char *expr)
 				connected = 0;
 				return;
 			}
-			
+
 			if (!password_match(info.encoder_pass, pass)) {
 				sock_write_line (con->sock, "ERROR - Bad Password\r\n");
 				kick_connection (con, "Bad Password");
@@ -167,7 +167,7 @@ void source_login(connection_t *con, char *expr)
 			} else
 				password_accepted = 1;
 
-		
+
 			if (!source->audiocast.mount)
 				source->audiocast.mount = my_strdup(arg);
 
@@ -180,7 +180,7 @@ void source_login(connection_t *con, char *expr)
 					source->audiocast.mount = my_strdup (slash);
 				}
 			}
-			
+
 			if (mount_exists (source->audiocast.mount) || (source->audiocast.mount[0] == '\0')) {
 				sock_write_line (con->sock, "ERROR - Mount Point Taken or Invalid\r\n");
 				kick_connection (con, "Invalid Mount Point");
@@ -189,12 +189,46 @@ void source_login(connection_t *con, char *expr)
 			if (source->type == encoder_e) go_on = 1;
 		}
 
-		else if (strncasecmp(command, "Source-Agent", 12) == 0)
+		else if (ice_strncmp(command, "POST", 4) == 0)
+		{
+			if (splitc(pass, arg, ' ') == NULL) {
+				sock_write_line (con->sock, "ERROR - Missing Mountpoint\r\n");
+				kick_connection (con, "No Mountpoint supplied");
+				connected = 0;
+				return;
+			}
+			source->audiocast.mount = my_strdup (pass);
+			if (mount_exists (source->audiocast.mount) || (source->audiocast.mount[0] == '\0')) {
+				sock_write_line (con->sock, "ERROR - Mount Point Taken or Invalid\r\n");
+				kick_connection (con, "Invalid Mount Point");
+				return;
+			}
+			if (source->type == encoder_e) go_on = 1;
+		}
+
+		else if (ice_strncmp(command, "Authorization", 13) == 0)
+		{
+			if (splitc(pass, arg, ' ') == NULL) {
+				sock_write_line (con->sock, "ERROR - Missing Mountpoint\r\n");
+				kick_connection (con, "No Mountpoint supplied");
+				connected = 0;
+				return;
+			}
+			if (!password_match(info.encoder_pass, arg)) {
+				sock_write_line (con->sock, "ERROR - Bad Password\r\n");
+				kick_connection (con, "Bad Password");
+				return;
+			} else {
+				password_accepted = 1;
+			}
+		}
+
+		else if (strncasecmp(command, "Source-Agent", 12) == 0 || strncasecmp(command, "User-Agent", 10) == 0)
 		{
 			source->source_agent = my_strdup(arg);
 		}
 	} while ((go_on > 0) && connected);
-	
+
 	if (!source->source_agent || strncasecmp(source->source_agent, "ntrip", 5) != 0) {
 		sock_write_line (con->sock, "Not authorized (no NTRIP source)\r\n");
 		kick_connection (con, "No NTRIP source");
@@ -258,25 +292,25 @@ source_func(void *conarg)
 		source_get_new_clients (source);
 
 		add_chunk(con);
-		
+
 		for (i = 0; i < 10; i++) {
-			
+
 			if (source->connected != SOURCE_CONNECTED)
 				break;
 
 			thread_mutex_lock(&source->mutex);
-			
+
 			zero_trav (&trav);
-			
+
 			while ((clicon = avl_traverse(source->clients, &trav)) != NULL) {
-			  
+
 				if (source->connected == SOURCE_KILLED || source->connected == SOURCE_PAUSED)
 					break;
-				
+
 				source_write_to_client (source, clicon);
-				
+
 			}
-			
+
 			thread_mutex_unlock(&source->mutex);
 
 			if (mt->ping == 1)
@@ -295,7 +329,7 @@ source_func(void *conarg)
 	thread_mutex_lock (&info.double_mutex);
 	thread_mutex_lock (&info.source_mutex);
 	thread_mutex_lock (&source->mutex);
-	
+
 	source_get_new_clients (source);
 
 	close_connection (con, &info);
@@ -316,7 +350,7 @@ create_source()
 	return source;
 }
 
-void 
+void
 put_source(connection_t *con)
 {
 	register int i;
@@ -371,7 +405,7 @@ find_mount_with_req (request_t *req)
 	int true = 0;
 
 	avl_traverser trav = {0};
-	
+
 	if (!req || !req->path || !req->host)
 	{
 		android_log (ANDROID_LOG_VERBOSE, "WARNING: find_mount_with_req called with NULL request!");
@@ -379,9 +413,9 @@ find_mount_with_req (request_t *req)
 	}
 
 	xa_debug (1, "DEBUG: Looking for [%s] on host [%s] on port %d", req->path, req->host, req->port);
-	
 
-	while ((con = avl_traverse(info.sources, &trav)) != NULL) 
+
+	while ((con = avl_traverse(info.sources, &trav)) != NULL)
 	{
 		true = 0;
 
@@ -426,7 +460,7 @@ find_mount_with_req (request_t *req)
 		if (true) {
 			xa_debug(1, "DEBUG: Found local mount for [%s]", req->path);
 			return con;
-		} 
+		}
 	}
 	return NULL;
 }
@@ -441,7 +475,7 @@ add_chunk (connection_t *con)
 	if (con->food.source->chunk[con->food.source->cid].clients_left > 0)
 	{
 #ifndef OPTIMIZE
-		xa_debug (2, "DEBUG: Kicking trailing clients [%d] on id %d", con->food.source->chunk[con->food.source->cid].clients_left, 
+		xa_debug (2, "DEBUG: Kicking trailing clients [%d] on id %d", con->food.source->chunk[con->food.source->cid].clients_left,
 			con->food.source->cid);
 #endif
 		thread_mutex_lock (&info.double_mutex);
@@ -452,7 +486,7 @@ add_chunk (connection_t *con)
 		thread_mutex_unlock (&con->food.source->mutex);
 		thread_mutex_unlock (&info.double_mutex);
 	}
-	
+
 	len = 0;
 	read_bytes = 0;
 	tries = 0;
@@ -464,21 +498,21 @@ add_chunk (connection_t *con)
 #endif
 
 		len = recv(con->sock, con->food.source->chunk[con->food.source->cid].data + read_bytes, SOURCE_READSIZE - read_bytes, 0);
-		
+
 		xa_debug (5, "DEBUG: Source received %d bytes in try %d, total %d, errno: %d", len, tries, read_bytes, errno);
 
 #ifdef _WIN32
 		sock_set_blocking(con->sock, SOCK_NONBLOCK);
 #endif
-		
+
 		if (con->food.source->connected == SOURCE_KILLED)
 			return;
-		
+
 		if ((len == 0) || ((len == -1) && (!is_recoverable(errno)))) {
 			if (info.client_timeout > 0 && con->food.source->connected != SOURCE_KILLED) {
 				/* Set this source as pending (not connected) */
 				pending_connection (con);
-				
+
 				/* Sleep for client_timeout seconds. If during that time this source is set to
 				SOURCE_KILLED, return false */
 
@@ -552,11 +586,11 @@ add_chunk (connection_t *con)
 #ifndef OPTIMIZE
 	xa_debug (4, "-------add_chunk: Chunk %d was [%d] bytes", con->food.source->cid, read_bytes );
 #endif
-	
+
 	con->food.source->chunk[con->food.source->cid].len = read_bytes;
 	con->food.source->chunk[con->food.source->cid].clients_left = con->food.source->num_clients;
 	con->food.source->cid = (con->food.source->cid + 1) % CHUNKLEN;
-	
+
 }
 
 void
@@ -573,10 +607,10 @@ write_chunk(source_t *source, connection_t *clicon)
 
 		/* This is how much we should be writing to the client */
 		len = source->chunk[clicon->food.client->cid].len - clicon->food.client->offset;
-		
-		xa_debug (5, "DEBUG: write_chunk(): Try: %d, writing chunk %d to client %d, len(%d) - offset(%d) == %d", i, clicon->food.client->cid, clicon->id, 
+
+		xa_debug (5, "DEBUG: write_chunk(): Try: %d, writing chunk %d to client %d, len(%d) - offset(%d) == %d", i, clicon->food.client->cid, clicon->id,
 			  source->chunk[clicon->food.client->cid].len, clicon->food.client->offset, len);
-		
+
 		if (len < 0 || source->chunk[clicon->food.client->cid].len == 0)
 		{
 #ifndef OPTIMIZE
@@ -587,8 +621,8 @@ write_chunk(source_t *source, connection_t *clicon)
 			clicon->food.client->cid = (clicon->food.client->cid + 1) % CHUNKLEN;
 			clicon->food.client->offset = 0;
 			continue; /* Perhaps for some reason the source read a zero sized chunk but the next one is ok */
-		} 
-		
+		}
+
 		write_bytes = write_data (clicon, source);
 
 		if (write_bytes < 0)
@@ -604,29 +638,29 @@ write_chunk(source_t *source, connection_t *clicon)
 		clicon->food.client->write_bytes += write_bytes;
 		info.hourly_stats.write_bytes += write_bytes;
 		stat_add_write (&source->stats, write_bytes);
-		
+
 		if (write_bytes + clicon->food.client->offset >= source->chunk[clicon->food.client->cid].len) {
 			source->chunk[clicon->food.client->cid].clients_left--;
 			clicon->food.client->cid = (clicon->food.client->cid + 1) % CHUNKLEN;
 			clicon->food.client->offset = 0;
 		} else {
-			
+
 			clicon->food.client->offset += write_bytes;
 #ifndef OPTIMIZE
-			xa_debug (5, "DEBUG: client %d only read %d of %d bytes", clicon->id, write_bytes, 
+			xa_debug (5, "DEBUG: client %d only read %d of %d bytes", clicon->id, write_bytes,
 				  source->chunk[clicon->food.client->cid].len - clicon->food.client->offset);
 #endif
 		}
 	}
-	
+
 	xa_debug (4, "DEBUG: client %d tried %d times, now has %d errors %d chunks behind source", clicon->id, i,
 		  client_errors (clicon->food.client), source->cid < clicon->food.client->cid ? source->cid+CHUNKLEN - clicon->food.client->cid : source->cid - clicon->food.client->cid);
-	
+
 	if (clicon->food.client->alive == CLIENT_DEAD)
 		return;
 }
 
-void 
+void
 kick_clients_on_cid(source_t *source)
 {
 	avl_traverser trav = {0};
@@ -646,9 +680,9 @@ kick_clients_on_cid(source_t *source)
 		clicon = avl_traverse (source->clients, &trav);
 		if (!clicon)
 			break;
-		
+
 		if (client_errors (clicon->food.client) >= (CHUNKLEN - 1) && clicon->food.client->alive != CLIENT_DEAD)
-		    
+
 		{
 			kick_connection (clicon, "Client cannot sustain sufficient bandwidth");
 			zero_trav (&trav); /* Start from the top of the tree */
@@ -661,18 +695,18 @@ kick_clients_on_cid(source_t *source)
 #endif
 }
 
-/* 
+/*
  * Can't be removing clients inside the loop which handles all the
- * write_chunk()s, instead we kick all the dead ones for each chunk. 
+ * write_chunk()s, instead we kick all the dead ones for each chunk.
  */
-void 
+void
 kick_dead_clients(source_t *source)
 {
 	avl_traverser trav = {0};
 	connection_t *clicon = NULL;
 
 	int max = avl_count (source->clients) * avl_count (source->clients) + 2;
-	
+
 #if !defined(SAVE_CPU) || !defined(OPTIMIZE)
 	xa_debug (5, "DEBUG: In function kick_dead_clients. Will run %d laps", max);
 #endif
@@ -683,25 +717,25 @@ kick_dead_clients(source_t *source)
 				kick_connection (clicon, "Too many errors (client not receiving data fast enough)");
 		}
 	}
-	
+
 	zero_trav (&trav);
 
-	while (max >= 0) 
+	while (max >= 0)
 	{
 		clicon = avl_traverse (source->clients, &trav);
 		if (!clicon)
 			break;
-		
+
 		if (clicon->food.client->alive == CLIENT_MOVE) {
 				kick_connection (clicon, "Smaller source stream signed off");
 			/* No zero_trav() here cause it's not removed from the list (close_connection() does that) */
 		}
-		
+
 		if (clicon->food.client->alive == CLIENT_DEAD) {
 			close_connection (clicon, &info);
 			zero_trav (&trav);
 		}
-		
+
 		max--;
 	}
 
@@ -714,13 +748,13 @@ int
 write_data (connection_t *clicon, source_t *source)
 {
 	int write_bytes;
-	
+
 	if (source->chunk[clicon->food.client->cid].len - clicon->food.client->offset <= 0)
 		return 0;
-	
-	write_bytes = sock_write_bytes_or_kick(clicon->sock, clicon, &source->chunk[clicon->food.client->cid].data[clicon->food.client->offset], 
+
+	write_bytes = sock_write_bytes_or_kick(clicon->sock, clicon, &source->chunk[clicon->food.client->cid].data[clicon->food.client->offset],
 					       source->chunk[clicon->food.client->cid].len - clicon->food.client->offset);
-	
+
 #ifndef OPTIMIZE
 	xa_debug (4, "DEBUG: client %d in write_data(). Function write() returned %d of %d bytes, client on chunk %d (+%d), source on chunk %d", clicon->id, write_bytes,
 		  source->chunk[clicon->food.client->cid].len - clicon->food.client->offset, clicon->food.client->cid, clicon->food.client->offset,
@@ -760,29 +794,29 @@ source_write_to_client (source_t *source, connection_t *clicon)
 		xa_debug (1, "WARNING: source_write_to_client() called with NULL pointers");
 		return;
 	}
-	
+
 	client = clicon->food.client;
 
 	if (client->alive == CLIENT_DEAD)
 		return;
-	
+
 	if (client->virgin == CLIENT_PAUSED || client->virgin == -1)
 		return;
-	
+
 	if (client->virgin == CLIENT_UNPAUSED)	{
 		client->cid = start_chunk (source);
 		client->offset = find_frame_ofs (source);
 		client->virgin = 0;
 	}
-	
+
 	if (client->virgin == 1) {
-		client->cid = start_chunk (source); 
+		client->cid = start_chunk (source);
 		client->offset = find_frame_ofs(source);
 		xa_debug (2, "Client got offset %d", client->offset);
 		client->virgin = 0;
 		source->num_clients = source->num_clients + (unsigned long int)1;
 	}
-	
+
   write_chunk (source, clicon);
 }
 
@@ -790,7 +824,7 @@ void
 source_get_new_clients (source_t *source)
 {
 	connection_t *clicon;
-	
+
 	while ((clicon = pool_get_my_clients (source))) {
 		xa_debug (1, "DEBUG: source_get_new_clients(): Accepted client %d", clicon->id);
 		avl_insert (source->clients, clicon);
