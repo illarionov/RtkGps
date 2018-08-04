@@ -75,8 +75,8 @@ LOCAL_SRC_FILES += \
     $(RTKLIB_PATH)/src/rcv/swiftnav.c \
     $(RTKLIB_PATH)/src/rcv/ublox.c \
     $(RTKLIB_PATH)/src/rcv/cmr.c \
-    $(RTKLIB_PATH)/src/rcv/tersus.c
-
+    $(RTKLIB_PATH)/src/rcv/tersus.c \
+    $(RTKLIB_PATH)/src/rcv/comnav.c \
 LOCAL_SRC_FILES += log.c
 
 #

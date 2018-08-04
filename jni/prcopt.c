@@ -436,7 +436,10 @@ static void ProcessingOptions_load_defaults(JNIEnv* env, jobject thiz)
       jarr = (*env)->GetObjectField(env, thiz, gpsplus_rtklib_prcopt_fields.exsats);
       j_bool_arr = (*env)->GetBooleanArrayElements(env, jarr, NULL);
       if (j_bool_arr == NULL) return;
-      for (i=0; i<sizeof(src->exsats)/sizeof(src->exsats[0]); ++i)
+       /* TODO
+        * URGENT BUG MAXSAT=153 cause crash limit to 147
+        */
+      for (i=0; i<(sizeof(src->exsats)/sizeof(src->exsats[0])-6); ++i)
 	 j_bool_arr[i] = src->exsats[i] == 1 ? JNI_TRUE : JNI_FALSE;
       (*env)->ReleaseBooleanArrayElements(env, jarr, j_bool_arr, 0);
    }
