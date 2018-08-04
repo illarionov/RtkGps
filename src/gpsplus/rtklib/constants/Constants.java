@@ -16,14 +16,14 @@ public class Constants {
     /** min satellite slot number of GLONASS */
     public final static int MINPRNGLO = 1;
     /** max satellite slot number of GLONASS */
-    public final static int MAXPRNGLO = 24;
+    public final static int MAXPRNGLO = 27;
     /** number of GLONASS satellites */
     public final static int NSATGLO = MAXPRNGLO-MINPRNGLO+1;
 
     /** min satellite PRN number of Galileo */
     public final static int MINPRNGAL = 1;
     /** max satellite PRN number of Galileo */
-    public final static int MAXPRNGAL = 27;
+    public final static int MAXPRNGAL = 36;
     /** number of Galileo satellites */
     public final static int NSATGAL = MAXPRNGAL-MINPRNGAL+1;
 
