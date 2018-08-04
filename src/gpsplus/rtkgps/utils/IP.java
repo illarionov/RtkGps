@@ -1,6 +1,6 @@
 package gpsplus.rtkgps.utils;
 
-import org.apache.http.conn.util.InetAddressUtils;
+import cz.msebera.android.httpclient.conn.util.InetAddressUtils;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;

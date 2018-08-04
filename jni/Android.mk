@@ -79,9 +79,6 @@ include $(BUILD_SHARED_LIBRARY)
 
 #Build ntripcaster
 include $(CLEAR_VARS)
-LOCAL_PATH := $(JNI_TOP_PATH)
-TARGET_PLATFORM := android-14
-TARGET_ARCH_ABI := armeabi armeabi-v7a mips x86
 LOCAL_MODULE    := ntripcaster
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/ntripcaster/src
 LOCAL_CFLAGS    := -DHAVE_CONFIG_H=1 -DJNI_ENABLED=1
@@ -100,7 +97,4 @@ LOCAL_SRC_FILES := \
 	ntripcaster/src/timer.c \
 	ntripcaster/src/utility.c \
 	ntripcaster/src/ntripcaster_jni.c
-
 include $(BUILD_SHARED_LIBRARY)
-$(call import-module,simonlynen_android_libs/lapack/jni)
-

@@ -71,8 +71,8 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @BindView(R.id.navigation_drawer) View mNavDrawer;
 
-    @InjectView(R.id.navdraw_server_switch) Switch mNavDrawerServerSwitch;
-    @InjectView(R.id.navdraw_ntripcaster_switch) Switch mNavDrawerCasterSwitch;
+    @BindView(R.id.navdraw_server_switch) Switch mNavDrawerServerSwitch;
+    @BindView(R.id.navdraw_ntripcaster_switch) Switch mNavDrawerCasterSwitch;
 
     private ActionBarDrawerToggle mDrawerToggle;
 

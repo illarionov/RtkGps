@@ -966,14 +966,16 @@ get_ticks()
   return (tv.tv_usec/1000 + tv.tv_sec * 1000);
 }
 
+void thread_exit_handler(int sig)
+{
+	android_log(ANDROID_LOG_VERBOSE, "Thread cancelling...");
+	pthread_exit(0);
+}
+
 void *
 join_timeout_helper(void *arg)
 {
-	void thread_exit_handler(int sig)
-	 {
-		android_log(ANDROID_LOG_VERBOSE, "Thread cancelling...");
-		pthread_exit(0);
-	 }
+
 	struct sigaction actions;
 	 	memset(&actions, 0, sizeof(actions));
 	 	sigemptyset(&actions.sa_mask);
