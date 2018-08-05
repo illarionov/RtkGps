@@ -19,9 +19,16 @@
     </style>
   </head>
   <body>
+$ 1.0 alpha 26
+   % Build 26
+  _ 2018-08-31
+    * Merge Embedded NTRIP Caster - use only if you know what you are doing
+    * Produce .urw .crw for Trimble MobileMapper field Office
+    * Add record point button wich add a point on an ESRI shape file and the .crw file
+    * Basic permissions request for newer Android platforms
 $ 1.0 alpha 25
    % Build 25
-  _ 201-08-31
+  _ 2018-07-31
     * Initial support for Trimble / SpectraPrecision MobileMapper 50
     * Merge some mods by Ken McGuire (GPSFan)
     *   re-order Processing options to resemble rtknavi options settings 1 & 2

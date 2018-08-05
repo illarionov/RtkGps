@@ -24,6 +24,7 @@ dependencies {
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.jakewharton:butterknife:8.8.1'
+    implementation 'com.karumi:dexter:5.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }
 
@@ -45,7 +46,6 @@ android {
         targetSdkVersion 26
         multiDexEnabled true
         ndk {
-            abiFilters 'armeabi-v7a'
         }
     }
     sourceSets {

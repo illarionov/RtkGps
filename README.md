@@ -8,7 +8,7 @@ RTKLIB rtknavi port on android.
 
 #### [rtklib][rtklib] features:
 
-* Version pre 2.4.3b29
+* Version pre 2.4.3b29d
 * GPS, GLONASS, Galileo, QZSS, BeiDou and SBAS Navigation systems
 * Single, DGPS/DGNSS, Kinematic, Static, Moving-Baseline, Fixed,
   PPP-Kinematic, PPP-Static and PPP-Fixed positioning modes.

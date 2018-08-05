@@ -1,5 +1,6 @@
 package gpsplus.rtkgps;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
@@ -27,6 +28,11 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import butterknife.BindString;
 import butterknife.ButterKnife;
 import butterknife.BindView;
 
@@ -40,11 +46,14 @@ import gpsplus.rtkgps.settings.SettingsHelper;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtkgps.settings.StreamSettingsActivity;
 import gpsplus.rtkgps.utils.ChangeLog;
+import gpsplus.rtkgps.utils.GpsTime;
+import gpsplus.rtklib.GTime;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
@@ -62,17 +71,22 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     public static final String APP_KEY = "6ffqsgh47v9y5dc";
     public static final String APP_SECRET = "hfmsbkv4ktyl60h";
+    public static final String RTKGPS_CHILD_DIRECTORY = "RtkGps/";
 //    private DbxAccountManager mDbxAcctMgr;
 
     RtkNaviService mRtkService;
     boolean mRtkServiceBound = false;
     private static DemoModeLocation mDemoModeLocation;
+    private String mSessionCode;
 
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @BindView(R.id.navigation_drawer) View mNavDrawer;
 
     @BindView(R.id.navdraw_server_switch) Switch mNavDrawerServerSwitch;
     @BindView(R.id.navdraw_ntripcaster_switch) Switch mNavDrawerCasterSwitch;
+
+    @BindString(R.string.permissions_request_title) String permissionTitle;
+    @BindString(R.string.permissions_request_message) String permissionMessage;
 
     private ActionBarDrawerToggle mDrawerToggle;
 
@@ -82,6 +96,28 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MultiplePermissionsListener dialogMultiplePermissionsListener =
+                DialogOnAnyDeniedMultiplePermissionsListener.Builder
+                        .withContext(this)
+                        .withTitle(permissionTitle)
+                        .withMessage(permissionMessage)
+                        .withButtonText(android.R.string.ok)
+                        .build();
+        // New Permissions request for newer Android SDK
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.ACCESS_NETWORK_STATE,
+                        Manifest.permission.BLUETOOTH,
+                        Manifest.permission.INTERNET,
+                        Manifest.permission.WAKE_LOCK,
+                        Manifest.permission.ACCESS_WIFI_STATE,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.BLUETOOTH_ADMIN,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(dialogMultiplePermissionsListener)
+                .check();
 
         PackageManager m = getPackageManager();
         String s = getPackageName();
@@ -126,9 +162,12 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
         mNavDrawerServerSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                GpsTime gpsTime = new GpsTime();
+                gpsTime.setTime(System.currentTimeMillis());
+                mSessionCode =String.format("%s_%s",gpsTime.getStringGpsWeek(),gpsTime.getStringGpsTOW());
                 mDrawerLayout.closeDrawer(mNavDrawer);
                 if (isChecked) {
-                    startRtkService();
+                    startRtkService(mSessionCode);
                 }else {
                     stopRtkService();
                 }
@@ -252,6 +291,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
         boolean serviceActive = mNavDrawerServerSwitch.isChecked();
         menu.findItem(R.id.menu_start_service).setVisible(!serviceActive);
         menu.findItem(R.id.menu_stop_service).setVisible(serviceActive);
+        menu.findItem(R.id.menu_add_point).setVisible(serviceActive);
         menu.findItem(R.id.menu_tools).setVisible(true);
 //        if (mDbxAcctMgr.hasLinkedAccount())
 //        {
@@ -274,6 +314,9 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
         case R.id.menu_stop_service:
             mNavDrawerServerSwitch.setChecked(false);
             break;
+        case R.id.menu_add_point:
+            askToAddPointToCrw();
+            break;
         case R.id.menu_tools:
             startActivity(new Intent(this, ToolsActivity.class));
             break;
@@ -290,6 +333,13 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
             return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private void askToAddPointToCrw()
+    {
+        final Intent intent = new Intent(RtkNaviService.ACTION_STORE_POINT);
+        intent.setClass(this, RtkNaviService.class);
+        startService(intent);
     }
 
     private void copyAssetsDirToApplicationDirectory(String sourceDir, File destDir) throws FileNotFoundException, IOException
@@ -444,10 +494,16 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
         mNavDrawerServerSwitch.setChecked(serviceActive);
     }
 
-    private void startRtkService() {
-        final Intent intent = new Intent(RtkNaviService.ACTION_START);
-        intent.setClass(this, RtkNaviService.class);
-        startService(intent);
+    private void startRtkService(String sessionCode) {
+        mSessionCode = sessionCode;
+        final Intent rtkServiceIntent = new Intent(RtkNaviService.ACTION_START);
+        rtkServiceIntent.putExtra(RtkNaviService.EXTRA_SESSION_CODE,mSessionCode);
+        rtkServiceIntent.setClass(this, RtkNaviService.class);
+        startService(rtkServiceIntent);
+    }
+
+    public String getSessionCode() {
+        return mSessionCode;
     }
 
     private void stopRtkService() {
@@ -531,12 +587,41 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
     @Nonnull
     public static File getFileStorageDirectory() {
-        return new File(Environment.getExternalStorageDirectory(), "RtkGps/");
+        File externalLocation = new File(Environment.getExternalStorageDirectory(), RTKGPS_CHILD_DIRECTORY);
+        if(!externalLocation.isDirectory()) {
+           if (externalLocation.mkdirs()) {
+               Log.v(TAG, "Local storage created on external card");
+           }else{
+               externalLocation = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),RTKGPS_CHILD_DIRECTORY);
+               if(!externalLocation.isDirectory()) {
+                   if (externalLocation.mkdirs()) {
+                       Log.v(TAG, "Local storage created on public storage");
+                   }else{
+                       externalLocation = new File(Environment.getDownloadCacheDirectory(), RTKGPS_CHILD_DIRECTORY);
+                       if (!externalLocation.isDirectory()){
+                           if (externalLocation.mkdirs()){
+                               Log.v(TAG, "Local storage created on cache directory");
+                           }else{
+                               externalLocation = new File(Environment.getDataDirectory(),RTKGPS_CHILD_DIRECTORY);
+                               if(!externalLocation.isDirectory()) {
+                                   if (externalLocation.mkdirs()) {
+                                       Log.v(TAG, "Local storage created on data storage");
+                                   }else{
+                                       Log.e(TAG,"NO WAY TO CREATE FILE SOTRAGE?????");
+                                   }
+                               }
+                           }
+                       }
+                   }
+               }
+           }
+        }
+        return externalLocation;
     }
 
     @Nonnull
     public static File getFileInStorageDirectory(String nameWithExtension) {
-        return new File(Environment.getExternalStorageDirectory(), "RtkGps/"+nameWithExtension);
+        return new File(Environment.getExternalStorageDirectory(), RTKGPS_CHILD_DIRECTORY+nameWithExtension);
     }
 
     @Nonnull

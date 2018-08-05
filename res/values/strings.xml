@@ -839,4 +839,7 @@
     <string name="ntripcaster_options_brutal_ending_summary">Ending NTRIP Caster will also shutown RTKGPS+, it is safer for being sure all connections are closed.</string>
     <string name="ntripcaster_options_brutal_ending_title">Brutal ending</string>
     <string name="ntripcaster_options_warning">Be carrefull\nThis is an highly experimental feature!\nRemember that when you will stop the caster, RTKGPS+ will close itself for cleaning the memory and closing the connections.\nPlease do not blame me for that...\nIf not sure to activate this feature.</string>
+    <string name="permissions_request_title">Permissions</string>
+    <string name="permissions_request_message">Storage is for geoids, ephemeris and raw datas, Bluetooth is for external devices, Internet is for all external IP communications… GPS is for… you know obviously, all others are also needed.</string>
+    <string name="menu_add_point">Add point to session</string>
 </resources>

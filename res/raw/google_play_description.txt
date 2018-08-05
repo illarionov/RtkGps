@@ -20,8 +20,9 @@ Since there is no new version I reworked the code for adding some features I nee
        for activating this you need to choose Height:Geodetic in the "Solution Options" view
 2- send mock locations to other applications.
        for activating this you need to check in the "Solution Options" view Output GPS mock locations, but this is only working if you have allowed "mock locations" in the developer settings (in Android setting).
-       today (in 1.0alpha13) the mock locations are not usable in the Google map API.
-3- automatically upload log file or solution file to your Dropbox account
+       today (in 1.0alpha26) the mock locations are not usable in the Google map API.
+3- Preliminary support for Trimble SpectraPrecision MobileMapper 50 internal chipset
+3b- Records .urw .crw .map and .shp compatibles with Trimble MobileMapper Office.
 4- can generate a gpx file of the track
 5- can display the result in ECEF, WGS84 Lat/Lon, NAD83, Lambert 93 (RGF93) or UTM (with auto zoning) coordinate system
 5b- use any Proj4 projection

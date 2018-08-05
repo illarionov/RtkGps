@@ -38,6 +38,7 @@ import gpsplus.rtkgps.settings.StreamBluetoothFragment;
 import gpsplus.rtkgps.settings.StreamBluetoothFragment.Value;
 import gpsplus.rtkgps.settings.StreamMobileMapperFragment;
 import gpsplus.rtkgps.settings.StreamUsbFragment;
+import gpsplus.rtkgps.utils.GpsTime;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.RtkControlResult;
@@ -50,7 +51,10 @@ import gpsplus.rtklib.Solution;
 import gpsplus.rtklib.constants.GeoidModel;
 import gpsplus.rtklib.constants.StreamType;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 public class RtkNaviService extends IntentService implements LocationListener
@@ -100,6 +104,8 @@ public class RtkNaviService extends IntentService implements LocationListener
 
     public static final String ACTION_START = "gpsplus.rtkgps.RtkNaviService.START";
     public static final String ACTION_STOP = "gpsplus.rtkgps.RtkNaviService.STOP";
+    public static final String ACTION_STORE_POINT = "gpsplus.rtkgps.RtkNaviService.STORE_POINT";
+    public static final String EXTRA_SESSION_CODE = "gpsplus.rtkgps.RtkNaviService.SESSION_CODE";
     private static final String RTK_GPS_MOCK_LOC_SERVICE = "RtkGps mock loc service";
     private static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
     private int NOTIFICATION = R.string.local_service_started;
@@ -124,6 +130,7 @@ public class RtkNaviService extends IntentService implements LocationListener
     private boolean mBoolGenerateGPXTrace = false;
     private GPXTrace mGpxTrace = null;
     private long  mLProcessingCycle = 5;
+    private String mSessionCode;
 
     @Override
     public void onCreate() {
@@ -141,8 +148,17 @@ public class RtkNaviService extends IntentService implements LocationListener
             processStart();
         }else {
             final String action = intent.getAction();
-            if (action.equals(ACTION_START)) processStart();
+
+            if (action.equals(ACTION_START)) {
+                if (intent.hasExtra(EXTRA_SESSION_CODE)){
+                    mSessionCode = intent.getStringExtra(EXTRA_SESSION_CODE);
+                }else{
+                    mSessionCode = String.valueOf(System.currentTimeMillis());
+                }
+                processStart();
+            }
             else if(action.equals(ACTION_STOP)) processStop();
+            else if(action.equals(ACTION_STORE_POINT)) addPointToCRW();
             else Log.e(TAG, "onStartCommand(): unknown action " + action);
         }
         super.onStartCommand(intent, flags, startId);
@@ -202,6 +218,36 @@ public class RtkNaviService extends IntentService implements LocationListener
         return mRtkServer.readSolutionBuffer();
     }
 
+    private void addPointToCRW()
+      {
+          double lat,lon,height,dLat,dLon;
+          Solution[] currentSolutions = readSolutionBuffer();
+          GpsTime gpsTime = new GpsTime();
+          gpsTime.setTime(System.currentTimeMillis());
+
+          Position3d roverEcefPos = currentSolutions[currentSolutions.length-1].getPosition();
+          Position3d roverPos = RtkCommon.ecef2pos(roverEcefPos);
+          lat = roverPos.getLat();
+          lon=roverPos.getLon();
+          dLat = Math.toDegrees(lat);
+          dLon = Math.toDegrees(lon);
+          height=roverPos.getHeight();
+          String currentLine = String.format("%s,%s,%.6f,%.6f,%.3f,%d,%.3f,%.3f,%.1f\n",gpsTime.getStringGpsWeek(),gpsTime.getStringGpsTOW(),dLat,dLon,height,10,0D,0D,0D);
+          try {
+              File crwFile = new File(MainActivity.getFileStorageDirectory()+"/"+mSessionCode+".crw");
+              if (!crwFile.exists()){
+                  crwFile.createNewFile();
+              }
+              FileWriter crwFileWriter = new FileWriter(crwFile,true);
+              BufferedWriter out = new BufferedWriter(crwFileWriter);
+              out.write(currentLine);
+              out.close();
+              crwFileWriter.close();
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+
+      }
     /**
      * Class used for the client Binder. Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
@@ -626,7 +672,7 @@ public class RtkNaviService extends IntentService implements LocationListener
         roverSettings = settings.getInputRover().getTransportSettings();
         if (roverSettings.getType() == StreamType.MOBILEMAPPER) {
             StreamMobileMapperFragment.Value mobileMapperSettings = (gpsplus.rtkgps.settings.StreamMobileMapperFragment.Value)roverSettings;
-            mMobileMapperToRtklib = new MobileMapperToRtklib(this, mobileMapperSettings);
+            mMobileMapperToRtklib = new MobileMapperToRtklib(this, mobileMapperSettings, mSessionCode);
             mMobileMapperToRtklib.start();
         }
     }
@@ -705,7 +751,13 @@ public class RtkNaviService extends IntentService implements LocationListener
                                      // provide the new location
                                      //   Log.i(RTK_GPS_MOCK_LOCATION_SERVICE,"Mock location is "+currentLocation.getLatitude()+" "+currentLocation.getLongitude());
                                         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                                        locationManager.setTestProviderLocation(GPS_PROVIDER, currentLocation);
+                                        try {
+                                            locationManager.setTestProviderLocation(GPS_PROVIDER, currentLocation);
+                                        }
+                                        catch (IllegalArgumentException e)
+                                        {
+                                            Log.i(RTK_GPS_MOCK_LOC_SERVICE,"Your device does not support MOCK_LOCATION with provider:" +GPS_PROVIDER);
+                                        }
                                     }
                             }
                             if (mBoolGenerateGPXTrace)
