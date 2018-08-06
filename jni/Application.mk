@@ -1,3 +1,3 @@
 APP_PLATFORM := android-18
 NDK_MODULE_PATH=$(APP_PROJECT_PATH)/jni
-APP_ABI := armeabi-v7a arm64-v8a x86 x86_64
+APP_ABI := armeabi-v7a x86
