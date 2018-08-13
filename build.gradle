@@ -17,14 +17,18 @@ repositories {
 }
 
 dependencies {
-    implementation  group: 'cz.msebera.android' , name: 'httpclient' , version: '4.4.1.2'
-    implementation 'com.android.support:support-v13:21.0.+'
-    implementation 'com.google.gms:google-services:3.1.0'
+    implementation  group: 'cz.msebera.android' , name: 'httpclient' , version: '4.4.+'
+    implementation 'com.android.support:support-v13:27.1.1'
+    implementation 'com.google.gms:google-services:3.2.1'
     implementation 'com.google.android.gms:play-services-gcm:11.0.4'
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.karumi:dexter:5.0.0'
+    implementation 'ch.acra:acra:4.5.0'
+    implementation 'commons-net:commons-net:3.6'
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation 'com.infstory:proguard-annotations:1.0.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }
 
@@ -73,8 +77,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
     buildTypes {
         debug {

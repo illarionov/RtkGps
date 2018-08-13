@@ -1,12 +1,15 @@
 package gpsplus.rtkgps;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -18,9 +21,11 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
+import butterknife.BindString;
 
 //import com.dropbox.sync.android.DbxAccountManager;
 //import com.dropbox.sync.android.DbxException;
@@ -29,6 +34,10 @@ import android.widget.Toast;
 //import com.dropbox.sync.android.DbxFileSystem;
 //import com.dropbox.sync.android.DbxPath;
 //import com.dropbox.sync.android.DbxPath.InvalidPathException;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import gpsplus.rtkgps.settings.OutputGPXTraceFragment;
 import gpsplus.rtkgps.settings.ProcessingOptions1Fragment;
@@ -57,8 +66,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-public class RtkNaviService extends IntentService implements LocationListener
-  {
+public class RtkNaviService extends IntentService implements LocationListener {
 
     private class dpFile {
         private String localFilenameWithPath;
@@ -69,6 +77,7 @@ public class RtkNaviService extends IntentService implements LocationListener
             this.localFilenameWithPath = localFilenameWithPath;
             this.remoteFilename = remoteFilename;
         }
+
         @SuppressWarnings("unused")
         public dpFile(String filename) {
             super();
@@ -80,19 +89,23 @@ public class RtkNaviService extends IntentService implements LocationListener
         public String getLocalFilenameWithPath() {
             return localFilenameWithPath;
         }
+
         @SuppressWarnings("unused")
         public void setLocalFilenameWithPath(String localFilenameWithPath) {
             this.localFilenameWithPath = localFilenameWithPath;
         }
+
         public String getRemoteFilename() {
             return remoteFilename;
         }
+
         @SuppressWarnings("unused")
         public void setRemoteFilename(String remoteFilename) {
             this.remoteFilename = remoteFilename;
         }
 
     }
+
     public RtkNaviService() {
         super(RtkNaviService.class.getSimpleName());
         // TODO Auto-generated constructor stub
@@ -107,7 +120,9 @@ public class RtkNaviService extends IntentService implements LocationListener
     public static final String ACTION_STORE_POINT = "gpsplus.rtkgps.RtkNaviService.STORE_POINT";
     public static final String EXTRA_SESSION_CODE = "gpsplus.rtkgps.RtkNaviService.SESSION_CODE";
     private static final String RTK_GPS_MOCK_LOC_SERVICE = "RtkGps mock loc service";
+    private static final String MM_MAP_HEADER = ",0],UNIT[\"Degrees\",0.0174532925199433],AXIS[\"Long\",East],AXIS[\"Lat\",North]],VERT_CS[\"\",VERT_DATUM[\"Ellipsoïde\",2002],UNIT[\"Meters\",1],AXIS[\"Height\",Up]]]";
     private static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
+    private boolean mHavePoint = false;
     private int NOTIFICATION = R.string.local_service_started;
     private RtkCommon rtkCommon;
 
@@ -129,9 +144,10 @@ public class RtkNaviService extends IntentService implements LocationListener
     private long mLStartingTime = 0;
     private boolean mBoolGenerateGPXTrace = false;
     private GPXTrace mGpxTrace = null;
-    private long  mLProcessingCycle = 5;
+    private long mLProcessingCycle = 5;
     private String mSessionCode;
-
+    @BindString(R.string.permission_to_use_gps_title) String permissionTitle;
+    @BindString(R.string.permission_to_use_gps) String permissionMessage;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -146,19 +162,22 @@ public class RtkNaviService extends IntentService implements LocationListener
         if (intent == null) {
             Log.v(TAG, "RtkNaviService restarted");
             processStart();
-        }else {
+        } else {
             final String action = intent.getAction();
 
             if (action.equals(ACTION_START)) {
-                if (intent.hasExtra(EXTRA_SESSION_CODE)){
+                if (intent.hasExtra(EXTRA_SESSION_CODE)) {
                     mSessionCode = intent.getStringExtra(EXTRA_SESSION_CODE);
-                }else{
+                } else {
                     mSessionCode = String.valueOf(System.currentTimeMillis());
                 }
                 processStart();
-            }
-            else if(action.equals(ACTION_STOP)) processStop();
-            else if(action.equals(ACTION_STORE_POINT)) addPointToCRW();
+            } else if (action.equals(ACTION_STOP)) {
+                processStop();
+                if (mHavePoint) {
+                    createMapFile();
+                }
+            } else if (action.equals(ACTION_STORE_POINT)) addPointToCRW();
             else Log.e(TAG, "onStartCommand(): unknown action " + action);
         }
         super.onStartCommand(intent, flags, startId);
@@ -180,10 +199,9 @@ public class RtkNaviService extends IntentService implements LocationListener
 
     public final RtkServerObservationStatus getRoverObservationStatus(
             RtkServerObservationStatus status) {
-        if (MainActivity.getDemoModeLocation().isInDemoMode() && mbStarted)
-        {
+        if (MainActivity.getDemoModeLocation().isInDemoMode() && mbStarted) {
             return MainActivity.getDemoModeLocation().getObservationStatus(status);
-        }else{
+        } else {
             return mRtkServer.getRoverObservationStatus(status);
         }
     }
@@ -206,6 +224,7 @@ public class RtkNaviService extends IntentService implements LocationListener
         if (mRtkServer != null)
             mRtkServer.readSatAnt(file);
     }
+
     public boolean isServiceStarted() {
         return mRtkServer.getStatus() != RtkServerStreamStatus.STATE_CLOSE;
     }
@@ -218,36 +237,61 @@ public class RtkNaviService extends IntentService implements LocationListener
         return mRtkServer.readSolutionBuffer();
     }
 
-    private void addPointToCRW()
-      {
-          double lat,lon,height,dLat,dLon;
-          Solution[] currentSolutions = readSolutionBuffer();
-          GpsTime gpsTime = new GpsTime();
-          gpsTime.setTime(System.currentTimeMillis());
+    private void createMapFile() {
+        try {
+            File mapFile = new File(MainActivity.getFileStorageDirectory() + "/" + mSessionCode + ".map");
+            if (!mapFile.exists()) {
+                mapFile.createNewFile();
+            }
+            FileWriter mapFileWriter = new FileWriter(mapFile, true);
+            BufferedWriter out = new BufferedWriter(mapFileWriter);
+            out.write(MM_MAP_HEADER + "\n");
+            out.close();
+            mapFileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-          Position3d roverEcefPos = currentSolutions[currentSolutions.length-1].getPosition();
-          Position3d roverPos = RtkCommon.ecef2pos(roverEcefPos);
-          lat = roverPos.getLat();
-          lon=roverPos.getLon();
-          dLat = Math.toDegrees(lat);
-          dLon = Math.toDegrees(lon);
-          height=roverPos.getHeight();
-          String currentLine = String.format("%s,%s,%.6f,%.6f,%.3f,%d,%.3f,%.3f,%.1f\n",gpsTime.getStringGpsWeek(),gpsTime.getStringGpsTOW(),dLat,dLon,height,10,0D,0D,0D);
-          try {
-              File crwFile = new File(MainActivity.getFileStorageDirectory()+"/"+mSessionCode+".crw");
-              if (!crwFile.exists()){
-                  crwFile.createNewFile();
-              }
-              FileWriter crwFileWriter = new FileWriter(crwFile,true);
-              BufferedWriter out = new BufferedWriter(crwFileWriter);
-              out.write(currentLine);
-              out.close();
-              crwFileWriter.close();
-          } catch (IOException e) {
-              e.printStackTrace();
-          }
+    }
 
-      }
+    private void addPointToCRW() {
+        double lat, lon, height, dLat, dLon;
+        Solution[] currentSolutions = readSolutionBuffer();
+        GpsTime gpsTime = new GpsTime();
+        gpsTime.setTime(System.currentTimeMillis());
+
+        Position3d roverEcefPos = currentSolutions[currentSolutions.length - 1].getPosition();
+        Position3d roverPos = RtkCommon.ecef2pos(roverEcefPos);
+        lat = roverPos.getLat();
+        lon = roverPos.getLon();
+        dLat = Math.toDegrees(lat);
+        dLon = Math.toDegrees(lon);
+        height = roverPos.getHeight();
+        String currentLine = String.format("%s,%s,%.6f,%.6f,%.3f,%d,%.3f,%.3f,%.1f\n", gpsTime.getStringGpsWeek(), gpsTime.getStringGpsTOW(), dLon, dLat, height, 10, 0D, 0D, 0D);
+        try {
+            File crwFile = new File(MainActivity.getFileStorageDirectory() + File.separator + mSessionCode + ".crw");
+            if (!crwFile.exists()) {
+                crwFile.createNewFile();
+            }
+            FileWriter crwFileWriter = new FileWriter(crwFile, true);
+            BufferedWriter out = new BufferedWriter(crwFileWriter);
+            out.write(currentLine);
+            out.close();
+            crwFileWriter.close();
+            mHavePoint = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File shpFile = new File(MainActivity.getFileStorageDirectory() + File.separator + mSessionCode + ".shp");
+        if (!shpFile.exists()) {
+            try {
+                //cfeate shapefile with gdal
+           } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * Class used for the client Binder. Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
@@ -266,8 +310,7 @@ public class RtkNaviService extends IntentService implements LocationListener
         mbStarted = true;
         try {
             MainActivity.getDemoModeLocation().reset();
-            if (MainActivity.getDemoModeLocation().isInDemoMode())
-            {
+            if (MainActivity.getDemoModeLocation().isInDemoMode()) {
                 MainActivity.getDemoModeLocation().startDemoMode();
             }
         } catch (NullPointerException e) {
@@ -294,30 +337,41 @@ public class RtkNaviService extends IntentService implements LocationListener
         Notification notification = createForegroundNotification();
         startForeground(NOTIFICATION, notification);
 
-        SharedPreferences prefs= this.getBaseContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
+        SharedPreferences prefs = this.getBaseContext().getSharedPreferences(SolutionOutputSettingsFragment.SHARED_PREFS_NAME, 0);
         mBoolMockLocationsPref = prefs.getBoolean(SolutionOutputSettingsFragment.KEY_OUTPUT_MOCK_LOCATION, false);
-        prefs= this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
+        prefs = this.getBaseContext().getSharedPreferences(OutputGPXTraceFragment.SHARED_PREFS_NAME, 0);
         mBoolGenerateGPXTrace = prefs.getBoolean(OutputGPXTraceFragment.KEY_ENABLE, false);
         prefs = this.getBaseContext().getSharedPreferences(ProcessingOptions1Fragment.SHARED_PREFS_NAME, 0);
-        mLProcessingCycle  = Long.valueOf(prefs.getString(ProcessingOptions1Fragment.KEY_PROCESSING_CYCLE, "5"));
-        if (mBoolMockLocationsPref)
-        {
-                if (Settings.Secure.getString(getContentResolver(),
-                        Settings.Secure.ALLOW_MOCK_LOCATION).equals("0") )
-                {
-                    Log.e(RTK_GPS_MOCK_LOC_SERVICE,"Mock Location is not allowed");
-                }else{
-                 // Connect to Location Services
-                    LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                    try {
-                        locationManager.addTestProvider(GPS_PROVIDER, false, false,
-                                false, false, true, false, true, 0, Criteria.ACCURACY_FINE);
-                    } catch (IllegalArgumentException e) {
-                        Log.e(RTK_GPS_MOCK_LOC_SERVICE,"Mock Location gps provider already exist");
-                    }
-                    locationManager.setTestProviderEnabled(GPS_PROVIDER, true);
-                    locationManager.requestLocationUpdates(GPS_PROVIDER, 0, 0, this);
+        mLProcessingCycle = Long.valueOf(prefs.getString(ProcessingOptions1Fragment.KEY_PROCESSING_CYCLE, "5"));
+        if (mBoolMockLocationsPref) {
+            if (Settings.Secure.getString(getContentResolver(),
+                    Settings.Secure.ALLOW_MOCK_LOCATION).equals("0")) {
+                Log.e(RTK_GPS_MOCK_LOC_SERVICE, "Mock Location is not allowed");
+            } else {
+                // Connect to Location Services
+                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                try {
+                    locationManager.addTestProvider(GPS_PROVIDER, false, false,
+                            false, false, true, false, true, 0, Criteria.ACCURACY_FINE);
+                } catch (IllegalArgumentException e) {
+                    Log.e(RTK_GPS_MOCK_LOC_SERVICE, "Mock Location gps provider already exist");
+                }
+                locationManager.setTestProviderEnabled(GPS_PROVIDER, true);
 
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    PermissionListener dialogPermissionListener =
+                            DialogOnDeniedPermissionListener.Builder
+                                    .withContext(this)
+                                    .withTitle(permissionTitle)
+                                    .withMessage(permissionMessage)
+                                    .withButtonText(android.R.string.ok)
+                                    .build();
+                    Dexter.withActivity((Activity)this.getApplicationContext())
+                            .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                            .withListener(dialogPermissionListener).check();
+                }else {
+                    locationManager.requestLocationUpdates(GPS_PROVIDER, 0, 0, this);
+                }
                     Log.i(RTK_GPS_MOCK_LOC_SERVICE,"Mock Location service was started");
                 }
         }

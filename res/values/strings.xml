@@ -842,4 +842,6 @@
     <string name="permissions_request_title">Permissions</string>
     <string name="permissions_request_message">Storage is for geoids, ephemeris and raw datas, Bluetooth is for external devices, Internet is for all external IP communications… GPS is for… you know obviously, all others are also needed.</string>
     <string name="menu_add_point">Add point to session</string>
+    <string name="permission_to_use_gps">Without gps we cannot continue</string>
+    <string name="permission_to_use_gps_title">GPS permission</string>
 </resources>
