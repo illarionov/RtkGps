@@ -1,7 +1,10 @@
 JNI_TOP_PATH:= $(call my-dir)
 LOCAL_PATH := $(call my-dir)
 
-TARGET_PLATFORM := android-18
+TARGET_PLATFORM := android-21
+
+include $(CLEAR_VARS)
+include $(LOCAL_PATH)/gdal.mk
 
 include $(LOCAL_PATH)/rtklib.mk
 

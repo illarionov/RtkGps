@@ -11,6 +11,8 @@ import gpsplus.ntripcaster.NTRIPCaster;
 
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
+import org.gdal.gdal.gdal;
+import org.gdal.ogr.ogr;
 import org.proj4.PJ;
 
 @ReportsCrashes(formKey = "",
@@ -47,6 +49,11 @@ public class RtkGps extends Application {
         Log.v("ntripcaster","NTRIP Caster "+NTRIPCaster.getVersion());
 
         System.loadLibrary("rtkgps");
+
+        //System.loadLibrary("gdalalljni"); //Automaticaly done
+        ogr.RegisterAll();
+        gdal.AllRegister();
+        Log.v("GDAL",gdal.VersionInfo("--version"));
         //set version
         PackageInfo pi;
         try {

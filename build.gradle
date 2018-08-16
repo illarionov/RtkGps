@@ -46,7 +46,7 @@ android {
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "gpsplus.rtkgps"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 26
         multiDexEnabled true
         ndk {

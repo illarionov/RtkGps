@@ -1,0 +1,16 @@
+CONFIG_VERSION=2.3.1
+CONFIG_INST_PREFIX=/Users/rlemeill/Development/Android/gdal-2.3.1/gdal-prebuilt/x86
+CONFIG_INST_LIBS=/Users/rlemeill/Development/Android/gdal-2.3.1/gdal-prebuilt/x86/lib/libgdal.a    -lm -ldl                   
+CONFIG_INST_CFLAGS=-I/Users/rlemeill/Development/Android/gdal-2.3.1/gdal-prebuilt/x86/include
+CONFIG_INST_DATA=/Users/rlemeill/Development/Android/gdal-2.3.1/gdal-prebuilt/x86/share/gdal
+prefix=${CONFIG_INST_PREFIX}
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${exec_prefix}/include
+datadir=${CONFIG_INST_DATA}
+
+Name: libgdal
+Description: Geospatial Data Abstraction Library
+Version: ${CONFIG_VERSION}
+Libs: ${CONFIG_INST_LIBS}
+Cflags: ${CONFIG_INST_CFLAGS}
