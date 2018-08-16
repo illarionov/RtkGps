@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.android.toolchain.gcc.799588751">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.android.toolchain.gcc.799588751" moduleId="org.eclipse.cdt.core.settings" name="Default">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="com.android.toolchain.gcc.799588751" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="com.android.toolchain.gcc.799588751.1310649516" name="/" resourcePath="">
+						<toolChain id="com.android.toolchain.gcc.1808047427" name="com.android.toolchain.gcc" superClass="com.android.toolchain.gcc" unusedChildren="com.android.gcc.compiler">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="com.android.targetPlatform.437353343" isAbstract="false" superClass="com.android.targetPlatform"/>
+							<builder arguments="-j10" command="ndk-build" id="com.android.builder.1834197326" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Android Builder" superClass="com.android.builder"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1348183156" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.include.paths.466609534" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RtkGps/jni}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/RtkGps/jni/RTKLIB/src}&quot;"/>
+									<listOptionValue builtIn="false" value="/Users/rlemeill/Development/android-ndk-r9d/platforms/android-17/arch-x86/usr/include"/>
+									<listOptionValue builtIn="false" value="/Users/rlemeill/Development/android-ndk-r9d/toolchains/x86-4.6/prebuilt/darwin-x86_64/include"/>
+									<listOptionValue builtIn="false" value="/Users/rlemeill/Development/android-ndk-r9d/toolchains/x86-4.8/prebuilt/darwin-x86_64/lib/gcc/i686-linux-android/4.8/include"/>
+									<listOptionValue builtIn="false" value="/Users/rlemeill/Development/android-ndk-r9d/toolchains/x86-4.8/prebuilt/darwin-x86_64/lib/gcc/i686-linux-android/4.8/include-fixed"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1450312203" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="jni"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="RtkGps.null.818600580" name="RtkGps"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.pathentry"/>
+	<storageModule moduleId="refreshScope" versionNumber="1">
+		<resource resourceType="PROJECT" workspacePath="/RtkGps"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.799588751;com.android.toolchain.gcc.799588751.1310649516;com.android.gcc.compiler.127734825;com.android.gcc.inputType.1646953919">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.android.AndroidPerProjectProfile"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.799588751;com.android.toolchain.gcc.799588751.1310649516;cdt.managedbuild.tool.gnu.c.compiler.base.1348183156;cdt.managedbuild.tool.gnu.c.compiler.input.1450312203">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+</cproject>

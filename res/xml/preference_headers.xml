@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
     <header 
-        android:fragment="ru0xdc.rtkgps.settings.ProcessingOptions1Fragment"
+        android:fragment="gpsplus.rtkgps.settings.ProcessingOptions1Fragment"
         android:title="@string/procopt_category_processing_options_1"
          />
     <header 
-        android:fragment="ru0xdc.rtkgps.settings.SolutionOutputSettingsFragment"
+        android:fragment="gpsplus.rtkgps.settings.SolutionOutputSettingsFragment"
         android:title="@string/procopt_category_solution_options"
          />
 </preference-headers>

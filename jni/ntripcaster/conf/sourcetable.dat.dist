@@ -1,0 +1,5 @@
+CAS;www.euref-ip.net;2101;EUREF-IP;BKG;0;DEU;50.12;8.69;http://www.euref-ip.net/home
+CAS;rtcm-ntrip.org;2101;NtripInfoCaster;BKG;0;DEU;50.12;8.69;http://www.rtcm-ntrip.org/home
+NET;EUREF;EUREF;B;N;http://www.epncb.oma.be/euref_IP;http://www.epncb.oma.be/euref_IP;http://igs.ifag.de/index_ntrip_reg.htm;none
+NET;IGS;BKG;B;N;http://igscb.jpl.nasa.gov/;none;http://igs.ifag.de/index_ntrip_reg.htm;none
+STR;BUCU0;Bucharest;RTCM 2.0;1(1),3(60),16(60);0;GPS;EUREF;ROU;44.46;26.12;0;0;Ashtech Z-XII3;none;B;N;520;TU Bucharest

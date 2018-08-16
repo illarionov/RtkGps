@@ -2,7 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/navigation_drawer"
-        android:layout_width="240dp"
+        android:layout_width="260dp"
         android:layout_height="match_parent"
         android:layout_gravity="left|bottom"
         android:layout_marginTop="?android:attr/actionBarSize"
@@ -21,11 +21,13 @@
     	        android:text="@string/navdraw_category_server" />
 
     	    <Switch
-    	        style="@style/NavigationDrawerItem"
     	        android:id="@+id/navdraw_server_switch"
+    	        style="@style/NavigationDrawerItem"
+    	        android:background="@null"
     	        android:text="@string/navdraw_item_server_switch"
-    	        android:background="@null" />
-    	        
+    	        android:textOff="OFF"
+    	        android:textOn="ON" />
+
     	    <TextView
     	        style="@style/NavigationDrawerItem"
     	        android:id="@+id/navdraw_item_status"
@@ -62,6 +64,24 @@
     	        android:onClick="onNavDrawevItemClicked" />
 
 			<TextView
+				style="?android:attr/listSeparatorTextViewStyle"
+				android:text="@string/navdraw_ntripcaster_server_switch" />
+
+			<Switch
+				android:id="@+id/navdraw_ntripcaster_switch"
+				style="@style/NavigationDrawerItem"
+				android:background="@null"
+				android:text="@string/navdraw_ntripcaster_server_switch"
+				android:textOff="OFF"
+				android:textOn="ON" />
+
+			<TextView
+				style="@style/NavigationDrawerItem"
+				android:id="@+id/navdraw_item_ntripcaster_options"
+				android:text="@string/navdraw_item_ntripcaster_options"
+				android:onClick="onNavDrawevItemClicked" />
+
+			<TextView
     	        style="?android:attr/listSeparatorTextViewStyle"
     	        android:layout_marginTop="10dp"
     	        android:text="@string/navdraw_category_settings" />
@@ -77,6 +97,5 @@
     	        android:id="@+id/navdraw_item_solution_options"
     	        android:text="@string/navdraw_item_solution_options"
     	        android:onClick="onNavDrawevItemClicked" />
-							    
     	</LinearLayout>
 </ScrollView>
