@@ -47,9 +47,11 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
     File autoCaptureFile=null;
     private int nbSat = 0;
     private boolean isStarting = false;
+    private String mSessionCode;
 
-    public MobileMapperToRtklib(Context parentContext, @Nonnull Value mobileMapperSettings) {
+    public MobileMapperToRtklib(Context parentContext, @Nonnull Value mobileMapperSettings, String sessionCode) {
         MobileMapperToRtklib.mParentContext = parentContext;
+        mSessionCode = sessionCode;
         this.mMobileMapperSettings = mobileMapperSettings;
         mLocalSocketThread = new LocalSocketThread(mMobileMapperSettings.getPath());
         mLocalSocketThread.setBindpoint(mMobileMapperSettings.getPath());
@@ -62,7 +64,7 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
         locationManager.addGpsStatusListener(this);
         locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, 1000, 0.5f, this);
-        mMobileMapperReceiver = new MobileMapperReceiver();
+        mMobileMapperReceiver = new MobileMapperReceiver(mSessionCode);
 
     }
 
@@ -173,6 +175,15 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
     private class MobileMapperReceiver extends Thread
     {
         private boolean mbIsRunning = false;
+        private String mSessionCode;
+
+        public MobileMapperReceiver(String sessionCode) {
+            mSessionCode = sessionCode;
+        }
+
+        public MobileMapperReceiver() {
+            mSessionCode = String.valueOf(System.currentTimeMillis());
+        }
 
         private int sendCommand(byte[] byteArray) {
             return PoGoPin.writeDevice(byteArray, byteArray.length);
@@ -268,7 +279,7 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
                 datagramSocketReceiver = new DatagramSocket(MOBILEMAPPER_RAW_PORT, InetAddress.getByName("localhost"));
                    packet = new DatagramPacket(buffer, buffer.length);
                 if (mMobileMapperSettings.isAutocapture()) {
-                    autoCaptureFile = MainActivity.getFileInStorageDirectory("MM50_" + System.currentTimeMillis()+".ubx");
+                    autoCaptureFile = MainActivity.getFileInStorageDirectory("MM50_" + mSessionCode +".ubw");
                     autoCaptureFileOutputStream = new FileOutputStream(autoCaptureFile);
                     // if file doesnt exists, then create it
                     if (!autoCaptureFile.exists()) {

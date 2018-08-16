@@ -37,3 +37,13 @@ my-release-key.keystore
 src/gpsplus/rtkgps/geoportail/License.java
 
 .crowdin-api-key
+
+*.setup
+
+libs/armeabi-v7a/gdbserver
+
+libs/armeabi/gdbserver
+
+libs/mips/gdbserver
+
+libs/x86/gdbserver

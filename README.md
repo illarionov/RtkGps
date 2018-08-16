@@ -8,7 +8,7 @@ RTKLIB rtknavi port on android.
 
 #### [rtklib][rtklib] features:
 
-* Version pre 2.4.3b29
+* Version pre 2.4.3b29d
 * GPS, GLONASS, Galileo, QZSS, BeiDou and SBAS Navigation systems
 * Single, DGPS/DGNSS, Kinematic, Static, Moving-Baseline, Fixed,
   PPP-Kinematic, PPP-Static and PPP-Fixed positioning modes.
@@ -89,6 +89,32 @@ If you need precise ephemeris you have 2 ways for using them:
 * Manualy: In the correction tab you select "File" and type SP3 , in the filename you put the filename of the file you provide in RtkGps directory (ending with .SP3)  
 * Automatically: When the server is running, hit the "Tools" menu, here you have an option to download and inject automatically the latest ultra-rapid ephemeris from IGS or simply inject them if you already have the good file.  
   
+#### NTRIP Caster  
+This is highly experimental, but I embedded NTRIP Caster 0.1.5. It works but I'm not satisfied of the implementation. Because it cannot shutdown cleanly.  
+Why?  
+* 1- because closing connections does not work at 100% (even in original soft), so thread do not end at 100%  
+* 2- because by conception of the original Caster the end is not clean, it waits for Control-C for ending and ends with exit(1)!!!    
+* 3- because Android lacks some pthread functions (ie: real pthread_cancel...)  
+
+So I locked the ability to stop the NTRIP Caster without closing RTKGPS+.  
+But if you want to test it works, on the first launch 2 files are created in RtkGps/ntripcaster/  ,you can edit them, But as is it works and can provide 3 streams:  
+```
+/GNSS0
+/GNSS1
+/GNSS2
+(all three sources have rtkgps as password)
+```
+for using with the log streams you need to set them:  
+```
+server: 127.0.0.1
+mountpoint: GNSSx
+password: rtkgps (please change it)  
+```
+On your wifi network you can use your stream on:
+```
+ntrip://username:password@ip_shown_in_caster_options:2101/GNSSx
+(please change the login and the password) 
+```
 #### Building on Windows
 Android is Unix so it is easier to build under an Unix system. Personnaly I use MacOSX but it can be done under Windows (tested under 8.1 x86_64).  
 You need a correctly installed ndk (under windows I use ndk-r9d), a correctly Installed ADT (I use x86_64-20140702).  
@@ -105,9 +131,6 @@ You also need to deactivate the use of lapack since it cannot be build under win
 For that please modify RtkGps/jni/rtklib.mk and Android.mk for removing LAPACK flag and clapck module import (with performance issues).  
 now under a cygwin terminal move to your RtkGps directory and build with ```ndk-build``` command.  
 Under Eclipse be sure that you do not set to build the native library since it fails.  
-  
-#### NTRIP Caster  
-I made an highly experimental version with an embedded ntripcaster 0.1.5 server, if you are intersting you can find it in the [ntripcaster branch](https://github.com/eltorio/RtkGps/tree/ntripcaster).  Do not hesitate to discuss about it.  
   
 #### Translations
 Contributors are welcomed for translating RTKGPS+, the translation can be easily managed on [Crowdin](https://crowdin.com/project/gpsplusrtkgps/invite).   

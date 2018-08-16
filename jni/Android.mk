@@ -1,7 +1,10 @@
 JNI_TOP_PATH:= $(call my-dir)
 LOCAL_PATH := $(call my-dir)
 
-TARGET_PLATFORM := android-18
+TARGET_PLATFORM := android-21
+
+include $(CLEAR_VARS)
+include $(LOCAL_PATH)/gdal.mk
 
 include $(LOCAL_PATH)/rtklib.mk
 
@@ -77,3 +80,24 @@ LOCAL_SRC_FILES := \
     proj4/src/PJ_deformation.c proj4/src/pj_internal.c proj4/src/PJ_axisswap.c
 include $(BUILD_SHARED_LIBRARY)
 
+#Build ntripcaster
+include $(CLEAR_VARS)
+LOCAL_MODULE    := ntripcaster
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/ntripcaster/src
+LOCAL_CFLAGS    := -DHAVE_CONFIG_H=1 -DJNI_ENABLED=1
+LOCAL_LDLIBS := -lm
+LOCAL_LDLIBS += -llog
+LOCAL_SRC_FILES := \
+	ntripcaster/src/avl.c \
+	ntripcaster/src/client.c \
+	ntripcaster/src/connection.c \
+	ntripcaster/src/log.c \
+	ntripcaster/src/main.c \
+	ntripcaster/src/ntrip_string.c \
+	ntripcaster/src/sock.c \
+	ntripcaster/src/source.c \
+	ntripcaster/src/threads.c \
+	ntripcaster/src/timer.c \
+	ntripcaster/src/utility.c \
+	ntripcaster/src/ntripcaster_jni.c
+include $(BUILD_SHARED_LIBRARY)

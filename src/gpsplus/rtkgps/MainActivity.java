@@ -1,11 +1,14 @@
 package gpsplus.rtkgps;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -25,27 +28,37 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.multi.DialogOnAnyDeniedMultiplePermissionsListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import butterknife.BindString;
 import butterknife.ButterKnife;
 import butterknife.BindView;
 
 // import com.dropbox.sync.android.DbxAccountManager;
 
+import gpsplus.ntripcaster.NTRIPCaster;
+import gpsplus.rtkgps.settings.NTRIPCasterSettingsFragment;
 import gpsplus.rtkgps.settings.ProcessingOptions1Fragment;
 import gpsplus.rtkgps.settings.SettingsActivity;
 import gpsplus.rtkgps.settings.SettingsHelper;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtkgps.settings.StreamSettingsActivity;
 import gpsplus.rtkgps.utils.ChangeLog;
+import gpsplus.rtkgps.utils.GpsTime;
+import gpsplus.rtklib.GTime;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnSharedPreferenceChangeListener{
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
 //    public static final int REQUEST_LINK_TO_DBX = 2654;
@@ -58,16 +71,22 @@ public class MainActivity extends Activity {
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     public static final String APP_KEY = "6ffqsgh47v9y5dc";
     public static final String APP_SECRET = "hfmsbkv4ktyl60h";
+    public static final String RTKGPS_CHILD_DIRECTORY = "RtkGps/";
 //    private DbxAccountManager mDbxAcctMgr;
 
     RtkNaviService mRtkService;
     boolean mRtkServiceBound = false;
     private static DemoModeLocation mDemoModeLocation;
+    private String mSessionCode;
 
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @BindView(R.id.navigation_drawer) View mNavDrawer;
 
     @BindView(R.id.navdraw_server_switch) Switch mNavDrawerServerSwitch;
+    @BindView(R.id.navdraw_ntripcaster_switch) Switch mNavDrawerCasterSwitch;
+
+    @BindString(R.string.permissions_request_title) String permissionTitle;
+    @BindString(R.string.permissions_request_message) String permissionMessage;
 
     private ActionBarDrawerToggle mDrawerToggle;
 
@@ -77,6 +96,28 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MultiplePermissionsListener dialogMultiplePermissionsListener =
+                DialogOnAnyDeniedMultiplePermissionsListener.Builder
+                        .withContext(this)
+                        .withTitle(permissionTitle)
+                        .withMessage(permissionMessage)
+                        .withButtonText(android.R.string.ok)
+                        .build();
+        // New Permissions request for newer Android SDK
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.ACCESS_NETWORK_STATE,
+                        Manifest.permission.BLUETOOTH,
+                        Manifest.permission.INTERNET,
+                        Manifest.permission.WAKE_LOCK,
+                        Manifest.permission.ACCESS_WIFI_STATE,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.BLUETOOTH_ADMIN,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(dialogMultiplePermissionsListener)
+                .check();
 
         PackageManager m = getPackageManager();
         String s = getPackageName();
@@ -90,6 +131,7 @@ public class MainActivity extends Activity {
         // copy assets/data
         try {
             copyAssetsToApplicationDirectory();
+            copyAssetsToWorkingDirectory();
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -106,6 +148,8 @@ public class MainActivity extends Activity {
 
         ButterKnife.bind(this);
 
+        toggleCasterSwitch();
+
         createDrawerToggle();
 
         if (savedInstanceState == null) {
@@ -118,11 +162,42 @@ public class MainActivity extends Activity {
         mNavDrawerServerSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                GpsTime gpsTime = new GpsTime();
+                gpsTime.setTime(System.currentTimeMillis());
+                mSessionCode =String.format("%s_%s",gpsTime.getStringGpsWeek(),gpsTime.getStringGpsTOW());
                 mDrawerLayout.closeDrawer(mNavDrawer);
                 if (isChecked) {
-                    startRtkService();
+                    startRtkService(mSessionCode);
                 }else {
                     stopRtkService();
+                }
+                invalidateOptionsMenu();
+            }
+        });
+        mNavDrawerCasterSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            private NTRIPCaster mCaster = null;
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mDrawerLayout.closeDrawer(mNavDrawer);
+                if (isChecked) {
+                    if (mCaster == null)
+                    {
+                        mCaster = new NTRIPCaster(getFileStorageDirectory()+"/ntripcaster/conf");
+                    }
+                    mCaster.start(2101, "none");
+                    //TEST
+                }else {
+                    if (getCasterBrutalEnding())
+                    {
+                        stopRtkService();
+                        int ret = mCaster.stop(1);
+                        android.os.Process.killProcess(android.os.Process.myPid()); //in case of not stopping
+                    }else{
+                        int ret = mCaster.stop(0);
+                        Log.v(TAG, "NTRIPCaster.stop(0)="+ret);
+
+                    }
                 }
                 invalidateOptionsMenu();
             }
@@ -131,6 +206,17 @@ public class MainActivity extends Activity {
         ChangeLog cl = new ChangeLog(this);
         if (cl.firstRun())
             cl.getLogDialog().show();
+    }
+
+    private void toggleCasterSwitch() {
+        SharedPreferences casterSolution = getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, 0);
+        boolean bIsCasterEnabled = casterSolution.getBoolean(NTRIPCasterSettingsFragment.KEY_ENABLE_CASTER, false);
+        mNavDrawerCasterSwitch.setEnabled(bIsCasterEnabled);
+    }
+
+    private boolean getCasterBrutalEnding() {
+        SharedPreferences casterSolution = getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, 0);
+        return casterSolution.getBoolean(NTRIPCasterSettingsFragment.KEY_BRUTAL_ENDING_CASTER, true);
     }
 
     public static DemoModeLocation getDemoModeLocation(){
@@ -205,6 +291,7 @@ public class MainActivity extends Activity {
         boolean serviceActive = mNavDrawerServerSwitch.isChecked();
         menu.findItem(R.id.menu_start_service).setVisible(!serviceActive);
         menu.findItem(R.id.menu_stop_service).setVisible(serviceActive);
+        menu.findItem(R.id.menu_add_point).setVisible(serviceActive);
         menu.findItem(R.id.menu_tools).setVisible(true);
 //        if (mDbxAcctMgr.hasLinkedAccount())
 //        {
@@ -227,6 +314,9 @@ public class MainActivity extends Activity {
         case R.id.menu_stop_service:
             mNavDrawerServerSwitch.setChecked(false);
             break;
+        case R.id.menu_add_point:
+            askToAddPointToCrw();
+            break;
         case R.id.menu_tools:
             startActivity(new Intent(this, ToolsActivity.class));
             break;
@@ -245,16 +335,23 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    private void copyAssetsDirToApplicationDirectory(String dir) throws FileNotFoundException, IOException
+    private void askToAddPointToCrw()
+    {
+        final Intent intent = new Intent(RtkNaviService.ACTION_STORE_POINT);
+        intent.setClass(this, RtkNaviService.class);
+        startService(intent);
+    }
+
+    private void copyAssetsDirToApplicationDirectory(String sourceDir, File destDir) throws FileNotFoundException, IOException
     {
         //copy assets/data to appdir/data
         java.io.InputStream stream = null;
         java.io.OutputStream output = null;
 
-        for(String fileName : this.getAssets().list(dir))
+        for(String fileName : this.getAssets().list(sourceDir))
         {
-            stream = this.getAssets().open(dir+File.separator + fileName);
-            String dest = this.getFilesDir()+ File.separator + dir + File.separator + fileName;
+            stream = this.getAssets().open(sourceDir+File.separator + fileName);
+            String dest = destDir+ File.separator + sourceDir + File.separator + fileName;
             File fdest = new File(dest);
             if (fdest.exists()) continue;
 
@@ -282,8 +379,13 @@ public class MainActivity extends Activity {
 
     private void copyAssetsToApplicationDirectory() throws FileNotFoundException, IOException
     {
-       copyAssetsDirToApplicationDirectory("data");
-       copyAssetsDirToApplicationDirectory("proj4");
+       copyAssetsDirToApplicationDirectory("data",this.getFilesDir());
+       copyAssetsDirToApplicationDirectory("proj4",this.getFilesDir());
+    }
+
+    private void copyAssetsToWorkingDirectory() throws FileNotFoundException, IOException
+    {
+        copyAssetsDirToApplicationDirectory("ntripcaster",getFileStorageDirectory());
     }
 
     private void proxyIfUsbAttached(Intent intent) {
@@ -337,6 +439,7 @@ public class MainActivity extends Activity {
             break;
         case R.id.navdraw_item_processing_options:
         case R.id.navdraw_item_solution_options:
+        case R.id.navdraw_item_ntripcaster_options:
             showSettings(itemId);
             break;
         default:
@@ -391,10 +494,16 @@ public class MainActivity extends Activity {
         mNavDrawerServerSwitch.setChecked(serviceActive);
     }
 
-    private void startRtkService() {
-        final Intent intent = new Intent(RtkNaviService.ACTION_START);
-        intent.setClass(this, RtkNaviService.class);
-        startService(intent);
+    private void startRtkService(String sessionCode) {
+        mSessionCode = sessionCode;
+        final Intent rtkServiceIntent = new Intent(RtkNaviService.ACTION_START);
+        rtkServiceIntent.putExtra(RtkNaviService.EXTRA_SESSION_CODE,mSessionCode);
+        rtkServiceIntent.setClass(this, RtkNaviService.class);
+        startService(rtkServiceIntent);
+    }
+
+    public String getSessionCode() {
+        return mSessionCode;
     }
 
     private void stopRtkService() {
@@ -417,6 +526,10 @@ public class MainActivity extends Activity {
         case R.id.navdraw_item_solution_options:
             intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
                     SolutionOutputSettingsFragment.class.getName());
+            break;
+        case R.id.navdraw_item_ntripcaster_options:
+            intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                    NTRIPCasterSettingsFragment.class.getName());
             break;
         default:
             throw new IllegalStateException();
@@ -474,12 +587,41 @@ public class MainActivity extends Activity {
 
     @Nonnull
     public static File getFileStorageDirectory() {
-        return new File(Environment.getExternalStorageDirectory(), "RtkGps/");
+        File externalLocation = new File(Environment.getExternalStorageDirectory(), RTKGPS_CHILD_DIRECTORY);
+        if(!externalLocation.isDirectory()) {
+           if (externalLocation.mkdirs()) {
+               Log.v(TAG, "Local storage created on external card");
+           }else{
+               externalLocation = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),RTKGPS_CHILD_DIRECTORY);
+               if(!externalLocation.isDirectory()) {
+                   if (externalLocation.mkdirs()) {
+                       Log.v(TAG, "Local storage created on public storage");
+                   }else{
+                       externalLocation = new File(Environment.getDownloadCacheDirectory(), RTKGPS_CHILD_DIRECTORY);
+                       if (!externalLocation.isDirectory()){
+                           if (externalLocation.mkdirs()){
+                               Log.v(TAG, "Local storage created on cache directory");
+                           }else{
+                               externalLocation = new File(Environment.getDataDirectory(),RTKGPS_CHILD_DIRECTORY);
+                               if(!externalLocation.isDirectory()) {
+                                   if (externalLocation.mkdirs()) {
+                                       Log.v(TAG, "Local storage created on data storage");
+                                   }else{
+                                       Log.e(TAG,"NO WAY TO CREATE FILE SOTRAGE?????");
+                                   }
+                               }
+                           }
+                       }
+                   }
+               }
+           }
+        }
+        return externalLocation;
     }
 
     @Nonnull
     public static File getFileInStorageDirectory(String nameWithExtension) {
-        return new File(Environment.getExternalStorageDirectory(), "RtkGps/"+nameWithExtension);
+        return new File(Environment.getExternalStorageDirectory(), RTKGPS_CHILD_DIRECTORY+nameWithExtension);
     }
 
     @Nonnull
@@ -500,6 +642,27 @@ public class MainActivity extends Activity {
     }
     public static String getApplicationDirectory() {
         return MainActivity.mApplicationDirectory;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (key.equalsIgnoreCase(NTRIPCasterSettingsFragment.KEY_ENABLE_CASTER))
+        {
+            toggleCasterSwitch();
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getSharedPreferences(NTRIPCasterSettingsFragment.SHARED_PREFS_NAME, MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
     }
 
 }

@@ -42,6 +42,7 @@
   <string name="navdraw_category_streams">Flujos</string>
   <string name="navdraw_category_settings">Configuración</string>
   <string name="navdraw_item_server_switch">Servidor</string>
+  <string name="navdraw_ntripcaster_server_switch">NTRIP Caster</string>
   <string name="navdraw_item_status">Estado</string>
   <string name="navdraw_item_map">Mapa</string>
   <string name="navdraw_item_input_streams">Flujos de entrada</string>
@@ -49,6 +50,7 @@
   <string name="navdraw_item_log_streams">Registrar secuencias</string>
   <string name="navdraw_item_processing_options">Opciones de procesamiento</string>
   <string name="navdraw_item_solution_options">Opciones de solución</string>
+  <string name="navdraw_item_ntripcaster_options">Caster options</string>
   <string-array name="rtk_server_receiver">
     <item>Móvil</item>
     <item>Base</item>
@@ -734,4 +736,14 @@
   <string name="changelog_title">Novedades</string>
   <string name="changelog_ok_button">OK</string>
   <string name="changelog_show_full">más&#8230;</string>
+  <string name="ntripcaster_options_enabled_summary">Enable experimental NTRIP Caster</string>
+  <string name="ntripcaster_options_enabled_title">NTRIP Caster</string>
+  <string name="ntripcaster_options_brutal_ending_summary">Ending NTRIP Caster will also shutown RTKGPS+, it is safer for being sure all connections are closed.</string>
+  <string name="ntripcaster_options_brutal_ending_title">Brutal ending</string>
+  <string name="ntripcaster_options_warning">Be carrefull\nThis is an highly experimental feature!\nRemember that when you will stop the caster, RTKGPS+ will close itself for cleaning the memory and closing the connections.\nPlease do not blame me for that...\nIf not sure to activate this feature.</string>
+  <string name="permissions_request_title">Permissions</string>
+  <string name="permissions_request_message">Storage is for geoids, ephemeris and raw datas, Bluetooth is for external devices, Internet is for all external IP communications&#8230; GPS is for&#8230; you know obviously, all others are also needed.</string>
+  <string name="menu_add_point">Add point to session</string>
+  <string name="permission_to_use_gps">Without gps we cannot continue</string>
+  <string name="permission_to_use_gps_title">GPS permission</string>
 </resources>

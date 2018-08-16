@@ -10,7 +10,11 @@
 		android:showAsAction="never"
 		android:title="@string/menu_stop_service"
 		android:orderInCategory="100" />
-	
+	<item
+		android:id="@+id/menu_add_point"
+		android:showAsAction="never"
+		android:title="@string/menu_add_point"
+		android:orderInCategory="100" />
 	<item
 		android:id="@+id/menu_settings"
 		android:showAsAction="never"

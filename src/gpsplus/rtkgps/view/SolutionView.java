@@ -18,6 +18,7 @@ import gpsplus.rtkgps.Proj4Converter;
 import gpsplus.rtkgps.R;
 import gpsplus.rtkgps.RtkNaviService;
 import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
+import gpsplus.rtkgps.utils.UTM;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Deg2Dms;
 import gpsplus.rtklib.RtkCommon.Matrix3x3;
@@ -27,9 +28,6 @@ import gpsplus.rtklib.Solution;
 import gpsplus.rtklib.constants.GeoidModel;
 import gpsplus.rtklib.constants.SolutionStatus;
 
-import org.jscience.geography.coordinates.LatLong;
-import org.jscience.geography.coordinates.UTM;
-import org.jscience.geography.coordinates.crs.CoordinatesConverter;
 import org.proj4.CRSRegistry;
 import org.proj4.ProjCoordinate;
 
@@ -37,9 +35,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import javax.measure.unit.NonSI;
-import javax.measure.unit.SI;
 
 public class SolutionView extends TableLayout {
 
@@ -360,6 +355,8 @@ public class SolutionView extends TableLayout {
         }
         double dlat = Math.toDegrees(lat);
         double dlon = Math.toDegrees(lon);
+        ProjCoordinate proj4Coordinate;
+
 
         switch (mSolutionFormat) {
             case PROJ4_LAMBERT93:
@@ -374,7 +371,6 @@ public class SolutionView extends TableLayout {
             case PROJ4_LAMBERTIIE:
             case PROJ4_NAD83:
             case PROJ4_CUSTOM:
-                ProjCoordinate proj4Coordinate;
                 if (proj4Converter == null)
                 {
                     proj4Converter = new Proj4Converter();
@@ -407,15 +403,17 @@ public class SolutionView extends TableLayout {
                         ));
                 break;
         case UTM:
-
             dGeoidHeight = getAltitudeCorrection(lat, lon);
-            CoordinatesConverter<LatLong, UTM> latLongToUTM = LatLong.CRS.getConverterTo(UTM.CRS);
-            LatLong latLong = LatLong.valueOf(dlat, dlon, NonSI.DEGREE_ANGLE);
-            UTM utm = latLongToUTM.convert(latLong);
-            mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f m", utm.eastingValue(SI.METER)));
-            mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f m", utm.northingValue(SI.METER)));
+            UTM myUTM = new UTM(dlat,dlon);
+            if (proj4Converter == null)
+            {
+                proj4Converter = new Proj4Converter();
+            }
+            proj4Coordinate = proj4Converter.convert(myUTM.getCRSString(), dlat, dlon);
+            mTextViewCoord1Value.setText(String.format(Locale.US, "%.3f m", proj4Coordinate.x));
+            mTextViewCoord2Value.setText(String.format(Locale.US, "%.3f m", proj4Coordinate.y));
             mTextViewCoord3Value.setText(String.format(Locale.US, "%.3f m el.", height-dGeoidHeight));
-            mTextViewCoord4Value.setText( Integer.toString(utm.longitudeZone())+utm.latitudeZone());
+            mTextViewCoord4Value.setText( myUTM.getUTMZone());
             if (mBoolIsGeodetic)
             {
                 mTextViewCoord3Name.setText(this.getContext().getResources().getStringArray(R.array.solution_view_coordinates_wgs84)[3]); //Altitude

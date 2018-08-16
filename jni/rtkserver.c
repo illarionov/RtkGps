@@ -537,7 +537,7 @@ static int set_solution_buffer(JNIEnv* env, jobject j_solbuf, const sol_t *solut
       (*env)->CallVoidMethod(env, j_solbuf, set_solution_method,
 	    i,
 	    (jlong)s->time.time,
-	    (jlong)s->time.sec,
+	    (jdouble)s->time.sec,
 	    (jint)s->type,
 	    (jint)s->stat,
 	    (jint)s->ns,
@@ -620,7 +620,7 @@ static int set_rtk_status(JNIEnv* env, jobject j_rtk_control_result, rtk_t *stat
    // solution
    (*env)->CallVoidMethod(env, sol_obj, set_solution_method_id,
 	 (jlong)status->sol.time.time,
-	 (jlong)status->sol.time.sec,
+	 (jdouble)status->sol.time.sec,
 	 (jint)status->sol.type,
 	 (jint)status->sol.stat,
 	 (jint)status->sol.ns,

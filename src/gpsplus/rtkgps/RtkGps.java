@@ -7,8 +7,12 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.util.PoGoPin;
 
+import gpsplus.ntripcaster.NTRIPCaster;
+
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
+import org.gdal.gdal.gdal;
+import org.gdal.ogr.ogr;
 import org.proj4.PJ;
 
 @ReportsCrashes(formKey = "",
@@ -38,21 +42,18 @@ public class RtkGps extends Application {
         }
         super.onCreate();
         //ACRA.init(this);
-        try {
-            System.loadLibrary("proj");
-            Log.v("Proj4", "Proj4 version: " + PJ.getVersion());
-        }
-        catch (Exception e)
-        {
-              Log.e("Error","loadLibrary",e.getCause());
-        }
-        try {
-            System.loadLibrary("rtkgps");
-        }
-        catch (Exception e)
-        {
-            Log.e("Error","loadLibrary",e.getCause());
-        }
+        System.loadLibrary("proj");
+        Log.v("Proj4","Proj4 version: "+PJ.getVersion());
+
+        System.loadLibrary("ntripcaster");
+        Log.v("ntripcaster","NTRIP Caster "+NTRIPCaster.getVersion());
+
+        System.loadLibrary("rtkgps");
+
+        //System.loadLibrary("gdalalljni"); //Automaticaly done
+        ogr.RegisterAll();
+        gdal.AllRegister();
+        Log.v("GDAL",gdal.VersionInfo("--version"));
         //set version
         PackageInfo pi;
         try {

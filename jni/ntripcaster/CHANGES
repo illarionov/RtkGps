@@ -1,0 +1,20 @@
+0.1.4 -> 0.1.5
+**************
+Position of blank line in sourcetable output corrected.
+
+0.1.3 -> 0.1.4
+**************
+- the 'Host:' line in the HTTP request of a client will now be ignored when searching
+for a mountpoint, so the caster can be run behind a proxy
+
+0.1.2 -> 0.1.3
+**************
+- multiple users can now be specified for each mountpoint
+
+0.1.1 -> 0.1.2
+**************
+- at the time when a client logs in and logs out the user name now appears in log file
+
+0.1.0 -> 0.1.1
+**************
+- initial version
