@@ -16,6 +16,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -48,6 +49,7 @@ import gpsplus.rtkgps.settings.StreamBluetoothFragment.Value;
 import gpsplus.rtkgps.settings.StreamMobileMapperFragment;
 import gpsplus.rtkgps.settings.StreamUsbFragment;
 import gpsplus.rtkgps.utils.GpsTime;
+import gpsplus.rtkgps.utils.Shapefile;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
 import gpsplus.rtklib.RtkControlResult;
@@ -146,6 +148,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
     private GPXTrace mGpxTrace = null;
     private long mLProcessingCycle = 5;
     private String mSessionCode;
+    private Shapefile mShapefile;
     @BindString(R.string.permission_to_use_gps_title) String permissionTitle;
     @BindString(R.string.permission_to_use_gps) String permissionMessage;
     @Override
@@ -171,9 +174,12 @@ public class RtkNaviService extends IntentService implements LocationListener {
                 } else {
                     mSessionCode = String.valueOf(System.currentTimeMillis());
                 }
+                mShapefile = new Shapefile(MainActivity.getFileStorageDirectory() + File.separator + mSessionCode,
+                                            mSessionCode+".shp");
                 processStart();
             } else if (action.equals(ACTION_STOP)) {
                 processStop();
+                mShapefile.close();
                 if (mHavePoint) {
                     createMapFile();
                 }
@@ -264,6 +270,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
         Position3d roverPos = RtkCommon.ecef2pos(roverEcefPos);
         lat = roverPos.getLat();
         lon = roverPos.getLon();
+
         dLat = Math.toDegrees(lat);
         dLon = Math.toDegrees(lon);
         height = roverPos.getHeight();
@@ -282,13 +289,8 @@ public class RtkNaviService extends IntentService implements LocationListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        File shpFile = new File(MainActivity.getFileStorageDirectory() + File.separator + mSessionCode + ".shp");
-        if (!shpFile.exists()) {
-            try {
-                //cfeate shapefile with gdal
-           } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (mShapefile != null){
+            mShapefile.addPoint("POINT",dLon, dLat,height,0,0,gpsTime.getGpsWeek(),gpsTime.getSecondsOfWeek());
         }
     }
 
