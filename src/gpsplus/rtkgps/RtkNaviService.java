@@ -16,7 +16,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -174,7 +173,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
                 } else {
                     mSessionCode = String.valueOf(System.currentTimeMillis());
                 }
-                mShapefile = new Shapefile(MainActivity.getFileStorageDirectory() + File.separator + mSessionCode,
+                mShapefile = new Shapefile(getAndCheckSessionDirectory(mSessionCode),
                                             mSessionCode+".shp");
                 processStart();
             } else if (action.equals(ACTION_STOP)) {
@@ -243,9 +242,18 @@ public class RtkNaviService extends IntentService implements LocationListener {
         return mRtkServer.readSolutionBuffer();
     }
 
+    private String getAndCheckSessionDirectory(String code){
+        String szSessionDirectory = MainActivity.getFileStorageDirectory() + File.separator + code;
+        File fsessionDirectory = new File(szSessionDirectory);
+        if (!fsessionDirectory.exists()){
+            fsessionDirectory.mkdirs();
+        }
+        return szSessionDirectory;
+    }
     private void createMapFile() {
         try {
-            File mapFile = new File(MainActivity.getFileStorageDirectory() + "/" + mSessionCode + ".map");
+            String sessionDirectory = getAndCheckSessionDirectory(mSessionCode);
+            File mapFile = new File(sessionDirectory + File.separator + mSessionCode + ".map");
             if (!mapFile.exists()) {
                 mapFile.createNewFile();
             }
@@ -262,21 +270,25 @@ public class RtkNaviService extends IntentService implements LocationListener {
 
     private void addPointToCRW() {
         double lat, lon, height, dLat, dLon;
+        double Qe[] = new double[9];
         Solution[] currentSolutions = readSolutionBuffer();
+        Solution currentSolution = currentSolutions[currentSolutions.length - 1];
         GpsTime gpsTime = new GpsTime();
         gpsTime.setTime(System.currentTimeMillis());
-
-        Position3d roverEcefPos = currentSolutions[currentSolutions.length - 1].getPosition();
+        RtkCommon.Matrix3x3 cov = currentSolution.getQrMatrix();
+        Position3d roverEcefPos = currentSolution.getPosition();
         Position3d roverPos = RtkCommon.ecef2pos(roverEcefPos);
         lat = roverPos.getLat();
         lon = roverPos.getLon();
+        Qe = RtkCommon.covenu(lat, lon, cov).getValues();
 
         dLat = Math.toDegrees(lat);
         dLon = Math.toDegrees(lon);
         height = roverPos.getHeight();
         String currentLine = String.format("%s,%s,%.6f,%.6f,%.3f,%d,%.3f,%.3f,%.1f\n", gpsTime.getStringGpsWeek(), gpsTime.getStringGpsTOW(), dLon, dLat, height, 10, 0D, 0D, 0D);
         try {
-            File crwFile = new File(MainActivity.getFileStorageDirectory() + File.separator + mSessionCode + ".crw");
+            String szSessionDirectory = getAndCheckSessionDirectory(mSessionCode);
+            File crwFile = new File(szSessionDirectory +File.separator+ mSessionCode+".crw");
             if (!crwFile.exists()) {
                 crwFile.createNewFile();
             }
@@ -290,7 +302,12 @@ public class RtkNaviService extends IntentService implements LocationListener {
             e.printStackTrace();
         }
         if (mShapefile != null){
-            mShapefile.addPoint("POINT",dLon, dLat,height,0,0,gpsTime.getGpsWeek(),gpsTime.getSecondsOfWeek());
+            mShapefile.addPoint("POINT",dLon, dLat,height,
+                    Math.sqrt(Qe[4] < 0 ? 0 : Qe[4]),
+                    Math.sqrt(Qe[0] < 0 ? 0 : Qe[0]),
+                    Math.sqrt(Qe[8] < 0 ? 0 : Qe[8]),
+                    gpsTime.getGpsWeek(),(long)gpsTime.getSecondsOfWeek(),
+                    currentSolution.getNs());
         }
     }
 
