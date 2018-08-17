@@ -20,8 +20,9 @@ Como no ha sacado ninguna nueva versión, he revisado el código para agregar al
        para activar esto debes elegir altura: geodésica en la vista "Opciones de la solución"
 2 - enviar posiciones ficticias para otras aplicaciones.
        esta opción se configura en la pestaña "Opciones de la solución" , pero sólo funcionará si están habilitadas las "Mock locations", en la configuración de Android.
-       a día de hoy (en 1.0alpha13) las posiciones ficticias no son utilizables con la API Google map.
-3 - subir automáticamente los archivos de registro o los archivos de solución a una cuenta de Dropbox
+       today (in 1.0alpha26) the mock locations are not usable in the Google map API.
+3- Preliminary support for Trimble SpectraPrecision MobileMapper 50 internal chipset
+3b- Records .urw .crw .map and .shp compatibles with Trimble MobileMapper Office.
 4 - se puede generar un archivo gpx de un recorrido
 5 - puede mostrar el resultado en ECEF, WGS84 Lat/Lon, NAD83, 93 Lambert (RGF93) o un sistema de coordenadas UTM (con huso automático)
 5B - uso cualquier de proyección Proj4
@@ -30,7 +31,7 @@ Como no ha sacado ninguna nueva versión, he revisado el código para agregar al
 8 - puede mostrar algunos mapas del Geoportal francés IGN (catastro, satélite, carreteras), de OpenStreetMap Mapnik o Bing (satélite, carreteras).
 9 - puede descargar y usar efemérides ultra rapidas del IGS
 
-Este software es una portabilidad del RTKLIB 2.4.2p9 desarrollado por Tomoki Takasu (http://www.rtklib.com). Si no conoce RTKLIB ¡tal vez esta app no es la que está buscando!
+This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
 Esta aplicación puede calcular posiciones GNSS precisas utilizando algoritmos de RTKLIB (RTK o PPP) pero se debe utilizar un receptor GNSS - externo - con salida de datos brutos.
 Éstos no son receptores GPS "estándar" como los que llevan los teléfonos o los coches. El más barato que puede encontrar es un modelo como el uBlox LEA-6T.
 NO HAY NINGUNA MANERA de usar los receptores GPS que se encuentran en los Samsung Galaxy(s), ni en cualquier otro teléfono que yo conozca.

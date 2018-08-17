@@ -20,8 +20,9 @@ Ponieważ nie ma nowych wersji zmieniłem kod tak aby było możliwe dodanie kil
        Aby aktywować tą funkcję to musisz wybrać Height:Geodetic w "Solution Options".
 2 - Wysyła symulację lokalizacji do innych aplikacji.
        Aby aktywować tą funkcję musisz sprawdzić w "Solution Options" stan wyjścia lokalizacji GPS, działa tylko wtedy, gdy jest dozwolone "mock locations" w ustawieniach programistycznych (w ustawieniach systemu Android).
-       Dzisiaj (1.0alpha13) "mock locations" nie mogą być wykorzystane w Google map API.
-3 - Automatycznie przesyła plik dziennika lub plik rozwiązania do konta Dropbox
+       today (in 1.0alpha26) the mock locations are not usable in the Google map API.
+3- Preliminary support for Trimble SpectraPrecision MobileMapper 50 internal chipset
+3b- Records .urw .crw .map and .shp compatibles with Trimble MobileMapper Office.
 4 - Generuje plik ścieżki GPX 
 5 - Pokazuje wynik w ECEF, WGS84 Lat / Lon, NAD83, Lambert 93 (RGF93) lub UTM (automatyczne strefy) układu współrzędnych
 5 b) - wykorzystanie projekcji Proj4
@@ -30,7 +31,7 @@ Ponieważ nie ma nowych wersji zmieniłem kod tak aby było możliwe dodanie kil
 8 - Ma możliwość wyświetlenia kilku map pochodzących z IGN Geoportail (działki ewidencyjne, satelitarne, drogi), OpenStreetMap Mapnik, Bing (satelitarne, drogi).
 9 - Ma możliwość pobrania i używania szybkiej efemerydy IGS.
 
-To oprogramowanie jest podobne do RTKLIB 2.4.2p9 opracowany przez Tomoki Takasu (http://www.rtklib.com), jeśli nie wiesz co to jest, to ta aplikacja nie jest chyba tym, czego szukasz!
+This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
 Ta aplikacja może obliczyć dokładną pozycje GPS za pomocą algorytmów RTKLIB (RTK lub PPP), ale do tego trzeba  zewnętrznego urządzenia GPS z wyjściem tzw „surowych” danych binarnych.
 To nie jest "uśredniona" pozycja, tak jak w wbudowanym GPS w telefonie lub samochodzie, przykładowy najtańszy odbiornik to coś w rodzaju uBlox LEA-6T.
 Nie ma sposobu, aby skorzystać z GPS znajdującego się w telefonie (Samsung Galaxy itp.) Przynajmniej nie znam takiego.

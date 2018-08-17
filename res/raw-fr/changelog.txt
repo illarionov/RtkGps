@@ -19,9 +19,16 @@
     </style>
   </head>
   <body>
+$ 1.0 alpha 26
+   % Build 26
+  _ 2018-08-31
+    * Introduit le support d'un caster NTRIP - ne l'utilisez que si vous savez ce que vous faites
+    * Produit des fichiers .urw .crw pour Trimble MobileMapper field Office
+    * Ajouter un enregistrement de position dans un shapefile ESRI et  dans un fichier .crw
+    * Demande d’autorisation basique pour les nouvelles plateformes Android
 $ 1.0 alpha 25
    % Build 25
-  _ 201-08-31
+  _ 2018-07-31
     * Support Initial pour Trimble / SpectraPrecision MobileMapper 50
     * Incorporation de certains mods par Ken McGuire (GPSFan)
     * re-ordonnement des options de traitement pour se conformer aux paramètres d’options de rtknavi 1 & 2

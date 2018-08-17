@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -20,12 +21,15 @@ import android.os.IBinder;
 import android.preference.PreferenceActivity;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.Switch;
 
 import com.karumi.dexter.Dexter;
@@ -47,13 +51,11 @@ import gpsplus.rtkgps.settings.SolutionOutputSettingsFragment;
 import gpsplus.rtkgps.settings.StreamSettingsActivity;
 import gpsplus.rtkgps.utils.ChangeLog;
 import gpsplus.rtkgps.utils.GpsTime;
-import gpsplus.rtklib.GTime;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
@@ -78,6 +80,8 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
     boolean mRtkServiceBound = false;
     private static DemoModeLocation mDemoModeLocation;
     private String mSessionCode;
+    String m_PointName = "POINT";
+    boolean m_bRet_pointName = false;
 
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @BindView(R.id.navigation_drawer) View mNavDrawer;
@@ -335,11 +339,42 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
         return true;
     }
 
+    private boolean askForPointName()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.PointNameAlertDialogStyle);
+        builder.setTitle(R.string.point_name_input_title);
+
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT );
+        builder.setView(input);
+
+        builder.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                 m_PointName = input.getText().toString();
+                 m_bRet_pointName = true;
+            }
+        });
+        builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                m_bRet_pointName = false;
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+        return m_bRet_pointName;
+    }
     private void askToAddPointToCrw()
     {
-        final Intent intent = new Intent(RtkNaviService.ACTION_STORE_POINT);
-        intent.setClass(this, RtkNaviService.class);
-        startService(intent);
+        if (askForPointName()) {
+            final Intent intent = new Intent(RtkNaviService.ACTION_STORE_POINT);
+            intent.setClass(this, RtkNaviService.class);
+            intent.putExtra(RtkNaviService.EXTRA_POINT_NAME, m_PointName);
+            startService(intent);
+        }
     }
 
     private void copyAssetsDirToApplicationDirectory(String sourceDir, File destDir) throws FileNotFoundException, IOException

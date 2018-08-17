@@ -24,7 +24,7 @@ $ 1.0 alpha 26
   _ 2018-08-31
     * Merge Embedded NTRIP Caster - use only if you know what you are doing
     * Produce .urw .crw for Trimble MobileMapper field Office
-    * Add record point button wich add a point on an ESRI shape file and the .crw file
+    * Add record point button which add a point on an ESRI shapefile and the .crw file
     * Basic permissions request for newer Android platforms
 $ 1.0 alpha 25
    % Build 25

@@ -20,8 +20,9 @@ Android上的RTKLIB应用
        如果需要这个功能，你需要在解算选项设置页面中选择“高度:大地 ”
 2- 发送模拟解算结果到其他应用程序
        如果需要使用此功能，你需要在解算选项设置页面选择输出“模拟位置”。同时，你必须在Android系统设置中开发人员选项中，允许“模拟位置”。
-       现在（1.0alpha13）版本的模拟位置功能在Google Map API中无效。
-3- 自动将log文件或解算结果文件上载到您的 Dropbox 账户
+       today (in 1.0alpha26) the mock locations are not usable in the Google map API.
+3- Preliminary support for Trimble SpectraPrecision MobileMapper 50 internal chipset
+3b- Records .urw .crw .map and .shp compatibles with Trimble MobileMapper Office.
 4-可以生成gpx格式的轨迹文件
 5- 支持显示各种坐标格式，包括ECEF, WGS84经纬度, NAD83, Lambert 93 (RGF93) or UTM (自动计算投影区) 
 5b-支持Proj4投影
@@ -30,7 +31,7 @@ Android上的RTKLIB应用
 8- 支持IGN Geoportail地图（地籍图、 卫星图、 道路图)， OpenStreetMap Mapnik，Bing 卫星，道路） 的地图。
 9- 支持下载并使用IGS超快速星历
 
-这个软件是RTKLIB 2.4.2p9（由Tomoki Takasu开发，http://www.rtklib.com）的一个移植版本。如果你甚至不知道RTKLIB是什么，那很有可能这个软件不是你所想要的。
+This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
 这个软件可以通过RTKLIB的算法（RTK/PPP）进行精密的GPS定位，但前提你需要有一个带原始载波数据输出的外置GPS接收机。
 它并不像你平常看到的内置在你的手机或者你的车里面的普通GPS，在市面上你能找到能用的最便宜一种是类似uBlox的LEA-6T这种模块。
 不管怎样，反正你不可能用Google Nexus或者任何我见过的手机里面的GPS来使用本软件。

@@ -746,4 +746,7 @@
   <string name="menu_add_point">Ajouter un point à la session</string>
   <string name="permission_to_use_gps">Sans gps, nous ne pouvons pas continuer</string>
   <string name="permission_to_use_gps_title">Accès au GPS</string>
+  <string name="point_name_input_title">Nom du point</string>
+  <string name="button_ok">OK</string>
+  <string name="button_cancel">Annuler</string>
 </resources>

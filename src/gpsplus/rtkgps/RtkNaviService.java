@@ -69,6 +69,8 @@ import java.lang.reflect.Method;
 
 public class RtkNaviService extends IntentService implements LocationListener {
 
+    private String m_pointName = "POINT";
+
     private class dpFile {
         private String localFilenameWithPath;
         private String remoteFilename;
@@ -120,6 +122,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
     public static final String ACTION_STOP = "gpsplus.rtkgps.RtkNaviService.STOP";
     public static final String ACTION_STORE_POINT = "gpsplus.rtkgps.RtkNaviService.STORE_POINT";
     public static final String EXTRA_SESSION_CODE = "gpsplus.rtkgps.RtkNaviService.SESSION_CODE";
+    public static final String EXTRA_POINT_NAME = "gpsplus.rtkgps.RtkNaviService.POINT_NAME";
     private static final String RTK_GPS_MOCK_LOC_SERVICE = "RtkGps mock loc service";
     private static final String MM_MAP_HEADER = ",0],UNIT[\"Degrees\",0.0174532925199433],AXIS[\"Long\",East],AXIS[\"Lat\",North]],VERT_CS[\"\",VERT_DATUM[\"Ellipsoïde\",2002],UNIT[\"Meters\",1],AXIS[\"Height\",Up]]]";
     private static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
@@ -170,7 +173,8 @@ public class RtkNaviService extends IntentService implements LocationListener {
             if (action.equals(ACTION_START)) {
                 if (intent.hasExtra(EXTRA_SESSION_CODE)) {
                     mSessionCode = intent.getStringExtra(EXTRA_SESSION_CODE);
-                } else {
+                }
+                else {
                     mSessionCode = String.valueOf(System.currentTimeMillis());
                 }
                 mShapefile = new Shapefile(MainActivity.getAndCheckSessionDirectory(mSessionCode),
@@ -182,7 +186,14 @@ public class RtkNaviService extends IntentService implements LocationListener {
                 if (mHavePoint) {
                     createMapFile();
                 }
-            } else if (action.equals(ACTION_STORE_POINT)) addPointToCRW();
+            } else if (action.equals(ACTION_STORE_POINT))
+            {
+                if (intent.hasExtra(EXTRA_POINT_NAME))
+                {
+                    m_pointName = intent.getStringExtra(EXTRA_POINT_NAME);
+                }
+                addPointToCRW(m_pointName);
+            }
             else Log.e(TAG, "onStartCommand(): unknown action " + action);
         }
         super.onStartCommand(intent, flags, startId);
@@ -260,7 +271,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
 
     }
 
-    private void addPointToCRW() {
+    private void addPointToCRW(String pointName) {
         double lat, lon, height, dLat, dLon;
         double Qe[] = new double[9];
         Position3d roverPos;
@@ -312,7 +323,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
             e.printStackTrace();
         }
         if (mShapefile != null){
-            mShapefile.addPoint("POINT",dLon, dLat,height,
+            mShapefile.addPoint(pointName,dLon, dLat,height,
                     Math.sqrt(Qe[4] < 0 ? 0 : Qe[4]),
                     Math.sqrt(Qe[0] < 0 ? 0 : Qe[0]),
                     Math.sqrt(Qe[8] < 0 ? 0 : Qe[8]),

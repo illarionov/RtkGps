@@ -844,4 +844,7 @@
     <string name="menu_add_point">Add point to session</string>
     <string name="permission_to_use_gps">Without gps we cannot continue</string>
     <string name="permission_to_use_gps_title">GPS permission</string>
+    <string name="point_name_input_title">Point name</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
 </resources>
