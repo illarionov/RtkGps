@@ -173,7 +173,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
                 } else {
                     mSessionCode = String.valueOf(System.currentTimeMillis());
                 }
-                mShapefile = new Shapefile(getAndCheckSessionDirectory(mSessionCode),
+                mShapefile = new Shapefile(MainActivity.getAndCheckSessionDirectory(mSessionCode),
                                             mSessionCode+".shp");
                 processStart();
             } else if (action.equals(ACTION_STOP)) {
@@ -242,17 +242,9 @@ public class RtkNaviService extends IntentService implements LocationListener {
         return mRtkServer.readSolutionBuffer();
     }
 
-    private String getAndCheckSessionDirectory(String code){
-        String szSessionDirectory = MainActivity.getFileStorageDirectory() + File.separator + code;
-        File fsessionDirectory = new File(szSessionDirectory);
-        if (!fsessionDirectory.exists()){
-            fsessionDirectory.mkdirs();
-        }
-        return szSessionDirectory;
-    }
     private void createMapFile() {
         try {
-            String sessionDirectory = getAndCheckSessionDirectory(mSessionCode);
+            String sessionDirectory = MainActivity.getAndCheckSessionDirectory(mSessionCode);
             File mapFile = new File(sessionDirectory + File.separator + mSessionCode + ".map");
             if (!mapFile.exists()) {
                 mapFile.createNewFile();
@@ -305,7 +297,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
         height = roverPos.getHeight();
         String currentLine = String.format("%s,%s,%.6f,%.6f,%.3f,%d,%.3f,%.3f,%.1f\n", gpsTime.getStringGpsWeek(), gpsTime.getStringGpsTOW(), dLon, dLat, height, 10, 0D, 0D, 0D);
         try {
-            String szSessionDirectory = getAndCheckSessionDirectory(mSessionCode);
+            String szSessionDirectory = MainActivity.getAndCheckSessionDirectory(mSessionCode);
             File crwFile = new File(szSessionDirectory +File.separator+ mSessionCode+".crw");
             if (!crwFile.exists()) {
                 crwFile.createNewFile();

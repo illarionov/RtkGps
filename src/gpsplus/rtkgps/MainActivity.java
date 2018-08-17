@@ -623,6 +623,20 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
     public static File getFileInStorageDirectory(String nameWithExtension) {
         return new File(Environment.getExternalStorageDirectory(), RTKGPS_CHILD_DIRECTORY+nameWithExtension);
     }
+    public static String getAndCheckSessionDirectory(String code){
+        String szSessionDirectory = MainActivity.getFileStorageDirectory() + File.separator + code;
+        File fsessionDirectory = new File(szSessionDirectory);
+        if (!fsessionDirectory.exists()){
+            fsessionDirectory.mkdirs();
+        }
+        return szSessionDirectory;
+    }
+
+    public static File getFileInStorageSessionDirectory(String code, String nameWithExtension){
+        String szSessionDirectory = MainActivity.getAndCheckSessionDirectory(code);
+        return new File (szSessionDirectory+File.separator+nameWithExtension);
+    }
+
 
     @Nonnull
     public static File getLocalSocketPath(Context ctx, String socketName) {

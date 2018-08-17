@@ -279,7 +279,7 @@ public class MobileMapperToRtklib implements android.location.GpsStatus.Listener
                 datagramSocketReceiver = new DatagramSocket(MOBILEMAPPER_RAW_PORT, InetAddress.getByName("localhost"));
                    packet = new DatagramPacket(buffer, buffer.length);
                 if (mMobileMapperSettings.isAutocapture()) {
-                    autoCaptureFile = MainActivity.getFileInStorageDirectory("MM50_" + mSessionCode +".ubw");
+                    autoCaptureFile = MainActivity.getFileInStorageSessionDirectory(mSessionCode, mSessionCode +".ubw");
                     autoCaptureFileOutputStream = new FileOutputStream(autoCaptureFile);
                     // if file doesnt exists, then create it
                     if (!autoCaptureFile.exists()) {
