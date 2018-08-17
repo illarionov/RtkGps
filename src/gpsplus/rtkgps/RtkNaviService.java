@@ -271,19 +271,37 @@ public class RtkNaviService extends IntentService implements LocationListener {
     private void addPointToCRW() {
         double lat, lon, height, dLat, dLon;
         double Qe[] = new double[9];
-        Solution[] currentSolutions = readSolutionBuffer();
-        Solution currentSolution = currentSolutions[currentSolutions.length - 1];
+        Position3d roverPos;
+        int nbSat = 0;
+
         GpsTime gpsTime = new GpsTime();
         gpsTime.setTime(System.currentTimeMillis());
-        RtkCommon.Matrix3x3 cov = currentSolution.getQrMatrix();
-        Position3d roverEcefPos = currentSolution.getPosition();
-        Position3d roverPos = RtkCommon.ecef2pos(roverEcefPos);
-        lat = roverPos.getLat();
-        lon = roverPos.getLon();
-        Qe = RtkCommon.covenu(lat, lon, cov).getValues();
 
-        dLat = Math.toDegrees(lat);
-        dLon = Math.toDegrees(lon);
+        if (MainActivity.getDemoModeLocation().isInDemoMode()) {
+            DemoModeLocation demoModeLocation = MainActivity.getDemoModeLocation();
+            nbSat = demoModeLocation.getNbSat();
+            Qe[4] = Math.pow(demoModeLocation.getNAccuracy(),2);
+            Qe[0] = Math.pow(demoModeLocation.getEAccuracy(),2);
+            Qe[8] = Math.pow(demoModeLocation.getVAccuracy(),2);
+            roverPos = demoModeLocation.getPosition();
+            lat = roverPos.getLat();
+            lon = roverPos.getLon();
+            dLat = Math.toDegrees(lat);
+            dLon = Math.toDegrees(lon);
+
+        }else {
+            Solution[] currentSolutions = readSolutionBuffer();
+            Solution currentSolution = currentSolutions[currentSolutions.length - 1];
+            RtkCommon.Matrix3x3 cov = currentSolution.getQrMatrix();
+            Position3d roverEcefPos = currentSolution.getPosition();
+            roverPos = RtkCommon.ecef2pos(roverEcefPos);
+            lat = roverPos.getLat();
+            lon = roverPos.getLon();
+            dLat = Math.toDegrees(lat);
+            dLon = Math.toDegrees(lon);
+            Qe = RtkCommon.covenu(lat, lon, cov).getValues();
+            nbSat = currentSolution.getNs();
+        }
         height = roverPos.getHeight();
         String currentLine = String.format("%s,%s,%.6f,%.6f,%.3f,%d,%.3f,%.3f,%.1f\n", gpsTime.getStringGpsWeek(), gpsTime.getStringGpsTOW(), dLon, dLat, height, 10, 0D, 0D, 0D);
         try {
@@ -307,7 +325,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
                     Math.sqrt(Qe[0] < 0 ? 0 : Qe[0]),
                     Math.sqrt(Qe[8] < 0 ? 0 : Qe[8]),
                     gpsTime.getGpsWeek(),(long)gpsTime.getSecondsOfWeek(),
-                    currentSolution.getNs());
+                    nbSat);
         }
     }
 
