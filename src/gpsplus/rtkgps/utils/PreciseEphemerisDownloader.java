@@ -5,7 +5,9 @@ import android.util.Log;
 import android.widget.ProgressBar;
 
 import gpsplus.rtkgps.BuildConfig;
+import gpsplus.rtkgps.MainActivity;
 import gpsplus.rtkgps.ToolsActivity.DownloaderCaller;
+import gpsplus.rtklib.RtkCommon;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -19,6 +21,11 @@ import java.net.URL;
 public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String> {
 
     final String TAG = PreciseEphemerisDownloader.class.getSimpleName();
+    public static final String IGUURLTemplateDir = "ftp://anonymous:world.com@cddis.gsfc.nasa.gov/gnss/products/%W/";
+    public static final String IGUURLTemplateFileDest = "igu%W%D_%hb.sp3";
+    public static final String IGUURLTemplateFileCompressExt = ".Z";
+    public static final String IGUURLTemplate = IGUURLTemplateDir+IGUURLTemplateFileDest+IGUURLTemplateFileCompressExt;
+
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
     private static final long IGU_INDICATIVE_SIZE = 489000 ; //approximative size for progress bar, noway to predict the size
@@ -54,7 +61,16 @@ public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String>
             this.mCaller = caller;
         }
 
-
+    public static File getCurrentOrbitFile()
+    {
+        String currentOrbitFile = RtkCommon.reppath(IGUURLTemplateFileDest,System.currentTimeMillis()/1000-3600*6, "", "");
+        File destFile = new File(MainActivity.getFileStorageDirectory() + File.separator + currentOrbitFile);
+        return destFile;
+    }
+    public static boolean isCurrentOrbitsPresent()
+    {
+        return getCurrentOrbitFile().exists();
+    }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

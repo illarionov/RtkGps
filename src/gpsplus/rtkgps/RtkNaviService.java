@@ -48,6 +48,7 @@ import gpsplus.rtkgps.settings.StreamBluetoothFragment.Value;
 import gpsplus.rtkgps.settings.StreamMobileMapperFragment;
 import gpsplus.rtkgps.settings.StreamUsbFragment;
 import gpsplus.rtkgps.utils.GpsTime;
+import gpsplus.rtkgps.utils.PreciseEphemerisDownloader;
 import gpsplus.rtkgps.utils.Shapefile;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
@@ -366,6 +367,11 @@ public class RtkNaviService extends IntentService implements LocationListener {
         if (!mRtkServer.start()) {
             Log.e(TAG, "rtkSrvStart() error");
             return;
+        }
+
+        if (PreciseEphemerisDownloader.isCurrentOrbitsPresent())
+        {
+            loadSP3(PreciseEphemerisDownloader.getCurrentOrbitFile().getAbsolutePath());
         }
 
         startBluetoothPipes();

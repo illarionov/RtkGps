@@ -26,11 +26,6 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
     @SuppressWarnings("unused")
     private static final boolean DBG = BuildConfig.DEBUG & true;
 
-    private final String IGUURLTemplateDir = "ftp://anonymous:world.com@cddis.gsfc.nasa.gov/gnss/products/%W/";
-    private final String IGUURLTemplateFileDest = "igu%W%D_%hb.sp3";
-    private final String IGUURLTemplateFileCompressExt = ".Z";
-    private final String IGUURLTemplate = IGUURLTemplateDir+IGUURLTemplateFileDest+IGUURLTemplateFileCompressExt;
-
     private final String RAF09URL = "http://geodesie.ign.fr/contenu/fichiers/documentation/grilles/metropole/RAF09.mnt";
     private final String RAF09LOCALFILE = MainActivity.getFileStorageDirectory() + "/RAF09_M15x20.geoid";
     @SuppressWarnings("rawtypes")
@@ -71,15 +66,15 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
         RAF09,
         EGM2008_M25,
         EGM2008_M10,
-        EGM96_M150;
+        EGM96_M150
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tools);
-        buttonIgu = (Button) findViewById(R.id.tools_button_igu);
+        buttonIgu = findViewById(R.id.tools_button_igu);
         buttonIgu.setEnabled(true);
-        if (isCurrentOrbitsPresent()){
+        if (PreciseEphemerisDownloader.isCurrentOrbitsPresent()){
             //Inhject only
             buttonIgu.setText(getString(R.string.tools_inject));
         }else{
@@ -87,39 +82,39 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
             buttonIgu.setText(getString(R.string.tools_get_inject));
         }
 
-        buttonRaf09 = (Button) findViewById(R.id.tools_button_raf09);
+        buttonRaf09 = findViewById(R.id.tools_button_raf09);
         if (isRAF09Present()) {
             buttonRaf09.setEnabled(false);
         }else{
             buttonRaf09.setEnabled(true);
         }
 
-        buttonEgm2008M25 = (Button) findViewById(R.id.tools_button_egm2008_m25);
+        buttonEgm2008M25 = findViewById(R.id.tools_button_egm2008_m25);
         if (isEGM2008_M25Present()) {
             buttonEgm2008M25.setEnabled(false);
         }else{
             buttonEgm2008M25.setEnabled(true);
         }
 
-        buttonEgm2008M10 = (Button) findViewById(R.id.tools_button_egm2008_m10);
+        buttonEgm2008M10 = findViewById(R.id.tools_button_egm2008_m10);
         if (isEGM2008_M10Present()) {
             buttonEgm2008M10.setEnabled(false);
         }else{
             buttonEgm2008M10.setEnabled(true);
         }
 
-        buttonEgm96M150 = (Button) findViewById(R.id.tools_button_egm96_m150);
+        buttonEgm96M150 = findViewById(R.id.tools_button_egm96_m150);
         if (isEGM96_M150Present()) {
             buttonEgm96M150.setEnabled(false);
         }else{
             buttonEgm96M150.setEnabled(true);
         }
 
-        pBarIgu = (ProgressBar) findViewById(R.id.tools_progressBar_igu);
-        pBarRaf09 = (ProgressBar) findViewById(R.id.tools_progressBar_raf09);
-        pBarEgm2008M25 = (ProgressBar) findViewById(R.id.tools_progressBar_egm2008_m25);
-        pBarEgm2008M10 = (ProgressBar) findViewById(R.id.tools_progressBar_egm2008_m10);
-        pBarEgm96M150 = (ProgressBar) findViewById(R.id.tools_progressBar_egm96_m150);
+        pBarIgu = findViewById(R.id.tools_progressBar_igu);
+        pBarRaf09 = findViewById(R.id.tools_progressBar_raf09);
+        pBarEgm2008M25 = findViewById(R.id.tools_progressBar_egm2008_m25);
+        pBarEgm2008M10 = findViewById(R.id.tools_progressBar_egm2008_m10);
+        pBarEgm96M150 = findViewById(R.id.tools_progressBar_egm96_m150);
 
         buttonIgu.setOnClickListener(eventHandler);
         buttonRaf09.setOnClickListener(eventHandler);
@@ -133,7 +128,7 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
     View.OnClickListener eventHandler = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ((Button)v).setEnabled(false);
+            v.setEnabled(false);
             switch(v.getId()) {
                 case R.id.tools_button_igu:
                     getIGUEphemeris();
@@ -158,18 +153,12 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
           return file.substring(0, file.lastIndexOf(".Z"));
       }
 
-      private boolean isCurrentOrbitsPresent()
-      {
-          String currentOrbitFile = RtkCommon.reppath(IGUURLTemplateFileDest,System.currentTimeMillis()/1000-3600*6, "", "");
-          File destFile = new File(MainActivity.getFileStorageDirectory() + File.separator + currentOrbitFile);
-          return destFile.exists();
-      }
 
     private void getIGUEphemeris(){
 
         final String USER="anonymous";
         final String PASSWORD="rtkgps@world.com";
-        String currentOrbit = RtkCommon.reppath(IGUURLTemplate,System.currentTimeMillis()/1000-3600*6, "", "");
+        String currentOrbit = RtkCommon.reppath(PreciseEphemerisDownloader.IGUURLTemplate,System.currentTimeMillis()/1000-3600*6, "", "");
         URL url;
         try {
             url = new URL(currentOrbit);
