@@ -169,3 +169,8 @@ I already made this translations:
 ###### Binary distribution
 
 * the latest apk with Mobile Mapper 50 and proj4 5.1.0 wich is maybe very instable can be found in bin directory, but prefer the Google Play version
+
+###### Beta distribution
+
+* the build 18 / 08 / 2018 (1.0alpha26) has been deployed as "BETA" on Google Play Store it is an open beta… If you want try it, but don't blame if it does not work.
+Ronan
