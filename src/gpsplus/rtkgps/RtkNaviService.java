@@ -69,6 +69,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 public class RtkNaviService extends IntentService implements LocationListener {
 
@@ -127,7 +128,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
     public static final String EXTRA_SESSION_CODE = "gpsplus.rtkgps.RtkNaviService.SESSION_CODE";
     public static final String EXTRA_POINT_NAME = "gpsplus.rtkgps.RtkNaviService.POINT_NAME";
     private static final String RTK_GPS_MOCK_LOC_SERVICE = "RtkGps mock loc service";
-    private static final String MM_MAP_HEADER = ",0],UNIT[\"Degrees\",0.0174532925199433],AXIS[\"Long\",East],AXIS[\"Lat\",North]],VERT_CS[\"\",VERT_DATUM[\"Ellipsoïde\",2002],UNIT[\"Meters\",1],AXIS[\"Height\",Up]]]";
+    private static final String MM_MAP_HEADER = "COMPD_CS[\"WGS 84\",GEOGCS[\"\",DATUM[\"WGS 84\",SPHEROID[\"WGS 84\",6378137,298.257223563],TOWGS84[0,0,0,0,0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"Degrees\",0.0174532925199433],AXIS[\"Long\",East],AXIS[\"Lat\",North]],VERT_CS[\"\",VERT_DATUM[\"Ellipsoid\",2002],UNIT[\"Meters\",1],AXIS[\"Height\",Up]]]\r\n";
     private static final String GPS_PROVIDER = LocationManager.GPS_PROVIDER;
     private boolean mHavePoint = false;
     private int NOTIFICATION = R.string.local_service_started;
@@ -259,13 +260,14 @@ public class RtkNaviService extends IntentService implements LocationListener {
     private void createMapFile() {
         try {
             String sessionDirectory = MainActivity.getAndCheckSessionDirectory(mSessionCode);
-            File mapFile = new File(sessionDirectory + File.separator + mSessionCode + ".map");
+            File mapFile = new File(sessionDirectory + File.separator + mSessionCode + ".map\r\n");
             if (!mapFile.exists()) {
                 mapFile.createNewFile();
             }
             FileWriter mapFileWriter = new FileWriter(mapFile, true);
             BufferedWriter out = new BufferedWriter(mapFileWriter);
-            out.write(MM_MAP_HEADER + "\n");
+            out.write(MM_MAP_HEADER + "\r\n");
+            out.write(mSessionCode+".shp\r\n");
             out.close();
             mapFileWriter.close();
         } catch (IOException e) {
@@ -309,7 +311,7 @@ public class RtkNaviService extends IntentService implements LocationListener {
             nbSat = currentSolution.getNs();
         }
         height = roverPos.getHeight();
-        String currentLine = String.format("%s,%s,%.6f,%.6f,%.3f,%d,%.3f,%.3f,%.1f\n", gpsTime.getStringGpsWeek(), gpsTime.getStringGpsTOW(), dLon, dLat, height, 10, 0D, 0D, 0D);
+        String currentLine = String.format(Locale.ROOT,"%s,%s,%.6f,%.6f,%.3f,%d,%.3f,%.3f,%.1f\n", gpsTime.getStringGpsWeek(), gpsTime.getStringGpsTOW(), dLon, dLat, height, 10, 0D, 0D, 0D);
         try {
             String szSessionDirectory = MainActivity.getAndCheckSessionDirectory(mSessionCode);
             File crwFile = new File(szSessionDirectory +File.separator+ mSessionCode+".crw");
