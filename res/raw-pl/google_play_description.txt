@@ -29,7 +29,7 @@ Ponieważ nie ma nowych wersji zmieniłem kod tak aby było możliwe dodanie kil
 6 - Wyświetla wysokość elipsoidalną lub wysokość geodezyjna (mogą być użyte różne modele geoidy, zobacz: https://github.com/eltorio/RtkGps jak zainstalować model geoidy)
 7 - Ma możliwość użycia dowolnego odbiornika zgodnego z GNSS RTKLIB, podłączonego przez USB (ACM / PL2303 / FTDI), Bluetooth, TCPIP lub NTRIP.
 8 - Ma możliwość wyświetlenia kilku map pochodzących z IGN Geoportail (działki ewidencyjne, satelitarne, drogi), OpenStreetMap Mapnik, Bing (satelitarne, drogi).
-9 - Ma możliwość pobrania i używania szybkiej efemerydy IGS.
+9- can download and use IGS GPS ultra-rapid ephemeris from NASA or IGN or ESU GPS+GLONASS ephemeris form ESA
 
 This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
 Ta aplikacja może obliczyć dokładną pozycje GPS za pomocą algorytmów RTKLIB (RTK lub PPP), ale do tego trzeba  zewnętrznego urządzenia GPS z wyjściem tzw „surowych” danych binarnych.

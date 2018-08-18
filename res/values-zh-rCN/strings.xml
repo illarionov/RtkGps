@@ -230,7 +230,9 @@
   <string name="geoid_raf09_m15x20">IGN RAF09 1.5x2.0\'</string>
   <!-- EPHOPT_XXX Exhemeris Options -->
   <string name="ephopt_brdc">广播星历</string>
-  <string name="ephopt_prec">精密星历</string>
+  <string name="ephopt_prec_ign">IGU Precise ephemeris from IGN</string>
+  <string name="ephopt_prec_nasa">IGU Precise ephemeris from NASA</string>
+  <string name="ephopt_prec">ESU Precise ephemeris from ESA</string>
   <string name="ephopt_sbas">广播星历 + SBAS</string>
   <string name="ephopt_ssrapc">广播星历 + SSR APC</string>
   <string name="ephopt_ssrcom">广播星历 + SSR CoM</string>

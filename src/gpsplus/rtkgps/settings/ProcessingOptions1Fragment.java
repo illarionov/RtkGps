@@ -21,6 +21,7 @@ import gpsplus.rtkgps.settings.widget.IonosphereCorrectionPreference;
 import gpsplus.rtkgps.settings.widget.MultiSelectListPreferenceWorkaround;
 import gpsplus.rtkgps.settings.widget.PositioningModePreference;
 import gpsplus.rtkgps.settings.widget.TroposphereCorrectionPreference;
+import gpsplus.rtkgps.utils.PreciseEphemerisProvider;
 import gpsplus.rtklib.ProcessingOptions;
 import gpsplus.rtklib.constants.EarthTideCorrectionType;
 import gpsplus.rtklib.constants.EphemerisOption;
@@ -51,7 +52,7 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
     static final String KEY_EARTH_TIDES_CORRECTION = "rec_earth_tides_correction";
     static final String KEY_IONOSPHERE_CORRECTION = "ionosphere_correction";
     static final String KEY_TROPOSPHERE_CORRECTION = "troposphere_correction";
-    static final String KEY_SAT_EPHEM_CLOCK = "satellite_ephemeris_clock";
+    public static final String KEY_SAT_EPHEM_CLOCK = "satellite_ephemeris_clock";
     static final String KEY_SAT_ANTENNA_PCV = "sat_antenna_pcv";
     static final String KEY_RECEIVER_ANTENNA_PCV = "receiver_antenna_pcv";
     static final String KEY_PHASE_WINDUP_CORRECTION = "phase_windup_correction";
@@ -530,7 +531,7 @@ public class ProcessingOptions1Fragment extends PreferenceFragment {
             updateEnable();
             reloadSummaries();
         }
-    };
+    }
 
     public static void setValue(Context ctx, ProcessingOptions opts) {
         SharedPreferences prefs;

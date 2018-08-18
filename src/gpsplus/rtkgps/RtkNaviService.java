@@ -49,6 +49,7 @@ import gpsplus.rtkgps.settings.StreamMobileMapperFragment;
 import gpsplus.rtkgps.settings.StreamUsbFragment;
 import gpsplus.rtkgps.utils.GpsTime;
 import gpsplus.rtkgps.utils.PreciseEphemerisDownloader;
+import gpsplus.rtkgps.utils.PreciseEphemerisProvider;
 import gpsplus.rtkgps.utils.Shapefile;
 import gpsplus.rtklib.RtkCommon;
 import gpsplus.rtklib.RtkCommon.Position3d;
@@ -59,6 +60,7 @@ import gpsplus.rtklib.RtkServerSettings;
 import gpsplus.rtklib.RtkServerSettings.TransportSettings;
 import gpsplus.rtklib.RtkServerStreamStatus;
 import gpsplus.rtklib.Solution;
+import gpsplus.rtklib.constants.EphemerisOption;
 import gpsplus.rtklib.constants.GeoidModel;
 import gpsplus.rtklib.constants.StreamType;
 
@@ -369,9 +371,14 @@ public class RtkNaviService extends IntentService implements LocationListener {
             return;
         }
 
-        if (PreciseEphemerisDownloader.isCurrentOrbitsPresent())
-        {
-            loadSP3(PreciseEphemerisDownloader.getCurrentOrbitFile().getAbsolutePath());
+        SharedPreferences processPrefs = this.getBaseContext().getSharedPreferences(ProcessingOptions1Fragment.SHARED_PREFS_NAME, 0);
+        String ephemVa = processPrefs.getString(ProcessingOptions1Fragment.KEY_SAT_EPHEM_CLOCK,"");
+        EphemerisOption ephemerisOption = EphemerisOption.valueOf(ephemVa);
+        PreciseEphemerisProvider provider = ephemerisOption.getProvider();
+        if (provider != null) {
+            if (PreciseEphemerisDownloader.isCurrentOrbitsPresent(provider)) {
+                loadSP3(PreciseEphemerisDownloader.getCurrentOrbitFile(provider).getAbsolutePath());
+            }
         }
 
         startBluetoothPipes();

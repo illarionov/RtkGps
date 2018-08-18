@@ -29,7 +29,7 @@ Como no ha sacado ninguna nueva versión, he revisado el código para agregar al
 6 - se puede mostrar la altura elipsoidal o la altitud geodésica (utilizando diferentes modelos de geoide, consulte: https://github.com/eltorio/RtkGps para instalar un modelo de geoide)
 7 - Utilice cualquier GNSS compatible con RTKLIB con salida conectada vía USB (ACM/PL2303/FTDI), Bluetooth, TCP/IP o NTRIP
 8 - puede mostrar algunos mapas del Geoportal francés IGN (catastro, satélite, carreteras), de OpenStreetMap Mapnik o Bing (satélite, carreteras).
-9 - puede descargar y usar efemérides ultra rapidas del IGS
+9- can download and use IGS GPS ultra-rapid ephemeris from NASA or IGN or ESU GPS+GLONASS ephemeris form ESA
 
 This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
 Esta aplicación puede calcular posiciones GNSS precisas utilizando algoritmos de RTKLIB (RTK o PPP) pero se debe utilizar un receptor GNSS - externo - con salida de datos brutos.

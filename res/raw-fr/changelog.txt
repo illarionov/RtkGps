@@ -26,6 +26,7 @@ $ 1.0 alpha 26
     * Produit des fichiers .urw .crw pour Trimble MobileMapper field Office
     * Ajouter un enregistrement de position dans un shapefile ESRI et  dans un fichier .crw
     * Demande d’autorisation basique pour les nouvelles plateformes Android
+    * Choix de la source des éphémérides précises (défaut ESU depuis l'ESA gps + glonass)
 $ 1.0 alpha 25
    % Build 25
   _ 2018-07-31

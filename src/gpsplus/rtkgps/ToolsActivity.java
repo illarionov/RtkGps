@@ -1,16 +1,20 @@
 package gpsplus.rtkgps;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import gpsplus.rtkgps.settings.ProcessingOptions1Fragment;
 import gpsplus.rtkgps.utils.HTTPDownloader;
 import gpsplus.rtkgps.utils.IDownloaderAccessResponse;
 import gpsplus.rtkgps.utils.PreciseEphemerisDownloader;
+import gpsplus.rtkgps.utils.PreciseEphemerisProvider;
 import gpsplus.rtklib.RtkCommon;
+import gpsplus.rtklib.constants.EphemerisOption;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -60,6 +64,7 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
     private ProgressBar pBarEgm2008M25;
     private ProgressBar pBarEgm2008M10;
     private ProgressBar pBarEgm96M150;
+    PreciseEphemerisProvider mProvider = null;
 
     public enum DownloaderCaller{
         IGU_ORBIT,
@@ -74,7 +79,12 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
         setContentView(R.layout.activity_tools);
         buttonIgu = findViewById(R.id.tools_button_igu);
         buttonIgu.setEnabled(true);
-        if (PreciseEphemerisDownloader.isCurrentOrbitsPresent()){
+        SharedPreferences processPrefs = this.getBaseContext().getSharedPreferences(ProcessingOptions1Fragment.SHARED_PREFS_NAME, 0);
+        String ephemVa = processPrefs.getString(ProcessingOptions1Fragment.KEY_SAT_EPHEM_CLOCK,"");
+        EphemerisOption ephemerisOption = EphemerisOption.valueOf(ephemVa);
+        mProvider = ephemerisOption.getProvider();
+
+        if (PreciseEphemerisDownloader.isCurrentOrbitsPresent(mProvider)){
             //Inhject only
             buttonIgu.setText(getString(R.string.tools_inject));
         }else{
@@ -158,15 +168,18 @@ public class ToolsActivity extends Activity implements IDownloaderAccessResponse
 
         final String USER="anonymous";
         final String PASSWORD="rtkgps@world.com";
-        String currentOrbit = RtkCommon.reppath(PreciseEphemerisDownloader.IGUURLTemplate,System.currentTimeMillis()/1000-3600*6, "", "");
+
+        if (mProvider == null ){return;}
+
+
         URL url;
         try {
-            url = new URL(currentOrbit);
+            url = new URL(PreciseEphemerisDownloader.getCurrentOrbit(mProvider));
             String uncompressedFilename = getUncompressedFileName( (new File(url.getFile()).getName() ));
             File destFile = new File(MainActivity.getFileStorageDirectory() + File.separator + uncompressedFilename);
             String iguCurrentFile = destFile.getAbsolutePath();
 
-            PreciseEphemerisDownloader iguDownloader = new PreciseEphemerisDownloader(currentOrbit, iguCurrentFile,  USER, PASSWORD, pBarIgu, DownloaderCaller.IGU_ORBIT);
+            PreciseEphemerisDownloader iguDownloader = new PreciseEphemerisDownloader(mProvider, iguCurrentFile,  USER, PASSWORD, pBarIgu, DownloaderCaller.IGU_ORBIT);
             iguDownloader.delegate = this;
                 iguDownloader.execute();
 

@@ -26,6 +26,7 @@ $ 1.0 alpha 26
     * Produce .urw .crw for Trimble MobileMapper field Office
     * Add record point button which add a point on an ESRI shapefile and the .crw file
     * Basic permissions request for newer Android platforms
+    * Add choose for precise ephemeris source (default to ESU from ESA gps+glonass)
 $ 1.0 alpha 25
    % Build 25
   _ 2018-07-31

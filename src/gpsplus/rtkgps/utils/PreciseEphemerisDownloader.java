@@ -21,14 +21,10 @@ import java.net.URL;
 public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String> {
 
     final String TAG = PreciseEphemerisDownloader.class.getSimpleName();
-    public static final String IGUURLTemplateDir = "ftp://anonymous:world.com@cddis.gsfc.nasa.gov/gnss/products/%W/";
-    public static final String IGUURLTemplateFileDest = "igu%W%D_%hb.sp3";
-    public static final String IGUURLTemplateFileCompressExt = ".Z";
-    public static final String IGUURLTemplate = IGUURLTemplateDir+IGUURLTemplateFileDest+IGUURLTemplateFileCompressExt;
+
+    private PreciseEphemerisProvider ephemerisProvider = PreciseEphemerisProvider.ESU_ESA;
 
     private static final boolean DBG = BuildConfig.DEBUG & true;
-
-    private static final long IGU_INDICATIVE_SIZE = 489000 ; //approximative size for progress bar, noway to predict the size
 
         private String USER="anonymous";
         private String PASSWORD="rtkgps@world.com";
@@ -39,8 +35,6 @@ public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String>
 
         private String currentOrbit;
 
-        private FTPClient ftp;
-
         private File destFile;
 
         private URL url;
@@ -50,7 +44,15 @@ public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String>
         private DownloaderCaller mCaller = DownloaderCaller.IGU_ORBIT;
 
 
-
+    public PreciseEphemerisDownloader(PreciseEphemerisProvider provider, String destFile, String username, String password, ProgressBar pBar, DownloaderCaller caller){
+        this.ephemerisProvider = provider;
+        this.USER = username;
+        this.PASSWORD = password;
+        this.currentOrbit = getCurrentOrbit(provider);
+        this.destFile = new File(destFile);
+        this.pBar = pBar;
+        this.mCaller = caller;
+    }
 
         public PreciseEphemerisDownloader(String url,String destFile, String username, String password, ProgressBar pBar, DownloaderCaller caller){
             this.USER = username;
@@ -61,15 +63,34 @@ public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String>
             this.mCaller = caller;
         }
 
-    public static File getCurrentOrbitFile()
+    public static File getCurrentOrbitFile(PreciseEphemerisProvider provider)
     {
-        String currentOrbitFile = RtkCommon.reppath(IGUURLTemplateFileDest,System.currentTimeMillis()/1000-3600*6, "", "");
+        String currentOrbitFile = RtkCommon.reppath(provider.getURLTemplateFileDest(),System.currentTimeMillis()/1000-3600*6, "", "");
         File destFile = new File(MainActivity.getFileStorageDirectory() + File.separator + currentOrbitFile);
         return destFile;
     }
-    public static boolean isCurrentOrbitsPresent()
+
+    public File getCurrentOrbitFile()
+    {
+        return getCurrentOrbitFile(ephemerisProvider);
+    }
+
+    public  boolean isCurrentOrbitsPresent()
     {
         return getCurrentOrbitFile().exists();
+    }
+
+    public static String getCurrentOrbit(PreciseEphemerisProvider provider)
+    {
+        return RtkCommon.reppath(provider.getURLTemplate(),System.currentTimeMillis()/1000-3600*6, "", "");
+    }
+
+    public static boolean isCurrentOrbitsPresent(PreciseEphemerisProvider provider)
+    {
+        if (provider != null)
+            return getCurrentOrbitFile(provider).exists();
+        else
+            return false;
     }
         @Override
         protected void onPreExecute() {
@@ -78,7 +99,6 @@ public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String>
             iguCurrentFile = "";
             Log.v(TAG, "Remote orbit is: "+currentOrbit);
             pBar.setProgress(0);
-            ftp = new FTPClient();
             try {
                 url = new URL(currentOrbit);
             } catch (MalformedURLException e) {
@@ -111,17 +131,25 @@ public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String>
 
         @Override
         protected String doInBackground(Void... arg0) {
-
+            java.io.InputStream is;
             int progress = 0;
             try {
 
                 if (!destFile.exists()) {
-                    ftp.connect(url.getHost(), (url.getPort()==-1)?url.getDefaultPort():url.getPort());
-                    ftp.login(USER,PASSWORD);
-                    ftp.enterLocalPassiveMode();
-                    ftp.setFileType(FTP.BINARY_FILE_TYPE);
-                    java.io.InputStream is = ftp.retrieveFileStream(url.getPath());
+                    if (url.getProtocol() == "http")
+                    {
+                        is = url.openStream();
 
+                    }else if (url.getProtocol() == "ftp") {
+                        FTPClient client = new FTPClient();
+                        client.connect(url.getHost(), (url.getPort() == -1) ? url.getDefaultPort() : url.getPort());
+                        client.login(USER, PASSWORD);
+                        client.enterLocalPassiveMode();
+                        client.setFileType(FTP.BINARY_FILE_TYPE);
+                        is = client.retrieveFileStream(url.getPath());
+                    }else{
+                        is = url.openStream();
+                    }
                     UncompressInputStream zStream = new UncompressInputStream( is );
 
                     if (!destFile.getParentFile().exists())
@@ -135,7 +163,7 @@ public class PreciseEphemerisDownloader extends AsyncTask<Void, Integer, String>
                      {
                           alreadyDownloaded += length;
                           out.write(buffer, 0, length);
-                          progress = (int) (alreadyDownloaded*100/IGU_INDICATIVE_SIZE);
+                          progress = (int) (alreadyDownloaded*100/ephemerisProvider.getPredictedSize());
                           publishProgress(progress);
                           try {
                              Thread.sleep(5);

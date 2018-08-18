@@ -29,9 +29,9 @@ Puisqu'il n'y avait pas de nouvelle version, j'ai retravaillé le code pour ajou
 6 - affichage hauteur ellipsoïdale ou altitude géodésique (modèles de géoïdes différents ) (voir : https://github.com/eltorio/RtkGps pour savoir comment installer un modèle de géoïde)
 7 - utilise n'importe quel GNSS compatible RTKLIB, avec sortie brute et connecté en USB (ACM/PL2303/FTDI), Bluetooth, TCPIP ou NTRIP
 8 - peut afficher des cartes provenant de l'IGN Geoportail (parcelles cadastrales, satellite, routes), OpenStreetMap Mapnik, Bing (satellite, routes).
-9 - téléchargement et utilisation des éphémérides ultra-rapides IGS
+9 - Vous pouvez télécharger et utiliser les éphémérides ultra-rapide IGS GPS depuis la NASA ou l'IGN ou les éphémérides ESU GPS + GLONASS depuis l'ESA
 
-This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
+Ce logiciel est un port de RTKLIB 2.4.3b29 développé par Tomoki Takasu (http://www.rtklib.com), si vous ne savez pas ce que cette application est; cette application n'est probablement pas ce que vous cherchez!
 Cette application permet de calculer des positions GPS précises en utilisant des algorithmes de RTKLIB (RTK ou PPP), mais pour cela vous avez besoin d'un GPS - externe - pris en charge avec sortie de la porteuse et de la phase brutes.
 Ce n'est pas un GPS « standard » comme ceux intégrés dans votre téléphone ou votre voiture, le moins cher vous puissiez trouver est quelque chose comme le uBlox LEA-6 t.
 Il n'y a aucune façon d'utiliser le GPS intégré dans un Galaxy(s) de Samsung, ni dans n'importe quel téléphone que j'ai vu.

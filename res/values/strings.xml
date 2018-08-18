@@ -246,7 +246,9 @@
 
     <!-- EPHOPT_XXX Exhemeris Options -->
     <string name="ephopt_brdc">Broadcast ephemeris</string>
-    <string name="ephopt_prec">Precise ephemeris</string>
+    <string name="ephopt_prec_ign">IGU Precise ephemeris from IGN</string>
+    <string name="ephopt_prec_nasa">IGU Precise ephemeris from NASA</string>
+    <string name="ephopt_prec">ESU Precise ephemeris from ESA</string>
     <string name="ephopt_sbas">Broadcast + SBAS</string>
     <string name="ephopt_ssrapc">Broadcast + SSR APC</string>
     <string name="ephopt_ssrcom">Broadcast + SSR CoM</string>

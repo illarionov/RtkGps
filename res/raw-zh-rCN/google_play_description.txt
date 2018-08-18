@@ -29,7 +29,7 @@ Android上的RTKLIB应用
 6- 可以显示椭球面高度或大地测量高度（可以使用不同的大地水准面模型，请参阅：如何安装大地水准面模型 https://github.com/eltorio/RtkGps）
 7- 可以使用任何RTKLIB兼容的带原始数据输出的GNSS接收机，支持通过USB（ACM/PL2303/FTDI），蓝牙，TCP/IP或者NTRIP连接。
 8- 支持IGN Geoportail地图（地籍图、 卫星图、 道路图)， OpenStreetMap Mapnik，Bing 卫星，道路） 的地图。
-9- 支持下载并使用IGS超快速星历
+9- can download and use IGS GPS ultra-rapid ephemeris from NASA or IGN or ESU GPS+GLONASS ephemeris form ESA
 
 This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
 这个软件可以通过RTKLIB的算法（RTK/PPP）进行精密的GPS定位，但前提你需要有一个带原始载波数据输出的外置GPS接收机。
