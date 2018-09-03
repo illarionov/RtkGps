@@ -36,4 +36,4 @@ This application can compute precise GPS positions using RTKLIB algorithms (RTK 
 This is not a "standard" GPS like those embedded into your phone or your car, the cheapest one you can find is something like uBlox LEA-6T .
 THERE IS NO WAY to use the GPS found in Samsung Galaxy(s) nor any phone I seen.
 
-But there is a special test mode witch use the internal GPS for testing only, obviously none of the precision algorithm found in RTKLIB can be use.
+But there is a special test mode which use the internal GPS for testing only, obviously none of the precision algorithm found in RTKLIB can be use.
