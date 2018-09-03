@@ -1,0 +1,6 @@
+#!/bin/sh
+PLATFORM=21
+~/Library/Android/sdk/ndk-bundle/build/tools/make-standalone-toolchain.sh --verbose --force --platform=android-$PLATFORM --use-llvm --stl=libc++ --install-dir=/Users/rlemeill/Development/android-toolchain/x86_64 --arch=x86_64
+~/Library/Android/sdk/ndk-bundle/build/tools/make-standalone-toolchain.sh --verbose --force --platform=android-$PLATFORM --use-llvm --stl=libc++ --install-dir=/Users/rlemeill/Development/android-toolchain/x86 --arch=x86
+~/Library/Android/sdk/ndk-bundle/build/tools/make-standalone-toolchain.sh --verbose --force --platform=android-$PLATFORM --use-llvm --stl=libc++ --install-dir=/Users/rlemeill/Development/android-toolchain/arm64 --arch=arm64
+~/Library/Android/sdk/ndk-bundle/build/tools/make-standalone-toolchain.sh --verbose --force --platform=android-$PLATFORM --use-llvm --stl=libc++ --install-dir=/Users/rlemeill/Development/android-toolchain/arm --arch=arm

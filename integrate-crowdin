@@ -1,0 +1,31 @@
+#/bin/sh
+cd ~/Development/Android/RtkGps
+. ./.crowdin-api-key
+mkdir CROWDIN-TMP
+cd CROWDIN-TMP
+wget "https://api.crowdin.com/api/project/gpsplusrtkgps/export?key=$CROWDINAPIKEY" -O -
+wget "https://api.crowdin.com/api/project/gpsplusrtkgps/download/all.zip?key=$CROWDINAPIKEY" -O gpsplusrtkgps.zip
+unzip gpsplusrtkgps.zip
+cp zh-CN/strings.xml ../res/values-zh-rCN/
+cp zh-CN/changelog.txt ../res/raw-zh-rCN/
+cp zh-CN/google_play_description.txt ../res/raw-zh-rCN/
+
+cp fr/strings.xml ../res/values-fr/
+cp fr/changelog.txt ../res/raw-fr/
+cp fr/google_play_description.txt ../res/raw-fr/
+
+cp es-ES/strings.xml ../res/values-es/
+cp es-ES/google_play_description.txt ../res/raw-es/
+cp es-ES/changelog.txt ../res/raw-es/
+
+cp de/strings.xml ../res/values-de/
+#not enough
+#cp de/changelog.txt ../res/raw-de/
+#cp de/google_play_description.txt ../res/raw-de/
+
+cp pl/strings.xml ../res/values-pl/
+cp pl/changelog.txt ../res/raw-pl/
+cp pl/google_play_description.txt ../res/raw-pl/
+
+cd ..
+rm -rf CROWDIN-TMP

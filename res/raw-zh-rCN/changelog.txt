@@ -1,0 +1,137 @@
+<html>
+  <head>
+    <style type='text/css'>
+      a            { color:#a0a0e0 }
+      div.title    { 
+          color:#C0F0C0; 
+          font-size:1.2em; 
+          font-weight:bold; 
+          margin-top:1em; 
+          margin-bottom:0.5em; 
+          text-align:center }
+      div.subtitle { 
+          color:#C0F0C0; 
+          font-size:0.8em; 
+          margin-bottom:1em; 
+          text-align:center }
+      div.freetext { color:#F0F0F0 }
+      div.list     { color:#C0C0F0 }
+    </style>
+  </head>
+  <body>
+$ 1.0 alpha 26
+   % Build 26
+  _ 2018-08-31
+    * Merge Embedded NTRIP Caster - use only if you know what you are doing
+    * Produce .urw .crw for Trimble MobileMapper field Office
+    * Add record point button which add a point on an ESRI shapefile and the .crw file
+    * Basic permissions request for newer Android platforms
+    * Add choose for precise ephemeris source (default to ESU from ESA gps+glonass)
+$ 1.0 alpha 25
+   % Build 25
+  _ 2018-07-31
+    * Initial support for Trimble / SpectraPrecision MobileMapper 50
+    * Merge some mods by Ken McGuire (GPSFan)
+    *   re-order Processing options to resemble rtknavi options settings 1 & 2
+    *   add yet more remaining parameters
+    *   Fix translations, and solopt settings
+    *   fix visibility of settings
+    *   Updated LICENSE.txt & README.md
+    *   Fix translations, and solopt settings
+    *   maybe re-order settings to resemble rtknavi
+    *   fix visibility of settings
+    *   added remaining prcopt settings
+    *   Fix translations, and solopt settings
+    *   re-order settings to resemble rtknavi
+    *   fix visibility of settings
+    *   u-blox via Bluetooth working, as is via USB
+    *   Fix translations,
+    *   add remaining prcopt and solopt settings
+    *   Move to rtklibxplorer RTKLIB Demo 5 B29a code
+    *   add remaining prcopt and solopt settings
+    * Update to newer Android libs, remove old static ones.
+    * Migration to Android Studio 3.1.3
+    * Add compile for Galileo & BeiDou
+    * Remove deprecated Dropbox
+$ 1.0 alpha 24
+   % Build 24
+  _ 2014-10-31
+    * Glonass integer ambiguity resolution
+    * TODO Full RTKLIB integer ambiguity settings 
+   % Build 23
+  _ 2014-10-16
+    * 支持NTRIP server功能  
+    * 支持在NTRIP的用户名和密码中输入特殊字符
+    * 西班牙语言翻译 (感谢Enoc Sanz Ablanedo的贡献)
+    * 波兰语言支持 (由Tomasz Robak 翻译)
+    * 德国语言支持 (由Hagen Felix 翻译)
+   % Build 22
+  _ 2014-09-13
+    * 支持更多的整周模糊度解算设置
+    * 支持标准的外部Proj4文件和来自proj-datumgrid-1.5.zip的文件
+    * 在关于页面显示更改日志信息
+    * 增加了uBlox M8N原始数据在UART#1输出的启动命令
+    * 缺省启用测试模式 (仅适用于新的安装)
+$ 1.0 alpha 21
+   % Build 21
+  _ 2014-09-12
+    * 支持流动站/参考站的天线相位中心参数
+$ 1.0 alpha 20
+   % Build 20
+  _ 2014-09-08
+    * 在改正选项设置中支持从文件中导入SP3轨道数据
+    * 卫星天线PCV参数加入并使用
+    * 提供新的工具菜单下载最新的IGS快速轨道信息和通用大地水准面模型文件
+$ 1.0 alpha 19
+   % Build 19
+  _ 2014-08-31
+    * rtklib 2.4.2p9
+    * 增加对Trimble RT17，Sirf III/IV，Furuno LPY1000和Septentrio的格式支持
+    * 中文语言支持 (由Yong Zhang翻译)
+$ 1.0 alpha 18
+   % Build 18
+  _ 2014-08-25
+    * 测试模式下一些小的性能提升
+$ 1.0 alpha 17
+   % Build 17
+  _ 2014-08-16
+    * 增加测试模式（从内部GPS获取定位数据)
+$ 1.0 alpha 16
+   % Build 16
+  _ 2014-08-15
+    * 支持French IGN Geoportail地图
+$ 1.0 alpha 15
+   % Build 15
+  _ 2014-08-10
+    * 支持RAF09法国大地水准面
+$ 1.0 alpha 14
+   % Build 14
+  _ 2014-08-08
+    * 支持一些 Proj4 坐标转换。 其中，这些转换是通过Proj4J来完成的，而不是直接在Proj4的JNI层实现（Proj4J是一个Proj4的衍生项目）。有一些功能会丢失，比如没有+pm参数。 这会造成有一些转换无法实现，比如转换到Lambert II-Paris。
+    * 增加部分坐标转换（法国大地水准面网格RGF93，RGF93CC43->CC50和美国NAD83）
+    * 在解算结果视图中显示大地水准面模型 -- 但是很多大地水准面模型文件的有效性并未测试
+$ 1.0 alpha 13
+   % Build 13
+  _ 2014-08-07
+    * 增加对FTDI USB转串口芯片的支持    
+$ 1.0 alpha 12
+   % Build 12
+  _ 2014-08-03
+    * Bug: 在UTM中，高度计算不正确
+增加: 放到Dropbox中的文件可以压缩后再发送
+$ 1.0 alpha 11
+   % Build 11
+  _ 2014-07-21
+    * 在状态视图中增加UTM坐标显示
+$ 1.0 alpha 10
+   % Build 10
+  _ 2014-07-20
+    * 升级到rtklib 2.4.2p8
+$ 1.0 alpha 9
+  % Build 9
+  _ 2014-07-14
+    * Bug:蓝牙地址异常
+    * 在处理选项中可以调整解算的周期
+$ END_OF_CHANGE_LOG
+  </body>
+</html>

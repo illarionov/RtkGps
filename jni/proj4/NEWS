@@ -1,0 +1,729 @@
+5.1.0 Release Notes
+-------------------
+
+ UPDATES
+ -------
+
+ o Function proj_errno_string() added to proj.h API (#847)
+
+ o Validate units between pipeline steps and ensure transformation
+   sanity (#906)
+
+ o Print help when calling cct and gie without arguments (#907)
+
+ o CITATION file added to source distribution (#914)
+
+ o Webmercator operation added (#925)
+
+ o Enhanced numerical precision of forward spherical Mercator near
+   the Equator (#928)
+
+ o Added --skip-lines option to cct (#923)
+
+ o Consistently return NaN values on NaN input (#949)
+
+ o Removed unused src/org_proj4_Projections.h file (#956)
+
+ o Java Native Interface bindings updated (#957, #969)
+
+ o Horizontal and vertical gridshift operations extended to
+   the temporal domain (#1015)
+
+
+ BUG FIXES
+ ------------
+
+ o Handle nan float cast overflow in PJ_robin.c and nad_intr.c (#887)
+
+ o Avoid overflow when Horner order is unreasonably large (#893)
+
+ o Avoid unwanted NaN conversions in etmerc (#899)
+
+ o Avoid memory failure in gie when not specifying x,y,z in gie files (#902)
+
+ o Avoid memory failure when +sweep is initialized incorrectly in geos (#908)
+
+ o Return HUGE_VAL on erroneous input in ortho (#912)
+
+ o Handle commented lines correctly in cct (#933)
+
+ o Avoid segmentation fault when transformation coordinates outside grid
+   area in deformation (#934)
+
+ o Avoid doing false easting/northing adjustments on cartesian
+   coordinates (#936)
+
+ o Thread-safe creation of proj mutex (#954)
+
+ o Avoid errors when setting up geos with +lat_0!=0 (#986)
+
+ o Reset errno when running proj in verbose mode (#988)
+
+ o Do not interpolate node values at nodata value in vertical
+   grid shifts (#1004)
+
+ o Restrict Horner degrees to positive integer values to avoid
+   memory allocation issues (#1005)
+
+ All bug fix numbers refer to issues or pull requests indexed at
+ https://github.com/OSGeo/proj.4/
+
+ THANKS TO
+ ------------
+
+ Version 5.1.0 is made possible by the following contributors:
+
+   Kristian Evers
+   Even Rouault
+   Kurt Schwehr
+   Mike Toews
+   Martin Desruisseaux
+   Charles Karney
+   Thomas Knudsen
+   Javier Goizueta
+   Bas Couwenberg
+   Adam Wulkiewicz
+   Aaron Puchert
+
+5.0.1 Release Notes
+-------------------
+
+ BUG FIXES
+ ------------
+
+ All bug fix numbers refer to issues or pull requests indexed at
+ https://github.com/OSGeo/proj.4/
+
+ o Handle ellipsoid change correctly in pipelines when
+   +towgs84=0,0,0 is set #881
+
+ o Handle the case where nad_ctable2_init returns NULL #883
+
+ o Avoid shadowed declaration errors with old gcc #880
+
+ o Expand +datum properly +datum in pipelines #872
+
+ o Fail gracefully when incorrect headers are encountered in grid
+   files #875
+
+ o Improve roundtrip stability in pipelines using +towgs84 #871
+
+ o Fixed typo in gie error codes #861
+
+ o Numerical stability fixes to the geodesic package #826 #843
+
+ o Make sure that transient errors are returned correctly #857
+
+ o Make sure that locally installed header files are not used when
+   building PROJ #849
+
+ o Fix inconsistent parameter names in proj.h/proj_4D_api.c #842
+
+ o Make sure +vunits is applied #833
+
+ o Fix incorrect Web Mercator transformations #834
+
+ THANKS TO
+ ------------
+
+ Version 5.0.1 is made possible by the following contributors:
+
+   Mike Toews
+   Kurt Schwehr
+   Even Rouault
+   Charles Karney
+   Thomas Knudsen
+   Kristian Evers
+
+
+5.0.0 Release Notes
+-------------------
+
+This version of PROJ introduces some significant extensions and
+improvements to (primarily) the geodetic functionality of the system.
+
+The main driver for introducing the new features is the emergence of
+dynamic reference frames, the increasing use of high accuracy GNSS,
+and the related growing demand for accurate coordinate
+transformations.  While older versions of PROJ included some geodetic
+functionality, the new framework lays the foundation for turning PROJ
+into a generic geospatial coordinate transformation engine.
+
+The core of the library is still the well established projection code.
+The new functionality is primarily exposed in a new programming
+interface and a new command line utility, "cct" (for "Coordinate
+Conversion and Transformation").  The old programming interface is
+still available and can - to some extent - use the new geodetic
+transformation features.
+
+The internal architecture has also seen many changes and much
+improvement.  So far, these improvements respect the existing
+programming interface. But the process has revealed a need to simplify
+and reduce the code base, in order to support sustained active
+development.
+
+!!!
+!!! Therefore we have scheduled regular releases over the coming years
+!!! which will gradually remove the old programming interface.
+!!!
+!!! This will cause breaking changes with the next two major version
+!!! releases, which will affect all projects that depend on PROJ
+!!! (cf. section "deprecations" below).
+!!!
+
+The decision to break the existing API has not been easy, but has
+ultimately been deemed necessary to ensure the long term survival of
+the project. Not only by improving the maintainability immensely, but
+also by extending the potential user (and hence developer) community.
+
+The end goal is to deliver a generic coordinate transformation
+software package with a clean and concise code base appealing to
+both users and developers.
+
+
+VERSIONING AND NAMING
+---------------------
+
+For the first time in more than 25 years the major version number of
+the software is changed. The decision to do this is based on the many
+new features and new API. While backwards compatibility remains -
+except in a few rare corner cases - the addition of a new and improved
+programming interface warrants a new major release.
+
+The new major version number unfortunately leaves the project in a bit
+of a conundrum regarding the name. For the majority of the life-time
+of the product it has been known as PROJ.4, but since we have now
+reached version 5 the name is no longer aligned with the version
+number.
+
+Hence we have decided to decouple the name from the version number and
+from this version and onwards the product will simply be called PROJ.
+
+In recognition of the history of the software we are keeping PROJ.4 as
+the *name of the organizing project*. The same project team also
+produces the datum-grid package.
+
+In summary:
+
+o The PROJ.4 project provides the product PROJ, which is now at
+  version 5.0.0.
+
+o The foundational component of PROJ is the library libproj.
+
+o Other PROJ components include the application proj, which provides
+  a command line interface to libproj.
+
+o The PROJ.4 project also distributes the datum-grid package,
+  which at the time of writing is at version 1.6.0.
+
+
+ UPDATES
+ -------
+
+ o Introduced new API in proj.h.
+   - The new API is orthogonal to the existing proj_api.h API and the
+     internally used projects.h API.
+   - The new API adds the ability to transform spatiotemporal (4D)
+     coordinates.
+   - Functions in the new API use the "proj_" namespace.
+   - Data types in the new API use the "PJ_" namespace, with a few
+     historic exceptions such as XY, XYZ, LP and LPZ.
+
+ o Introduced the concept of "transformation pipelines" that makes it
+   possible to do complex geodetic transformations of spatiotemporal
+   coordinates by daisy chaining simple coordinate operations.
+
+ o Introduced cct, the Coordinate Conversion and Transformation
+   application.
+
+ o Introduced gie, the Geospatial Integrity Investigation Environment.
+   - Selftest invoked by -C flag in proj has been removed
+   - Ported approx. 1300 built-in selftests to gie format
+   - Ported approx. 1000 tests from the gigs test framework
+   - Added approx. 200 new tests
+
+ o Adopted terminology from the OGC/ISO-19100 geospatial standards
+   series. Key definitions are:
+   - At the most generic level, a *coordinate operation* is a change
+     of coordinates, based on a one-to-one relationship, from one
+     coordinate reference system to another.
+   - A *transformation* is a coordinate operation in which the two
+     coordinate reference systems are based on different datums, e.g.
+     a change from a global reference frame to a regional frame.
+   - A *conversion* is a coordinate operation in which both
+     coordinate reference systems are based on the same datum,
+     e.g. change of units of coordinates.
+   - A *projection* is a coordinate conversion from an ellipsoidal
+     coordinate system to a plane. Although projections are simply
+     conversions according to the standard, they are treated as
+     separate entities in PROJ as they make up the vast majority
+     of operations in the library.
+
+ o New operations:
+   - The pipeline operator (pipeline)
+   - Transformations:
+     + Helmert transform (helmert)
+     + Horner real and complex polynomial evaluation (horner)
+     + Horizontal gridshift (hgridshift)
+     + Vertical gridshift (vgridshift)
+     + Molodensky transform (molodensky)
+     + Kinematic gridshift with deformation model (deformation)
+   - Conversions:
+     + Unit conversion (unitconvert)
+     + Axis swap (axisswap)
+   - Projections:
+     + Central Conic projection (ccon)
+
+ o Significant documentation updates, including
+   - Overhaul of the structure of the documentation
+   - A better introduction to the use of PROJ
+   - A complete reference to the new proj.h API
+   - a complete rewrite of the section on geodesic calculations
+   - Figures for all projections
+
+ o New "free format" option for operation definitions, which
+   permits separating tokens by whitespace when specifying key/value-
+   pairs, e.g. "proj = merc lat_0 = 45".
+
+ o Added metadata to init-files that can be read with the
+   proj_init_info() function in the new proj.h API.
+
+ o Added ITRF2000, ITRF2008 and ITRF2014 init-files with ITRF
+   transformation parameters, including plate motion model
+   parameters.
+
+ o Added ellipsoid parameters for GSK2011, PZ90 and "danish". The
+   latter is similar to the already supported andrae ellipsoid,
+   but has a slightly different semimajor axis.
+
+ o Added Copenhagen prime meridian.
+
+ o Updated EPSG database to version 9.2.0.
+
+ o Geodesic library updated to version 1.49.2-c.
+
+ o Support for analytical partial derivatives has been removed.
+
+ o Improved performance in Winkel Tripel and Aitoff.
+
+ o Introduced pj_has_inverse() function to proj_api.h. Checks if an
+   operation has an inverse. Use this instead of checking whether
+   P->inv exists, since that can no longer be relied on.
+
+ o ABI version number updated to 13:0:0.
+
+ o Removed support for Windows CE.
+
+ o Removed the VB6 COM interface.
+
+ BUG FIXES
+ ------------
+
+ All bug fix numbers refer to issues indexed at
+ https://github.com/OSGeo/proj.4/issues/
+
+ o Fixed incorrect convergence calculation in Lambert Conformal
+   Conic. #16.
+
+ o Handle ellipsoid parameters correctly when using +nadgrids=@null.
+   #22.
+
+ o Return correct latitude when using negative northings in
+   Transverse Mercator (tmerc). #138.
+
+ o Return correct result at origin in inverse Mod. Stererographic
+   of Alaska. #161.
+
+ o Return correct result at origin in inverse Mod. Stererographic
+   of 48 U.S. #162.
+
+ o Return correct result at origin in inverse Mod. Stererographic
+   of 50 U.S. #163.
+
+ o Return correct result at origin in inverse Lee Oblated
+   Stereographic. #164.
+
+ o Return correct result at origin in inverse Miller Oblated
+   Stereographic. #164.
+
+ o Fixed scaling and wrap-around issues in Oblique Cylindrical
+   Equal Area. #166.
+
+ o Corrected a coefficient error in inverse Transverse Mercator. #174.
+
+ o Respect -r flag when calling proj with -V. #184.
+
+ o Remove multiplication by 2 at the equator error in Stereographic
+   projection. #194.
+
+ o Allow +alpha=0 and +gamma=0 when using Oblique Mercator. #195.
+
+ o Return correct result of inverse Oblique Mercator when alpha is
+   between 90 and 270. #331.
+
+ o Avoid segmentation fault when accessing point outside grid. #369.
+
+ o Avoid segmentation fault on NaN input in Robin inverse. #463.
+
+ o Very verbose use of proj (-V) on Windows is fixed. #484.
+
+ o Fixed memory leak in General Oblique Transformation. #497.
+
+ o Equations for meridian convergence and partial derivatives have
+   been corrected for non-conformal projections. #526.
+
+ o Fixed scaling of cartesian coordinates in pj_transform(). #726.
+
+ o Additional bug fixes courtesy of Google's OSS-Fuzz program:
+   https://bugs.chromium.org/p/oss-fuzz/issues/list?can=1&q=proj4
+
+
+ DEPRECATIONS
+ ------------
+
+ o The projects.h header and the functions related to it is
+   considered deprecated from version 5.0.0 and onwards.
+
+
+    !!!     PROJECTS.H WILL BE REMOVED FROM THE LIBRARY     !!!
+    !!!                 WITH VERSION 6.0.0                  !!!
+
+ o The nmake build system on Windows will not be supported from
+   version 6.0.0 on onwards. Use CMake instead.
+
+    !!! NMAKE BUILD SYSTEM WILL BE REMOVED FROM THE LIBRARY !!!
+    !!!                 WITH VERSION 6.0.0                  !!!
+
+ o The proj_api.h header and the functions related to it is
+   consided deprecated from version 5.0.0 and onwards.
+
+    !!!     PROJ_API.H WILL BE REMOVED FROM THE LIBRARY     !!!
+    !!!                 WITH VERSION 7.0.0                  !!!
+
+
+ THANKS TO
+ ------------
+
+ Version 5.0.0 is made possible by the following contributors:
+
+    Lukasz Komsta
+    Maxim Churilin
+    edechaux
+    dusanjovic
+    Zoltan Siki
+    Tom Fili
+    Nicolas David
+    Mike Toews
+    Micah Cochran
+    Luke Campbell
+    Ilya Oshchepkov
+    Adam Wulkiewicz
+    Jonas Tittmann
+    Mateusz Loskot
+    Etienne Jacques
+    Bas Couwenberg
+    Elliott Sales de Andrade
+    Charles Karney
+    Aaron Puchert
+    Julien Moquet
+    Charles Karney
+    Howard Butler
+    Even Rouault
+    Thomas Knudsen
+    Kristian Evers
+
+
+4.9.3 Release Notes
+-------------------
+
+ o UTM now uses etmerc, following NGA recommendations.  Tests adjusted
+   for tiny changes in values.
+
+ o new projections: Times, Natural Earth II, Compact Miller, Patterson
+   Cylindrical, and inverse for Hammer and Eckert-Greifendorff.
+
+ o runtime self tests are now opt-in instead of opt-out
+
+ o math constants moved to projects.h
+
+ o bugfixes
+
+ o New (optional) runtime self tests added to proj
+
+4.9.2 Release Notes
+-------------------
+
+ o proj_def.dat was missing from source distribution
+   see https://github.com/OSGeo/proj.4/issues/274 for more detail
+
+ o Update Geodesic library from GeographicLib
+
+ o Remove setlocale() use in pj_init_ctx()
+
+ o Renamed PVALUE in pj_param.c to prevent clash with Windows
+
+4.9.1 Release Notes
+-------------------
+
+ o 4.9.0RC2 release was abandoned because it was not promoted in a
+   timely fashion. Subsequent maintenance of tickets has continued,
+   and a new 4.9.1 release was issued in its place.
+
+ o Implement inverse solution for Winkel Tripel from Drazan Tutic #250
+
+ o More CMake configuration tweaks. The CMake configuration is probably
+   not at feature parity with the autotools builds at this point but it
+   is converging #256
+
+ o Tweak initialization ordering around setlocal which may have caused
+   issues #237
+
+ o Support out-of-tree autoconf builds more completely #247
+
+ o Fix NaN handling by geod_inverse and geod_polygon_addedge #251 & #253
+
+ o Update config.sub and config.guess #257
+
+ o Adapt Charles Karney's CMake patches for smoother build #258
+
+ o Define default PROJ_LIB location for CMake compilation #261
+
+ o Fix Windows compilation on PJ_aitoff.c
+
+ o Align CMake SOVERSION with autotools #263
+
+ o Regenerate nad/epsg with GDAL r28536 to avoid precision loss in TOWGS84
+   parameters, e.g. on Amersfoort / RD EPSG:4289 (#260)
+
+ o Add CMake project-config.cmake scripts (#264 from Charles Karney)
+
+ o Dial back test sensitivity #255
+
+4.9.0 Release Notes
+-------------------
+
+ o Implement CMake as an option for building PROJ.4
+
+ o Implement new virtual file api (projFileAPI) so that all access to grid
+   shift and init files can be hooked.
+
+ o Replace geodesic implementation with one from Charles Karney and add a
+   supported public interface (geodesic.h).
+
+ o Upgraded to EPSG 8.5.
+
+ o Removed old (deprecated) Java bindings in favor of the new api introduced
+   in 4.8.0.
+
+ o Implement the calcofi (Cal Coop Ocean Fish Invest Lines/Stations) projection
+
+ o Install projects.h again for applications that want access to internal
+   structures and functions despite the inherent fragility.
+
+ o Various bug fixes and cleanup.
+
+ o Added the CalCOFI pseudo-projection, #135
+
+4.8.0 Release Notes
+-------------------
+
+ o Added the Natural Earth projection.
+
+ o Added HEALPIX, rHEALPIX and Icosahedral Snyder Equal Area projections.
+
+ o nad2bin now produces "CTable2" format grid shift files by default which
+   are platform independent.
+
+ o nad2nad removed, use cs2cs for datum shift operations.
+
+ o projects.h no longer installed as a public include file.  Please try to
+   only use proj_api.h.
+
+ o Add pj_get_spheroid_defn() accessor.
+
+ o Added an alternate version of pj_init() that takes a projCtx (execution
+   context) structure to address multithreading issues with error management
+   and to provide a support for application hookable error reporting and
+   logging.
+
+ o Upgrade to EPSG 7.9.  Some changes in ideal datum selection.
+
+ o JNI bindings reworked, org.proj4.Projections deprecated in favor of
+   org.proj4.PJ.
+
+ o Added preliminary vertical datum support.
+
+ o Fix various multithreading issues, particular in datum grid handling code.
+
+ o Added support for the +axis= option for alternate axis orientations as
+   part of a coordinate system (used for TM South Orientated support).
+
+ o +proj=omerc implementatioin replaced with code from libproj4.  +rot_conv
+   flag no longer works, and some coordinate systems (ie. Malaysian) will
+   need to use +gamma instead.  "epsg" init file updated accordingly.
+
+
+4.7.0 Release Notes
+-------------------
+
+ o Added in memory caching of init file search results for substantial
+   acceleration in some application environments (like MapServer).
+
+ o Regenerated nad/epsg init file with EPSG 7.1 database, including new
+   support for Google Mercator (EPSG:3857).
+
+ o Various thread safety improvements, including preliminary support for
+   a mutex lock around some operations, like grid loading.
+
+
+4.6.1 Release Notes
+-------------------
+
+ o Upgraded to EPSG 6.17 version for nad/epsg.  Also corrected the precision
+   problem introduced in the last version.
+
+ o Added logic for tmerc projection to fail rather than return crazy results
+   if more than 90 degrees away from the central meridian (#5).  This change
+   may only be temporary till a more comprehensive solution is found.
+
+ o Fixed handling of extra text in cs2cs.
+
+ o Renamed INSTALL to INSTALL.TXT.
+
+ o The eqc projection has been generalized to include a latitude of origin.
+
+ o Added the glabsgm (Gauss Laborde / Sphere Geometric Mean) projection,
+   and gstmerc variation.
+
+ o nad/IGNF init catalogue created.
+
+ o added the ntf_r93.gsb datum shift file.
+
+ o Add /Op in nmake.opt compile options to avoid VC7 optimization bug (#12)
+
+ o Fix testvarious test script so it works properly when grid files available
+
+
+
+4.6.0 Release Notes
+-------------------
+
+ o MAJOR: Rework pj_transform() to avoid applying ellipsoid to ellipsoid
+   transformations as a datum shift when no datum info is available.
+
+ o Avoid applying "change of ellipsoid" during datum shifting based on
+   ellipsoids getting changed to spheres for spherical projections.
+
+ o Upgrade to EPSG 6.13
+
+ o Added "900913" "Google Mercator" code in nad/esri.extra.
+
+ o Avoid some static variable based multi-threading problems.
+
+ o Improve error recovery if ctable style datum shift grid fails to load.
+
+ o Support drive letters properly in PROJ_LIB paths for win32.
+
+ o Fix occasional problem with DMS parsing.
+
+ o Removed non-functional mpoly projection.
+
+ o add lonlat, and latlon as aliases for longlat.
+
+
+4.5.0 Release Notes
+-------------------
+
+ o Microsoft Visual Studio 8 compatibility changes.
+
+ o Upgraded to EPSG 6.11.1 database.
+
+ o Several bug fixes to pj_transform() to handle transient errors properly.
+
+ o Fix Krovak projection (include +czech flag)
+
+ o Added Roussilhe Stereographic projection from libproj4 (proj=rouss).
+
+ o Added experimental +lon_wrap flag for alternate pj_transform() longitude
+   wrapping behavior on output.
+
+
+4.4.9 Release Notes
+-------------------
+
+ o Win32 build uses proj.dll by default now.
+
+ o Added accessor functions for the datums, ellps, prime_meridians, units and
+   main projection definition lists so they can be used on windows where
+   data objects exported from the DLL don't work easily.
+
+ o Added JNI (Java Native Interface) support within the jniwrap directory,
+   and some supporting entry points directly in the proj dll/so.   See
+   --with-jni configure switch, and jniwrap/README.
+
+ o Added the proj=stereoa and proj=geos projections, incorporated from
+   Gerald's libproj4.
+
+ o A few other bug fixes.
+
+
+4.4.8 Release Notes
+-------------------
+
+ o Updated epsg file to EPSG 6.5, added other.extra pseudo-EPSG WMS definitions
+
+ o Made significant fixes to prime meridian support.
+
+ o Substantially change pj_datum_transform(), so it and pj_transform() will
+   work between coordinate systems with different ellipsoids but no datum
+   shift information (assume +towgs84=0,0,0).
+
+ o Added pj_get_release() function.
+
+ o Ensure pj_transform() will try to transform all points in provided list if
+   even some might transform properly.
+
+ o Improved the accuracy of Geocentric_To_Geodetic() via an iterative
+   solution.
+
+ o Various other bug fixes.
+
+
+4.4.7 Release Notes
+-------------------
+
+ o Added NTv2 (.gsb) grid shift file support.
+
+ o Modified datum shift support so that data file data is only loaded if
+   needed.  Also added 'null' grid as a fallback option, and support for
+   making grids optional (prefix with '@' in +nadgrids).
+
+ o Regenerated nad/epsg file with towgs84 parameters for non-greenwich prime
+   meridians.
+
+ o Updated nad/esri file with better generated form from Paul Ramsey.
+
+ o Various bug fixes.
+
+
+4.4.6 Release Notes
+-------------------
+
+ o Incorporated new lcca (Lambert Conformal Conic Alternate) projection from
+   Gerald.
+
+ o Updated 'espg' translation file for EPSG 6.2.2 with better support for
+   prime meridians.
+
+ o Added Prime Meridians via +pm command switch to cs2cs (and pj_transform).
+
+ o Fixed bug with 7 parameter transforms.
+
+ o Added 'esri' pseudo-epsg coordinate system file.
+
+ o Cleanup so that PROJ.4 compiles clean as C++ code.
+
+ o Added pj_get_def() to expand definitions of stuff like +init clauses.
+
+ o Added a Krovak implementation (proj=krov).  Note this may change again
+   in the next release.

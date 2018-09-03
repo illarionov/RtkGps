@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="stream_mobilemapper_autocapture"
+        android:title="@string/mobilemapper_autocapture_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="stream_mobilemapper_force_coldstart"
+        android:title="@string/stream_mobilemapper_force_coldstart_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="stream_mobilemapper_enable_native_sbas"
+        android:title="@string/stream_mobilemapper_enable_native_sbas_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="stream_mobilemapper_disable_NMEA"
+        android:title="@string/stream_mobilemapper_disable_NMEA_title" />
+
+    <ListPreference
+        android:key="stream_mobilemapper_dynmodel"
+        android:title="Dynamic model"
+        android:entries="@array/stream_mobilemapper_dynmodel_entries"
+        android:entryValues="@array/stream_mobilemapper_dynmodel_values"
+        android:defaultValue="1" />
+
+</PreferenceScreen>

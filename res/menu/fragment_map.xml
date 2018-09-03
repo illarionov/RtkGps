@@ -21,6 +21,16 @@
 					<item
             			android:id="@+id/menu_map_mode_bing_aerial"
             			android:title="@string/menu_map_mode_bing_aerial" />
+					<item
+            			android:id="@+id/menu_map_mode_geoportail_map"
+            			android:title="@string/menu_map_mode_geoportail_map" />
+					<item
+            			android:id="@+id/menu_map_mode_geoportail_cadastral"
+            			android:title="@string/menu_map_mode_geoportail_cadastral" />
+					<item
+            			android:id="@+id/menu_map_mode_geoportail_orthoimages"
+            			android:title="@string/menu_map_mode_geoportail_orthoimages" />
+										
 				</group>
         	</menu>
         </item>            

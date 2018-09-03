@@ -1,0 +1,39 @@
++++++++++++++ DISCLAIMER ++++++++++++++ 
+THIS IS AN ALPHA VERSION
+I received some requests to move it to a production version, from my point of view it works but this version lacks some extensive tests.
+However I changed it to public with this disclaimer.
+
+Also as an ALPHA version expect frequent upgrades.
+IT IS PROVIDED AS IS...
+WITHOUT ANY WARRANTY.
+++++++++++++++++++++++++++++++++++++++
+
+Android RTKLIB frontend.
+
+source code can by downloaded on https://github.com/eltorio/RtkGps
+
+Heavily based on RtkGps from Alexey Illarionov, this is a fork of his work. He allows explicitly to modify and redistribute his work only with the distribution his copyright. You'll find the original license in the "About/Legacy Info" screen. Thanks to all contributors to respect this original license clause.
+
+Since there is no new version I reworked the code for adding some features I need:
+
+1- show the altitude in the status view.
+       for activating this you need to choose Height:Geodetic in the "Solution Options" view
+2- send mock locations to other applications.
+       for activating this you need to check in the "Solution Options" view Output GPS mock locations, but this is only working if you have allowed "mock locations" in the developer settings (in Android setting).
+       today (in 1.0alpha26) the mock locations are not usable in the Google map API.
+3- Preliminary support for Trimble SpectraPrecision MobileMapper 50 internal chipset
+3b- Records .urw .crw .map and .shp compatibles with Trimble MobileMapper Office.
+4- can generate a gpx file of the track
+5- can display the result in ECEF, WGS84 Lat/Lon, NAD83, Lambert 93 (RGF93) or UTM (with auto zoning) coordinate system
+5b- use any Proj4 projection
+6- can display ellipsoidal height or geodetic altitude (different geoid models can be use see: https://github.com/eltorio/RtkGps for how to install a geoid model)
+7- use any RTKLIB compliant GNSS with raw output connected via USB (ACM/PL2303/FTDI), Bluetooth, TCPIP or NTRIP
+8- can display some maps coming from IGN Geoportail (cadastral parcels, satellite, roads), OpenStreetMap Mapnik, Bing (satellite, roads).
+9- can download and use IGS GPS ultra-rapid ephemeris from NASA or IGN or ESU GPS+GLONASS ephemeris from ESA
+
+This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
+This application can compute precise GPS positions using RTKLIB algorithms (RTK or PPP) but for this you need a supported -external- GPS with raw carrier phase output.
+This is not a "standard" GPS like those embedded into your phone or your car, the cheapest one you can find is something like uBlox LEA-6T .
+THERE IS NO WAY to use the GPS found in Samsung Galaxy(s) nor any phone I seen.
+
+But there is a special test mode which use the internal GPS for testing only, obviously none of the precision algorithm found in RTKLIB can be use.

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <SwitchPreference
+        android:key="enable"
+        android:title="@string/output_streams_settings_enable_gpxtrace_title" />
+    
+    <EditTextPreference
+        android:key="gpxtrace_file_filename"
+        android:title="@string/file_filename_title"
+        android:defaultValue="gpxtrace.gpx"
+        android:dependency="enable"
+        />
+</PreferenceScreen>
