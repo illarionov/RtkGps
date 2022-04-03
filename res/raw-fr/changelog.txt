@@ -1,0 +1,137 @@
+<html>
+  <head>
+    <style type='text/css'>
+      a            { color:#a0a0e0 }
+      div.title    { 
+          color:#C0F0C0; 
+          font-size:1.2em; 
+          font-weight:bold; 
+          margin-top:1em; 
+          margin-bottom:0.5em; 
+          text-align:center }
+      div.subtitle { 
+          color:#C0F0C0; 
+          font-size:0.8em; 
+          margin-bottom:1em; 
+          text-align:center }
+      div.freetext { color:#F0F0F0 }
+      div.list     { color:#C0C0F0 }
+    </style>
+  </head>
+  <body>
+$ 1.0 alpha 26
+   % Build 26
+  _ 2018-08-31
+    * Introduit le support d'un caster NTRIP - ne l'utilisez que si vous savez ce que vous faites
+    * Produit des fichiers .urw .crw pour Trimble MobileMapper field Office
+    * Ajouter un enregistrement de position dans un shapefile ESRI et  dans un fichier .crw
+    * Demande d’autorisation basique pour les nouvelles plateformes Android
+    * Choix de la source des éphémérides précises (défaut ESU depuis l'ESA gps + glonass)
+$ 1.0 alpha 25
+   % Build 25
+  _ 2018-07-31
+    * Support Initial pour Trimble / SpectraPrecision MobileMapper 50
+    * Incorporation de certains mods par Ken McGuire (GPSFan)
+    * re-ordonnement des options de traitement pour se conformer aux paramètres d’options de rtknavi 1 & 2
+    * ajout de plus de paramètres  manquants
+    * Correction de traductions
+    * correction de la visibilité de certains paramètres
+    * Mise à jour des LICENSE.txt et README.md
+    * Correction de traductions
+    * réorganisation des paramètres pour ressembler à rtknavi
+    * correction de la visibilité des paramètres
+    ajouté de paramètres restants de prcopt
+    * Correction de traductions
+    * réorganisation des paramètres pour ressembler à rtknavi
+    * correction de la visibilité des paramètres
+    * u-blox via Bluetooth comme pour l'USB
+    * Corriger la traduction
+    Ajouter des paramètres restants, prcopt et solopt
+    * Changement de RTKLIB originel vers rtklibxplorer RTKLIB démo 5 b29
+    Ajouter des paramètres restants, prcopt et solopt
+    * Mise à jour des bibliothèques Android .
+    * Migration vers Android Studio 3.1.3
+    Ajouter des compilation pour Galileo & BeiDou
+    * Suppression de Dropbox
+$ 1.0 alpha 24
+   % Build 24
+  _ 2014-10-31
+    * Résolution des ambiguïtés entières Glonass
+    * TODO Full RTKLIB integer ambiguity settings 
+   % Build 23
+  _ 2014-10-16
+    * support de l'envoi à un caster ntrip  
+    * support des caractères spéciaux dans le nom d'utilisateur et le mot de passe NTRIP
+    * Traduction en espagnol (merci à Enoc Sanz Ablanedo pour sa contribution)
+    * Traduction en polonais (traduit par Tomasz Robak)
+    * Traduction en allemand (traduit par Hagen Felix)
+   % Build 22
+  _ 2014-09-13
+    * support des paramètres de résolution des ambiguïtés entières
+    * support de tous les fichiers proj4 externes standards et tous les fichiers de proj-datumgrid-1.5.zip
+    * les notes de version apparaissent automatiquement ou peuvent être affichées dans l'écran "à propos"
+    * ajout des commandes de démarrage pour uBlox M8N port uart #1
+    * le mode de test est activé par défaut (nouvelle installation seulement)
+$ 1.0 alpha 21
+   % Build 21
+  _ 2014-09-12
+    * mobile/base antenne support de la variation du centre de phase
+$ 1.0 alpha 20
+   % Build 20
+  _ 2014-09-08
+    * Les orbites SP3 peuvent être fournies en tant que fichier dans l'onglet correction
+    * Les antennes satellites sont incluses et utilisables (Satellites PCV)
+    * Nouvelle activité « Outils » pour télécharger les orbites ultra rapides IGS et les modèles de géoïdes communs
+$ 1.0 alpha 19
+   % Build 19
+  _ 2014-08-31
+    * rtklib 2.4.2p9
+    Ajout du support pour Trimble RT17, Furuno LPY1000, Sirf III/IV et Septentrio
+    * traduction en chinois (traduit par Yong Zhang)
+$ 1.0 alpha 18
+   % Build 18
+  _ 2014-08-25
+    * petites améliorations du mode test
+$ 1.0 alpha 17
+   % Build 17
+  _ 2014-08-16
+    * mode test avec positions depuis le GPS interne
+$ 1.0 alpha 16
+   % Build 16
+  _ 2014-08-15
+    * support des cartes IGN françaises du géoportail
+$ 1.0 alpha 15
+   % Build 15
+  _ 2014-08-10
+    * support du géoïde français RAF09
+$ 1.0 alpha 14
+   % Build 14
+  _ 2014-08-08
+    * support des conversions de coordonnées Proj4. C'est fait par l'intermédiaire de proj4J et non de proj4 jni or proj4J est un sous-ensemble de proj4.  Certaines fonctionnalités sont manquantes, par exemple, il n'y a aucun paramètre +pm (méridien). Il est encore impossible de convertir en Lambert II-Paris par exemple.
+    conversion de coordonnées pour les réseaux actuels français (RGF93, RGF93CC43-> CC50) et NAD83 américain
+    * afficher le modèle de géoïde dans la solution - mais la validité du fichier de modèle de géoïde n'est toujours pas testée
+$ 1.0 alpha 13
+   % Build 13
+  _ 2014-08-07
+    * support des chipsets séries USB FTDI    
+$ 1.0 alpha 12
+   % Build 12
+  _ 2014-08-03
+    * bug : l'altitude n'est pas correctement calculée en UTM
+Ajouter : les fichiers dropbox peuvent être compressés avant l'envoi
+$ 1.0 alpha 11
+   % Build 11
+  _ 2014-07-21
+    * Ajoute les coordonnées UTM dans la vue "statut"
+$ 1.0 alpha 10
+   % Build 10
+  _ 2014-07-20
+    * mise à niveau vers rtklib 2.4.2p8
+$ 1.0 alpha 9
+  % Build 9
+  _ 2014-07-14
+    * bug : exception d'adresse bluetooth
+    le cycle de traitement peut être réglé dans les options de traitement
+$ END_OF_CHANGE_LOG
+  </body>
+</html>

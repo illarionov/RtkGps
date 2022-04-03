@@ -1,0 +1,39 @@
++++ CLAUSE DE NON-RESPONSABILITÉ +++ 
+IL S'AGIT D'UNE VERSION ALPHA
+J'ai reçu quelques demandes pour le déplacer vers une version de production, de mon point de vue, cela fonctionne, mais cette version ne dispose pas de certains des tests approfondis.
+Cependant je l'ai changée en version public avec cet avis de non-responsabilité.
+
+Aussi, comme une version ALPHA, il faut s'attendre à de fréquentes mises à jour.
+CE LOGICIEL EST FOURNI TEL QUEL...
+SANS AUCUNE GARANTIE.
+++++++++++++++++++++++++++++++++++++++
+
+Frontal Android pour RTKLIB.
+
+le code source peut être téléchargé sur https://github.com/eltorio/RtkGps
+
+Fortement basé sur RtkGps de Alexey Illarionov, c'est un fork de son travail. Il permet explicitement de modifier et redistribuer son travail seulement avec la distribution de son copyright. Vous trouverez la licence originale dans l'écran "A propos/Informations légales". Merci à tous les contributeurs de respecter cette clause de la licence originale.
+
+Puisqu'il n'y avait pas de nouvelle version, j'ai retravaillé le code pour ajouter certaines fonctionnalités dont j'ai besoin :
+
+1 - afficher l'altitude dans l'affichage Statut.
+       pour activer ceci, vous devez choisir la hauteur : géodésique dans la vue « Options de solution »
+2- envoyer des positions fictives à d'autres applications.
+       pour cela vous devez cocher dans la vue « Options de solution » "Générer des positions fictives", mais cela ne fonctionnera que si vous avez autorisé « positions fictives » dans les paramètres développeur (paramètres Android).
+       aujourd'hui (en 1.0alpha26) les positions fictives ne sont pas utilisables avec Google map.
+3 - Support préliminaire pour le chipset interne des Trimble SpectraPrecision MobileMapper 50
+3 b-Enregistre des fichiers .urw .crw .map et .shp compatibles avec MobileMapper Office de Trimble.
+4 - peut générer un fichier gpx de la trace
+5 - peut afficher le résultat en ECEF, Lat/Long WGS84, NAD83, Lambert 93 (RGF93) ou système de coordonnées UTM (avec zone automatique)
+5 b-utiliser n'importe quelle projection Proj4
+6 - affichage hauteur ellipsoïdale ou altitude géodésique (modèles de géoïdes différents ) (voir : https://github.com/eltorio/RtkGps pour savoir comment installer un modèle de géoïde)
+7 - utilise n'importe quel GNSS compatible RTKLIB, avec sortie brute et connecté en USB (ACM/PL2303/FTDI), Bluetooth, TCPIP ou NTRIP
+8 - peut afficher des cartes provenant de l'IGN Geoportail (parcelles cadastrales, satellite, routes), OpenStreetMap Mapnik, Bing (satellite, routes).
+9 - Vous pouvez télécharger et utiliser les éphémérides ultra-rapide IGS GPS depuis la NASA ou l'IGN ou les éphémérides ESU GPS + GLONASS depuis l'ESA
+
+Ce logiciel est un port de RTKLIB 2.4.3b29 développé par Tomoki Takasu (http://www.rtklib.com), si vous ne savez pas ce que cette application est; cette application n'est probablement pas ce que vous cherchez!
+Cette application permet de calculer des positions GPS précises en utilisant des algorithmes de RTKLIB (RTK ou PPP), mais pour cela vous avez besoin d'un GPS - externe - pris en charge avec sortie de la porteuse et de la phase brutes.
+Ce n'est pas un GPS « standard » comme ceux intégrés dans votre téléphone ou votre voiture, le moins cher vous puissiez trouver est quelque chose comme le uBlox LEA-6 t.
+Il n'y a aucune façon d'utiliser le GPS intégré dans un Galaxy(s) de Samsung, ni dans n'importe quel téléphone que j'ai vu.
+
+Mais il y a un mode spécial test pour utiliser le GPS interne pour le test uniquement, évidemment aucun algorithme de précision trouvé dans RTKLIB ne peut être utilisé.

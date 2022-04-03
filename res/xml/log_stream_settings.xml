@@ -5,7 +5,7 @@
         android:key="enable"
         android:title="@string/log_streams_settings_enable_rover_title" />
     
-    <ru0xdc.rtkgps.settings.widget.StreamTypePreference
+    <gpsplus.rtkgps.settings.widget.StreamTypePreference
         android:key="type"
         android:title="@string/streams_settings_type_title"
         android:dependency="enable" />

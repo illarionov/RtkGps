@@ -27,6 +27,7 @@
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:clickable">true</item>
     </style>
-    	
-    
+
+    <style name="PointNameAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
+    </style>
 </resources>

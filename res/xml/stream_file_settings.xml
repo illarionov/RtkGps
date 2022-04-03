@@ -4,7 +4,9 @@
     <EditTextPreference
         android:key="stream_file_filename"
         android:title="@string/file_filename_title"
+        android:summary="@string/file_filename_summary"
         android:defaultValue=""
-        />    
+        />
+
 
 </PreferenceScreen>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <EditTextPreference
+        android:key="stream_ntrip_server_host"
+        android:title="@string/ntrip_client_host_title"
+        android:defaultValue="127.0.0.1"
+        android:inputType="textUri" />
+    
+    <EditTextPreference
+        android:key="stream_ntrip_server_port"
+        android:title="@string/ntrip_client_port_title"
+        android:defaultValue="2101"
+        android:inputType="number" />
+    
+    <EditTextPreference
+        android:key="stream_ntrip_server_mountpoint"
+        android:title="@string/ntrip_client_mountpoint_title" 
+        android:defaultValue="GNSS0"/>
+    
+	<EditTextPreference
+        android:key="stream_ntrip_server_password"
+        android:title="@string/ntrip_client_password_title"
+        android:inputType="textVisiblePassword" 
+        android:defaultValue="rtkgps"/>
+
+</PreferenceScreen>

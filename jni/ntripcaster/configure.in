@@ -1,0 +1,424 @@
+
+
+AC_INIT(src/main.c)
+
+NTRIPCASTER_MAJOR=0
+NTRIPCASTER_MINOR=1
+NTRIPCASTER_MICRO=5
+
+NTRIPCASTER_VERSION=$NTRIPCASTER_MAJOR.$NTRIPCASTER_MINOR.$NTRIPCASTER_MICRO
+
+PACKAGE=ntripcaster
+VERSION="$NTRIPCASTER_VERSION"
+
+echo "Building Ntripcaster-$VERSION..."
+
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+AM_MAINTAINER_MODE
+
+if test "x$prefix" = "xNONE"; then
+	prefix="/usr/local/ntripcaster"
+else
+	prefix=$prefix
+fi
+
+NTRIPCASTER_BINDIR=${prefix}/bin
+NTRIPCASTER_ETCDIR_INST=${prefix}/conf
+NTRIPCASTER_LOGDIR_INST=${prefix}/logs
+NTRIPCASTER_ETCDIR=conf
+NTRIPCASTER_LOGDIR=logs
+NTRIPCASTER_SHAREDIR=${prefix}
+
+AM_CONFIG_HEADER(config.h)
+
+AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+AC_SUBST(VERSION)
+
+AC_SUBST(NTRIPCASTER_BINDIR)
+AC_SUBST(NTRIPCASTER_ETCDIR_INST)
+AC_SUBST(NTRIPCASTER_LOGDIR_INST)
+
+AC_DEFINE_UNQUOTED(NTRIPCASTER_ETCDIR, "$NTRIPCASTER_ETCDIR")
+AC_SUBST(NTRIPCASTER_ETCDIR)
+AC_DEFINE_UNQUOTED(NTRIPCASTER_LOGDIR, "$NTRIPCASTER_LOGDIR")
+AC_SUBST(NTRIPCASTER_LOGDIR)
+
+AC_ARG_PROGRAM
+AC_PROG_RANLIB
+AC_PROG_CC
+
+if test "$CC" = "gcc"; then
+	CFLAGS="$CFLAGS -Wall" 
+fi 
+
+AC_CHECK_PROG(UNAME,uname,uname)
+AC_PROG_INSTALL
+
+dnl weird ass systems
+AC_AIX
+AC_ISC_POSIX
+AC_MINIX
+
+AC_MSG_CHECKING(your OS)
+system=`$UNAME`
+IRIX=no
+case $system in
+	Linux)
+		LINUX=1
+		AC_DEFINE(LINUX)
+		AC_MSG_RESULT(Linux)
+		;;
+	SunOS)
+		if test x`uname -r | cut -d . -f 1` = "x5"; then
+			SYSV=1
+			SVR4=1
+			SOLARIS=1
+			AC_MSG_RESULT(Solaris)
+			AC_DEFINE(SYSV)
+			AC_DEFINE(SVR4)
+			AC_DEFINE(SOLARIS)
+		else
+			AC_MSG_RESULT(SunOS)
+		fi
+		if test "$CC" = cc; then
+			CFLAGS="$CFLAGS -mt"
+		fi
+		;;
+	HP-UX)
+		hpux=1
+		AC_DEFINE(hpux)
+		AC_MSG_RESULT(HP-UX)
+		CFLAGS="$CFLAGS -D_HPUX_SOURCE -DHPUX"
+		if test "$CC" = cc; then
+			CFLAGS="$CFLAGS -Aa"
+		fi
+		;;
+	IRIX)
+		IRIX=yes
+		AC_DEFINE(IRIX)
+		AC_MSG_RESULT(IRIX)
+		;;
+	BSD/OS)
+		__SOMEBSD__=yes
+		AC_DEFINE(__SOMEBSD__)
+		AC_MSG_RESULT(BSD/OS)
+		;;
+	*BSD*)
+		__SOMEBSD__=yes
+		AC_DEFINE(__SOMEBSD__)
+		AC_MSG_RESULT(Some BSD variant)
+		OLDCPPFLAGS=$CPPFLAGS
+		THREADCPPFLAGS="-pthread"
+		CPPFLAGS="$OLDCPPFLAGS $THREADCPPFLAGS"
+		AC_TRY_COMPILE([#include <pthread.h>],
+			       [pthread_t thread; ],	
+	       		       ,
+			       	CPPFLAGS="$OLDCPPFLAGS")
+		CPPFLAGS=$OLDCPPFLAGS
+		if test "$CC" = gcc; then
+			CFLAGS="-pthreads $CFLAGS"
+		fi
+		;;
+	*)
+		AC_MSG_RESULT($system)
+		;;
+esac
+
+if test ${IRIX} = yes; then
+	echo Skipping library tests because they confuse Irix.
+else
+
+	
+
+  AC_CHECK_FUNCS(socket)
+
+  if test "$ac_cv_func_socket" = no; then
+    for lib in socket inet; do
+	if test "$HAVE_SOCKET" != 1; then
+		AC_CHECK_LIB($lib, socket,LIBS="$LIBS -l$lib";HAVE_SOCKET=1;AC_DEFINE(HAVE_SOCKET))
+	fi
+    done
+  fi
+  
+  AC_CHECK_FUNCS(connect)	
+
+  if test "$ac_cv_func_connect" = no; then
+    for lib in nsl; do
+	if test "$HAVE_CONNECT" != 1; then
+		AC_CHECK_LIB($lib, connect,LIBS="$LIBS -l$lib";HAVE_CONNECT=1;AC_DEFINE(HAVE_CONNECT))
+	fi
+    done
+  fi
+
+  AC_CHECK_FUNCS(log)
+
+  if test "$ac_cv_func_log" = no; then
+    for lib in m; do
+	AC_CHECK_LIB($lib, log)
+    done
+  fi
+
+  AC_CHECK_FUNCS(gethostbyname)
+  if test "$ac_cv_func_gethostbyname" = no; then
+	for lib in dns nsl resolv; do
+	  if test "$HAVE_GETHOSTBYNAME" != 1; then
+	    AC_CHECK_LIB($lib, gethostbyname, LIBS="$LIBS -l$lib";HAVE_GETHOSTBYNAME=1;AC_DEFINE(HAVE_GETHOSTBYNAME))
+	  fi
+	done	
+  fi	
+
+  AC_CHECK_FUNCS(nanosleep)
+	
+  if test "$ac_cv_func_nanosleep" = no; then
+	for lib in rt; do
+		AC_CHECK_LIB($lib, nanosleep,LIBS="$LIBS -l$lib";HAVE_NANOSLEEP=1;AC_DEFINE(HAVE_NANOSLEEP))
+	done
+  fi
+fi
+
+opt_readline="no"
+
+dnl Do we want libreadline ?
+if test "$opt_readline" = "unset"; then
+	if test -f "$withval/include/readline/readline.h"; then
+    		READLINE_INCLUDE="-I$withval/include"
+		LDFLAGS="$LDFLAGS -L$withval/lib"
+		AC_MSG_RESULT(yes)
+		opt_readline="yes"
+    	elif test -f "$withval/include/readline.h"; then
+		READLINE_INCLUDE="-I$withval/include"
+		LDFLAGS="$LDFLAGS -L$withval/lib"
+		AC_MSG_RESULT(yes)
+		opt_readline="yes"
+	elif test -f "$withval/readline.h"; then
+		READLINE_INCLUDE="-I$withval"
+		LDFLAGS="$LDFLAGS -L$withval"
+		AC_MSG_RESULT(yes)
+		opt_readline="yes"
+    	elif test -f "/usr/include/readline/readline.h"; then
+		READLINE_INCLUDE="-I/usr/include/readline"
+		AC_MSG_RESULT(yes)
+		opt_readline="yes"
+	elif test -f "/usr/include/readline.h"; then
+		AC_MSG_RESULT(yes)
+		opt_readline="yes"
+	elif test -f "/usr/local/include/readline.h"; then
+		READLINE_INCLUDE="-I/usr/local/include"
+		LDFLAGS="$LDFLAGS -L/usr/local/lib"
+		AC_MSG_RESULT(yes)
+		opt_readline="yes"
+    	elif test -f "/usr/local/include/readline/readline.h"; then
+		READLINE_INCLUDE="-I/usr/local/include/readline"
+		LDFLAGS="$LDFLAGS -L/usr/local/lib"
+		AC_MSG_RESULT(yes)
+		opt_readline="yes"
+    	else
+		AC_MSG_RESULT(no)
+		opt_readline="no"
+	fi
+fi
+
+if test "$opt_readline" = yes; then
+  AC_CHECK_LIB(readline,
+    readline,,
+    [ AC_MSG_WARN(Testing with -ltermcap)
+    unset ac_cv_lib_readline_readline
+    AC_CHECK_LIB(readline,
+      readline,
+      LIBS="$LIBS -lreadline -ltermcap" 
+      AC_DEFINE(HAVE_LIBREADLINE),
+      AC_MSG_WARN(Compiling without readline support),
+      -ltermcap)]
+  )	
+fi
+
+CPPFLAGS="$CPPFLAGS $READLINE_INCLUDE"
+
+dnl Do we want libwrap?
+AC_MSG_CHECKING(whether to use libwrap)
+AC_ARG_WITH(libwrap,
+[  --with-libwrap[=PATH]   compile in libwrap (tcp_wrappers) support.],
+[ case "$withval" in
+  no)
+	AC_MSG_RESULT(no)
+	;;
+  yes)
+	AC_MSG_RESULT(yes)
+	AC_CHECK_LIB(wrap, request_init,WRAPLIBS="-lwrap";opt_libwrap="yes";)
+	;;
+  *)
+	AC_MSG_RESULT(yes)
+	opt_libwrap="yes"
+	if test -d "$withval"; then
+		WRAPLIBS="-L$withval -lwrap"
+		WRAPINCLUDES="-I$withval/include"
+	else
+		WRAPLIBS="$withval"
+	fi
+	OLDLIBS="$LIBS"
+	LIBS="$WRAPLIBS $LIBS"
+	AC_TRY_LINK([int allow_severity; int deny_severity; ],
+		    [hosts_access(); ],
+		    [],
+		    [AC_MSG_ERROR(Could not find the $withval library. You must first install tcp_wrappers.)])
+	    LIBS="$OLDLIBS"
+	;;
+  esac ],
+  AC_MSG_RESULT(no)
+)
+
+if test "$opt_libwrap" = yes; then
+AC_DEFINE(HAVE_LIBWRAP)
+
+AC_CHECK_FUNCS(yp_get_default_domain)
+
+	if test "$ac_cv_func_yp_get_default_domain" = no; then
+		for lib in wrap nsl nss_nis; do
+			if test "$HAVE_YP_GET_DEFAULT_DOMAIN" != 1; then
+				AC_CHECK_LIB($lib, yp_get_default_domain,LIBS="$LIBS -l$lib";HAVE_YP_GET_DEFAULT_DOMAIN=1;AC_DEFINE(HAVE_YP_GET_DEFAULT_DOMAIN))
+			fi
+		done
+	fi
+
+fi
+
+AC_SUBST(WRAPLIBS)
+AC_SUBST(WRAPINCLUDES)
+
+dnl Do we want crypt?
+AC_MSG_CHECKING(whether to use crypted passwords)
+AC_ARG_WITH(crypt,
+[  --with-crypt            use crypt() to encrypt server passwords.],
+[ case "$withval" in
+  yes)
+	AC_MSG_RESULT(yes)
+	opt_crypt="yes"
+	;;
+  *)
+	AC_MSG_RESULT(no)
+	;;
+  esac ],
+  AC_MSG_RESULT(no)
+)
+
+CRYPTLIB=	
+if test "$opt_crypt" = yes; then
+	AC_CHECK_LIB(crypt, crypt, CRYPTLIB="-lcrypt",)
+	AC_DEFINE(USE_CRYPT)
+fi
+
+AC_SUBST(CRYPTLIB)
+
+THREADLIBS="no"
+
+AC_MSG_CHECKING(for pthread functions in standard libraries)
+AC_TRY_LINK(, [pthread_create();],AC_MSG_RESULT(yes);THREADLIBS="",AC_MSG_RESULT(no))
+
+if test "$THREADLIBS" = ""; then
+	AC_MSG_CHECKING(if that definition really works)
+	AC_TRY_RUN([int main() { return !pthread_equal(pthread_self(), pthread_self());}],
+		    AC_MSG_RESULT(yes);THREADLIBS="",
+		    AC_MSG_RESULT(no);THREADLIBS="no",
+		    AC_MSG_RESULT(crosscompiling so no);THREADLIBS="no")
+fi
+
+if test "$THREADLIBS" = "no"; then
+    for lib in pthread c_r dce pthreads; do
+      AC_CHECK_LIB($lib,pthread_create,THREADLIBS="-l$lib")
+      if test $THREADLIBS != "no"; then
+	break
+      fi
+    done
+fi
+  
+if test "$THREADLIBS" = "no"; then
+	  AC_CHECK_FUNCS(pthread_create,THREADLIBS="")
+fi
+
+if test "$THREADLIBS" = "no"; then
+        AC_MSG_ERROR(Your system doesn't seem to support posix threads. Ntripcaster 0.2.0 and above won't work without threads support)
+        exit
+fi
+
+AC_SUBST(THREADLIBS)
+LIBS="$LIBS $THREADLIBS"
+CFLAGS="$THREADCPPFLAGS $CPPFLAGS $CFLAGS"
+
+AC_ARG_WITH(python,
+[  --with-python[=ARG]        enable usage of the python interpreter [ARG=yes]])
+
+AC_ARG_WITH(python-includes,
+[  --with-python-includes=DIR Python include files are in DIR])
+AC_ARG_WITH(python-libraries,
+[  --with-python-libraries=DIR Python library file are in DIR])
+
+if test "$with_python_includes"; then
+        CPPFLAGS="$CPPFLAGS -I$with_python_includes"
+        if test "$with_python" = ""; then
+                with_python=yes
+        fi
+fi
+
+if test "$with_python_libraries"; then
+        LIBS="$LIBS -L$with_python_libraries"
+        if test "$with_python" = ""; then
+                with_python=yes
+        fi
+fi
+
+if test "$with_python"; then
+dnl I can't say for sure what libs we need for python, but this is what my system needs
+AC_CHECK_LIB(dl, dlopen)
+	for lib in python python2.0 python1.6 python1.5; do
+		AC_CHECK_LIB($lib, Py_Initialize)
+	done
+fi
+
+AC_TRY_COMPILE([#include <syslog.h>],
+               [int foo = LOG_DAEMON; ],
+               ,
+               AC_DEFINE(NEED_SYS_SYSLOG_H))
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_HEADER_DIRENT
+AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h sys/soundcard.h machine/soundcard.h pthread.h assert.h sys/resource.h math.h signal.h sys/signal.h mcheck.h malloc.h history.h Python.h) 
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_SIGNAL
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_RETSIGTYPE
+
+AC_MSG_CHECKING([for unix98 socklen_t])
+AC_TRY_COMPILE([#include <sys/types.h>
+		#include <sys/socket.h>],
+	    [typedef socklen_t int; 
+	    int apan (void) {return 1;}],
+	AC_MSG_RESULT(yeah)
+	HAVE_SOCKLEN_T=yes,
+	AC_MSG_RESULT(nah)
+	HAVE_SOCKLEN_T=no)
+
+if test ${HAVE_SOCKLEN_T} = yes ;then 
+	AC_DEFINE(HAVE_SOCKLEN_T)		
+fi
+
+dnl Checks for library functions.
+AC_FUNC_STRFTIME
+AC_FUNC_VPRINTF
+
+AC_CHECK_FUNCS(gettimeofday strstr snprintf vsnprintf rename setpgid basename setsockopt gethostbyname_r gethostbyaddr_r getrlimit setrlimit umask inet_addr inet_aton localtime_r select pthread_attr_setstacksize inet_ntoa mcheck mallinfo mtrace sigaction pthread_sigmask lseek)
+
+AC_MSG_CHECKING(if libm is bundled with some lib we're already linking)
+AC_TRY_LINK(, [sin(1);],AC_MSG_RESULT(yes);LDLAGS="",AC_MSG_RESULT(no);LDFLAGS="-lm")
+
+AC_OUTPUT([Makefile src/Makefile conf/Makefile conf/ntripcaster.conf.dist])
+
+echo "Ok, everything seems ok. Now do 'make'."
+echo "You can then run make install to install as you specified"
+
