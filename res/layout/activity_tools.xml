@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    >
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tools_textView_igu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="@string/tools_download_and_inject_igu" />
+
+        <Button
+            android:id="@+id/tools_button_igu"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tools_inject" />
+
+    </TableRow>
+
+    <ProgressBar
+        android:id="@+id/tools_progressBar_igu"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tools_textView_about_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="@string/tools_download_raf09_geoid" />
+
+        <Button
+            android:id="@+id/tools_button_raf09"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tools_install" />
+
+    </TableRow>
+
+    <ProgressBar
+        android:id="@+id/tools_progressBar_raf09"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tools_textView_egm2008_m25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="@string/tools_download_egm2008_m25_geoid" />
+
+        <Button
+            android:id="@+id/tools_button_egm2008_m25"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tools_install" />
+
+    </TableRow>
+
+    <ProgressBar
+        android:id="@+id/tools_progressBar_egm2008_m25"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    
+    <TableRow
+        android:id="@+id/tableRow4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tools_textView_egm2008_m10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="@string/tools_download_egm2008_m10_geoid" />
+
+        <Button
+            android:id="@+id/tools_button_egm2008_m10"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tools_install" />
+
+    </TableRow>
+
+    <ProgressBar
+        android:id="@+id/tools_progressBar_egm2008_m10"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />    
+    
+    <TableRow
+        android:id="@+id/tableRow5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tools_textView_egm96_m150"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="@string/tools_download_egm96_m150_geoid" />
+
+        <Button
+            android:id="@+id/tools_button_egm96_m150"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tools_install" />
+
+    </TableRow>
+
+    <ProgressBar
+        android:id="@+id/tools_progressBar_egm96_m150"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />  
+</TableLayout>

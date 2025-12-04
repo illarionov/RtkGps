@@ -11,13 +11,13 @@
 		<TableRow
 	    	android:layout_width="wrap_content"
 	    	android:layout_height="wrap_content"
-	    	android:paddingBottom="16dp" >
+	    	android:paddingBottom="0dp" >
 
-			<LinearLayout
+			<!--  <LinearLayout
 	        	android:layout_width="wrap_content"
 	        	android:layout_height="wrap_content"
 	        	android:layout_span="2"
-	        	android:orientation="horizontal" >
+	        	android:orientation="horizontal" >-->
 		
         		<TextView
         		    android:id="@+id/solution_title"
@@ -34,15 +34,50 @@
         	    	android:gravity="center"
         	    	android:layout_weight="1" />
         	
-        		<view class="ru0xdc.rtkgps.view.SolutionView$SolutionIndicatorView"
+        		<view class="gpsplus.rtkgps.view.SolutionView$SolutionIndicatorView"
         	    	android:id="@+id/solution_indicator_view"
         	    	android:layout_width="wrap_content"
         	    	android:layout_height="wrap_content"
         	    	android:layout_gravity="center"
         	     	/>
-        	</LinearLayout>
+        	<!--   </LinearLayout> -->
     	</TableRow>
-
+		<TableRow
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content" >
+			<TextView
+				android:id="@+id/coordinate_system_title"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/solution_view_crs"			
+				android:minEms="2"
+				/>
+			<TextView
+				android:id="@+id/coordinate_system"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:gravity="right"
+				android:minEms="8"
+				/>
+		</TableRow>
+		<TableRow
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content" >
+			<TextView
+				android:id="@+id/geoid_model_title"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/solution_view_geoid"
+				android:minEms="3"
+				/>
+			<TextView
+				android:id="@+id/geoid_model"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:gravity="right"
+				android:minEms="7"
+				/>
+        </TableRow>
 		<TableRow
 	    	android:layout_width="wrap_content"
 	    	android:layout_height="wrap_content" >
@@ -96,6 +131,25 @@
 
             <TextView
                 android:id="@+id/coord3_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:minEms="7"
+                />
+        </TableRow>
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+			<TextView
+                android:id="@+id/coord4_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minEms="3"
+                />
+
+            <TextView
+                android:id="@+id/coord4_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="right"

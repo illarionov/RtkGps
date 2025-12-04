@@ -1,0 +1,2 @@
+#!/bin/sh
+export PATH=$PATH:~/Development/android-toolchain/arm/bin/:~/Development/android-toolchain/arm64/bin/:~/Development/android-toolchain/x86/bin/:~/Development/android-toolchain/x86_64/bin/

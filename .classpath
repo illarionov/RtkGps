@@ -2,6 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs/osmdroid-android-4.2.jar" sourcepath="/Users/rlemeill/Development/osmdroid-4.2/osmdroid-android-4.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/Users/rlemeill/Development/osmdroid-4.2/osmdroid-android-4.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="src" path=".apt_generated">
@@ -10,5 +15,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/google-play-services_lib"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JScience"/>
+	<classpathentry kind="lib" path="libs/d2xx.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

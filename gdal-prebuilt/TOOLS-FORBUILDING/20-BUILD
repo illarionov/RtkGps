@@ -1,0 +1,76 @@
+#!/bin/sh
+BASE=$HOME/Development/Android
+GDAL=gdal-2.3.1
+TOOLCHAIN_BASE=~/Development/android-toolchain
+    if [ "$1" = "x86_64" ]; then
+            ARCHBASE=x86_64
+            ARCHANDROID=x86_64-linux-android
+            ARCHDEST=x86_64
+            FLAG=""
+            LDFLAG=""
+    elif [ "$1" = "x86" ]; then
+            ARCHBASE=x86
+            ARCHANDROID=i686-linux-android
+            ARCHDEST=x86
+            FLAG=""
+            LDFLAG=""
+    elif [ "$1" = "arm" ]; then
+            ARCHBASE=arm
+            ARCHANDROID=arm-linux-androideabi
+            ARCHDEST=armeabi-v7a
+            FLAG="-fexceptions -mthumb "
+            LDFLAG="-L$TOOLCHAIN_BASE/$ARCHBASE/arm-linux-androideabi/lib/armv7-a/thumb/ -lc++_static -lc++abi "
+    elif [ "$1" = "arm64" ];then
+            ARCHBASE=arm64
+            ARCHANDROID=aarch64-linux-android
+            ARCHDEST=arm64-v8a
+            FLAG=""
+            LDFLAG=""
+    else
+        echo "ONLY x86_64 x86 arm or arm64 parameter"
+        exit 1
+    fi
+
+PREBUILT=$BASE/$GDAL/gdal-prebuilt/$ARCHBASE/lib/
+mkdir -p $BASE/$GDAL/gdal-prebuilt/$ARCHBASE/jni/jniwrap
+LDFLAGS="$LDFLAG " CFLAGS="-fPIC -pthread -pie -isystem $TOOLCHAIN_BASE/$ARCHBASE/include/c++/4.9.x $FLAG " CXXFLAGS="-fPIC -pthread -pie -frtti -isystem $TOOLCHAIN_BASE/$ARCHBASE/include/c++/4.9.x $FLAG" \
+            ./configure --host=$ARCHANDROID --prefix=`pwd`/gdal-prebuilt/$ARCHDEST/ --without-gif --with-python=no --with-java=no --with-libz=internal --with-threads=yes --without-libtool
+if [ $? -ne 0 ] ;then
+        exit 1
+fi            
+make -j16 lib-target
+echo "#################################################"
+echo ""
+echo ""
+rm -f libgdal.a libgdal.so
+$ARCHANDROID-ar r $BASE/$GDAL/libgdal.a $BASE/$GDAL/frmts/o/*.o $BASE/$GDAL/gcore/*.o $BASE/$GDAL/port/*.o $BASE/$GDAL/alg/*.o $BASE/$GDAL/apps/commonutils.o $BASE/$GDAL/apps/gdalinfo_lib.o $BASE/$GDAL/apps/gdal_translate_lib.o $BASE/$GDAL/apps/gdalwarp_lib.o $BASE/$GDAL/apps/ogr2ogr_lib.o $BASE/$GDAL/apps/gdaldem_lib.o $BASE/$GDAL/apps/nearblack_lib.o $BASE/$GDAL/apps/gdal_grid_lib.o $BASE/$GDAL/apps/gdal_rasterize_lib.o $BASE/$GDAL/apps/gdalbuildvrt_lib.o $BASE/$GDAL/ogr/ogrsf_frmts/o/*.o $BASE/$GDAL/gnm/*.o $BASE/$GDAL/gnm/gnm_frmts/o/*.o ./ogr/ogrgeometryfactory.o ./ogr/ogrpoint.o ./ogr/ogrcurve.o ./ogr/ogrlinestring.o ./ogr/ogrlinearring.o ./ogr/ogrpolygon.o ./ogr/ogrtriangle.o ./ogr/ogrutils.o ./ogr/ogrgeometry.o ./ogr/ogrgeometrycollection.o ./ogr/ogrmultipolygon.o ./ogr/ogrsurface.o ./ogr/ogrpolyhedralsurface.o ./ogr/ogrtriangulatedsurface.o ./ogr/ogrmultipoint.o ./ogr/ogrmultilinestring.o ./ogr/ogrcircularstring.o ./ogr/ogrcompoundcurve.o ./ogr/ogrcurvepolygon.o ./ogr/ogrcurvecollection.o ./ogr/ogrmulticurve.o ./ogr/ogrmultisurface.o ./ogr/ogr_api.o ./ogr/ogrfeature.o ./ogr/ogrfeaturedefn.o ./ogr/ogrfeaturequery.o ./ogr/ogrfeaturestyle.o ./ogr/ogrfielddefn.o ./ogr/ogrspatialreference.o ./ogr/ogr_srsnode.o ./ogr/ogr_srs_proj4.o ./ogr/ogr_fromepsg.o ./ogr/ogrct.o ./ogr/ogr_opt.o ./ogr/ogr_srs_esri.o ./ogr/ogr_srs_pci.o ./ogr/ogr_srs_usgs.o ./ogr/ogr_srs_dict.o ./ogr/ogr_srs_panorama.o ./ogr/ogr_srs_ozi.o ./ogr/ogr_srs_erm.o ./ogr/swq.o ./ogr/swq_expr_node.o ./ogr/swq_parser.o ./ogr/swq_select.o ./ogr/swq_op_registrar.o ./ogr/swq_op_general.o ./ogr/ogr_srs_validate.o ./ogr/ogr_srs_xml.o ./ogr/ograssemblepolygon.o ./ogr/ogr2gmlgeometry.o ./ogr/gml2ogrgeometry.o ./ogr/ogr_expat.o ./ogr/ogrpgeogeometry.o ./ogr/ogrgeomediageometry.o ./ogr/ogr_geocoding.o ./ogr/osr_cs_wkt.o ./ogr/osr_cs_wkt_parser.o ./ogr/ogrgeomfielddefn.o ./ogr/ograpispy.o ./ogr/ogr_xerces.o ./ogr/ogr_geo_utils.o
+$ARCHANDROID-g++ -shared -o libgdal.so  $BASE/$GDAL/frmts/o/*.o $BASE/$GDAL/gcore/*.o $BASE/$GDAL/port/*.o $BASE/$GDAL/alg/*.o $BASE/$GDAL/apps/commonutils.o $BASE/$GDAL/apps/gdalinfo_lib.o $BASE/$GDAL/apps/gdal_translate_lib.o $BASE/$GDAL/apps/gdalwarp_lib.o $BASE/$GDAL/apps/ogr2ogr_lib.o $BASE/$GDAL/apps/gdaldem_lib.o $BASE/$GDAL/apps/nearblack_lib.o $BASE/$GDAL/apps/gdal_grid_lib.o $BASE/$GDAL/apps/gdal_rasterize_lib.o $BASE/$GDAL/apps/gdalbuildvrt_lib.o $BASE/$GDAL/ogr/ogrsf_frmts/o/*.o $BASE/$GDAL/gnm/*.o $BASE/$GDAL/gnm/gnm_frmts/o/*.o ./ogr/ogrgeometryfactory.o ./ogr/ogrpoint.o ./ogr/ogrcurve.o ./ogr/ogrlinestring.o ./ogr/ogrlinearring.o ./ogr/ogrpolygon.o ./ogr/ogrtriangle.o ./ogr/ogrutils.o ./ogr/ogrgeometry.o ./ogr/ogrgeometrycollection.o ./ogr/ogrmultipolygon.o ./ogr/ogrsurface.o ./ogr/ogrpolyhedralsurface.o ./ogr/ogrtriangulatedsurface.o ./ogr/ogrmultipoint.o ./ogr/ogrmultilinestring.o ./ogr/ogrcircularstring.o ./ogr/ogrcompoundcurve.o ./ogr/ogrcurvepolygon.o ./ogr/ogrcurvecollection.o ./ogr/ogrmulticurve.o ./ogr/ogrmultisurface.o ./ogr/ogr_api.o ./ogr/ogrfeature.o ./ogr/ogrfeaturedefn.o ./ogr/ogrfeaturequery.o ./ogr/ogrfeaturestyle.o ./ogr/ogrfielddefn.o ./ogr/ogrspatialreference.o ./ogr/ogr_srsnode.o ./ogr/ogr_srs_proj4.o ./ogr/ogr_fromepsg.o ./ogr/ogrct.o ./ogr/ogr_opt.o ./ogr/ogr_srs_esri.o ./ogr/ogr_srs_pci.o ./ogr/ogr_srs_usgs.o ./ogr/ogr_srs_dict.o ./ogr/ogr_srs_panorama.o ./ogr/ogr_srs_ozi.o ./ogr/ogr_srs_erm.o ./ogr/swq.o ./ogr/swq_expr_node.o ./ogr/swq_parser.o ./ogr/swq_select.o ./ogr/swq_op_registrar.o ./ogr/swq_op_general.o ./ogr/ogr_srs_validate.o ./ogr/ogr_srs_xml.o ./ogr/ograssemblepolygon.o ./ogr/ogr2gmlgeometry.o ./ogr/gml2ogrgeometry.o ./ogr/ogr_expat.o ./ogr/ogrpgeogeometry.o ./ogr/ogrgeomediageometry.o ./ogr/ogr_geocoding.o ./ogr/osr_cs_wkt.o ./ogr/osr_cs_wkt_parser.o ./ogr/ogrgeomfielddefn.o ./ogr/ograpispy.o ./ogr/ogr_xerces.o ./ogr/ogr_geo_utils.o
+mkdir -p $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/lib$ARCHBASE/
+mkdir -p $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/bin/
+cp libgdal.a $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/lib$ARCHBASE/
+cp libgdal.so $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/lib$ARCHBASE/
+make install-static-lib
+cp $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/lib$ARCHBASE/libgdal.a .
+rm -f $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/lib
+mkdir -p $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/lib/
+cp libgdal.a $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/lib/
+cp libgdal.so $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/lib/
+echo "#################################################"
+echo ""
+echo ""
+make
+echo "#################################################"
+echo ""
+echo ""
+cd apps; make ; cp gdalinfo gdal_contour  gdal_grid gdal_rasterize gdal_translate gdal_config gdaltransform gdalwrap $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/bin/ ; cd $BASE/$GDAL
+echo "#################################################"
+echo ""
+echo ""
+cd swig
+make
+cd java
+make
+find . -name "*.rej" | xargs rm -f
+cd $BASE/$GDAL
+cp swig/java/*_wrap.cpp swig/java/gdalconst_wrap.c $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/jni/
+cp -R swig/java/org $BASE/$GDAL/gdal-prebuilt/$ARCHDEST/jni/jniwrap

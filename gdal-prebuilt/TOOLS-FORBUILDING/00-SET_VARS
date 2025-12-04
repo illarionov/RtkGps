@@ -1,0 +1,24 @@
+#!/bin/sh
+BASE=$HOME/Development/Android
+GDAL=gdal-2.3.1
+PREBUILT=$BASE/$GDAL/gdal-prebuilt/$ARCHBASE/lib/
+TOOLCHAIN_BASE=~/Development/android-toolchain
+    if [ "$1" = "x86_64" ]; then
+            ARCHBASE=x86_64
+            ARCHANDROID=x86_64-linux-android
+            ARCHDEST=x86_64
+    elif [ "$1" = "x86" ]; then
+            ARCHBASE=x86
+            ARCHANDROID=i686-linux-android
+            ARCHDEST=x86
+    elif [ "$1" = "arm" ]; then
+            ARCHBASE=arm
+            ARCHANDROID=arm-linux-androideabi
+            ARCHDEST=armeabi-v7a
+    elif [ "$1" = "arm64" ];then
+            ARCHBASE=arm64
+            ARCHANDROID=aarch64-linux-android
+            ARCHDEST=arm64-v8a
+    else
+        echo "ONLY x86_64 x86 arm or arm64 parameter"
+    fi

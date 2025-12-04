@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="http://schemas.android.com/apk/res/ru0xdc.rtkgps"
+    xmlns:custom="http://schemas.android.com/apk/res/gpsplus.rtkgps"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
         android:clipChildren="false"
         android:gravity="center_vertical" >
 
-        <ru0xdc.rtkgps.view.GTimeView
+        <gpsplus.rtkgps.view.GTimeView
             android:id="@+id/gtimeView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -27,13 +27,13 @@
             android:maxLines="1"
             custom:time_format="gps_tow" />
 
-        <ru0xdc.rtkgps.view.StreamIndicatorsView
+        <gpsplus.rtkgps.view.StreamIndicatorsView
             android:id="@+id/streamIndicatorsView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-	<ru0xdc.rtkgps.view.SolutionView
+	<gpsplus.rtkgps.view.SolutionView
 		android:id="@+id/solutionView"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"

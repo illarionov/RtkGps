@@ -44,12 +44,41 @@ static void RtkCommon_dops(JNIEnv* env, jclass clazz, jdoubleArray j_azel, jint 
 	 dst[0], dst[1], dst[2], dst[3]);
 }
 
+static jint RtkCommon_opengeoid(JNIEnv* env, jclass clazz, jint model, jstring geoid_filename)
+{
+	const char *filename = (*env)->GetStringUTFChars(env, geoid_filename, 0);
+	int ret = opengeoid(model,filename);
+	(*env)->ReleaseStringUTFChars(env,geoid_filename, filename);
+	return (jint)ret;
+}
+
+static void RtkCommon_closegeoid(JNIEnv* env, jclass class)
+{
+	closegeoid();
+}
+
 static jdouble RtkCommon_geoidh(JNIEnv* env, jclass clazz, jdouble j_lat, jdouble j_lon)
 {
    double pos[2] = {j_lat, j_lon};
    return (jdouble)geoidh(pos);
 }
 
+static jdouble RtkCommon_geoidh_from_external_model(JNIEnv* env, jclass clazz, jdouble j_lat, jdouble j_lon, jint model, jstring geoid_filename)
+{
+   double pos[2] = {j_lat, j_lon};
+   const char *filename = (*env)->GetStringUTFChars(env, geoid_filename, 0);
+   if (model != GEOID_EMBEDDED)
+   {
+	   int r = opengeoid(model,filename);
+   }
+   jdouble correction = (jdouble)geoidh(pos);
+   if (model != GEOID_EMBEDDED)
+   {
+	   closegeoid();
+   }
+   (*env)->ReleaseStringUTFChars(env,geoid_filename, filename);
+   return correction;
+}
 
 static void RtkCommon__ecef2pos(JNIEnv* env, jclass clazz, jdouble x,
       jdouble y, jdouble z, jdoubleArray j_pos)
@@ -104,7 +133,7 @@ static void RtkCommon__deg2dms(JNIEnv* env, jclass clazz, jdouble j_deg,
       jdoubleArray j_dst)
 {
    double dms[3];
-   deg2dms(j_deg, dms);
+   deg2dms(j_deg, dms, 5);  //  Modif Mathieu Peyréga : adapt to new 2.4.3b26 API
    (*env)->SetDoubleArrayRegion(env, j_dst, 0, 3, dms);
 }
 
@@ -126,23 +155,77 @@ static jdouble RtkCommon_norm(JNIEnv* env, jclass clazz, jdoubleArray j_a)
    return res;
 }
 
+/* see
+ * extern int reppath(const char *path, char *rpath, gtime_t time, const char *rov, const char *base)
+ */
+static jstring RtkCommon_reppath(JNIEnv* env, jclass clazz, jstring inPath, jlong time, jstring roverId, jstring baseId){
+	char remote[1024];
+	jstring result;
+	gtime_t now;
+
+	const char *path = (*env)->GetStringUTFChars(env, inPath, 0);
+	const char *rover = (*env)->GetStringUTFChars(env, roverId, 0);
+	const char *base = (*env)->GetStringUTFChars(env, baseId, 0);
+
+	now.sec=0.0;
+	now.time=time;
+
+	reppath(path,remote,now,rover,base);
+
+	(*env)->ReleaseStringUTFChars(env,inPath, path);
+	(*env)->ReleaseStringUTFChars(env,roverId, rover);
+	(*env)->ReleaseStringUTFChars(env,baseId, base);
+	result = (*env)->NewStringUTF(env,remote);
+	return result;
+}
+
+static jobjectArray RtkCommon_getantlist(JNIEnv* env, jclass thiz, jstring file)
+{
+	jobjectArray ret;
+	pcvs_t pcvs={0};
+	char *p;
+	const char *path = (*env)->GetStringUTFChars(env, file, 0);
+	int i;
+
+	if(!readpcv(path,&pcvs)) {
+		return ret;
+	}
+
+	ret = (jobjectArray)(*env)->NewObjectArray(env,pcvs.n,(*env)->FindClass(env,"java/lang/String"),(*env)->NewStringUTF(env,""));
+	for(i=0;i<pcvs.n;i++) {
+		if (pcvs.pcv[i].sat) continue;
+		if ((p=strchr(pcvs.pcv[i].type,' '))) *p='\0';
+		if (i>0&&!strcmp(pcvs.pcv[i].type,pcvs.pcv[i-1].type)) continue;
+
+		(*env)->SetObjectArrayElement(env,ret,i,(*env)->NewStringUTF(env,pcvs.pcv[i].type));
+	}
+
+	(*env)->ReleaseStringUTFChars(env,file, path);
+	return(ret);
+}
+
 static JNINativeMethod nativeMethods[] = {
    {"getSatId", "(I)Ljava/lang/String;", (void*)RtkCommon_get_sat_id},
-   {"dops", "([DIDLru0xdc/rtklib/RtkCommon$Dops;)V", (void*)RtkCommon_dops},
+   {"dops", "([DIDLgpsplus/rtklib/RtkCommon$Dops;)V", (void*)RtkCommon_dops},
+   {"opengeoid", "(ILjava/lang/String;)I",(void*)RtkCommon_opengeoid},
+   {"closegeoid", "()V",(void*)RtkCommon_closegeoid},
    {"geoidh", "(DD)D", (void*)RtkCommon_geoidh},
+   {"geoidh_from_external_model","(DDILjava/lang/String;)D",(void*)RtkCommon_geoidh_from_external_model},
    {"_deg2dms", "(D[D)V", (void*)RtkCommon__deg2dms},
    {"norm", "([D)D", (void*)RtkCommon_norm},
    {"_ecef2pos", "(DDD[D)V", (void*)RtkCommon__ecef2pos},
    {"_ecef2enu", "(DD[D[D)V", (void*)RtkCommon__ecef2enu},
    {"_pos2ecef", "(DDD[D)V", (void*)RtkCommon__pos2ecef},
    {"_covenu", "(DD[D[D)V", (void*)RtkCommon__covenu},
+   {"_reppath", "(Ljava/lang/String;JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;",(void*)RtkCommon_reppath},
+   {"_getantlist", "(Ljava/lang/String;)[Ljava/lang/String;", (void*)RtkCommon_getantlist}
 };
 
 int registerRtkCommonNatives(JNIEnv* env) {
     int result = -1;
 
     /* look up the class */
-    jclass clazz = (*env)->FindClass(env, "ru0xdc/rtklib/RtkCommon");
+    jclass clazz = (*env)->FindClass(env, "gpsplus/rtklib/RtkCommon");
 
     if (clazz == NULL)
        return JNI_FALSE;

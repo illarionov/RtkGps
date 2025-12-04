@@ -1,0 +1,39 @@
++++ DECLARACION DE RESPONSABILIDAD +++ 
+ESTA ES UNA VERSIÓN ALFA
+He recibido algunas peticiones para pasarlo a una versión de producción, desde mi punto de vista funciona, pero esta versión carece de algunas pruebas extensas.
+Sin embargo lo cambié al público con este aviso.
+
+Como ocurre en todas las versiones ALFA, son de esperar actualizaciones frecuentes.
+SE PROPORCIONA TAL CUAL...
+SIN NINGÚN TIPO DE GARANTÍA.
+++++++++++++++++++++++++++++++++++++++
+
+Android RTKLIB frontend.
+
+el código fuente puede descargarse en https://github.com/eltorio/RtkGps
+
+Fuertemente basado en el RtkGps de Alexey Illarionov, este es un fork de su trabajo. Él ha permitido explícitamente la modificación y la redistribución de su trabajo, siempre con la inclusión de su copyright. La licencia original se encuentra en la pantalla "Acerca de/Información Legal". Gracias a todos los colaboradores por respetar esta cláusula de la licencia original.
+
+Como no ha sacado ninguna nueva versión, he revisado el código para agregar algunas características que necesito:
+
+1 - Mostrar la altitud en la pantalla de estado.
+       para activar esto debes elegir altura: geodésica en la vista "Opciones de la solución"
+2 - enviar posiciones ficticias para otras aplicaciones.
+       esta opción se configura en la pestaña "Opciones de la solución" , pero sólo funcionará si están habilitadas las "Mock locations", en la configuración de Android.
+       today (in 1.0alpha26) the mock locations are not usable in the Google map API.
+3- Preliminary support for Trimble SpectraPrecision MobileMapper 50 internal chipset
+3b- Records .urw .crw .map and .shp compatibles with Trimble MobileMapper Office.
+4 - se puede generar un archivo gpx de un recorrido
+5 - puede mostrar el resultado en ECEF, WGS84 Lat/Lon, NAD83, 93 Lambert (RGF93) o un sistema de coordenadas UTM (con huso automático)
+5B - uso cualquier de proyección Proj4
+6 - se puede mostrar la altura elipsoidal o la altitud geodésica (utilizando diferentes modelos de geoide, consulte: https://github.com/eltorio/RtkGps para instalar un modelo de geoide)
+7 - Utilice cualquier GNSS compatible con RTKLIB con salida conectada vía USB (ACM/PL2303/FTDI), Bluetooth, TCP/IP o NTRIP
+8 - puede mostrar algunos mapas del Geoportal francés IGN (catastro, satélite, carreteras), de OpenStreetMap Mapnik o Bing (satélite, carreteras).
+9- can download and use IGS GPS ultra-rapid ephemeris from NASA or IGN or ESU GPS+GLONASS ephemeris form ESA
+
+This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
+Esta aplicación puede calcular posiciones GNSS precisas utilizando algoritmos de RTKLIB (RTK o PPP) pero se debe utilizar un receptor GNSS - externo - con salida de datos brutos.
+Éstos no son receptores GPS "estándar" como los que llevan los teléfonos o los coches. El más barato que puede encontrar es un modelo como el uBlox LEA-6T.
+NO HAY NINGUNA MANERA de usar los receptores GPS que se encuentran en los Samsung Galaxy(s), ni en cualquier otro teléfono que yo conozca.
+
+Pero hay un modo especial de prueba que utiliza el GPS interno, solo para probar, obviamente ningun algoritmo de precisión que se encuentra en RTKLIB se puede utilizar.

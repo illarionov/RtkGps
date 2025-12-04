@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="invite_translation_title"><![CDATA[<div class=\'title\'>%s translation is missing!</div>\n]]></string>
+    <string name="invite_translation_subtitle"><![CDATA[<div class=\'subtitle\'>You can contribute to the translation</div>\n]]></string>
+    <string name="invite_translation_message"><![CDATA[<div class=\'freetext\' style=\'text-align:center\'>Translation in your language is missing or incomplete.<br />If you want to participate to the translation,<br />please join us at<br /><a href=\'https://crowdin.com/project/gpsplusrtkgps/invite?\'>RTKGPS+ translation</a></div>\n]]></string>
+    <string name="about_translation_title">%s translation is missing!</string>
+    <string name="about_translation_subtitle">You can contribute to the translation</string>
+    <string name="about_translation_message">please join us at\n</string>
+    <string name="about_translation_link"><![CDATA[<a href=\'https://crowdin.com/project/gpsplusrtkgps/invite\'>RTKGPS+ translation</a>]]></string>
+</resources>

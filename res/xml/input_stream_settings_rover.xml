@@ -5,7 +5,7 @@
         android:key="enable"
         android:title="@string/input_streams_settings_enable_rover_title" />
     
-    <ru0xdc.rtkgps.settings.widget.StreamTypePreference
+    <gpsplus.rtkgps.settings.widget.StreamTypePreference
         android:key="type"
         android:title="@string/streams_settings_type_title"
         android:dependency="enable" />
@@ -16,11 +16,17 @@
         android:title="@string/streams_settings_button_title"
         android:persistent="false" />
     
-    <ru0xdc.rtkgps.settings.widget.StreamFormatPreference
+    <gpsplus.rtkgps.settings.widget.StreamFormatPreference
         android:key="format"
         android:title="@string/streams_settings_format_title"
         android:dependency="enable" />
 
+    <ListPreference android:key="antenna"
+            android:title="@string/input_streams_setting_antenna_title" 
+            android:dialogTitle="@string/input_streams_setting_antenna_summary"
+            android:defaultValue="" 
+            android:dependency="enable"/>
+    
 	<Preference
         android:key="commands_at_startup_shutdown_button"
         android:dependency="enable"

@@ -1,0 +1,39 @@
++++++++++++++ 免责声明 ++++++++++++++ 
+目前这个版本还仅仅是ALPHA
+很多人希望我尽快发布一个实用的版本，但是，从我的角度来看，虽然它可以用起来，但仍然缺少完整的测试。
+因此，我加入了本免责声明并发布该版本。
+
+由于还是ALPHA阶段，升级会比较频繁。
+只是提供给大家测试。
+不作任何保证。
+++++++++++++++++++++++++++++++++++++++
+
+Android上的RTKLIB应用
+
+所有源代码可以在这里下载: https://github.com/eltorio/RtkGps
+
+这个项目很大程度上是基于Alexey Illarionov的RtkGps项目，可以说是他的项目的分支。 他明确地允许在声明他得版权的情况下修改和重新分发他的作品。 你会在"关于/版权信息"页面中看到原始的许可条款。 感谢所有代码贡献者尊重这个原始的许可条款。
+
+在后续更新停止后，我重新开始维护并增加一些我需要的功能:
+
+1- 在状态视图中显示高度。
+       如果需要这个功能，你需要在解算选项设置页面中选择“高度:大地 ”
+2- 发送模拟解算结果到其他应用程序
+       如果需要使用此功能，你需要在解算选项设置页面选择输出“模拟位置”。同时，你必须在Android系统设置中开发人员选项中，允许“模拟位置”。
+       today (in 1.0alpha26) the mock locations are not usable in the Google map API.
+3- Preliminary support for Trimble SpectraPrecision MobileMapper 50 internal chipset
+3b- Records .urw .crw .map and .shp compatibles with Trimble MobileMapper Office.
+4-可以生成gpx格式的轨迹文件
+5- 支持显示各种坐标格式，包括ECEF, WGS84经纬度, NAD83, Lambert 93 (RGF93) or UTM (自动计算投影区) 
+5b-支持Proj4投影
+6- 可以显示椭球面高度或大地测量高度（可以使用不同的大地水准面模型，请参阅：如何安装大地水准面模型 https://github.com/eltorio/RtkGps）
+7- 可以使用任何RTKLIB兼容的带原始数据输出的GNSS接收机，支持通过USB（ACM/PL2303/FTDI），蓝牙，TCP/IP或者NTRIP连接。
+8- 支持IGN Geoportail地图（地籍图、 卫星图、 道路图)， OpenStreetMap Mapnik，Bing 卫星，道路） 的地图。
+9- can download and use IGS GPS ultra-rapid ephemeris from NASA or IGN or ESU GPS+GLONASS ephemeris form ESA
+
+This software is a port of RTKLIB 2.4.3b29 developed by Tomoki Takasu (http://www.rtklib.com), if you do not know what this application is; this application is probably not what you are looking for!
+这个软件可以通过RTKLIB的算法（RTK/PPP）进行精密的GPS定位，但前提你需要有一个带原始载波数据输出的外置GPS接收机。
+它并不像你平常看到的内置在你的手机或者你的车里面的普通GPS，在市面上你能找到能用的最便宜一种是类似uBlox的LEA-6T这种模块。
+不管怎样，反正你不可能用Google Nexus或者任何我见过的手机里面的GPS来使用本软件。
+
+但是，出于测试的需要，我仍然提供了一个TEST模式来使用内置GPS，很显然，这种情况下RTKLIB的高精度算法是不起作用的。

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rtkgps="http://schemas.android.com/apk/res/ru0xdc.rtkgps"
+    xmlns:rtkgps="http://schemas.android.com/apk/res/gpsplus.rtkgps"
     android:id="@+id/map_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
-	<ru0xdc.rtkgps.view.StreamIndicatorsView
+	<gpsplus.rtkgps.view.StreamIndicatorsView
 	    android:id="@+id/streamIndicatorsView"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
 	    android:paddingRight="5dp"
 	    android:paddingTop="5dp">
 	    
-		<ru0xdc.rtkgps.view.GTimeView
+		<gpsplus.rtkgps.view.GTimeView
 		    android:id="@+id/gtimeView"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
 		    android:textColor="@android:color/white"
 		    rtkgps:time_format="local" />
 	
-		<ru0xdc.rtkgps.view.SolutionView
+		<gpsplus.rtkgps.view.SolutionView
 		    android:id="@+id/solutionView"
 		    android:layout_width="wrap_content"
 		    rtkgps:textColor="@android:color/white"

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:key="ntripcaster_enabled"
+        android:summary="@string/ntripcaster_options_enabled_summary"
+        android:title="@string/ntripcaster_options_enabled_title" 
+        android:defaultValue="false"/>
+    
+    <CheckBoxPreference
+        android:key="ntripcaster_force_brutal_ending"
+        android:summary="@string/ntripcaster_options_brutal_ending_summary"
+        android:title="@string/ntripcaster_options_brutal_ending_title" 
+        android:defaultValue="true"/>
+    
+</PreferenceScreen>
